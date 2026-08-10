@@ -492,8 +492,8 @@ As-is, this is not enough equations ($4 < \gls{sym-N}+2\gls{sym-M}+\gls{sym-K}$)
 We must leverage eigenfunction orthogonality to get enough equations.
 The first equation will turn into $\gls{sym-N}$ equations; the second and third each give $\gls{sym-M}$; the fourth $\gls{sym-K}$.
 The transformation uses the following property of orthogonality.
-Consider a generic function $\gls{sym-Y}(\gls{sym-x})$ expressed as a series with coefficients $\gls{sym-alpha}$ and basis functions $e(\gls{sym-x})$: $\gls{sym-Y}(\gls{sym-x})=\sum_i \gls{sym-alpha-i} \gls{sym-e-i}(\gls{sym-x})$.
-If $\gls{sym-e-j}(\gls{sym-x})$ is orthogonal to $\gls{sym-e-i}(\gls{sym-x})$ from $\gls{sym-x} = \gls{sym-a}$ to $\gls{sym-b}$, then:
+Consider a generic function $\gls{sym-Y}(x)$ expressed as a series with coefficients $\gls{sym-alpha}$ and basis functions $e(x)$: $\gls{sym-Y}(x)=\sum_i \gls{sym-alpha-i} \gls{sym-e-i}(x)$.
+If $\gls{sym-e-j}(x)$ is orthogonal to $\gls{sym-e-i}(x)$ from $x = \gls{sym-a}$ to $\gls{sym-b}$, then:
 
 \begin{equation}
 \begin{aligned}
@@ -518,7 +518,7 @@ Other combinations of eigenfunction multiplication or integration besides those 
 
 \subsection{Block Matrix Structure}
 
-Once orthogonality is applied, the matching equations create a linear system $\gls{sym-A}\gls{sym-vec-x}=\gls{sym-vec-b}$ where $\gls{sym-A}$ is a complex sparse $(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$x$(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$ square matrix corresponding to the homogeneous case, $\gls{sym-vec-x}=[\gls{sym-vec-C-1n-i1}, \gls{sym-vec-C-1m-i2}, \gls{sym-vec-C-2m-i2}, \vec{\gls{sym-B}_{\gls{sym-k-index}}^{e}}]$ is the complex eigencoefficient vector, and $\gls{sym-vec-b}$ is the real boundary condition vector corresponding to the particular case.
+Once orthogonality is applied, the matching equations create a linear system $\gls{sym-mathbf-A}\gls{sym-vec-x}=\gls{sym-vec-b}$ where $\gls{sym-mathbf-A}$ is a complex sparse $(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$x$(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$ square matrix corresponding to the homogeneous case, $\gls{sym-vec-x}=[\gls{sym-vec-C-1n-i1}, \gls{sym-vec-C-1m-i2}, \gls{sym-vec-C-2m-i2}, \vec{\gls{sym-B}_{\gls{sym-k-index}}^{e}}]$ is the complex eigencoefficient vector, and $\gls{sym-vec-b}$ is the real boundary condition vector corresponding to the particular case.
 We elaborate on the block structure of the A-matrix and b-vector, an implementation detail that prior discussion of MEEM overlooks.
 The A-matrix and b-vector block structures are shown in \Cref{tab:MEEM-A-matrix,tab:MEEM-b-vector} respectively.
 They are written in compact notation using row vectors of basis functions, so $\gls{sym-vec-R-1n-i1}=[R_{10}^{i1}, R_{11}^{i1},\dots, R_{1(N-1)}^{i1}]$ and so on.
@@ -675,7 +675,7 @@ The third and fourth integrals of \Cref{eq:meem-c-derivation} vanish, and the se
 The first and second term are independent of and scale linearly with the eigencoefficients $\gls{sym-vec-x}$, respectively.
 The radiation coefficients are thus computed as
 \begin{equation}\label{eq:hydro}
-    \gls{sym-A-h} + \frac{i\gls{sym-B-h}}{\gls{sym-omega}}=2\gls{sym-pi} \gls{sym-rho} \gls{sym-h}^3 (\gls{sym-c-0} + \gls{sym-vec-c}\cdot\gls{sym-vec-x}) =2\gls{sym-pi} \gls{sym-rho} \gls{sym-h}^3 (\gls{sym-c-0} + \gls{sym-vec-c} \cdot \gls{sym-A}^{-1} \gls{sym-vec-b})
+    \gls{sym-A-h} + \frac{i\gls{sym-B-h}}{\gls{sym-omega}}=2\gls{sym-pi} \gls{sym-rho} \gls{sym-h}^3 (\gls{sym-c-0} + \gls{sym-vec-c}\cdot\gls{sym-vec-x}) =2\gls{sym-pi} \gls{sym-rho} \gls{sym-h}^3 (\gls{sym-c-0} + \gls{sym-vec-c} \cdot \gls{sym-mathbf-A}^{-1} \gls{sym-vec-b})
 \end{equation}
 with output constant $\gls{sym-c-0}$ and output row vector $\gls{sym-vec-c}$ defined in \Cref{eq:c0,tab:MEEM-c-vector} respectively:
 \begin{equation}\label{eq:c0}

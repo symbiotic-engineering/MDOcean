@@ -451,22 +451,22 @@ These dimensions are shown in \Cref{fig:trapezoid}.
 To approximately capture the dimensions of a trapezoid, which effectively set the deflection curvature and therefore stress, $x_{\text{min}}$ is set to the diameter of the largest circle that can be inscribed in the trapezoid tangent to the shorter base $b_1$.
 This inscribed circle scheme satisfies all limit cases mentioned above and can be calculated as
 \begin{equation}
-    \gls{sym-x}_{\text{min}} = \begin{cases}\gls{sym-b-1} \left( \gls{sym-m} + \sqrt{1+\gls{sym-m}^2}\right), & \gls{sym-h-0} \geq \sqrt{\gls{sym-b}_1b_2} \\ \gls{sym-h-0}, & \gls{sym-h-0} < \sqrt{\gls{sym-b}_1b_2}\end{cases}
+    \gls{sym-x-min} = \begin{cases}\gls{sym-b-1} \left( \gls{sym-m} + \sqrt{1+\gls{sym-m}^2}\right), & \gls{sym-h-0} \geq \sqrt{\gls{sym-b}_1b_2} \\ \gls{sym-h-0}, & \gls{sym-h-0} < \sqrt{\gls{sym-b}_1b_2}\end{cases}
 \end{equation}
 where $m=(b_2-b_1)/(2h_0)$ is the slope of the trapezoid.
 The expression is continuous at $h_0=\sqrt{b_1b_2}$, the point where the inscribed circle becomes tangent to base $b_2$ in addition to $b_1$.
 Continuity of the model across the design space avoids problems in the gradient-based optimization due to undefined gradients.
-The inscribed circle model gives $x_{\text{min}}\approx2.2$~\gls{sym-m} for the nominal float design.
-In addition to the shorter side length $x_{\text{min}}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $x_{\text{max}}$, which for the trapezoid is taken as
+The inscribed circle model gives $\gls{sym-x-min}\approx2.2$~\gls{sym-m} for the nominal float design.
+In addition to the shorter side length $\gls{sym-x-min}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $\gls{sym-x-max}$, which for the trapezoid is taken as
 \begin{equation}
-    \gls{sym-x}_{\text{max}} = \begin{cases} \gls{sym-h-0},& \gls{sym-h-0} \geq \sqrt{\gls{sym-b}_1b_2} \\ \frac{\gls{sym-b-1}+\gls{sym-b-2}}{2} + \gls{sym-h}(1-\sqrt{1+\gls{sym-m}^2}), & \gls{sym-h-0} < \sqrt{\gls{sym-b-1} \gls{sym-b-2}}\end{cases}
+    \gls{sym-x-max} = \begin{cases} \gls{sym-h-0},& \gls{sym-h-0} \geq \sqrt{\gls{sym-b}_1b_2} \\ \frac{\gls{sym-b-1}+\gls{sym-b-2}}{2} + \gls{sym-h}(1-\sqrt{1+\gls{sym-m}^2}), & \gls{sym-h-0} < \sqrt{\gls{sym-b-1} \gls{sym-b-2}}\end{cases}
 \end{equation}
 using a similar inscribed circle scheme to maintain continuity.
 
 \subsubsection{Float Bottom Plate}
 Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then:
 \begin{equation}\label{eq:bottom-plate-moment}
-\gls{sym-M-bot}=\gls{sym-beta} \gls{sym-q} \gls{sym-x}_{\text{min}}^2
+\gls{sym-M-bot}=\gls{sym-beta} \gls{sym-q} \gls{sym-x-min}^2
 \end{equation}
 for $\beta$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
 While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
@@ -547,7 +547,9 @@ The Euler critical buckling force $F_{\text{crit}}$ is:
 \begin{equation}
     \gls{sym-F}_{\text{crit}} = \frac{\gls{sym-pi}^2 \gls{sym-E} \gls{sym-I}}{(\gls{sym-K-end} \gls{sym-L})^2}
 \end{equation}
-where $E$ is the Young'\gls{sym-s} modulus, $I$ is the second moment of area, $K_{end}=2$ is the end condition (fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface), and $L$ is the beam length, set to $h_s$ the full spar height.
+where $E$ is the Young's modulus, $I$ is the second moment of area, $K_{end}=2$ is the end condition
+(fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface),
+and $L$ is the beam length, set to $h_s$ the full spar height.
 The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
 \begin{equation}
     FOS = \frac{\gls{sym-sigma}_{\gls{sym-s},\text{max}}}{\gls{sym-sigma-s}} = \frac{\gls{sym-sigma-Y} \frac{\gls{sym-zeta-2} + \sqrt{\gls{sym-zeta-2}^2+4\gls{sym-omega-2}}}{2}}{\frac{\gls{sym-F}}{\gls{sym-A}} + \gls{sym-q}}
