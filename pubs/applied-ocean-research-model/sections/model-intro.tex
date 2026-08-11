@@ -141,11 +141,22 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     The method leverages the analytical Pontryagin Maximum Principle (PMP) and performs a case study to optimize a single geometric variable.
     A different PMP formulation \citep{abdulkadir_optimal_2024} incorporates PTO-constrained array dynamics, although it has not yet been used for design optimization.
 \else
-    Across these studies, the most directly relevant work falls into three groups.
-    First, several large-scale optimization studies \citep{gaudin_single_2021,khanal_multi-objective_2024,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} address one to four disciplines but invariably exclude either structures or powertrain.
-    Second, structural optimization of WECs is hampered by the cost of FEA \citep{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022}; the few WEC studies that perform structural optimization \citep{an_optimal_2024,ambuhl_reliability-based_2014} decouple it from power calculations.
-    Third, recent control co-design studies \citep{rosati_control_2023,son_performance_2016,gaebele_tpl_2025,devin_high-dimensional_2024,grasberger_control_2024,herber_dynamic_2014,lin_fast_2025,abdulkadir_optimal_2024} efficiently handle constraints via pseudo-spectral methods or analytical Pontryagin Maximum Principle, but none integrate structures or full economic costs.
-    The directly comparable RM3 study \citep{gaebele_tpl_2025} optimizes dimensional scale and PTO with control co-design but excludes structures.
+    Existing studies therefore tend to sacrifice disciplinary breadth and/or search space
+    in order to maintain computational tractability.
+
+    High-fidelity multidisciplinary models are generally too expensive for large-scale optimization.
+    For example, the cost of FEA means that most structural studies analyze rather than optimize
+    \citep{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022}.
+
+    Meanwhile, optimization-oriented models often omit structures, powertrain dynamics, or economic assessment.
+    The few WEC structural optimizations \citep{an_optimal_2024,ambuhl_reliability-based_2014} do not calculate power.
+    Large-scale optimizations invariably exclude either structures or powertrain include
+    \citep{gaudin_single_2021,khanal_multi-objective_2024,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022}.
+    Control co-design studies
+    \citep{rosati_control_2023,son_performance_2016,gaebele_tpl_2025,devin_high-dimensional_2024,grasberger_control_2024,herber_dynamic_2014,lin_fast_2025,abdulkadir_optimal_2024,gaebele_tpl_2025}
+    efficiently handle constraints via pseudo-spectral methods or analytical Pontryagin Maximum Principle,
+    but none integrate structures or full economic costs.
+    \citep{gaebele_tpl_2025} is directly comparable since it optimizes RM3 dimensional scale and PTO.
 \fi
 
 \paragraph{Software tools and gaps}
@@ -160,11 +171,11 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     This lack of a multidisciplinary WEC simulation platform that is sufficiently fast for optimization helps explain why no optimization study in \Cref{tab:lit} simultaneously optimizes the device geometry, structures, and powertrain.
 \else
     The two leading open-source WEC simulation tools illustrate the gap.
-    WEC-Sim \citep{ruehl_wec-simwec-sim_2024} is a time-domain simulator extensible to multidisciplinary studies via integrations (NEMOH/Capytaine for hydrodynamics, PTO-Sim for powertrain, MoorDyn for mooring), but is too slow for large-scale optimization \citep{housner_numerical_2024}.
+    WEC-Sim \citep{ruehl_wec-simwec-sim_2024} is a time-domain simulator extensible to multidisciplinary studies via integrations
+    (NEMOH/Capytaine for hydrodynamics, PTO-Sim for powertrain, MoorDyn for mooring),
+    but is too slow for large-scale optimization \citep{housner_numerical_2024}.
     WecOptTool \citep{coe_initial_2020} is a faster pseudospectral tool suitable for control co-design but currently limited to hydrodynamics and control.
-    A 2023 marine energy software assessment \citep{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \Cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain. 
-    
-    Existing studies therefore tend to sacrifice either disciplinary breadth or computational tractability: high-fidelity multidisciplinary models are generally too expensive for large-scale optimization, while optimization-oriented models often omit structures, powertrain dynamics, or economic assessment.
+    A 2023 marine energy software assessment \citep{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \Cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain.
     This tradeoff motivates the development of a computationally efficient framework capable of concurrently capturing the major techno-economic couplings governing WEC performance.
 \fi
 \begin{landscape}
@@ -293,6 +304,7 @@ For early-stage WEC design optimization, where the model must be run many thousa
 \else
     The directly comparable studies above either use slow numerical models that limit optimization scope (e.g.\ a BEM-based 4-WEC array optimization that took 36 hours per frequency on a high-end workstation \citep{khanal_multi-objective_2024}) or fast algebraic models that lack accuracy for meaningful design conclusions (e.g.\ \citep{mccabe_multidisciplinary_2022}).
     Semi-analytical models offer a useful intermediate that has not yet been combined with multidisciplinary scope in an open-source WEC tool, which is the gap MDOcean addresses.
+    \hl{Merge this section with the previous one, and just say that I can explain all the stuff in 1.2 by the type of model they use.}
 \fi
 
 \subsection{Paper Contributions and Roadmap}
