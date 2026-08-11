@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.4.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.1) - 2026-8-8
+## [v1.4.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.1) - 2026-8-11
 ### Added
 - Dissertation: AI acknowledgement, Cayuga nation land acknowledgement, and UTF-8 inputs for Cayuga special characters
 
