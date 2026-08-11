@@ -1,11 +1,11 @@
 # Changelog
 ## Unreleased
-### Fixed
-- Paper: avoid `geometry` and `hyperref` option clashes in Elsevier manuscript builds by conditionally loading these packages only for non-Elsevier document classes.
 
 ## [v1.4.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.2) - 2026-8-11
 ### Added
 - Figures: add a TikZ block diagram showing static analyses and dynamics including five two-ports
+### Fixed
+- Paper: avoid `geometry` and `hyperref` option clashes in Elsevier manuscript builds by conditionally loading these packages only for non-Elsevier document classes.
 
 ## [v1.4.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.1) - 2026-8-11
 ### Added
