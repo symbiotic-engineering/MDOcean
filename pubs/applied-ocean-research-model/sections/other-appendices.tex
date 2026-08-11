@@ -236,8 +236,8 @@ The radiation and drag efficiencies are defined relative to a drag-free simulati
 \mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}}, \qquad
 \mathbf{\eta}^{H,T}_{drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
 \end{equation}
-$\gls{sym-boldsymbol-eta-H-T}_{\text{drag}}$ may exceed 1 at frequencies where the drag-free system is so undamped that the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability; in such cases a sub-optimal controller is substituted, which lowers $\mathbf{\gls{sym-P}}_{F\gls{sym-dot-X},\text{no drag}}$ (the denominator) rather than raising the numerator.
-In cases where the unconstrained controller is stable, $\gls{sym-boldsymbol-eta-H-T}_{\text{drag}} \leq 1$ is guaranteed.
+$\gls{sym-boldsymbol-eta-H-T-drag}$ may exceed 1 at frequencies where the drag-free system is so undamped that the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability; in such cases a sub-optimal controller is substituted, which lowers $\mathbf{\gls{sym-P}}_{F\gls{sym-dot-X},\text{no drag}}$ (the denominator) rather than raising the numerator.
+In cases where the unconstrained controller is stable, $\gls{sym-boldsymbol-eta-H-T-drag} \leq 1$ is guaranteed.
 
 The product of the first four matrices is the theoretical ideal mechanical power:
 \begin{equation}
@@ -249,7 +249,7 @@ The remaining two efficiency matrices capture the loss to dynamic constraints an
     \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}.
 \end{equation}
 
-Although it would be possible to formulate alternative variants such as $\gls{sym-boldsymbol-eta-H-T}_{\text{drag},\text{var}} = \gls{sym-mathbf-P-IV}/\mathbf{\gls{sym-P}}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
+Although it would be possible to formulate alternative variants such as $\gls{sym-boldsymbol-eta-H-T-drag-var} = \gls{sym-mathbf-P-IV}/\mathbf{\gls{sym-P}}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
 The current decomposition preserves multiplicativity, which is the key advantage of the formulation in \Cref{eq:power-matrix-decomposition}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -276,8 +276,8 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
          1.3 - Mooring/Foundation&  3\%&  12\%&No\\
-         1.4 - Structural&  17\%&  46\%&$\gls{sym-V}_{\text{struct}}$\\
-         1.5 - Power Take Off&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
+         1.4 - Structural&  17\%&  46\%&$\gls{sym-V-struct}$\\
+         1.5 - Power Take Off&  4\%&  11\%&$\gls{sym-F-max}, \gls{sym-P-pk-elec}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
          1.7 - Installation&  34\%&  10\%&No\\
          1.8 - Decommissioning&  9\%&  9\%&No\\
@@ -297,7 +297,7 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
 \subsection{Power-Law Scaling with Number of Devices}
 \label{sec:appendix-econ-power-law}
 
-The per-WEC unit costs and prices in \Cref{eq:unit-cost} ($\gls{sym-C}_{\text{fixed}}$, $\gls{sym-C}_{pto,\text{constant}}$, $\gls{sym-p}_{\gls{sym-P}}$, $\gls{sym-p}_{\gls{sym-F}}$, $\gls{sym-p}_{\gls{sym-s}}$) each decrease with the number of devices $\gls{sym-N-WEC}$ according to
+The per-WEC unit costs and prices in \Cref{eq:unit-cost} ($\gls{sym-C-fixed}$, $\gls{sym-C-pto-constant}$, $\gls{sym-p}_{\gls{sym-P}}$, $\gls{sym-p}_{\gls{sym-F}}$, $\gls{sym-p}_{\gls{sym-s}}$) each decrease with the number of devices $\gls{sym-N-WEC}$ according to
 \begin{equation}\label{eq:cost-power-law}
     C = C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta},
 \end{equation}
@@ -382,7 +382,7 @@ Next, deflection of the stiffened plate is equal to the deflection of the equiva
 
 The maximum stress $\sigma$ of the stiffened plate is then:
 \begin{equation}\label{eq:plate-stress}
-    \gls{sym-sigma}= 12M \gls{sym-z}_{\text{max}}/\gls{sym-t-eq}^3
+    \gls{sym-sigma}= 12M \gls{sym-z-max}/\gls{sym-t-eq}^3
 \end{equation}
 where $M$ is the maximum moment per unit length and $z_{\text{max}}$ is the maximum distance from the neutral axis of the stiffened section.
 This parallels the stress for an unstiffened plate of thickness $t$, which is $\sigma=6M/t^2 = 12 M(t/2)/t^3$.
@@ -501,7 +501,7 @@ The 24 radial plate stiffeners are taken into account with the procedure describ
 The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $K_{\text{tube}}$.
 This results in the following expression for the radial plate bending stress $\sigma_r$:
 \begin{equation}
-    \gls{sym-sigma-r} =  \frac{\gls{sym-F}_{\text{heave}}}{\gls{sym-S-eq}} \left(
+    \gls{sym-sigma-r} =  \frac{\gls{sym-F-heave}}{\gls{sym-S-eq}} \left(
     \overline{\gls{sym-M}}_{\gls{sym-r},dis} + \overline{\gls{sym-M}}_{\gls{sym-r},con} \frac{\overline{\gls{sym-delta}}_{\text{plate},dis}}{\frac{\gls{sym-D-eq}}{\gls{sym-a}^2K_{\text{tube}}} - \overline{\gls{sym-delta}}_{\text{plate},con}}
     \right)
 \end{equation}

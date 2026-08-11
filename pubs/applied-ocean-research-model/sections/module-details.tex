@@ -52,7 +52,7 @@ where $\gls{sym-V-surf}$ (design-dependent) and $\gls{sym-V-pto}$ (fixed) are vo
 %TC:break Hydrodynamic Coefficients
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Hydrodynamic Coefficients}\label{sec:hydro}
-The first-order hydrodynamic force phasors $\gls{sym-vec-hat-F}$ for interacting floating bodies are expressed in the frequency domain as the sum of wave excitation $\gls{sym-vec-hat-F}_{e}$, hydrodynamic radiation $\gls{sym-vec-hat-F-rad}$, and hydrostatic restoring $\gls{sym-vec-hat-F-res}$ contributions:
+The first-order hydrodynamic force phasors $\gls{sym-vec-hat-F}$ for interacting floating bodies are expressed in the frequency domain as the sum of wave excitation $\gls{sym-vec-hat-F-e}$, hydrodynamic radiation $\gls{sym-vec-hat-F-rad}$, and hydrostatic restoring $\gls{sym-vec-hat-F-res}$ contributions:
 \begin{equation}\label{eq:hydro-forces}
     \gls{sym-vec-hat-F} = \gls{sym-vec-hat-F-e} + \gls{sym-vec-hat-F-rad} + \gls{sym-vec-hat-F-res}
 \end{equation}
@@ -484,7 +484,7 @@ In the frequency domain, the complex transfer function from real regular wave he
 \begin{equation}\label{eq:eom-freq-domain}
     \frac{\gls{sym-vec-hat-dot-xi}}{\gls{sym-H}} = \frac{1}{2}\left[\gls{sym-mathbf-Z-i}+\gls{sym-mathbf-Z-p}\right]^{-1} (\gls{sym-vec-gamma}+\gls{sym-vec-gamma-d})
 \end{equation}
-where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damping terms have been combined into a single intrinsic impedance matrix $\gls{sym-mathbf-Z}_{i}$ for compactness:
+where the inertial, hydrodynamic radiation, hydrostatic restoring, and drag damping terms have been combined into a single intrinsic impedance matrix $\gls{sym-mathbf-Z-i}$ for compactness:
 \begin{equation}\label{eq:intrinsic-impedance}
 \gls{sym-mathbf-Z-i} = -i\gls{sym-omega} (\gls{sym-mathbf-M}+\gls{sym-mathbf-A-h})+ (\gls{sym-mathbf-B-h}+\gls{sym-mathbf-B-d})+\frac{1}{i\gls{sym-omega}} (\gls{sym-mathbf-K-h})
 \end{equation}
@@ -543,7 +543,7 @@ The average and peak powers over a wave period, derived in \Cref{sec:appendix-po
 \begin{equation}\label{eq:power-avg-peak}
     \gls{sym-p-avg} = \gls{sym-P}, \qquad p_{pk} = \gls{sym-P} + |\gls{sym-S}|.
 \end{equation}
-The corresponding minimum power is $\gls{sym-p}_{\text{min}} = \gls{sym-P} - |\gls{sym-S}|$, negative when $|\gls{sym-S}|>\gls{sym-P}$ (i.e., reactive control).
+The corresponding minimum power is $\gls{sym-p-min} = \gls{sym-P} - |\gls{sym-S}|$, negative when $|\gls{sym-S}|>\gls{sym-P}$ (i.e., reactive control).
 
 To capture non-dynamic power losses such as those in an electrical drive, a constant efficiency $\gls{sym-eta}$ describes the gain between average generator electrical power and average absorbed electrical power.
 \ifdefined\DISSERTATION
@@ -553,7 +553,7 @@ To capture non-dynamic power losses such as those in an electrical drive, a cons
 \fi
 Validation in \Cref{sec:validation-benchmarking} sets $\gls{sym-eta}=80\%$ to match the RM3 design assumption of \citet{RM3}.
 
-The full expansion of $\gls{sym-p}_{\text{avg},\text{elec}}$ and $\gls{sym-p}_{pk,\text{elec}}$ in terms of the optimal-control variables $\gls{sym-B-l}$, $\gls{sym-K-l}$, and the electrical-port current phasor $\gls{sym-hat-I}$ is given in \Cref{sec:appendix-power-elec}.
+The full expansion of $\gls{sym-p-avg-elec}$ and $\gls{sym-p-pk-elec}$ in terms of the optimal-control variables $\gls{sym-B-l}$, $\gls{sym-K-l}$, and the electrical-port current phasor $\gls{sym-hat-I}$ is given in \Cref{sec:appendix-power-elec}.
 
 % Additionally, the drivetrain mechanical cascade matrix $[\gls{sym-a}]_{\gls{sym-m}}$ is set to the identity matrix, which represents a static effective gear radius $\gls{sym-R}=1$:
 % \begin{equation}
@@ -583,7 +583,7 @@ This is called reactive control, with subscript $\text{reac}$:
 
 However, some PTOs lack reactive capability (the ability to function as a motor and add energy to the system at some times), such as rectifying hydraulic systems or winches where cable tension must be maintained.
 Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K}_{l,\text{damp}}=0$.
-The power-maximizing PTO damping $\gls{sym-B}_{l,\text{damp}}$ is then:
+The power-maximizing PTO damping $\gls{sym-B-l-damp}$ is then:
 \begin{equation}\label{eq:damping-control}
     \gls{sym-B-l-damp} = \sqrt{ (\gls{sym-B-l-reac})^2 + (\gls{sym-K-l-reac}/\gls{sym-omega})^2}
 \end{equation}
@@ -591,7 +591,7 @@ The power-maximizing PTO damping $\gls{sym-B}_{l,\text{damp}}$ is then:
     When a port other than the electrical port must avoid reactive power, the constrained solution detailed later in this section can be used to enforce $\gls{sym-Q}=0$ at that port.
 
     Both of these controllers frequently result in excessively large forces and thus structural and powertrain requirements, especially in energetic sea states or in reactive control when $\gls{sym-K-l}$ is far from zero.
-    $\gls{sym-K}_{l,\text{reac}}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
+    $\gls{sym-K-l-reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
     Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
 \else
     Both controllers frequently produce excessively large forces in energetic sea states or under reactive control, and provide no mechanism to obey limits.
@@ -621,7 +621,7 @@ The matrices for various metrics are given in \Cref{tab:power-metrics}.
 \caption{Matrices for calculating various metrics at a port via \Cref{eq:metrics}}
 \label{tab:power-metrics}
 \begin{tabular}{L{0.1\linewidth}|ccccc}
-    Metric $\gls{sym-M}$ & $\gls{sym-p}_{\text{avg}}=\gls{sym-P}$ & $\gls{sym-Q}$ & $\gls{sym-S}$ & $|\gls{sym-hat-e}|^2$ & $|\gls{sym-hat-q}|^2$ \\ \hline
+    Metric $\gls{sym-M}$ & $\gls{sym-p-avg}=\gls{sym-P}$ & $\gls{sym-Q}$ & $\gls{sym-S}$ & $|\gls{sym-hat-e}|^2$ & $|\gls{sym-hat-q}|^2$ \\ \hline
     Matrix $\gls{sym-mathbf-A-M}$ &
     $\begin{bmatrix}
         0 & 1 \\
@@ -705,12 +705,12 @@ The linear equality constraint $\gls{sym-vec-c}^{\,*}\gls{sym-vec-x} = d$ enforc
     \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re (\gls{sym-Z-s-th})}~ (1 - |\Gamma_{\text{opt}}|^2)
 \end{aligned}
 \end{equation}
-where $\gls{sym-Gamma}_{\text{opt}}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
+where $\gls{sym-Gamma-opt}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
 The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch.
-$\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (no active inequality constraints).
+$\gls{sym-Gamma-opt}=0$ corresponds to the impedance-matched solution (no active inequality constraints).
 
 \ifdefined\DISSERTATION
-    As \Cref{sec:mod-freq-domain} describes, the solution for $\gls{sym-Gamma}_{\text{opt}}$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
+    As \Cref{sec:mod-freq-domain} describes, the solution for $\gls{sym-Gamma-opt}$ can be found numerically or analytically, and we further distinguish that the numerical approach can be accomplished with either direct or indirect optimal control.
     Direct methods solve the optimization problem itself, while indirect methods first derive the optimality conditions and then solve those conditions.
     MDOcean currently implements both the analytical approach, which corresponds to the explicit architecture in \Cref{fig:control-arch}, and the numerical indirect approach, which corresponds to the implicit architecture in \Cref{fig:control-arch}.
     The analytical approach is described in \Cref{sec:appendix-qp-solution}, and the numerical indirect approach in \Cref{sec:appendix-qp-numerical}.
@@ -719,8 +719,8 @@ $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (
     While the nested architecture solves the quadratic program \Cref{eq:opt-problem}, the simultaneous architecture integrates the QCQP into the nonlinear design optimization, which does not take advantage of the efficiency available with the QCQP formulation.
     It is unknown whether the numerical direct approach to solving the QCQP would be more efficient than the numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is used for all results and benchmarks presented here.
 \else
-    Both analytical and numerical-indirect solutions for $\gls{sym-Gamma}_{\text{opt}}$ are implemented in MDOcean.
-    This study focuses on the superior analytical approach described in \Cref{sec:appendix-qp-solution}, which has a geometric interpretation as a minimum-distance problem on the complex plane of $\gls{sym-Gamma}_{\text{opt}}$ and is used for all results presented here.
+    Both analytical and numerical-indirect solutions for $\gls{sym-Gamma-opt}$ are implemented in MDOcean.
+    This study focuses on the superior analytical approach described in \Cref{sec:appendix-qp-solution}, which has a geometric interpretation as a minimum-distance problem on the complex plane of $\gls{sym-Gamma-opt}$ and is used for all results presented here.
     \citet[Appendix A.3.3]{mccabe_dissertation_2026} describes the numerical-indirect approach.
 \fi
 
@@ -795,14 +795,14 @@ The amplitude of the sinusoidal approximation equals $\frac{8}{3\gls{sym-pi}}\ap
 Integrating the drag pressure over the wetted surface via strip theory (\Cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
 \begin{equation}\label{eq:drag-damping-excitation}
     \gls{sym-vec-hat-F-d} = -\gls{sym-mathbf-B-d} \gls{sym-vec-hat-dot-xi}
-    + \gls{sym-vec-gamma}_{d} \gls{sym-hat-zeta}
+    + \gls{sym-vec-gamma-d} \gls{sym-hat-zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $\gls{sym-y}$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
 Explicit expressions for $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
 These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
-The resulting magnitude and phase of WEC motion are obtained by numerically converging the state-dependent coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma}_{d}$.
+The resulting magnitude and phase of WEC motion are obtained by numerically converging the state-dependent coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$.
 \Cref{sec:appendix-drag} discusses details and control implications.
 
 %\subsubsection{Power Saturation}
@@ -840,7 +840,7 @@ The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and
 \label{fig:JPD-multiply}
 \end{figure}
 
-The annual energy production $AEP$ in kWh/year for a farm of multiple devices is the product of the number of devices, the average power per device, an efficiency $\gls{sym-eta}_{\text{array}}$ representing transmission losses and array downtime, and an appropriate unit conversion:
+The annual energy production $AEP$ in kWh/year for a farm of multiple devices is the product of the number of devices, the average power per device, an efficiency $\gls{sym-eta-array}$ representing transmission losses and array downtime, and an appropriate unit conversion:
 \begin{equation}\label{eq:AEP}
     AEP = N_{WEC} ~ \overline{P}_{elec} ~\eta_{array} \frac{8766}{1000}.
 \end{equation}
@@ -879,10 +879,10 @@ In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator
 In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 \ifdefined\DISSERTATION
     Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
-    The peak of $\gls{sym-tau}(\gls{sym-t})$ is lower than its fundamental amplitude due to generator force saturation at $\gls{sym-tau}_{\text{max}}$, so using $\gls{sym-tau}_{\text{max}}$ rather than $|\gls{sym-hat-tau}|$ is both less conservative and more realistic.
+    The peak of $\gls{sym-tau}(\gls{sym-t})$ is lower than its fundamental amplitude due to generator force saturation at $\gls{sym-tau-max}$, so using $\gls{sym-tau-max}$ rather than $|\gls{sym-hat-tau}|$ is both less conservative and more realistic.
     Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
 \else
-    Saturation caps the operational generator torque at $\gls{sym-tau}_{\text{max}}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\gls{sym-hat-tau}|$.
+    Saturation caps the operational generator torque at $\gls{sym-tau-max}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\gls{sym-hat-tau}|$.
     Assuming constructive interference with the shaft torque,
 \fi
 \begin{equation}\label{eq:peak-pto-force}
@@ -941,7 +941,7 @@ This approximation can either under- or overestimate the true peak depending on 
         &Equals $\gls{sym-xi-f}$ due to brake\\ \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Maximum allowable relative amplitude between float and spar, $|\gls{sym-xi-f}-\gls{sym-xi-s}|_{\text{max}}$ \vspace{8pt}}
-        & \shortstack{$\min(\gls{sym-h}_{fs,\text{clear}},\gls{sym-h}_{fs,\text{up}},$\\$\gls{sym-h}_{fs,\text{down}})$}
+        & \shortstack{$\min(\gls{sym-h-fs-clear},\gls{sym-h-fs-up},$\\$\gls{sym-h-fs-down})$}
         &N/A\\  \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Maximum allowable float amplitude, $|\gls{sym-xi-f}|_{\text{max}}$ \vspace{8pt} }
@@ -1028,7 +1028,7 @@ The values of $\gls{sym-Delta} \gls{sym-z}$ used for float and spar in operation
 % \hline
 % $\gls{sym-X}_{\text{slam}}$& Storm sea state & Not relevant (controller is off during storm) \\ \hline
 %  $\gls{sym-X}_{fs}$& Operating sea states with nonzero JPD&Ideally, but requires more work\\\hline
-% $\gls{sym-P}_{\text{max}}$& Operating sea states with nonzero JPD & Ideally, but requires more work \\
+% $\gls{sym-P-max}$& Operating sea states with nonzero JPD & Ideally, but requires more work \\
 % \hline
 
 % \end{tabular}
@@ -1170,7 +1170,7 @@ where the numerator consists of the up-front capital expenditure $CAPEX$, annual
     Constant and design-dependent cost categories are calibrated against the RM3 Cost Breakdown Structure (CBS) \citep{neary_reference_2014} (\Cref{tab:CBS} in \Cref{sec:appendix-econ}).
 \fi
 
-Two CBS categories scale with design: structural cost (category 1.4) scales linearly with the volume of structural material $\gls{sym-V}_{\text{struct}}$, and PTO cost (category 1.5) scales with the peak electrical power $\gls{sym-P}_{pk,\text{elec}}$ and the force limit $\gls{sym-F}_{\text{max}}$.
+Two CBS categories scale with design: structural cost (category 1.4) scales linearly with the volume of structural material $\gls{sym-V-struct}$, and PTO cost (category 1.5) scales with the peak electrical power $\gls{sym-P-pk-elec}$ and the force limit $\gls{sym-F-max}$.
 All other categories are held constant per device but decrease with the number of devices $\gls{sym-N-WEC}$ via a power law calibrated against the CBS estimates for $\gls{sym-N-WEC} = (1, 10, 50, 100)$ \citep{neary_reference_2014}.
 
 \ifdefined\DISSERTATION
