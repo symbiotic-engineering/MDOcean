@@ -77,7 +77,7 @@ Instead, the kinematics can be packaged into a square hybrid matrix $\gls{sym-ma
     \end{bmatrix}
     = \underbrace{
         \begin{bmatrix}
-            \mathbf{0}             & \gls{sym-mathbf-T-kin}^T \\
+            \mathbf{0}             & \gls{sym-mathbf-T-kin}^{\top} \\
             \gls{sym-mathbf-T-kin} & \mathbf{0}
         \end{bmatrix}}
         _{\gls{sym-mathbf-h-kin}}
@@ -107,9 +107,9 @@ Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at t
 
 \begin{equation}
 \begin{aligned}
-    \gls{sym-vec-hat-F-th} &= (\gls{sym-mathbf-T-kin}\gls{sym-mathbf-T-kin}^T)^{-1} \gls{sym-mathbf-T-kin} \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta}
+    \gls{sym-vec-hat-F-th} &= (\gls{sym-mathbf-T-kin}\gls{sym-mathbf-T-kin}^{\top})^{-1} \gls{sym-mathbf-T-kin} \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta}
     = \frac{1}{2} [1,~-1] \mathbf{Z}_{i}^{-1} \vec{\gamma}\hat{\zeta} \\
-    \gls{sym-vec-Z-i-th} &= (-\gls{sym-mathbf-T-kin}\mathbf{Z}_{i}^{-1} \gls{sym-mathbf-T-kin}^T)^{-1} = -\frac{\det(\mathbf{Z}_{i})}{\Sigma \mathbf{Z}_{i}} = -\frac{Z_{i,f}Z_{i,s}-Z_{i,c}^2}{Z_{i,f}+Z_{i,s}+2Z_{i,c}}
+    \gls{sym-vec-Z-i-th} &= (-\gls{sym-mathbf-T-kin}\mathbf{Z}_{i}^{-1} \gls{sym-mathbf-T-kin}^{\top})^{-1} = -\frac{\det(\mathbf{Z}_{i})}{\Sigma \mathbf{Z}_{i}} = -\frac{Z_{i,f}Z_{i,s}-Z_{i,c}^2}{Z_{i,f}+Z_{i,s}+2Z_{i,c}}
 \end{aligned}
 \end{equation}
 where the vector expressions for the general case are shown first, followed by the scalar result for the $\gls{sym-mathbf-T-kin}$ in \Cref{eq:T-kin-specific} with 1 controlled degree of freedom.
@@ -120,7 +120,7 @@ However, it cannot transform in the other direction due to underactuation.
 Even in the favorable direction, this matrix cannot transform to the body ports directly.
 Due to the wave excitation, body velocities can be nonzero even when the PTO force and velocity are both zero.
 Hence, there is no way to express $\gls{sym-hat-dot-xi}$ as a weighted sum of $\gls{sym-hat-F-PTO}$ and $\gls{sym-dot-hat-X-PTO}$.
-$\gls{sym-hat-dot-xi}$ could be expressed as a function of the PTO variables by substituting $\gls{sym-mathbf-Z-p}=\gls{sym-mathbf-T-kin}^T (\gls{sym-vec-hat-F-PTO}/\gls{sym-vec-hat-dot-X-PTO}) \gls{sym-mathbf-T-kin}$ into \Cref{eq:eom-freq-domain}, but this yields a nonlinear expression of limited utility.
+$\gls{sym-hat-dot-xi}$ could be expressed as a function of the PTO variables by substituting $\gls{sym-mathbf-Z-p}=\gls{sym-mathbf-T-kin}^{\top} (\gls{sym-vec-hat-F-PTO}/\gls{sym-vec-hat-dot-X-PTO}) \gls{sym-mathbf-T-kin}$ into \Cref{eq:eom-freq-domain}, but this yields a nonlinear expression of limited utility.
 Instead, we can use cascade-like matrices to solve for a modified variable $\gls{sym-vec-dot-xi-Delta}$ defined as the change in the body velocities caused by the PTO, in other words the difference between the actual body velocities $\gls{sym-vec-dot-xi}$ and their values if the PTO were disconnected with $\gls{sym-F-PTO}=0$, $\gls{sym-vec-dot-xi-0}$:
 \begin{equation}\label{eq:modified-body-velocity}
     \gls{sym-vec-dot-xi-Delta} = \gls{sym-vec-dot-xi} - \gls{sym-vec-dot-xi-0}
@@ -134,7 +134,7 @@ The cascade-like matrix from the PTO port $\{\gls{sym-F-PTO}, \gls{sym-dot-X-PTO
 \gls{sym-mathbf-I}^{2\times2} \\
 -\gls{sym-mathbf-Z-i}^{-1}
 \end{bmatrix}
-\gls{sym-mathbf-T-kin}^T
+\gls{sym-mathbf-T-kin}^{\top}
 \begin{bmatrix}
 1 & 0
 \end{bmatrix}
