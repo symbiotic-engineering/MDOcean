@@ -38,10 +38,16 @@
 }
 
 % for 11x17 pages
-\usepackage[top=1in,
-  bottom=1in,
-  left=1in,
-  right=1in]{geometry}
+\makeatletter
+\@ifclassloaded{cas-sc}{}{%
+  \@ifclassloaded{cas-dc}{}{%
+    \usepackage[top=1in,
+      bottom=1in,
+      left=1in,
+      right=1in]{geometry}
+  }%
+}
+\makeatother
 \usepackage{caption}
 \newenvironment{foldoutpage}{%
   \ifdefined\DISSERTATION
@@ -63,7 +69,13 @@
 \usepackage{verbatim}  % word counts
 \usepackage{textcomp}  % cent symbol
 
-\usepackage[unicode,hypertexnames=false,colorlinks=true,bookmarksnumbered=true]{hyperref}
+\makeatletter
+\@ifclassloaded{cas-sc}{}{%
+  \@ifclassloaded{cas-dc}{}{%
+    \usepackage[unicode,hypertexnames=false,colorlinks=true,bookmarksnumbered=true]{hyperref}
+  }%
+}
+\makeatother
 \usepackage{cleveref}
 
 \newcommand*\rot{\rotatebox{90}} % for rotated table headers
