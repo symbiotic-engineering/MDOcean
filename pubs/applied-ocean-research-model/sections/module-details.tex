@@ -582,8 +582,8 @@ This is called reactive control, with subscript $\text{reac}$:
 \end{equation}
 
 However, some PTOs lack reactive capability (the ability to function as a motor and add energy to the system at some times), such as rectifying hydraulic systems or winches where cable tension must be maintained.
-Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K}_{l,\text{damp}}=0$.
-The power-maximizing PTO damping $\gls{sym-B}_{l,\text{damp}}$ is then:
+Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K}_{\gls{sym-l},\text{damp}}=0$.
+The power-maximizing PTO damping $\gls{sym-B}_{\gls{sym-l},\text{damp}}$ is then:
 \begin{equation}\label{eq:damping-control}
     \gls{sym-B-l-damp} = \sqrt{ (\gls{sym-B-l-reac})^2 + (\gls{sym-K-l-reac}/\gls{sym-omega})^2}
 \end{equation}
@@ -591,7 +591,7 @@ The power-maximizing PTO damping $\gls{sym-B}_{l,\text{damp}}$ is then:
     When a port other than the electrical port must avoid reactive power, the constrained solution detailed later in this section can be used to enforce $\gls{sym-Q}=0$ at that port.
 
     Both of these controllers frequently result in excessively large forces and thus structural and powertrain requirements, especially in energetic sea states or in reactive control when $\gls{sym-K-l}$ is far from zero.
-    $\gls{sym-K}_{l,\text{reac}}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
+    $\gls{sym-K}_{\gls{sym-l},\text{reac}}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
     Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
 \else
     Both controllers frequently produce excessively large forces in energetic sea states or under reactive control, and provide no mechanism to obey limits.
@@ -669,20 +669,20 @@ For the linear impedance mismatch, the average electrical power from \Cref{eq:po
 This is a quadratically-constrained quadratic program (QCQP):
 \begin{equation}\label{eq:opt-problem}
 \begin{aligned}
-& \max_{\vec{x} \in \mathbb{C}^2} & p_{avg,VI} &= \frac{1}{4}\vec{x}^{\,*} \mathbf{A}_P \vec{x} \\[3pt]
-& \text{s.t.}
-& \vec{x}^{\,*}\gls{sym-mathbf-Q-mu}\vec{x}
-    + 2\Re\!\left\{\vec{a}_{\mu}^{\,*}\vec{x}\right\}
-    &\le b_{\mu},
-    \quad \forall \mu \in [1,\cdots,N] \\[3pt]
-& & \vec{c}^{\,*}\vec{x} &= d \\[3pt]
+& \max_{\gls{sym-vec-x} \in \gls{sym-mathbb-C}^2} & \gls{sym-p-avg-VI} &= \frac{1}{4}\gls{sym-vec-x}^{\,*} \gls{sym-mathbf-A-P} \gls{sym-vec-x} \\[3pt]
+& \text{\gls{sym-s}.\gls{sym-t}.}
+& \gls{sym-vec-x}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x}
+    + 2\Re\!\left\{\gls{sym-vec-a-mu}^{\,*}\gls{sym-vec-x}\right\}
+    &\le \gls{sym-b-mu},
+    \quad \forall \gls{sym-mu} \in [1,\cdots,\gls{sym-N}] \\[3pt]
+& & \gls{sym-vec-c}^{\,*}\gls{sym-vec-x} &= d \\[3pt]
 & \text{where}
-& \vec{x} &= \begin{bmatrix} \hat{V} & \hat{I} \end{bmatrix}^T \\[3pt]
-& & \gls{sym-mathbf-Q-mu} &\in \mathbb{C}^{2\times 2}, \quad \gls{sym-mathbf-Q-mu} = \gls{sym-mathbf-Q-mu}^{\,*} \\[3pt]
-& & \vec{a}_{\mu} &\in \mathbb{C}^2 \\[3pt]
-& & b_{\mu} &\in \mathbb{R} \\[3pt]
-& & \vec{c}^{\,*} &= \begin{bmatrix} 1 & Z_{s,th} \end{bmatrix} \\[3pt]
-& & d &= \hat{V}_{s,th}
+& \gls{sym-vec-x} &= \begin{bmatrix} \gls{sym-hat-V} & \gls{sym-hat-I} \end{bmatrix}^T \\[3pt]
+& & \gls{sym-mathbf-Q-mu} &\in \gls{sym-mathbb-C-2-times-2}, \quad \gls{sym-mathbf-Q-mu} = \gls{sym-mathbf-Q-mu}^{\,*} \\[3pt]
+& & \gls{sym-vec-a-mu} &\in \gls{sym-mathbb-C}^2 \\[3pt]
+& & \gls{sym-b-mu} &\in \gls{sym-mathbb-R} \\[3pt]
+& & \gls{sym-vec-c}^{\,*} &= \begin{bmatrix} 1 & \gls{sym-Z-s-th} \end{bmatrix} \\[3pt]
+& & d &= \gls{sym-hat-V-s-th}
 \end{aligned}
 \end{equation}
 
@@ -842,7 +842,7 @@ The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and
 
 The annual energy production $AEP$ in kWh/year for a farm of multiple devices is the product of the number of devices, the average power per device, an efficiency $\gls{sym-eta}_{\text{array}}$ representing transmission losses and array downtime, and an appropriate unit conversion:
 \begin{equation}\label{eq:AEP}
-    AEP = N_{WEC} ~ \overline{P}_{elec} ~\eta_{array} \frac{8766}{1000}.
+    AEP = \gls{sym-N-WEC} ~ \overline{\gls{sym-P}}_{elec} ~\eta_{array} \frac{8766}{1000}.
 \end{equation}
 
 %Finally, the standard deviation $\gls{sym-sigma}$ of power across all sea states $\gls{sym-P}(\gls{sym-omega})$ is computed, and normalized by the average power $\gls{sym-mu}$ to get the coefficient of variation (see equation \eqref{cv}).
@@ -875,7 +875,7 @@ When the WEC is in survival mode, an external brake locks the PTO, enforcing the
     \gls{sym-F-heave-s} (\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p} (\gls{sym-t})|,~ |\gls{sym-m-s}\gls{sym-ddot-xi-s} (\gls{sym-t})-\gls{sym-F-p} (\gls{sym-t})|\right)
 \end{aligned}
 \end{equation}
-In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the PTO dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F}_p\gls{sym-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
+In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the PTO dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F}_\gls{sym-p}\gls{sym-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
 In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 \ifdefined\DISSERTATION
     Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
@@ -894,10 +894,10 @@ In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its 
 \end{equation}
 The storm case lacks the control saturation nonlinearity and uses the fundamental amplitude $\gls{sym-hat-F-p-st}$ directly.
 
-The fluid force nonlinearities $|m\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ are harder to handle, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
+The fluid force nonlinearities $|\gls{sym-m}\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ are harder to handle, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
 MDOcean currently uses the fundamental amplitude for both load cases:
 \begin{equation}\label{eq:peak-fluid-force}
-\max_{\gls{sym-t}} \left|m\ddot{\xi}(t) - F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|.
+\max_{\gls{sym-t}} \left|\gls{sym-m}\gls{sym-ddot-xi}(\gls{sym-t}) - \gls{sym-F-p}(\gls{sym-t})\right| \approx \left|-\gls{sym-m}\gls{sym-omega}^2 \gls{sym-hat-xi} - \gls{sym-hat-F-p}\right|.
 \end{equation}
 This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \Cref{sec:appendix-peak-fluid-force}.
 \ifdefined\DISSERTATION
@@ -923,7 +923,7 @@ This approximation can either under- or overestimate the true peak depending on 
         & \parbox[m]{\linewidth}{\centering
         Solve \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients for $\gls{sym-F-p}$}\\ \hline
     \parbox[m]{\linewidth}{\centering
-    Peak fluid force, $\max_{\gls{sym-t}} |m\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ }
+    Peak fluid force, $\max_{\gls{sym-t}} |\gls{sym-m}\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ }
         & \parbox[m]{\linewidth}{\centering
         Given by \Cref{eq:peak-fluid-force} with \Cref{eq:op-hydro-coeffs} coefficients and $\gls{sym-F-p}$ from \Cref{eq:peak-pto-force}}
         & \parbox[m]{\linewidth}{\centering
@@ -956,7 +956,7 @@ This approximation can either under- or overestimate the true peak depending on 
 
 The surge force for each component is calculated as \citep{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
-   F_{surge} = \frac{H\rho_w \omega^2 A_w}{k} (\exp(-kz_{\text{top}})-\exp(-kT))
+   \gls{sym-F-surge} = \frac{\gls{sym-H}\gls{sym-rho-w} \gls{sym-omega}^2 \gls{sym-A-w}}{\gls{sym-k-wavenumber}} (\exp(-\gls{sym-k-wavenumber}\gls{sym-z-top})-\exp(-\gls{sym-k-wavenumber}\gls{sym-T-draft}))
 \end{equation}
 using the respective waterplane areas $\gls{sym-A-w}$  and drafts $\gls{sym-T}$ for the float and spar.
 The top vertical height $\gls{sym-z}_{\text{top}}$ is set to zero for the float and $\gls{sym-T-f-2}$ for the spar.
@@ -994,20 +994,41 @@ This includes slamming (the bottom surface rises out of the water and impacts on
 The condition to prevent slamming and submersion in regular waves of height $\gls{sym-H}$ is derived in \Cref{sec:appendix-slam}.
 These limits depend on the phase of the response, not just the magnitude, so they do not use the quadratic coefficients of \Cref{tab:qp-constraints} but can nonetheless be expressed in a quadratic form compatible with \Cref{eq:opt-problem}:
 \begin{equation}\label{eq:slam-constraint-quadratic}
-    \hat{\xi}^*\hat{\xi} - H\Re (\exp (iky)\hat{\xi}) < \Delta z^2-\left(\frac{H}{2}\right)^2
+    \gls{sym-hat-xi}^*\gls{sym-hat-xi} 
+    - \gls{sym-H} \Re(
+                    \exp (i\gls{sym-k-wavenumber}\gls{sym-y})
+                    \gls{sym-hat-xi}
+                    )
+    < \gls{sym-Delta-z}^2
+    -\left(
+            \frac{\gls{sym-H}}{2}
+    \right)^2
 \end{equation}
-for relevant vertical body dimension $\gls{sym-Delta} \gls{sym-z}$ and horizontal coordinate $\gls{sym-y}$.
-The values of $\gls{sym-Delta} \gls{sym-z}$ used for float and spar in operational and storm cases and the rationale (avoiding slanted-surface slamming, damping plate surfacing, and related effects) are given in \Cref{sec:appendix-slam}.
+for relevant vertical body dimension $\gls{sym-Delta-z}$ and horizontal coordinate $\gls{sym-y}$.
+The values of $\gls{sym-Delta-z}$ used for float and spar in operational and storm cases and the rationale
+(avoiding slanted-surface slamming, damping plate surfacing, and related effects)
+are given in \Cref{sec:appendix-slam}.
 
 \ifdefined\DISSERTATION
-    The values $\gls{sym-h-fs-clear}$, $\gls{sym-h-fs-up}$, $\gls{sym-h-fs-down}$, $\gls{sym-xi-f-lin}$, and $\gls{sym-xi-s-lin}$ are all upper limits and are independent of sea state, while $\gls{sym-xi-slam}$ depends on the sea state and can separately act as both an upper and lower limit on the oscillation magnitude, as shown in \Cref{sec:appendix-slam}.
-    In early design studies that do not directly compute the hydrodynamic coefficients and associated power production, the amplitude limits proposed here could be plugged into Budal's upper bound, a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity to yield an upper bound on power production \citep{zou_practical_2023}.
+    The values $\gls{sym-h-fs-clear}$, $\gls{sym-h-fs-up}$, $\gls{sym-h-fs-down}$,
+    $\gls{sym-xi-f-lin}$, and $\gls{sym-xi-s-lin}$
+    are all upper limits and are independent of sea state,
+    while $\gls{sym-xi-slam}$ depends on the sea state
+    and can separately act as both an upper and lower limit on the oscillation magnitude,
+    as shown in \Cref{sec:appendix-slam}.
+    In early design studies that do not directly compute the hydrodynamic coefficients and associated power production,
+    the amplitude limits proposed here could be plugged into Budal's upper bound,
+    a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity
+    to yield an upper bound on power production \citep{zou_practical_2023}.
 
-    Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves, even for the storm condition.
-    This is a questionable assumption, but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
+    Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves,
+    even for the storm condition.
+    This is a questionable assumption,
+    but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
     \Cref{sec:discussion} will discuss possible future alternatives to this modeling choice.
 \else
-    Both load cases use standard linear wave theory with equivalent regular waves, an approximation whose limitations and possible future alternatives are discussed in \Cref{sec:unmodeled-effects}.
+    Both load cases use standard linear wave theory with equivalent regular waves,
+    an approximation whose limitations and possible future alternatives are discussed in \Cref{sec:unmodeled-effects}.
 \fi
 
 % Todo: This \creftab:sea-state} is \hl{possibly out of date now:}
@@ -1042,7 +1063,9 @@ MDOcean uses a JPD (joint probability density matrix) to capture the long-term v
 Additionally, it represents each irregular wave condition within the JPD as an equivalent sinusoidal regular wave.
 Regular wave height $\gls{sym-H}$ and period $\gls{sym-T}$ are selected to provide equal energy as the irregular sea state:
 \begin{equation}\label{eq:regular-wave-equiv}
-    \gls{sym-H} = \frac{\gls{sym-H-s}}{\sqrt{2}}, \qquad \gls{sym-T} = \gls{sym-T-e} \approx 0.857 ~\gls{sym-T-p},
+    \gls{sym-H} = \frac{\gls{sym-H-s}}{\sqrt{2}},
+    \qquad
+    \gls{sym-T} = \gls{sym-T-e} \approx 0.857 ~\gls{sym-T-p},
 \end{equation}
 where the irregular sea state has significant wave height $\gls{sym-H-s}$, energy period $\gls{sym-T-e}$, and (for a Pierson-Moskowitz spectrum) peak period $\gls{sym-T-p}$.
 This regular wave assumption avoids the time-consuming convolution integral or state-space identification that is typically required to simulate nonlinear dynamics subject to irregular wave forcing.
@@ -1133,9 +1156,9 @@ Further details of all structural calculations performed in the simulation are p
 For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
 \begin{equation}\label{eq:struct-scaling}
 \begin{aligned}
-    t_{f} h_{\text{stiff},f}^2 &\sim \frac{F_{\text{heave}} D_f}{\left(\frac{D_f}{D_s}-1\right)^2} \\
-    t_{s}^4 &\sim F_{\text{heave}} h_s^2 \\
-    t_{d} h_{\text{stiff},d}^2 &\sim \frac{F_{\text{heave}}D_d^2}{D_s} \\
+    \gls{sym-t-fb} h_{\text{stiff},f}^2 &\sim \frac{F_{\text{heave}} \gls{sym-D-f}}{\left(\frac{\gls{sym-D-f}}{\gls{sym-D-s}}-1\right)^2} \\
+    \gls{sym-t-sr}^4 &\sim F_{\text{heave}} \gls{sym-h-s}^2 \\
+    \gls{sym-t-d} h_{\text{stiff},d}^2 &\sim \frac{F_{\text{heave}}\gls{sym-D-d}^2}{\gls{sym-D-s}} \\
 \end{aligned}
 \end{equation}
 
@@ -1200,7 +1223,7 @@ This yields:
 where $\gls{sym-p-P}$, $\gls{sym-p-F}$, and $\gls{sym-p-s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
 See \Cref{sec:appendix-econ-power-law} for more details.
 
-The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, and $p_{s}$ all decrease with the number of devices $N_{WEC}$ via \gls{sym-a} power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
+The per-WEC unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $\gls{sym-p-P-2}$, $\gls{sym-p-F-2}$, and $\gls{sym-p-s-2}$ all decrease with the number of devices $\gls{sym-N-WEC}$ via \gls{sym-a} power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
 
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $\gls{sym-N-WEC}$.
 For consistency with prior references \citep{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 USD without adjusting for inflation.

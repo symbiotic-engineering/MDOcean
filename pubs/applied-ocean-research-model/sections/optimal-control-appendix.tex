@@ -418,7 +418,7 @@ the squared optimal reflection coefficient magnitude in each sea state takes one
         + \frac{\gls{sym-b-mu-star}+\gls{sym-c-mu-star}}{\gls{sym-d-mu-star}}
     & \text{only $\gls{sym-mu}^*$ active} \\
         \left|
-            \gls{sym-Gamma-c-mu-star} + \frac{\gls{sym-Gamma-c-nu-star} - \gls{sym-Gamma-c-mu-star}}{d_{\mu^*\nu^*}}
+            \gls{sym-Gamma-c-mu-star} + \frac{\gls{sym-Gamma-c-nu-star} - \gls{sym-Gamma-c-mu-star}}{\gls{sym-d-mu-star-nu-star}}
             \left( \gls{sym-a-mu-nu-star}
                 \pm
                 1i \sqrt{
@@ -466,9 +466,9 @@ Then, the optimal reflection coefficient of each candidate type can be written a
     \min_{\gls{sym-mu}} \left\{
         | \gls{sym-f}\left(\gls{sym-Gamma-cl-mu} (\gls{sym-b-mu})\right) |
     \right\}, \quad
-    |\Gamma_{int,\mu^*,\nu^*}| =
-    \min_{\mu,\nu} \left\{
-        | f\left(\Gamma_{\mu,\nu} (b_\mu, b_\nu)\right) |
+    |\gls{sym-Gamma-int-mu-star-nu-star}| =
+    \min_{\gls{sym-mu},\gls{sym-nu}} \left\{
+        | \gls{sym-f}\left(\gls{sym-Gamma-mu-nu}(\gls{sym-b-mu}, \gls{sym-b-nu})\right) |
     \right\}
 \end{aligned}
 \end{equation}
@@ -477,7 +477,8 @@ Finally, the overall optimal reflection coefficient $|\gls{sym-Gamma-opt}|$ is t
 \begin{aligned}
     |\gls{sym-Gamma-opt}| &=
     \min \left\{
-        |\gls{sym-Gamma-cl-mu-star} (b_\mu)|,  |\Gamma_{int,\mu^*,\nu^*} (b_\mu, b_\nu)|
+        |\gls{sym-Gamma-cl-mu-star} \gls{sym-b-mu}|, 
+        |\gls{sym-Gamma-int-mu-star-nu-star} (\gls{sym-b-mu}, \gls{sym-b-nu})|
     \right\}
 \end{aligned}
 \end{equation}
@@ -489,11 +490,16 @@ so $\sqrt{\textrm{aff}(\gls{sym-b-mu})}$ is concave.
 The sum of a concave function and an affine function is concave,
 so $|\gls{sym-Gamma-cl}|=\textrm{aff}(\gls{sym-b-mu}) + \sqrt{\textrm{aff}(\gls{sym-b-mu})}$ is concave.
 The penalty function is convex if and only if all constraints are convex,
-so $-|\gls{sym-f}(\gls{sym-Gamma-cl})|$ is concave if and only if $\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
+so $-|\gls{sym-f}(\gls{sym-Gamma-cl})|$
+is concave if and only if
+$\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
 The minimum of a set of concave functions is a concave increasing function,
 % or the maximum of a set of convex functions is a convex increasing function
-and $|\gls{sym-Gamma}_{cl,\gls{sym-mu}^*}|$ is the minimum of a set of concave functions if and only if all constraints are concave,
-so $|\gls{sym-Gamma}_{cl,\gls{sym-mu}^*}|$ is concave if and only if $\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
+and $|\gls{sym-Gamma}_{cl,\gls{sym-mu}^*}|$
+is the minimum of a set of concave functions if and only if all constraints are concave,
+so $|\gls{sym-Gamma}_{cl,\gls{sym-mu}^*}|$
+is concave if and only if
+$\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
 
 Moving onto the candidates at intersection points, a quadratic function is concave if its leading order term is negative, and the leading order term of $\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})$ is negative (arising from the subtraction of squared-affine term $\gls{sym-a-mu-nu-star}^2$).
 %Square root is a concave function, and a concave function of a concave function is concave, so $\sqrt{\textrm{quad}(\gls{sym-b-mu}, \gls{sym-b-nu})}$ is concave.
@@ -518,11 +524,12 @@ it can be written as a sum over all constraint pairs $(\gls{sym-mu},\gls{sym-nu}
     |\gls{sym-Gamma-opt}|^2
     = &\sum_{\gls{sym-mu}} \sum_{\gls{sym-nu} > \gls{sym-mu}}
     \left[
-        \delta_{\mu,\mu^*}(1-\delta_{\nu,\nu^*})
-        \left(            \textrm{aff} (\gls{sym-b-mu})
+        \gls{sym-delta-mu-mu-star}(1-\gls{sym-delta-nu-nu-star})
+        \left(
+                    \textrm{aff} (\gls{sym-b-mu})
             + \sqrt{\textrm{aff} (\gls{sym-b-mu})}
         \right)
-     + \delta_{\mu,\mu^*}\delta_{\nu,\nu^*}
+     + \gls{sym-delta-mu-mu}\gls{sym-delta-nu-nu}
     \right.
 \\
     &\left.
@@ -563,21 +570,23 @@ The second term represents power lost to constraint-induced impedance mismatch a
 Substituting \Cref{eq:gamma-opt-scale-sum} into \Cref{eq:power-elec-sensitivity} requires a $\gls{sym-beta}$ subscript on the starred index to the Kronecker delta functions since constraint activity varies by sea state, as well as a $\gls{sym-beta}$ subscript on the affine and quadratic functions to capture sea-state dependence of the Th\'{e}venin parameters:
 \begin{equation}
 \begin{aligned}
-    \overline{P}_{elec} = &\overline{P}_{elec,0}
-    - \eta \sum_\mu \sum_{\nu > \mu}
-    \sum_{\beta=1}^{N_{sea}} w_\beta
+    \overline{\gls{sym-P}}_{elec} = &\overline{\gls{sym-P}}_{elec,0}
+    - \gls{sym-eta} \sum_\gls{sym-mu} \sum_{\gls{sym-nu} > \gls{sym-mu}}
+    \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-w-beta}
     \left[
-        \delta_{\mu,\mu^*_\beta}(1-\delta_{\nu,\nu^*_\beta})
-        \left(            \textrm{aff}_\beta (b_{\mu})
-            + \sqrt{\textrm{aff}_\beta (b_{\mu})}
+        \gls{sym-delta-mu-mu-star-beta}(1-\gls{sym-delta-nu-nu-star-beta})
+        \left(
+            \textrm{aff}_\gls{sym-beta}(\gls{sym-b-mu})
+            + \sqrt{\textrm{aff}_\gls{sym-beta}(\gls{sym-b-mu})}
         \right)
     \right.
 \\
     &\left.
-        + \delta_{\mu,\mu^*_\beta}\delta_{\nu,\nu^*_\beta}
-        \left(            \textrm{quad}_\beta (b_{\mu}, b_{\nu}) +
-            \left(\textrm{aff}_\beta (b_{\mu}) + \textrm{aff}_\beta (b_{\nu})\right)
-            \sqrt{\textrm{quad}_\beta (b_{\mu}, b_{\nu})}
+        + \gls{sym-delta-mu-mu-star-beta}\gls{sym-delta-nu-nu-star-beta}
+        \left(
+            \textrm{quad}_\gls{sym-beta}(\gls{sym-b-mu}, \gls{sym-b-nu}) +
+            \left(\textrm{aff}_\gls{sym-beta}(\gls{sym-b-mu}) + \textrm{aff}_\gls{sym-beta}(\gls{sym-b-nu})\right)
+            \sqrt{\textrm{quad}_\gls{sym-beta}(\gls{sym-b-mu}, \gls{sym-b-nu})}
         \right)
     \right]
 \end{aligned}
@@ -587,19 +596,21 @@ we find that $\gls{sym-overline-P-elec}$ is a piecewise function of each constra
 The two Kronecker delta terms are combined with the weighting term $\gls{sym-w-beta}$ to create revised weighting terms $\gls{sym-tilde-w-1-mu-nu-beta}$ and $\gls{sym-tilde-w-2-mu-nu-beta}$ that are non-zero only when the corresponding constraint (s) are active in that sea state:
 \begin{equation}\label{eq:power-triple-sum}
 \begin{aligned}
-    \gls{sym-overline-P-elec} &= \overline{P}_{elec,0}
-    - \eta \sum_\mu \sum_{\nu > \mu}
+    \gls{sym-overline-P-elec} &= \overline{\gls{sym-P}}_{elec,0}
+    - \gls{sym-eta} \sum_\gls{sym-mu} \sum_{\gls{sym-nu} > \gls{sym-mu}}
     \left[
-        \sum_{\beta=1}^{N_{sea}} \tilde{w}_{1\mu\nu\beta}
-        \left(            \textrm{aff}_\beta (b_{\mu})
-            + \sqrt{\textrm{aff}_\beta (b_{\mu})}
+        \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-tilde-w-1-mu-nu-beta}
+        \left(
+            \textrm{aff}_\gls{sym-beta}(\gls{sym-b-mu})
+            + \sqrt{\textrm{aff}_\gls{sym-beta}(\gls{sym-b-mu})}
         \right)
     \right. + \\
     &\left.
-     \sum_{\beta=1}^{N_{sea}} \tilde{w}_{2\mu\nu\beta}
-        \left(            \textrm{quad}_\beta (b_{\mu}, b_{\nu}) +
-            \left(\textrm{aff}_\beta (b_{\mu}) + \textrm{aff}_\beta (b_{\nu})\right)
-            \sqrt{\textrm{quad}_\beta (b_{\mu}, b_{\nu})}
+     \sum_{\gls{sym-beta}=1}^{\gls{sym-N-sea}} \gls{sym-tilde-w-2-mu-nu-beta}
+        \left(
+            \textrm{quad}_\gls{sym-beta}(\gls{sym-b-mu}, \gls{sym-b-nu}) +
+            \left(\textrm{aff}_\gls{sym-beta}(\gls{sym-b-mu}) + \textrm{aff}_\gls{sym-beta}(\gls{sym-b-nu})\right)
+            \sqrt{\textrm{quad}_\gls{sym-beta}(\gls{sym-b-mu}, \gls{sym-b-nu})}
         \right)
     \right]
 \end{aligned}
@@ -608,14 +619,14 @@ so the power-constraint relationship is a sum over sea states of piecewise funct
 Recognizing that the sea state sum in \eqref{eq:power-triple-sum} essentially just scales the individual piecewise functions, the expression can be simplified by absorbing the weights into the subscripts of the affine and quadratic terms, and combining the sum of an affine and quadratic term into a single quadratic term:
 \begin{equation}\label{eq:power-double-sum}
 \begin{aligned}
-    \gls{sym-overline-P-elec} = \overline{P}_{elec,0}
-    - \eta \sum_{\mu\nu\beta}
+    \gls{sym-overline-P-elec} = \overline{\gls{sym-P}}_{elec,0}
+    - \gls{sym-eta} \sum_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}
     &\left[
-        \sqrt{\textrm{aff}_{\mu\nu\beta} (b_{\mu})}
-        + \textrm{quad}_{\mu\nu\beta} (b_{\mu}, b_{\nu})
+        \sqrt{\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu})}
+        + \textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu}, \gls{sym-b-nu})
     +
-        \left(\textrm{aff}_{\mu\nu\beta} (b_{\mu}) + \textrm{aff}_{\mu\nu\beta} (b_{\nu})\right)
-        \sqrt{\textrm{quad}_{\mu\nu\beta} (b_{\mu}, b_{\nu})}
+        \left(\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu}) + \textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-nu})\right)
+        \sqrt{\textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu}, \gls{sym-b-nu})}
     \right]
 \end{aligned}\end{equation}
 We can then use a similar analysis as before to obtain conditions for the convexity of the overall power-constraint relationship.
