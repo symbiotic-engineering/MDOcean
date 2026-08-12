@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# run the command inside the mip project environment, so that the
+# dependencies in mip.lock (openflash, wec-sim, safe) are loaded.
+# single quotes are doubled to escape them for the matlab char literal.
+esc="${1//\'/\'\'}"
+cmd="mip('project','run','--locked','${esc}')"
+
 if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
 # if running on github actions, use the auto-licensed matlab
-    exec ../../_actions/matlab-actions/run-command/v2/dist/bin/glnxa64/run-matlab-command "$1"
+    exec ../../_actions/matlab-actions/run-command/v2/dist/bin/glnxa64/run-matlab-command "$cmd"
 else
 # if running locally, use the local matlab installation (requires its own license)
-    exec matlab -batch "$1"
+    exec matlab -batch "$cmd"
 fi
