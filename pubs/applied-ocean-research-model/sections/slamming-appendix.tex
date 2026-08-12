@@ -28,8 +28,8 @@ In general, after taking the square root of \Cref{eq:slamming-squared}, both the
 This yields a maximum and minimum amplitude criteria to prevent slamming, $\gls{sym-xi}_{\text{min},\text{slam}}<|\gls{sym-hat-xi}|<\gls{sym-xi}_{\text{max},\text{slam}}$, with the following values:
 \begin{equation}\label{eq:slamming-min-max}
 \begin{aligned}
-    \gls{sym-xi-max-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta} + \sqrt{\gls{sym-Delta} \gls{sym-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta}\right)^2 } \\
-    \gls{sym-xi-min-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta} - \sqrt{\gls{sym-Delta} \gls{sym-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta}\right)^2 }
+    \gls{sym-xi-max-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta} + \sqrt{\gls{sym-Delta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta}\right)^2 } \\
+    \gls{sym-xi-min-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta} - \sqrt{\gls{sym-Delta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta}\right)^2 }
 \end{aligned}
 \end{equation}
 where $\gls{sym-theta}=\angle\gls{sym-hat-xi} + \gls{sym-k-wavenumber}\gls{sym-y}$ must be evaluated with the value of $\gls{sym-y}$ that creates the minimum value of $\gls{sym-xi}_{\text{max},\text{slam}}$ and the maximum value of $\gls{sym-xi}_{\text{min},\text{slam}}$ to ensure lack of slamming across the entire WEC surface.
@@ -154,17 +154,17 @@ Conceptually, both the slamming requirement \eqref{eq:slamming-time-domain} and 
 However, the limit on $|\gls{sym-hat-xi-f}-\gls{sym-hat-xi-s}|$ described in \Cref{tab:DLCs} already ensures that the top of the spar remains above the top of the float across all dynamic conditions.
 Coupled with the fact that the float diameter always exceeds the spar diameter, this means that satisfaction of the float submersion requirement implies automatic satisfaction of the spar submersion requirement.
 While this logic works for submersion, it does not apply for slamming because the damping plate diameter may exceed the float diameter.
-The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\gls{sym-Delta} \gls{sym-z}_{\text{surf}}=\\text{min}(\gls{sym-Delta-z-sub}, \gls{sym-Delta-z-slam} )$, where the values for $\gls{sym-Delta-z-sub} $ and $\gls{sym-Delta-z-slam}$ were given in \Cref{sec:dynamics}.
+The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\gls{sym-Delta-z-surf}=\\text{min}(\gls{sym-Delta-z-sub}, \gls{sym-Delta-z-slam} )$, where the values for $\gls{sym-Delta-z-sub} $ and $\gls{sym-Delta-z-slam}$ were given in \Cref{sec:dynamics}.
 This reduces the number of free surface constraints per sea state from four to one.
 
-For operational waves, the vertical dimension $\gls{sym-Delta} \gls{sym-z}$ in \Cref{eq:slam-constraint-quadratic} is set as follows.
-For float slamming, $\gls{sym-Delta} \gls{sym-z} = \gls{sym-T-f-1}$ (rather than $\gls{sym-T-f-2}$):
+For operational waves, the vertical dimension $\gls{sym-Delta-z}$ in \Cref{eq:slam-constraint-quadratic} is set as follows.
+For float slamming, $\gls{sym-Delta-z} = \gls{sym-T-f-1}$ (rather than $\gls{sym-T-f-2}$):
 this prevents slamming on the slanted underside of the float and additionally maintains constant waterplane area,
 avoiding unmodeled nonlinearities in the hydrostatic stiffness and Froude–Krylov excitation force.
-For spar slamming, $\gls{sym-Delta} \gls{sym-z} = \gls{sym-T-s} - \gls{sym-h-d}$
+For spar slamming, $\gls{sym-Delta-z} = \gls{sym-T-s} - \gls{sym-h-d}$
 prevents both slamming on the bottom of the spar and surfacing of the damping plate.
 For float and spar submersion,
-$\gls{sym-Delta} \gls{sym-z}$
+$\gls{sym-Delta-z}$
 is set to the above-water heights
 $\gls{sym-h-f} - \gls{sym-T-f-2}$
 and
@@ -173,7 +173,7 @@ respectively.
 
 The storm case slamming constraint is not currently applied.
 A future extension should set
-$\gls{sym-Delta} \gls{sym-z} = \gls{sym-T-f-2}$
+$\gls{sym-Delta-z} = \gls{sym-T-f-2}$
 in the storm case to prevent slamming on the (now-merged) bottom surface of the float-spar system.
 
 The amplitude limits

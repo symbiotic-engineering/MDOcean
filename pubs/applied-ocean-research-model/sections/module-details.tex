@@ -20,7 +20,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Geometry}\label{sec:geom}
 The geometry module computes submerged volume $\gls{sym-V-sub}$, structural volume $\gls{sym-V-struct}$, and associated hydrostatic properties from bulk dimensions.
-\Cref{fig:dims} defines the principal geometric variables, where $\gls{sym-T}$ denotes drafts, $\gls{sym-h}$ heights, and $\gls{sym-D}$ diameters.
+\Cref{fig:dims} defines the principal geometric variables, where $\gls{sym-T-draft}$ denotes drafts, $\gls{sym-h}$ heights, and $\gls{sym-D}$ diameters.
 Subscripts $\gls{sym-f}$, $\gls{sym-s}$, and $d$ refer to the float, spar, and damping plate, respectively.
 Key points include the center of buoyancy $\gls{sym-B}$, center of gravity $\gls{sym-G}$, the keel $\gls{sym-K}$, and metacenter $\gls{sym-M}$ for the combined system.
 Additional structural dimensions and thickness definitions are provided in \Cref{sec:structures}.
@@ -582,8 +582,8 @@ This is called reactive control, with subscript $\text{reac}$:
 \end{equation}
 
 However, some PTOs lack reactive capability (the ability to function as a motor and add energy to the system at some times), such as rectifying hydraulic systems or winches where cable tension must be maintained.
-Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K}_{\gls{sym-l},\text{damp}}=0$.
-The power-maximizing PTO damping $\gls{sym-B}_{\gls{sym-l},\text{damp}}$ is then:
+Avoiding reactive power ($\gls{sym-Q}=0$) at the electrical port restricts the system to so-called damping control, with subscript $\text{damp}$, and requires $\gls{sym-K-l-damp}=0$.
+The power-maximizing PTO damping $\gls{sym-B-l-damp}$ is then:
 \begin{equation}\label{eq:damping-control}
     \gls{sym-B-l-damp} = \sqrt{ (\gls{sym-B-l-reac})^2 + (\gls{sym-K-l-reac}/\gls{sym-omega})^2}
 \end{equation}
@@ -591,7 +591,7 @@ The power-maximizing PTO damping $\gls{sym-B}_{\gls{sym-l},\text{damp}}$ is then
     When a port other than the electrical port must avoid reactive power, the constrained solution detailed later in this section can be used to enforce $\gls{sym-Q}=0$ at that port.
 
     Both of these controllers frequently result in excessively large forces and thus structural and powertrain requirements, especially in energetic sea states or in reactive control when $\gls{sym-K-l}$ is far from zero.
-    $\gls{sym-K}_{\gls{sym-l},\text{reac}}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
+    $\gls{sym-K-l-reac}$ is often a large negative number because cost minimization favors a low mass, and the negative PTO stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
     Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
 \else
     Both controllers frequently produce excessively large forces in energetic sea states or under reactive control, and provide no mechanism to obey limits.
@@ -678,7 +678,7 @@ This is a quadratically-constrained quadratic program (QCQP):
 & & \gls{sym-vec-c}^{\,*}\gls{sym-vec-x} &= d \\[3pt]
 & \text{where}
 & \gls{sym-vec-x} &= \begin{bmatrix} \gls{sym-hat-V} & \gls{sym-hat-I} \end{bmatrix}^T \\[3pt]
-& & \gls{sym-mathbf-Q-mu} &\in \gls{sym-mathbb-C-2-times-2}, \quad \gls{sym-mathbf-Q-mu} = \gls{sym-mathbf-Q-mu}^{\,*} \\[3pt]
+& & \gls{sym-mathbf-Q-mu} &\in \gls{sym-mathbb-C}^{2\times 2}, \quad \gls{sym-mathbf-Q-mu} = \gls{sym-mathbf-Q-mu}^{\,*} \\[3pt]
 & & \gls{sym-vec-a-mu} &\in \gls{sym-mathbb-C}^2 \\[3pt]
 & & \gls{sym-b-mu} &\in \gls{sym-mathbb-R} \\[3pt]
 & & \gls{sym-vec-c}^{\,*} &= \begin{bmatrix} 1 & \gls{sym-Z-s-th} \end{bmatrix} \\[3pt]
@@ -816,20 +816,20 @@ We now combine the results across sea states to find the long-term energy statis
 
 \ifdefined\DISSERTATION
     While matrices in \Cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\gls{sym-vec-hat-xi}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\gls{sym-hat-xi-f}$) or the sum across all degrees of freedom (i.e.\ power in systems with multiple actuated degrees of freedom).
-    These scalars are assembled into ``matrices'' (i.e.\ $\gls{sym-boldsymbol-hat-xi-H-T-f}$) indexed by sea state rather than by degree of freedom, indicated by the $\gls{sym-H},\gls{sym-T}$ superscript.
+    These scalars are assembled into ``matrices'' (i.e.\ $\gls{sym-boldsymbol-hat-xi-H-T-f}$) indexed by sea state rather than by degree of freedom, indicated by the $\gls{sym-H},\gls{sym-T-period}$ superscript.
     Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
     To distinguish from the average and maximum signal values over a wave period denoted with $\text{avg}$ and $pk$ subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $\text{max}$.
     This intentionally matches the $\text{max}$ subscript used in \Cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
     An exception is the slamming and submergence constraints, which will be discussed separately in \Cref{sec:design-load-cases}.
 \else
-    Quantities indexed by sea state are written as ``power matrices'' $(\cdot)^{\gls{sym-H},\gls{sym-T}}$ (e.g.\ $\mathbf{\gls{sym-P}}_{\text{elec}}^{\gls{sym-H},\gls{sym-T}}$),
+    Quantities indexed by sea state are written as ``power matrices'' $(\cdot)^{\gls{sym-H},\gls{sym-T-period}}$ (e.g.\ $\mathbf{\gls{sym-P}}_{\text{elec}}^{\gls{sym-H},\gls{sym-T-period}}$),
     with operations interpreted elementwise across sea states rather than as matrix multiplication.
     Long-term averages across sea states are denoted with an overbar $\overline{(\cdot)}$ and long-term maxima with subscript $\text{max}$,
     distinguishing them from the within-period averages and peaks ($\text{avg}$, $pk$) introduced in \Cref{sec:power}.
     A separate quadratic amplitude limit for slamming and submergence, which varies across sea states, is treated in \Cref{sec:design-load-cases}.
 \fi
 
-To find the long-term average power production $\overline{\gls{sym-P}}_{\text{elec}}$ in a location with a given distribution of sea states, the power matrix $\mathbf{\gls{sym-P}}^{\gls{sym-H},\gls{sym-T}}_{\text{elec}}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
+To find the long-term average power production $\overline{\gls{sym-P}}_{\text{elec}}$ in a location with a given distribution of sea states, the power matrix $\mathbf{\gls{sym-P}}^{\gls{sym-H},\gls{sym-T-period}}_{\text{elec}}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (JPD) matrix and then summed.
 This method is illustrated in \Cref{fig:JPD-multiply}.
 The JPD used in this analysis represents wave conditions in Humboldt Bay, CA and is taken from the study by \citet{janzou_system_2020}.
 
@@ -875,7 +875,7 @@ When the WEC is in survival mode, an external brake locks the PTO, enforcing the
     \gls{sym-F-heave-s} (\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p} (\gls{sym-t})|,~ |\gls{sym-m-s}\gls{sym-ddot-xi-s} (\gls{sym-t})-\gls{sym-F-p} (\gls{sym-t})|\right)
 \end{aligned}
 \end{equation}
-In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the PTO dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F}_\gls{sym-p}\gls{sym-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
+In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the PTO dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F}_{\gls{sym-p}}\gls{sym-dot-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
 In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 \ifdefined\DISSERTATION
     Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
@@ -958,8 +958,8 @@ The surge force for each component is calculated as \citep{newman_motions_1963}
 \begin{equation}\label{eq:surge-force}
    \gls{sym-F-surge} = \frac{\gls{sym-H}\gls{sym-rho-w} \gls{sym-omega}^2 \gls{sym-A-w}}{\gls{sym-k-wavenumber}} (\exp(-\gls{sym-k-wavenumber}\gls{sym-z-top})-\exp(-\gls{sym-k-wavenumber}\gls{sym-T-draft}))
 \end{equation}
-using the respective waterplane areas $\gls{sym-A-w}$  and drafts $\gls{sym-T}$ for the float and spar.
-The top vertical height $\gls{sym-z}_{\text{top}}$ is set to zero for the float and $\gls{sym-T-f-2}$ for the spar.
+using the respective waterplane areas $\gls{sym-A-w}$  and drafts $\gls{sym-T-draft}$ for the float and spar.
+The top vertical height $\gls{sym-z-top}$ is set to zero for the float and $\gls{sym-T-f-2}$ for the spar.
 The design surge force is the maximum surge force over all nonzero-probability sea states.
 Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
 Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work.
@@ -1061,11 +1061,11 @@ are given in \Cref{sec:appendix-slam}.
 \subsubsection{Irregular Waves}\label{sec:irregular-waves}
 MDOcean uses a JPD (joint probability density matrix) to capture the long-term variation in wave conditions and accurately estimate annual average power and fatigue load.
 Additionally, it represents each irregular wave condition within the JPD as an equivalent sinusoidal regular wave.
-Regular wave height $\gls{sym-H}$ and period $\gls{sym-T}$ are selected to provide equal energy as the irregular sea state:
+Regular wave height $\gls{sym-H}$ and period $\gls{sym-T-period}$ are selected to provide equal energy as the irregular sea state:
 \begin{equation}\label{eq:regular-wave-equiv}
     \gls{sym-H} = \frac{\gls{sym-H-s}}{\sqrt{2}},
     \qquad
-    \gls{sym-T} = \gls{sym-T-e} \approx 0.857 ~\gls{sym-T-p},
+    \gls{sym-T-period} = \gls{sym-T-e} \approx 0.857 ~\gls{sym-T-p},
 \end{equation}
 where the irregular sea state has significant wave height $\gls{sym-H-s}$, energy period $\gls{sym-T-e}$, and (for a Pierson-Moskowitz spectrum) peak period $\gls{sym-T-p}$.
 This regular wave assumption avoids the time-consuming convolution integral or state-space identification that is typically required to simulate nonlinear dynamics subject to irregular wave forcing.
@@ -1156,8 +1156,8 @@ Further details of all structural calculations performed in the simulation are p
 For illustrative purposes only, assuming a fixed maximum stress and considering only dominant terms for geometries similar to the nominal design, the scaling of the required structural thicknesses with bulk dimensions simplifies to the following:
 \begin{equation}\label{eq:struct-scaling}
 \begin{aligned}
-    \gls{sym-t-fb} h_{\text{stiff},f}^2 &\sim \frac{F_{\text{heave}} \gls{sym-D-f}}{\left(\frac{\gls{sym-D-f}}{\gls{sym-D-s}}-1\right)^2} \\
-    \gls{sym-t-sr}^4 &\sim F_{\text{heave}} \gls{sym-h-s}^2 \\
+    \gls{sym-t-f-b} h_{\text{stiff},f}^2 &\sim \frac{F_{\text{heave}} \gls{sym-D-f}}{\left(\frac{\gls{sym-D-f}}{\gls{sym-D-s}}-1\right)^2} \\
+    \gls{sym-t-s-r}^4 &\sim F_{\text{heave}} \gls{sym-h-s}^2 \\
     \gls{sym-t-d} h_{\text{stiff},d}^2 &\sim \frac{F_{\text{heave}}\gls{sym-D-d}^2}{\gls{sym-D-s}} \\
 \end{aligned}
 \end{equation}

@@ -107,7 +107,7 @@ The $\gls{sym-C-d}=0$ simulation with identical hydrodynamic coefficients (top l
 The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
 This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
 For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
-An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $\gls{sym-T}>12 \gls{sym-s}$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $\gls{sym-T-period}>12 \gls{sym-s}$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
 Turning on drag ($\gls{sym-C-d}=1$, top right of \Cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
 While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
 
@@ -226,14 +226,14 @@ The efficiency matrices introduced in \Cref{eq:power-matrix-decomposition} are d
 The wave power density $\gls{sym-mathbf-J-H-T-wave}$ and maximum capture width  $\gls{sym-mathbf-CW-H-T-max}$ are independent of design:
 \begin{equation}
 \mathbf{J}^{H,T}_{wave} = \frac{\gls{sym-rho-w} \gls{sym-g}^2}{64\gls{sym-pi}} \gls{sym-T-e} \gls{sym-H-s}^2, \qquad
-\mathbf{CW}^{\gls{sym-H},\gls{sym-T}}_{max} = \frac{\gls{sym-g} \gls{sym-T-e}^2}{4\gls{sym-pi}^2}.
+\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max} = \frac{\gls{sym-g} \gls{sym-T-e}^2}{4\gls{sym-pi}^2}.
 \end{equation}
 The maximum capture width matrix represents the radiation limit determined by the WEC mode of motion
 (heave in this case; for surge or pitch the value would be doubled due to the asymmetry of the outgoing wave field).
 
 The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$ (computed with $\gls{sym-C-d-f}=\gls{sym-C-d-s}=0$, ideal PTO):
 \begin{equation}
-\gls{sym-boldsymbol-eta-H-T-rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T}}_{max}}, \qquad
+\gls{sym-boldsymbol-eta-H-T-rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}}, \qquad
 \gls{sym-boldsymbol-eta-H-T-drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
 \end{equation}
 $\gls{sym-boldsymbol-eta-H-T-drag}$ may exceed 1 at frequencies where the drag-free system is so undamped that
@@ -246,7 +246,7 @@ $\gls{sym-boldsymbol-eta-H-T-drag} \leq 1$ is guaranteed.
 
 The product of the first four matrices is the theoretical ideal mechanical power:
 \begin{equation}
-    \mathbf{P}^{H,T}_{F\dot{X},\text{ideal}} = \mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T}}_{max}\,\gls{sym-boldsymbol-eta-H-T-rad}\,\gls{sym-boldsymbol-eta-H-T-drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\gls{sym-mathbf-Z-H-T-i-th})}.
+    \mathbf{P}^{H,T}_{F\dot{X},\text{ideal}} = \mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}\,\gls{sym-boldsymbol-eta-H-T-rad}\,\gls{sym-boldsymbol-eta-H-T-drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\gls{sym-mathbf-Z-H-T-i-th})}.
 \end{equation}
 The remaining two efficiency matrices capture the loss to dynamic constraints and to PTO electrical inefficiency:
 \begin{equation}
@@ -531,7 +531,7 @@ This prevents the need for a separate structural analysis of the side plates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damping Plate}
-For an annular plate with free outer radius $\gls{sym-a}$ and fixed inner radius $\gls{sym-b}$, the nondimensional plate deflection $\overline{\gls{sym-delta}}_{\text{plate}}$ and bending moment $\overline{\gls{sym-M}}_\gls{sym-hat-e-r}$ can be calculated as a function of plate aspect ratio $\gls{sym-b}/\gls{sym-a}$ for various load cases.
+For an annular plate with free outer radius $\gls{sym-a}$ and fixed inner radius $\gls{sym-b}$, the nondimensional plate deflection $\overline{\gls{sym-delta}}_{\text{plate}}$ and bending moment $\overline{\gls{sym-M}}_{\gls{sym-r}}$ can be calculated as a function of plate aspect ratio $\gls{sym-b}/\gls{sym-a}$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
 Formulas for the concentrated loading are given by \citet{boedo_corrected_1998}, and formulas for distributed loading are given by \citet[case 2L, table 11.2]{young_roarks_2001}.
 The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $\gls{sym-D-eq}$ and equivalent section modulus $\gls{sym-S-eq}$.
@@ -680,14 +680,14 @@ $\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$\gls{sym-m}^3$  \\
 $\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$\gls{sym-s}^2$  \\ 
 $\gls{sym-h}$& Water depth & 100 & m  \\ 
 JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
-$\gls{sym-H-s}$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$\gls{sym-H-s}$ & Significant wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
 $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$\gls{sym-T}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$\gls{sym-T-e}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
 $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
-$\gls{sym-sigma-y}$ & Material yield strength& 248 & MPa  \\ 
+$\gls{sym-sigma-Y}$ & Material yield strength& 248 & MPa  \\ 
 $\gls{sym-rho-M}$ & Material density& 7850 & kg/$\gls{sym-m}^3$  \\ 
 $\gls{sym-E}$& Material Young's modulus& 200 & GPa  \\ 
-$\text{cost}_\gls{sym-m}$ & Material cost& 1.89 & \$/kg \\ 
+$\text{cost}_M$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
 %$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
 %$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
@@ -701,7 +701,7 @@ $\gls{sym-N-WEC}$ & Number of WECs in array& 100 & -  \\
 $\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\ 
 $\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 
 $\gls{sym-h-d}/{\gls{sym-D-s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
-$\gls{sym-T-f}/{\gls{sym-h-f}}$ & Float submergence ratio & 0.5 & -  \\ 
+$\gls{sym-T-f-2}/{\gls{sym-h-f}}$ & Float submergence ratio & 0.615 & -  \\ 
 $F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
  \end{table}
