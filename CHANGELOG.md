@@ -1,5 +1,7 @@
 # Changelog
 ## Unreleased
+### Fixed
+- Paper: editorial corrections to dissertation (sampleThesis.tex and included files): fix typos/misspellings, grammar, inconsistent style, leftover draft highlights, and outdated "in preparation" statuses.
 
 ## [v1.3.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.3.5) - 2026-8-1
 ### Fixed
