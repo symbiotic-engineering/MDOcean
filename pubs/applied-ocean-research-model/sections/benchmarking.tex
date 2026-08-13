@@ -2,6 +2,51 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Validation and Benchmarking}
 \label{sec:validation-benchmarking}
+Validation \Cref{sec:dynamic-validation,sec:static-validation} and benchmarking \Cref{sec:sim-runtime} demonstrate the accuracy and speed of the MDOcean model.
+
+\subsection{Verification, Calibration, and Validation: Dynamics and Control Module}
+
+- verification = under matched assumptions, did i implement the assumptions that I say I'm going to implement correctly?
+ --- left side of figure 12 (first subfigure)
+
+ --- Fig 37: drag numerical amplitude and phase are not very correct (but doesn't matter too much)
+
+- calibration = for the outputs that didn't pass verification, apply tuning to make them match
+
+- validation = how accurate are my assumptions?
+ --- subfigures 2,3,4 of figure 12
+
+ Assumption: use describing function for drag
+--- Fig 38: THD figure (with the assumed shape, harmonics are negligible)
+--- Fig 39: drag signal shape (proves shape is correct)
+
+ Assumption: use meem for hydro coeffs
+ Assumption: simultaneous interaction of (use describing function for drag) and (use meem for hydro coeffs)
+ 
+Assumption: linearization
+-- linearization of drag: validated above
+-- linearization of PTO saturation: not directly validated, but the drag linearization validates the concept that it stands on (low pass filter)
+Assumption: regular waves (narrowband)
+-- not yet validated, but refer to 92\% study
+Assumption: peak fluid force uses the fundamental
+-- not yet validated
+Assumption: peak amplitude uses the fundamental
+-- not directly validated, but the low drag THD validates the concept that it stands on (low pass filter)
+Assumption: you only care about sinusoidal steady state, no transients
+-- not directly validated, but the drag linearization validates the concept that it stands on (low pass filter bc transients are high frequency)
+Assumption: surge force is not contributing to the structural stress
+-- not yet validated
+
+Table of assumption, whether I validate it, and if I don't validate it if that's because it doesn't need validating or because it's not validated yet.
+
+\subsection{Verification, Calibration, and Validation: Other Modules}
+\subsubsection{Verification}
+\subsubsection{Calibration}
+(no validation)
+
+\subsection{Benchmarking}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Dynamic Validation Using WEC-Sim}\label{sec:dynamic-validation}
@@ -42,6 +87,7 @@ since the goal is to demonstrate the value of simultaneously analyzing multiple 
 and the ability to quickly evaluate a large number of design options.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Static Validation}
+\label{sec:static-validation}
 
 \ifdefined\DISSERTATION
     The MEEM hydrodynamic coefficients for the nominal RM3 geometry match WAMIT BEM results closely, as previously shown in Fig.~5 of \citep{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.

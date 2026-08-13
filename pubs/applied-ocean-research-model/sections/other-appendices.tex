@@ -71,6 +71,8 @@ This section provides supplementary derivations and implementation details for t
 
 %%%%%%%%%%%%%%%
 \subsection{Relationship Between Peak and Fundamental Amplitudes}
+\label{sec:appendix-peak-fundamental}
+
 \ifdefined\DISSERTATION
     The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the PTO force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
     The distributed nature of the inertial force means that the float and spar structures experience internal loads that vary not only in time but also in space along their lengths.
@@ -130,8 +132,18 @@ A future refinement could explicitly reconstruct the time-domain drag force from
 \label{sec:appendix-slam}
 \input{sections/slamming-appendix}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Narrow-band Wave Approximation}
+\label{sec:appendix-narrowband}
+\Cref{sec:irregular-waves} introduced the narrow-band wave environment approximation,
+in which an irregular sea state is approximated by a regular wave at its energy-equivalent period and wave height.
 
+In addition to enabling the QCQP formulation for the linearized system to be single-frequency and thus solvable analytically,
+even for the nonlinear system the regular wave assumption may be desirable to avoid the time-consuming convolution integral or state-space identification that is typically required to simulate nonlinear dynamics subject to irregular wave forcing.
 
+In the absence of dynamic constraints, the regular wave assumption does not significantly affect power production if the ultimate design utilizes a high-order linear controller capable of impedance matching over the bandwidth of each sea state.
+If the ultimate design instead utilizes a simple PI controller, the assumption slightly overestimates the power produced in a broadband wave environment.
+\citet{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Dynamic Validation}
