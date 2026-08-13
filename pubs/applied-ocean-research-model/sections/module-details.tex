@@ -853,6 +853,7 @@ The annual energy production $AEP$ in kWh/year for a farm of multiple devices is
 This study considers two design load cases: (1) cyclic operational loading in sea states where power is produced, and (2) storm loading in sea states where the device enters survival mode and stops producing power.
 These correspond roughly with the 1-year and 50-year return periods specified in the wave energy design standard IEC TS 62600-2, and with the fatigue limit state (FLS) and ultimate limit state (ULS) in offshore wind standards.
 When the WEC is in survival mode, an external brake locks the PTO, enforcing the float and spar to move together without loading the generator.
+
 \ifdefined\DISSERTATION
     This section details the allowable amplitudes and forces in each case.
     Currently all sea states in the JPD with nonzero probability are considered operational, since the generator force and power limit serve to reduce loads in energetic sea states.
@@ -861,47 +862,21 @@ When the WEC is in survival mode, an external brake locks the PTO, enforcing the
     All nonzero-probability sea states in the JPD are considered operational; the generator force and power limits reduce loads in the most energetic sea states.
 \fi
 
-\ifdefined\DISSERTATION
-    The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the PTO force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
-    The distributed nature of the inertial force means that the float and spar structures experience internal loads that vary not only in time but also in space along their lengths.
-    Due to force balance in dynamic equilibrium, the maximum magnitude of internal heave force in space at any given time, $F_{\text{heave},f}(t)$, is the greater of the absolute value of the PTO force and the fluid force.
-    Expressing the latter as the difference between the inertial force and the PTO force, this gives:
-\else
-    By force balance, the peak internal heave force at any cross-section of each body is the greater of the PTO force and the fluid (inertial minus PTO) force:
-\fi
-\begin{equation}\label{eq:heave-force-decomp}
-\begin{aligned}
-    F_{heave,f}(t) &=\max\!\left(|F_p(t)|,~ |m_f\ddot{\xi}_f(t)-F_p(t)|\right) \\
-    F_{heave,s}(t) &=\max\!\left(|F_p(t)|,~ |m_s\ddot{\xi}_s(t)-F_p(t)|\right)
-\end{aligned}
-\end{equation}
-In operational seas, $F_p(t)$ is determined by the generator torque $\tau(t)$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$.
-In storm seas, $F_p(t)$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
-\ifdefined\DISSERTATION
-    Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
-    The peak of $\tau(t)$ is lower than its fundamental amplitude due to generator force saturation at $\tau_{\text{max}}$, so using $\tau_{\text{max}}$ rather than $|\hat{\tau}|$ is both less conservative and more realistic.
-    Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
-\else
-    Saturation caps the operational generator torque at $\tau_{\text{max}}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\hat{\tau}|$.
-    Assuming constructive interference with the shaft torque,
-\fi
-\begin{equation}\label{eq:peak-pto-force}
-\max_t |F_{p,op}(t)| \approx \frac{1}{R} \left(\left| Z_{shaft} \hat{\Omega} \right| + \tau_{max} \right).
-\end{equation}
-The storm case lacks the control saturation nonlinearity and uses the fundamental amplitude $\hat{F}_{p,st}$ directly.
+\paragraph{Peak Forces and Amplitudes as a Function of Fundamental}
 
-The fluid force nonlinearities $|m\ddot{\xi}(t)-F_p(t)|$ are harder to handle, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
-MDOcean currently uses the fundamental amplitude for both load cases:
-\begin{equation}\label{eq:peak-fluid-force}
-\max_t \left|m\ddot{\xi}(t)-F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|.
-\end{equation}
-This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \Cref{sec:appendix-peak-fluid-force}.
-\ifdefined\DISSERTATION
-    The fundamental amplitudes are also used to calculate the peak float and spar displacements $\max_t |\xi_f(t)|$ and $\max_t |\xi_s(t)|$ in both cases.
-    Using the fundamental for the response displacements is more accurate than for the forces because the system dynamics filter out high frequency inputs.
-\else
-    Peak float and spar displacements likewise use fundamental amplitudes; the second-order plant filters out higher harmonics, making the approximation more accurate for displacements than for forces.
-\fi
+Assumptions:
+Operational case:
+- PTO force shape is satuted sin wave
+- PTO force has constructive interference with shaft torque (conservative) 
+- Use the fundamental of fluid force (could be under or over estimate)
+- Use the fundamental for displacements (good approximation because low-pass)
+
+Storm case:
+- Use the fundamental amplitude directly since no PTO saturation
+- Use the fundamental of fluid force (could be under or over estimate)
+- Use the fundamental for displacements (good approximation because low-pass)
+
+See \Cref{sec:appendix-peak-fundamental} for further discussion and derivation.
 
 \Cref{tab:DLCs} summarizes the peak forces and amplitudes based on the assumptions of each design load case.
 
@@ -963,6 +938,7 @@ Maximum acceptable heave %and surge
 forces will be evaluated with structural factors of safety in \Cref{sec:structures}.
 The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the simulation.
 
+\paragraph{Permissible Force and Amplitude Limits}
 The table also indicates the maximum permissible amplitudes.
 In operational sea states, the geometric clearance between the float and spar is enforced to prevent overtravel.
 The permissible heights for upward and downward motion of the float relative to the spar are:

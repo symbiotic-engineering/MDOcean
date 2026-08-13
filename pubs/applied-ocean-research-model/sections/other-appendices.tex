@@ -69,13 +69,52 @@ This section provides supplementary derivations and implementation details for t
 \label{sec:appendix-drag}}
 \input{sections/drag-appendix}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Slamming and Submersion Amplitude}
-\label{sec:appendix-slam}
-\input{sections/slamming-appendix}
-
 %%%%%%%%%%%%%%%
-\subsection{Conservatism of the Fundamental-Amplitude Approximation for Fluid Forces}
+\subsection{Relationship Between Peak and Fundamental Amplitudes}
+\ifdefined\DISSERTATION
+    The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the PTO force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
+    The distributed nature of the inertial force means that the float and spar structures experience internal loads that vary not only in time but also in space along their lengths.
+    Due to force balance in dynamic equilibrium, the maximum magnitude of internal heave force in space at any given time, $F_{\text{heave},f}(t)$, is the greater of the absolute value of the PTO force and the fluid force.
+    Expressing the latter as the difference between the inertial force and the PTO force, this gives:
+\else
+    By force balance, the peak internal heave force at any cross-section of each body is the greater of the PTO force and the fluid (inertial minus PTO) force:
+\fi
+\begin{equation}\label{eq:heave-force-decomp}
+\begin{aligned}
+    F_{heave,f}(t) &=\max\!\left(|F_p(t)|,~ |m_f\ddot{\xi}_f(t)-F_p(t)|\right) \\
+    F_{heave,s}(t) &=\max\!\left(|F_p(t)|,~ |m_s\ddot{\xi}_s(t)-F_p(t)|\right)
+\end{aligned}
+\end{equation}
+In operational seas, $F_p(t)$ is determined by the generator torque $\tau(t)$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$.
+In storm seas, $F_p(t)$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
+\ifdefined\DISSERTATION
+    Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
+    The peak of $\tau(t)$ is lower than its fundamental amplitude due to generator force saturation at $\tau_{\text{max}}$, so using $\tau_{\text{max}}$ rather than $|\hat{\tau}|$ is both less conservative and more realistic.
+    Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
+\else
+    Saturation caps the operational generator torque at $\tau_{\text{max}}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\hat{\tau}|$.
+    Assuming constructive interference with the shaft torque,
+\fi
+\begin{equation}\label{eq:peak-pto-force}
+\max_t |F_{p,op}(t)| \approx \frac{1}{R} \left(\left| Z_{shaft} \hat{\Omega} \right| + \tau_{max} \right).
+\end{equation}
+The storm case lacks the control saturation nonlinearity and uses the fundamental amplitude $\hat{F}_{p,st}$ directly.
+
+The fluid force nonlinearities $|m\ddot{\xi}(t)-F_p(t)|$ are harder to handle, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
+MDOcean currently uses the fundamental amplitude for both load cases:
+\begin{equation}\label{eq:peak-fluid-force}
+\max_t \left|m\ddot{\xi}(t)-F_p(t)\right| \approx \left|-m\omega^2 \hat{\xi} - \hat{F}_p\right|.
+\end{equation}
+This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \Cref{sec:appendix-peak-fluid-force}.
+\ifdefined\DISSERTATION
+    The fundamental amplitudes are also used to calculate the peak float and spar displacements $\max_t |\xi_f(t)|$ and $\max_t |\xi_s(t)|$ in both cases.
+    Using the fundamental for the response displacements is more accurate than for the forces because the system dynamics filter out high frequency inputs.
+\else
+    Peak float and spar displacements likewise use fundamental amplitudes; the second-order plant filters out higher harmonics, making the approximation more accurate for displacements than for forces.
+\fi
+
+
+\subsubsection{Conservatism of the Fundamental-Amplitude Approximation for Fluid Forces}
 \label{sec:appendix-peak-fluid-force}
 
 \Cref{eq:peak-fluid-force} approximates the peak fluid force by the magnitude of its fundamental harmonic phasor.
@@ -85,6 +124,13 @@ The fundamental amplitudes are also used for the peak float and spar displacemen
 The fundamental is more accurate for displacements than for forces because the second-order plant dynamics filter out high-frequency inputs, attenuating drag-induced harmonics in the displacement response.
 
 A future refinement could explicitly reconstruct the time-domain drag force from the describing function and track its peak directly, at the cost of either time-domain integration or additional Fourier-component bookkeeping in the frequency-domain formulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slamming and Submersion Amplitude}
+\label{sec:appendix-slam}
+\input{sections/slamming-appendix}
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
