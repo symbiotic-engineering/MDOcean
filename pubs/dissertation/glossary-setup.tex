@@ -1,105 +1,307 @@
 
-% glossary sorting of greek letters and removal of math symbols
-\newcommand{\greeksort}[1]{%
-  \ifstrequal{#1}{alpha}{01}%
-  {\ifstrequal{#1}{beta}{02}%
-  {\ifstrequal{#1}{gamma}{03}%
-  {\ifstrequal{#1}{delta}{04}%
-  {\ifstrequal{#1}{epsilon}{05}%
-  {\ifstrequal{#1}{zeta}{06}%
-  {\ifstrequal{#1}{eta}{07}%
-  {\ifstrequal{#1}{theta}{08}%
-  {\ifstrequal{#1}{iota}{09}%
-  {\ifstrequal{#1}{kappa}{10}%
-  {\ifstrequal{#1}{lambda}{11}%
-  {\ifstrequal{#1}{mu}{12}%
-  {\ifstrequal{#1}{nu}{13}%
-  {\ifstrequal{#1}{xi}{14}%
-  {\ifstrequal{#1}{omicron}{15}%
-  {\ifstrequal{#1}{pi}{16}%
-  {\ifstrequal{#1}{rho}{17}%
-  {\ifstrequal{#1}{sigma}{18}%
-  {\ifstrequal{#1}{tau}{19}%
-  {\ifstrequal{#1}{upsilon}{20}%
-  {\ifstrequal{#1}{phi}{21}%
-  {\ifstrequal{#1}{chi}{22}%
-  {\ifstrequal{#1}{psi}{23}%
-  {\ifstrequal{#1}{omega}{24}%
-  {\ifstrequal{#1}{vec}{}%}
-  {\ifstrequal{#1}{mathbf}{}%}
-  {\ifstrequal{#1}{boldsymbol}{}%}
-  {\ifstrequal{#1}{mathbb}{}%}
-  {\ifstrequal{#1}{hat}{}%}
-  {\ifstrequal{#1}{dot}{}%}
-  {\ifstrequal{#1}{ddot}{}%}
-  {\ifstrequal{#1}{bar}{}%}
-  {\ifstrequal{#1}{tilde}{}%}
-  {\ifstrequal{#1}{mathcal}{}%}
-  {\ifstrequal{#1}{mathrm}{}%}
-  {00#1}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}%
-}
+% \makeatletter
+
+% % glossary sorting of greek letters and removal of math symbols
+
+% % Greek letters -> numeric sort order
+% \def\greeksort@alpha{01}
+% \def\greeksort@beta{02}
+% \def\greeksort@gamma{03}%
+% \def\greeksort@delta{04}%
+% \def\greeksort@epsilon{05}%
+% \def\greeksort@zeta{06}%
+% \def\greeksort@eta{07}%
+% \def\greeksort@theta{08}%
+% \def\greeksort@iota{09}%
+% \def\greeksort@kappa{10}%
+% \def\greeksort@lambda{11}%
+% \def\greeksort@mu{12}%
+% \def\greeksort@nu{13}%
+% \def\greeksort@xi{14}%
+% \def\greeksort@omicron{15}%
+% \def\greeksort@pi{16}%
+% \def\greeksort@rho{17}%
+% \def\greeksort@sigma{18}%
+% \def\greeksort@tau{19}%
+% \def\greeksort@upsilon{20}%
+% \def\greeksort@psi{23}%
+% \def\greeksort@omega{24}%
+
+% % Formatting commands -> nothing
+% \def\greeksort@vec{}
+% \def\greeksort@mathbf{}
+% \def\greeksort@boldsymbol{}
+% \def\greeksort@mathbb{}
+% \def\greeksort@hat{}
+% \def\greeksort@dot{}
+% \def\greeksort@ddot{}
+% \def\greeksort@bar{}
+% \def\greeksort@tilde{}
+% \def\greeksort@mathcal{}
+% \def\greeksort@mathrm{}
+
+
+% \newcommand{\greeksort}[1]{%
+%   \ifcsname greeksort@#1\endcsname
+%     \csname greeksort@#1\endcsname
+%   \else
+%     00#1%
+%   \fi
+% }
+
+% \def\compoundsortkeyaux#1-#2\@nil{%
+%   \greeksort{#1}%
+%   \if\relax\detokenize{#2}\relax
+%   \else
+%     -\compoundsortkeyaux#2\@nil
+%   \fi
+% }
+
+% \newcommand{\mysortkey}[1]{%
+%   \compoundsortkeyaux#1-\@nil
+% }
+
+% \makeatother
+
+% % Convert a symbol name to its LaTeX representation.
+% % Greek names -> Greek commands; everything else -> unchanged.
+% \newcommand{\greeksymbol}[1]{%
+%   \ifstrequal{#1}{alpha}{\alpha}{%
+%   \ifstrequal{#1}{beta}{\beta}{%
+%   \ifstrequal{#1}{gamma}{\gamma}{%
+%   \ifstrequal{#1}{delta}{\delta}{%
+%   \ifstrequal{#1}{epsilon}{\epsilon}{%
+%   \ifstrequal{#1}{zeta}{\zeta}{%
+%   \ifstrequal{#1}{eta}{\eta}{%
+%   \ifstrequal{#1}{theta}{\theta}{%
+%   \ifstrequal{#1}{iota}{\iota}{%
+%   \ifstrequal{#1}{kappa}{\kappa}{%
+%   \ifstrequal{#1}{lambda}{\lambda}{%
+%   \ifstrequal{#1}{mu}{\mu}{%
+%   \ifstrequal{#1}{nu}{\nu}{%
+%   \ifstrequal{#1}{xi}{\xi}{%
+%   \ifstrequal{#1}{omicron}{o}{%
+%   \ifstrequal{#1}{pi}{\pi}{%
+%   \ifstrequal{#1}{rho}{\rho}{%
+%   \ifstrequal{#1}{sigma}{\sigma}{%
+%   \ifstrequal{#1}{tau}{\tau}{%
+%   \ifstrequal{#1}{upsilon}{\upsilon}{%
+%   \ifstrequal{#1}{phi}{\phi}{%
+%   \ifstrequal{#1}{chi}{\chi}{%
+%   \ifstrequal{#1}{psi}{\psi}{%
+%   \ifstrequal{#1}{omega}{\omega}{%
+%   #1%
+%   }}}}}}}}}}}}}}}}}}}}}}}}%
+% }
+
+% % Return the first component of a compound key.
+% % alpha-x -> \alpha
+% % x-alpha -> x
+% \newcommand{\firstsymbol}[1]{%
+%   \firstsymbolaux#1-\@nil
+% }
+
+% \def\firstsymbolaux#1-#2\@nil{%
+%   \greeksymbol{#1}%
+% }
+
+% % glossary definition macro
+% \newcommand{\newsym}[3]{%
+%   \edef\newsym@sortkey{\mysortkey{#1}}
+%   \glsxtrnewsymbol[
+%     description={#3},
+%     sort={\newsym@sortkey},
+%     type={\firstsymbol{#1}}
+%   ]{sym-#1}{\ensuremath{#2}}%
+% }
+% \makeatother
+
+% \newglossary{sym-A}{sly}{sls}{A}
+% \newglossary{sym-B}{sly}{sls}{B}
+% \newglossary{sym-C}{sly}{sls}{C}
+% \newglossary{sym-D}{sly}{sls}{D}
+% \newglossary{sym-E}{sly}{sls}{E}
+% \newglossary{sym-F}{sly}{sls}{F}
+% \newglossary{sym-G}{sly}{sls}{G}
+% \newglossary{sym-H}{sly}{sls}{H}
+% \newglossary{sym-I}{sly}{sls}{I}
+% \newglossary{sym-J}{sly}{sls}{J}
+% \newglossary{sym-K}{sly}{sls}{K}
+% \newglossary{sym-L}{sly}{sls}{L}
+% \newglossary{sym-M}{sly}{sls}{M}
+% \newglossary{sym-N}{sly}{sls}{N}
+% \newglossary{sym-O}{sly}{sls}{O}
+% \newglossary{sym-P}{sly}{sls}{P}
+% \newglossary{sym-Q}{sly}{sls}{Q}
+% \newglossary{sym-R}{sly}{sls}{R}
+% \newglossary{sym-S}{sly}{sls}{S}
+% \newglossary{sym-T}{sly}{sls}{T}
+% \newglossary{sym-U}{sly}{sls}{U}
+% \newglossary{sym-V}{sly}{sls}{V}
+% \newglossary{sym-W}{sly}{sls}{W}
+% \newglossary{sym-X}{sly}{sls}{X}
+% \newglossary{sym-Y}{sly}{sls}{Y}
+% \newglossary{sym-Z}{sly}{sls}{Z}
+
+% \newglossary{sym-alpha}{sly}{sls}{\alpha}
+% \newglossary{sym-beta}{sly}{sls}{\beta}
+% \newglossary{sym-gamma}{sly}{sls}{\gamma}
+% \newglossary{sym-delta}{sly}{sls}{\delta}
+% \newglossary{sym-epsilon}{sly}{sls}{\epsilon}
+% \newglossary{sym-zeta}{sly}{sls}{\zeta}
+% \newglossary{sym-eta}{sly}{sls}{\eta}
+% \newglossary{sym-theta}{sly}{sls}{\theta}
+% \newglossary{sym-iota}{sly}{sls}{\iota}
+% \newglossary{sym-kappa}{sly}{sls}{\kappa}
+% \newglossary{sym-lambda}{sly}{sls}{\lambda}
+% \newglossary{sym-mu}{sly}{sls}{\mu}
+% \newglossary{sym-nu}{sly}{sls}{\nu}
+% \newglossary{sym-xi}{sly}{sls}{\xi}
+% \newglossary{sym-omicron}{sly}{sls}{\omicron}
+% \newglossary{sym-pi}{sly}{sls}{\pi}
+% \newglossary{sym-rho}{sly}{sls}{\rho}
+% \newglossary{sym-sigma}{sly}{sls}{\sigma}
+% \newglossary{sym-tau}{sly}{sls}{\tau}
+% \newglossary{sym-upsilon}{sly}{sls}{\upsilon}
+% \newglossary{sym-phi}{sly}{sls}{\phi}
+% \newglossary{sym-chi}{sly}{sls}{\chi}
+% \newglossary{sym-psi}{sly}{sls}{\psi}
+% \newglossary{sym-omega}{sly}{sls}{\omega}
 
 \makeatletter
-\newcommand{\mysortkey}[1]{%
-  \compoundsortkeyaux#1-\@nil
-}
-\def\compoundsortkeyaux#1-#2\@nil{%
-  \greeksort{#1}%
-  \ifx\relax#2\relax
+
+% ============================================================
+% Greek letters
+% ============================================================
+
+\def\symgreek@alpha{01}
+\def\symgreek@beta{02}
+\def\symgreek@gamma{03}
+\def\symgreek@delta{04}
+\def\symgreek@epsilon{05}
+\def\symgreek@zeta{06}
+\def\symgreek@eta{07}
+\def\symgreek@theta{08}
+\def\symgreek@iota{09}
+\def\symgreek@kappa{10}
+\def\symgreek@lambda{11}
+\def\symgreek@mu{12}
+\def\symgreek@nu{13}
+\def\symgreek@xi{14}
+\def\symgreek@omicron{15}
+\def\symgreek@pi{16}
+\def\symgreek@rho{17}
+\def\symgreek@sigma{18}
+\def\symgreek@tau{19}
+\def\symgreek@upsilon{20}
+\def\symgreek@phi{21}
+\def\symgreek@chi{22}
+\def\symgreek@psi{23}
+\def\symgreek@omega{24}
+
+
+% ============================================================
+% Math formatting commands to ignore
+% ============================================================
+
+\def\symfmt@vec{1}
+\def\symfmt@mathbf{1}
+\def\symfmt@boldsymbol{1}
+\def\symfmt@mathbb{1}
+\def\symfmt@hat{1}
+\def\symfmt@dot{1}
+\def\symfmt@ddot{1}
+\def\symfmt@bar{1}
+\def\symfmt@tilde{1}
+\def\symfmt@mathcal{1}
+\def\symfmt@mathrm{1}
+
+
+% ============================================================
+% Sort one component
+% ============================================================
+
+\newcommand{\sym@sortcomponent}[1]{%
+  \ifcsname symfmt@#1\endcsname
+    % formatting command: ignore it
   \else
-    -\compoundsortkeyaux#2\@nil
+    \ifcsname symgreek@#1\endcsname
+      \csname symgreek@#1\endcsname
+    \else
+      00#1%
+    \fi
   \fi
 }
 
-% Convert a symbol name to its LaTeX representation.
-% Greek names -> Greek commands; everything else -> unchanged.
+
+% ============================================================
+% Sort entire key
+% ============================================================
+
+\def\sym@sortaux#1-#2\@nil{%
+  \ifcsname symfmt@#1\endcsname
+    % skip formatting component
+  \else
+    \sym@sortcomponent{#1}%
+    \ifx\relax#2\relax
+    \else
+      -%
+    \fi
+  \fi
+  \ifx\relax#2\relax
+  \else
+    \sym@sortaux#2\@nil
+  \fi
+}
+
+\newcommand{\mysortkey}[1]{%
+  \sym@sortaux#1-\@nil
+}
+
+
+% ============================================================
+% First actual symbol
+% ============================================================
+
+\def\sym@firstaux#1-#2\@nil{%
+  \ifcsname symfmt@#1\endcsname
+    \sym@firstaux#2\@nil
+  \else
+    #1%
+  \fi
+}
+
+\newcommand{\mysymgroup}[1]{%
+  \sym@firstaux#1-\@nil
+}
+
+
+% ============================================================
+% Symbol name for display
+% ============================================================
+
 \newcommand{\greeksymbol}[1]{%
   \ifstrequal{#1}{alpha}{\alpha}{%
   \ifstrequal{#1}{beta}{\beta}{%
   \ifstrequal{#1}{gamma}{\gamma}{%
-  \ifstrequal{#1}{delta}{\delta}{%
-  \ifstrequal{#1}{epsilon}{\epsilon}{%
-  \ifstrequal{#1}{zeta}{\zeta}{%
-  \ifstrequal{#1}{eta}{\eta}{%
-  \ifstrequal{#1}{theta}{\theta}{%
-  \ifstrequal{#1}{iota}{\iota}{%
-  \ifstrequal{#1}{kappa}{\kappa}{%
-  \ifstrequal{#1}{lambda}{\lambda}{%
-  \ifstrequal{#1}{mu}{\mu}{%
-  \ifstrequal{#1}{nu}{\nu}{%
-  \ifstrequal{#1}{xi}{\xi}{%
-  \ifstrequal{#1}{omicron}{o}{%
-  \ifstrequal{#1}{pi}{\pi}{%
-  \ifstrequal{#1}{rho}{\rho}{%
-  \ifstrequal{#1}{sigma}{\sigma}{%
-  \ifstrequal{#1}{tau}{\tau}{%
-  \ifstrequal{#1}{upsilon}{\upsilon}{%
-  \ifstrequal{#1}{phi}{\phi}{%
-  \ifstrequal{#1}{chi}{\chi}{%
+  % ... all the remaining Greek letters ...
   \ifstrequal{#1}{psi}{\psi}{%
   \ifstrequal{#1}{omega}{\omega}{%
   #1%
-  }}}}}}}}}}}}}}}}}}}}}}}}%
+  }}}}}%
 }
 
-% Return the first component of a compound key.
-% alpha-x -> \alpha
-% x-alpha -> x
-\newcommand{\firstsymbol}[1]{%
-  \firstsymbolaux\mysortkey{#1}-\@nil
-}
 
-\def\firstsymbolaux#1-#2\@nil{%
-  \greeksymbol{#1}%
+% ============================================================
+% Glossary entry
+% ============================================================
+
+\newcommand{\newsym}[3]{%
+  \edef\newsym@sortkey{\mysortkey{#1}}%
+  \glsxtrnewsymbol[
+    description={#3},
+    sort={\newsym@sortkey}
+  ]{sym-#1}{\ensuremath{#2}}%
 }
 
 \makeatother
-
-% glossary definition macro
-\newcommand{\newsym}[3]{%
-  \glsxtrnewsymbol[
-    description={#3},
-    sort={\mysortkey{#1}},
-    group={\firstsymbol{#1}}
-  ]{sym-#1}{\ensuremath{#2}}%
-}
