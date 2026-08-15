@@ -46,6 +46,16 @@ GLOSSARY_LABEL_STRIP_COMMANDS = {
 GLOSSARY_SORT_STRIP_COMMANDS = SYMBOL_DECORATOR_COMMANDS | GLOSSARY_LABEL_STRIP_COMMANDS
 GLOSSARY_IGNORED_SYMBOLS = set(MATH_SYMBOL_STOPWORDS)
 GLS_COMMAND_RE = re.compile(r"\\gls[a-zA-Z]*\{([^{}]+)\}")
+LABEL_COMMAND_RE = re.compile(r"\\label\*?\{[^{}]*\}")
+INCLUDEGRAPHICS_COMMAND_RE = re.compile(r"\\includegraphics\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+DOCUMENTCLASS_COMMAND_RE = re.compile(r"\\documentclass\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+TITLE_COMMAND_RE = re.compile(r"\\title\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+SHORTTITLE_COMMAND_RE = re.compile(r"\\shorttitle\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+AUTHOR_COMMAND_RE = re.compile(r"\\author\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+AFFILIATION_COMMAND_RE = re.compile(r"\\affiliation\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+REF_COMMANDS_RE = re.compile(r"\\(?:ref|eqref|cref|Cref|autoref|pageref|nameref)\*?\{[^{}]*\}")
+CITE_COMMANDS_RE = re.compile(r"\\(?:cite|citet|citep)\*?(?:\[[^\]]*\]){0,2}\{[^{}]*\}")
+DECLARE_FIGURE_OPTIONS_RE = re.compile(r"\\DeclareFigureOptions\*?\{[^{}]*\}\{[^{}]*\}\{[^{}]*\}")
 
 _skip_ws = shared_skip_ws
 _read_braced_group = shared_read_braced_group
@@ -88,9 +98,88 @@ def read_glossary_replacements(path):
     return replacements
 
 
+def parse_acronym_entries(path):
+    entries = []
+    if not path.exists():
+        return entries
+
+    for raw_line in path.read_text().splitlines():
+        line = ts.strip_comment_from_line(raw_line).strip()
+        if not line.startswith(r"\newabbreviation"):
+            continue
+
+        idx = len(r"\newabbreviation")
+        idx = _skip_ws(line, idx)
+
+        if idx < len(line) and line[idx] == "[":
+            end_idx = idx + 1
+            brace_depth = 0
+            while end_idx < len(line):
+                char = line[end_idx]
+                if char == "{":
+                    brace_depth += 1
+                elif char == "}":
+                    if brace_depth > 0:
+                        brace_depth -= 1
+                elif char == "]" and brace_depth == 0:
+                    break
+                end_idx += 1
+            if end_idx >= len(line) or line[end_idx] != "]":
+                continue
+            idx = end_idx + 1
+
+        idx = _skip_ws(line, idx)
+        label_group, idx = _read_braced_group(line, idx)
+        idx = _skip_ws(line, idx)
+        short_group, idx = _read_braced_group(line, idx)
+        idx = _skip_ws(line, idx)
+        long_group, idx = _read_braced_group(line, idx)
+        if label_group is None or short_group is None or long_group is None:
+            continue
+
+        label = _unwrap_braces(label_group).strip()
+        short = _unwrap_braces(short_group).strip()
+        long_form = _unwrap_braces(long_group).strip()
+        if label and short:
+            entries.append((label, short, long_form))
+    return entries
+
+
+def read_acronym_replacements(path):
+    replacements = []
+    if not path:
+        return replacements
+    for label, short, long_form in parse_acronym_entries(pathlib.Path(path)):
+        if long_form:
+            replacements.append((f"{long_form} ({short})", rf"\gls{{{label}}}"))
+            if not long_form.endswith("s") and short.endswith("s") is False:
+                replacements.append((f"{long_form}s ({short}s)", rf"\glspl{{{label}}}"))
+        replacements.append((short, rf"\gls{{{label}}}"))
+        replacements.append((f"{short}s", rf"\glspl{{{label}}}"))
+        replacements.append((f"{short}'s", rf"\gls{{{label}}}'s"))
+        if long_form:
+            replacements.append((long_form, rf"\gls{{{label}}}"))
+            if not long_form.endswith("s"):
+                replacements.append((f"{long_form}s", rf"\glspl{{{label}}}"))
+
+    # Replace longer phrases first so singular does not consume plural forms.
+    replacements.sort(key=lambda item: len(item[0]), reverse=True)
+    return replacements
+
+
 def replace_glossary_refs_in_span(span_text, replacements):
+    def has_spaced_backslash_prefix(text, idx):
+        probe = idx - 1
+        saw_space = False
+        while probe >= 0 and text[probe].isspace():
+            saw_space = True
+            probe -= 1
+        return saw_space and probe >= 0 and text[probe] == "\\"
+
     updates = []
     for start, end, symbol in shared_find_math_symbol_matches(span_text):
+        if has_spaced_backslash_prefix(span_text, start):
+            continue
         label = replacements.get(shared_symbol_key(shared_canonicalize_symbol(symbol)))
         if label is None:
             continue
@@ -102,42 +191,108 @@ def replace_glossary_refs_in_span(span_text, replacements):
     updated = span_text
     for start, end, label in sorted(updates, key=lambda item: item[0], reverse=True):
         updated = updated[:start] + r"\gls{%s}" % label + updated[end:]
+    updated = re.sub(r"([_^])\s*(\\gls[a-zA-Z]*\{[^{}]+\})", r"\1{\2}", updated)
     return updated, len(updates)
 
 
-def replace_glossary_refs_in_line(line, replacements, equation_line=False):
+def _mask_label_commands(text):
+    placeholders = []
+
+    def repl(match):
+        placeholders.append(match.group(0))
+        return f"__PAPERLINT_LABEL_{len(placeholders) - 1}__"
+
+    masked = LABEL_COMMAND_RE.sub(repl, text)
+    masked = INCLUDEGRAPHICS_COMMAND_RE.sub(repl, masked)
+    masked = DOCUMENTCLASS_COMMAND_RE.sub(repl, masked)
+    masked = TITLE_COMMAND_RE.sub(repl, masked)
+    masked = SHORTTITLE_COMMAND_RE.sub(repl, masked)
+    masked = AUTHOR_COMMAND_RE.sub(repl, masked)
+    masked = AFFILIATION_COMMAND_RE.sub(repl, masked)
+    masked = REF_COMMANDS_RE.sub(repl, masked)
+    masked = CITE_COMMANDS_RE.sub(repl, masked)
+    masked = DECLARE_FIGURE_OPTIONS_RE.sub(repl, masked)
+    return masked, placeholders
+
+
+def _restore_label_commands(text, placeholders):
+    restored = text
+    for idx, original in enumerate(placeholders):
+        restored = restored.replace(f"__PAPERLINT_LABEL_{idx}__", original)
+    return restored
+
+
+def replace_acronym_refs_in_span(span_text, acronym_replacements):
+    if not acronym_replacements:
+        return span_text, 0
+
+    updates = []
+    for source, replacement in acronym_replacements:
+        if not source:
+            continue
+        pattern = re.compile(r"(?<![A-Za-z0-9\\])%s(?![A-Za-z0-9])" % re.escape(source))
+        for match in pattern.finditer(span_text):
+            updates.append((match.start(), match.end(), replacement))
+
+    if not updates:
+        return span_text, 0
+
+    # Keep the longest replacement for overlapping matches.
+    updates.sort(key=lambda item: (item[0], -(item[1] - item[0])))
+    selected = []
+    for start, end, replacement in updates:
+        if selected and start < selected[-1][1]:
+            continue
+        selected.append((start, end, replacement))
+
+    updated = span_text
+    for start, end, replacement in reversed(selected):
+        updated = updated[:start] + replacement + updated[end:]
+    return updated, len(selected)
+
+
+def replace_glossary_refs_in_line(line, replacements, acronym_replacements=None, equation_line=False):
     content, comment = ts.split_comment_from_line(line)
     if not content:
         return line, 0
 
+    content, label_placeholders = _mask_label_commands(content)
+
     stripped = content.strip()
     if equation_line and stripped.startswith((r"\begin", r"\end", r"\label", r"\tag", r"\nonumber", r"\notag")):
-        return line, 0
+        return _restore_label_commands(content, label_placeholders) + comment, 0
 
     total = 0
     if equation_line:
         updated, count = replace_glossary_refs_in_span(content, replacements)
         total += count
-        return updated + comment, total
+        return _restore_label_commands(updated, label_placeholders) + comment, total
 
     spans = ts.get_math_spans(content)
     if not spans:
-        return line, 0
+        updated, count = replace_acronym_refs_in_span(content, acronym_replacements)
+        total += count
+        return _restore_label_commands(updated, label_placeholders) + comment, total
 
     pieces = []
     last_index = 0
     for start, end, _ in spans:
-        pieces.append(content[last_index:start])
+        prose_updated, prose_count = replace_acronym_refs_in_span(content[last_index:start], acronym_replacements)
+        pieces.append(prose_updated)
+        total += prose_count
         updated, count = replace_glossary_refs_in_span(content[start:end], replacements)
         pieces.append(updated)
         total += count
         last_index = end
 
-    pieces.append(content[last_index:])
-    return "".join(pieces) + comment, total
+    prose_updated, prose_count = replace_acronym_refs_in_span(content[last_index:], acronym_replacements)
+    pieces.append(prose_updated)
+    total += prose_count
+    updated = "".join(pieces)
+    return _restore_label_commands(updated, label_placeholders) + comment, total
 
 
-def replace_glossary_refs_in_file(path, replacements):
+def replace_glossary_refs_in_file(path, replacements, acronym_replacements=None):
     try:
         with open(path) as handle:
             lines = handle.readlines()
@@ -147,7 +302,12 @@ def replace_glossary_refs_in_file(path, replacements):
     updated_lines = []
     total = 0
     for i, line in enumerate(lines):
-        updated_line, count = replace_glossary_refs_in_line(line, replacements, equation_line=ts.in_equation(i))
+        updated_line, count = replace_glossary_refs_in_line(
+            line,
+            replacements,
+            acronym_replacements=acronym_replacements,
+            equation_line=ts.in_equation(i),
+        )
         updated_lines.append(updated_line)
         total += count
 

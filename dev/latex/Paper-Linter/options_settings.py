@@ -93,6 +93,8 @@ def apply_params_file(params_file, options):
             options["ignored_files"].append(resolve_path(value))
         elif key in ["symbol_glossary_seed_file", "symbol_glossary_seed"]:
             options["symbol_glossary_seed_file"] = resolve_path(value)
+        elif key in ["acronym_glossary_seed_file", "acronym_glossary_seed"]:
+            options["acronym_glossary_seed_file"] = resolve_path(value)
         elif key in ["symbol_glossary_file", "symbol_glossary_output"]:
             options["symbol_glossary_file"] = resolve_path(value)
         elif key in ["output_file", "output"]:
@@ -111,6 +113,7 @@ def parse_cli_args(argv, switch_exists, add_categories, remove_categories):
         "output_file": None,
         "symbol_glossary_file": None,
         "symbol_glossary_seed_file": None,
+        "acronym_glossary_seed_file": None,
         "replace_glossary_refs": False,
         "exit_code": False,
         "check_states": {},

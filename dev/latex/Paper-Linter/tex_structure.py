@@ -266,12 +266,6 @@ def in_equation(line):
         return True
     if "eqnarray" in in_env and in_env["eqnarray"][line]:
         return True
-    if "theorem" in in_env and in_env["theorem"][line]:
-        return True
-    if "proof" in in_env and in_env["proof"][line]:
-        return True
-    if "proposition" in in_env and in_env["proposition"][line]:
-        return True
 
     return False
 

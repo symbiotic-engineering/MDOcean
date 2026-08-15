@@ -17,6 +17,7 @@ SENTENCE_END_RE = ts.SENTENCE_END_RE
 math_text_mix_strings = set()
 current_file_equation_symbols = set()
 GLOSSARY_FILE = None
+ACRONYM_GLOSSARY_FILE = None
 PREFIX_CHECK_CONFIGS = {}
 
 def split_sentences(text):
@@ -166,15 +167,21 @@ def check_mathmode_subscripts():
 
 def check_glossary_refs():
     warns = []
-    if GLOSSARY_FILE is None:
+    if GLOSSARY_FILE is None and ACRONYM_GLOSSARY_FILE is None:
         return warns
-    replacements = gs.read_glossary_replacements(GLOSSARY_FILE)
-    if not replacements:
+    replacements = gs.read_glossary_replacements(GLOSSARY_FILE) if GLOSSARY_FILE else {}
+    acronym_replacements = gs.read_acronym_replacements(ACRONYM_GLOSSARY_FILE)
+    if not replacements and not acronym_replacements:
         return warns
     for i, line in enumerate(ts.tex_lines_clean):
-        _, count = gs.replace_glossary_refs_in_line(line, replacements, equation_line=ts.in_equation(i))
+        _, count = gs.replace_glossary_refs_in_line(
+            line,
+            replacements,
+            acronym_replacements=acronym_replacements,
+            equation_line=ts.in_equation(i),
+        )
         if count > 0:
-            warns.append((i, "Math symbols should use glossary references where available", (0, len(line))))
+            warns.append((i, "Glossary terms should use glossary references where available", (0, len(line))))
             break
     return warns
 

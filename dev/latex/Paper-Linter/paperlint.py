@@ -39,6 +39,7 @@ def main():
     )
 
     checks.GLOSSARY_FILE = GLOSSARY_FILE
+    checks.ACRONYM_GLOSSARY_FILE = options["acronym_glossary_seed_file"]
     checks.PREFIX_CHECK_CONFIGS = options["check_params"]
     if options["replace_glossary_refs"]:
         options["check_states"]["glossary-refs"] = 2
@@ -105,7 +106,7 @@ def main():
                         pass
                     elif state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
                         if c[2] == "glossary-refs":
-                            c[3](file, GLOSSARY_FILE)
+                            c[3](file, GLOSSARY_FILE, options["acronym_glossary_seed_file"])
                         elif c[2] == "prefix":
                             c[3](config.get("path"), config.get("prefix"), recursive=config.get("recursive", False), source_prefix=config.get("source_prefix"))
                         else:

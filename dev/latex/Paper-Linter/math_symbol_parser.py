@@ -34,6 +34,7 @@ SYMBOL_DECORATOR_COMMANDS = {
     "vec", "mathbf", "boldsymbol", "bm", "hat", "dot", "ddot", "bar", "tilde",
     "mathit", "mathsf", "mathtt", "mathcal", "mathbb", "mathfrak", "mathrm",
 }
+SPECIAL_MATHBB_BASES = {r"\mathbb{R}", r"\mathbb{C}"}
 
 
 def _skip_ws(text: str, idx: int) -> int:
@@ -138,11 +139,21 @@ def _script_is_ignored_superscript(script_value: str) -> bool:
 def _canonicalize_script(script_op: str, script_value: str):
     original_value = _normalize_symbol(script_value)
     had_outer_braces = original_value.startswith("{") and original_value.endswith("}")
+    original_inner_value = _normalize_symbol(_unwrap_braces(original_value)) if had_outer_braces else original_value
     normalized_value = _normalize_script_value(script_value)
     if normalized_value is None:
         return None
     if script_op == "^" and _script_is_ignored_superscript(normalized_value):
         return None
+    # Preserve explicitly braced control-sequence-like scripts with spacing,
+    # e.g., ^{\ e}, so they do not collapse into undefined commands like ^\e.
+    if had_outer_braces and re.search(r"\\\s+[A-Za-z@]", original_inner_value):
+        return script_op + "{" + original_inner_value + "}"
+    # Preserve explicit braces around control sequences when they were present
+    # in the source script.
+    if had_outer_braces and original_inner_value.startswith("\\"):
+        normalized_inner = _unwrap_braces(normalized_value)
+        return script_op + "{" + normalized_inner + "}"
     # Preserve braces when they were explicitly present around a multi-character
     # simple script value (e.g., a_{in}, x^{ij}).
     if had_outer_braces and re.fullmatch(r"[A-Za-z0-9]{2,}", normalized_value):
@@ -264,6 +275,7 @@ def _collect_math_symbol_matches(content: str):
             continue
 
         symbol = base
+        base_is_special_mathbb = _normalize_symbol(base) in SPECIAL_MATHBB_BASES
         script_idx = next_idx
         replace_end = next_idx
         while True:
@@ -276,6 +288,10 @@ def _collect_math_symbol_matches(content: str):
                 break
             if base == "e" and script_op == "^":
                 idx = next_idx
+                break
+            if base_is_special_mathbb and script_op == "^":
+                # Keep the superscript out of the base symbol and let its
+                # contents be parsed as independent symbols.
                 break
             canonical_script = _canonicalize_script(script_op, script_val)
             if canonical_script is not None:

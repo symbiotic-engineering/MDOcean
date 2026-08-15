@@ -14,10 +14,11 @@ For example, `-i typography` only activates the typography rules, whereas `-i al
 
 If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1|2 <switch>` (`2` enables a check and runs its fix action when available).
 If `--params` is provided, paper-specific parameters are loaded from a parameter file as `key=value` pairs.
+Supported params include `symbol_glossary_seed`, `symbol_glossary_output`, and `acronym_glossary_seed` for glossary-based rewrite workflows.
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
 If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows. If the file already exists, matching symbols keep their existing `description={...}` values and only new symbols receive a blank description.
-If `--replace-glossary-refs` is provided, the linter rewrites matched math-mode symbol bodies to `\gls{...}` references in place using `pubs/shared/symbol-glossary-shared.tex` as the source of glossary labels.
+If `--replace-glossary-refs` is provided, the linter rewrites matched math-mode symbol bodies to `\gls{...}` references in place using `pubs/shared/symbol-glossary-shared.tex` as the source of glossary labels, and can also rewrite acronym short/long forms when `acronym_glossary_seed` is configured.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings

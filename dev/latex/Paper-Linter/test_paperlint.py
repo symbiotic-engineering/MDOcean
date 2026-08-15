@@ -125,3 +125,354 @@ def test_collect_tex_files_finds_nested_includes_with_root_fallback():
     assert "main.tex" in file_names
     assert "sec1.tex" in file_names
     assert "appendix-note.tex" in file_names
+
+
+def test_replace_glossary_refs_replaces_acronym_short_long_plural_and_possessive():
+    acronym_replacements = [
+        ("Wave Energy Converters", r"\glspl{acr-wec}"),
+        ("Wave Energy Converter", r"\gls{acr-wec}"),
+        ("WEC's", r"\gls{acr-wec}'s"),
+        ("WECs", r"\glspl{acr-wec}"),
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = "WEC WECs WEC's Wave Energy Converter Wave Energy Converters"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == (
+        r"\gls{acr-wec} \glspl{acr-wec} \gls{acr-wec}'s "
+        r"\gls{acr-wec} \glspl{acr-wec}"
+    )
+    assert count == 5
+
+
+def test_special_mathbb_superscript_is_split_from_base_symbol():
+    symbols = msp.extract_math_symbols(r"\mathbb{R}^{n} \mathbb{C}^{m}")
+
+    assert r"\mathbb{R}" in symbols
+    assert r"\mathbb{C}" in symbols
+    assert "n" in symbols
+    assert "m" in symbols
+    assert r"\mathbb{R}^{n}" not in symbols
+    assert r"\mathbb{C}^{m}" not in symbols
+
+
+def test_non_special_superscript_behavior_is_preserved():
+    symbols = msp.extract_math_symbols(r"x^{n}")
+
+    assert "x^n" in symbols
+
+
+def test_symbol_replacement_wraps_subscript_gls_command_in_braces():
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+    updated, count = gs.replace_glossary_refs_in_span("_x", replacements)
+
+    assert updated == r"_{\gls{sym-x}}"
+    assert count == 1
+
+
+def test_symbol_replacement_wraps_superscript_gls_command_in_braces():
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+    updated, count = gs.replace_glossary_refs_in_span("^x", replacements)
+
+    assert updated == r"^{\gls{sym-x}}"
+    assert count == 1
+
+
+def test_acronym_replacement_does_not_modify_label_body():
+    acronym_replacements = [
+        ("meem", r"\gls{acr-meem}"),
+    ]
+    line = r"\label{jfm:tab:meem-eigenfunctions}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_symbol_replacement_does_not_modify_label_body():
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+    line = r"\label{tab:x-results}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_theorem_prose_not_treated_as_equation_context():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "main.tex"
+        path.write_text(
+            "\\begin{theorem}\n"
+            "a implies b.\n"
+            "\\end{theorem}\n"
+            "\\begin{equation}\n"
+            "a=b\n"
+            "\\end{equation}\n"
+        )
+
+        ts.next_file(str(path))
+        ts.preprocess()
+
+    assert ts.in_equation(1) is False
+    assert ts.in_equation(4) is True
+
+
+def test_acronym_replacement_does_not_modify_includegraphics_body():
+    acronym_replacements = [
+        ("wec", r"\gls{acr-wec}"),
+    ]
+    line = r"\includegraphics{figs/wec-overview}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_symbol_replacement_does_not_modify_includegraphics_body():
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+    line = r"\includegraphics{x-plot}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        replacements,
+        equation_line=True,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_read_acronym_replacements_emits_single_backslash_commands():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "acronyms.tex"
+        path.write_text("\\newabbreviation{acr-wec}{WEC}{Wave Energy Converter}\n")
+        replacements = gs.read_acronym_replacements(str(path))
+
+    replacement_map = dict(replacements)
+    assert replacement_map["WEC"] == r"\gls{acr-wec}"
+    assert replacement_map["WECs"] == r"\glspl{acr-wec}"
+
+
+def test_read_acronym_replacements_includes_long_short_combo():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "acronyms.tex"
+        path.write_text("\\newabbreviation{acr-wec}{WEC}{Wave Energy Converter}\n")
+        replacements = gs.read_acronym_replacements(str(path))
+
+    replacement_map = dict(replacements)
+    assert replacement_map["Wave Energy Converter (WEC)"] == r"\gls{acr-wec}"
+    assert replacement_map["Wave Energy Converters (WECs)"] == r"\glspl{acr-wec}"
+
+
+def test_replace_acronym_long_short_combo_with_single_call():
+    acronym_replacements = [
+        ("Wave Energy Converters (WECs)", r"\glspl{acr-wec}"),
+        ("Wave Energy Converter (WEC)", r"\gls{acr-wec}"),
+        ("WEC", r"\gls{acr-wec}"),
+        ("Wave Energy Converter", r"\gls{acr-wec}"),
+    ]
+    line = "A Wave Energy Converter (WEC) is tested."
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == r"A \gls{acr-wec} is tested."
+    assert count == 1
+
+
+def test_acronym_replacement_does_not_modify_documentclass_body():
+    acronym_replacements = [
+        ("wec", r"\gls{acr-wec}"),
+    ]
+    line = r"\documentclass[wec-option]{article-wec}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_symbol_replacement_does_not_modify_documentclass_body():
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+    line = r"\documentclass{xclass}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        replacements,
+        equation_line=True,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_title_body():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"\title{A WEC Design Study}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_shorttitle_body():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"\shorttitle{WEC Optimization}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_author_body_or_optional_arg():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"\author[WEC Team]{Wave Energy Converter Group}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_affiliation_body_or_optional_arg():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"\affiliation[WEC Lab]{Wave Energy Converter Institute}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_ref_command_body():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"See \nameref{WEC-overview} and \cref{WEC-fig}."
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_citation_command_body():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"See \cite{WEC-overview,other-key}, \citet[Sec.~2]{WEC-paper}, and \citep[cf.][p.~4]{WEC-study}."
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_acronym_replacement_does_not_modify_declare_figure_options_body():
+    acronym_replacements = [
+        ("WEC", r"\gls{acr-wec}"),
+    ]
+    line = r"\DeclareFigureOptions{aor:figs/from-matlab/cost_vs_N_WEC.pdf}{\linewidth}{\linewidth}"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_symbol_replacement_preserves_spaced_control_sequence_in_exponent():
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("c")): "sym-c"}
+    line = r"$a_b^{\ c}$"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        replacements,
+        equation_line=False,
+    )
+
+    assert updated == line
+    assert count == 0
+
+
+def test_extract_math_symbols_preserves_spaced_control_sequence_superscript():
+    symbols = msp.extract_math_symbols(r"\vec{c}_p^{ \ e}")
+
+    assert r"\vec{c}_p^{\ e}" in symbols
+    assert r"\vec{c}_p^\e" not in symbols
