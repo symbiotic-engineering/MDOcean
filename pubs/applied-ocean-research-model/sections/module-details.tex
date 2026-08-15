@@ -779,8 +779,13 @@ The pressure along the bottom surface of each body due to drag $\vec{p}_d(y,t)$ 
 \Cref{eq:drag-pressure-approx} expands the velocity term then applies the describing function approximation:
 \begin{equation}\label{eq:drag-pressure-approx}
 \begin{aligned}
-    \left(\vec{v}_{rel}(y,t)~\cdot\right.\\
-    \left.\left|\vec{v}_{rel}(y,t)\right|\right)
+    \left(\vec{v}_{rel}(y,t)~\cdot
+    \ifdefined\DISSERTATION
+    \else
+        \right.\\
+        \left.  
+    \fi
+    \left|\vec{v}_{rel}(y,t)\right|\right)
     &= |\vec{\hat{V}}_{rel}(y)|^2 \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y)) 
     \left| \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))\right|\\
     &\approx~|\vec{\hat{V}}_{rel}(y)|^2\frac{8}{3\pi} \cos(\omega t+\angle \vec{\hat{V}}_{rel}(y))
@@ -875,7 +880,7 @@ When the WEC is in survival mode, an external brake locks the PTO, enforcing the
     F_{heave,s}(t) &=\max\!\left(|F_p(t)|,~ |m_s\ddot{\xi}_s(t)-F_p(t)|\right)
 \end{aligned}
 \end{equation}
-In operational seas, $F_p(t)$ is determined by the generator torque $\tau(t)$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\xi\leftarrow \tau\Omega}$.
+In operational seas, $F_p(t)$ is determined by the generator torque $\tau(t)$ cascaded through the PTO dynamics matrix $\mathbf{a}_{F_p\dot{\xi}\leftarrow \tau\Omega}$.
 In storm seas, $F_p(t)$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-DOF equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 \ifdefined\DISSERTATION
     Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
