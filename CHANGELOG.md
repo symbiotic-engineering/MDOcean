@@ -1,6 +1,11 @@
 # Changelog
 ## Unreleased
 
+## [v1.4.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.3) - 2026-8-15
+### Fixed
+- Paper: nicer spacing of tables and equations in dissertation
+- Pipeline: add forgotten JFM appendix dependency to dissertation
+
 ## [v1.4.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.2) - 2026-8-11
 ### Added
 - Figures: add a TikZ block diagram showing static analyses and dynamics including five two-ports
