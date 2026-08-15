@@ -35,12 +35,47 @@
     \ifdefined\JOURNALTWOCOLUMN
       \twocolumn%
     \fi
-}
+}%
+
+% for 11x17 pages
+\makeatletter
+\@ifclassloaded{cas-sc}{}{%
+  \@ifclassloaded{cas-dc}{}{%
+    \usepackage[top=1in,
+      bottom=1in,
+      left=1in,
+      right=1in]{geometry}
+  }%
+}%
+\makeatother
+\usepackage{caption}
+\newenvironment{foldoutpage}{%
+  \ifdefined\DISSERTATION
+    \eject\pdfpageheight=11in\pdfpagewidth=17in
+    \newgeometry{margin=1in}
+    \textwidth=15in
+    \linewidth=15in
+    \textheight=9in
+    \captionsetup{width=\textwidth, margin={0in,-8.5in}} 
+  \fi
+}{%
+  \ifdefined\DISSERTATION
+    \clearpage % otherwise it will float to another, non-resized page
+    \eject\pdfpageheight=11in\pdfpagewidth=8.5in
+    \restoregeometry
+  \fi
+}%
 
 \usepackage{verbatim}  % word counts
 \usepackage{textcomp}  % cent symbol
 
-\usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
+\makeatletter
+\@ifclassloaded{cas-sc}{}{%
+  \@ifclassloaded{cas-dc}{}{%
+    \usepackage[unicode,hypertexnames=false,colorlinks=true,bookmarksnumbered=true]{hyperref}
+  }%
+}%
+\makeatother
 \usepackage{cleveref}
 
 % glossary - must come after hyperref
