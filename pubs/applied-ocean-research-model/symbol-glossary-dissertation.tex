@@ -1,0 +1,1225 @@
+
+% efficiencies
+\newsym{eta}{\eta}{Static efficiency from generator electrical port to grid electrical port}
+\newsym{eta-array}{\eta_{array}}{Static efficiency due to array uptime}
+\newsym{boldsymbol-eta-H-T}{\boldsymbol{\eta}^{H,T}}{Matrix of efficiencies in each sea state}
+\newsym{boldsymbol-eta-H-T-drag}{\boldsymbol{\eta}^{H,T}_\text{drag}}{Matrix of drag efficiency in each sea state}
+\newsym{boldsymbol-eta-H-T-drag-var}{\boldsymbol{\eta}^{H,T}_{\text{drag},\text{var}}}{}
+\newsym{boldsymbol-eta-H-T-elec}{\boldsymbol{\eta}^{H,T}_{\text{elec}}}{Matrix of electrical efficiency in each sea state}
+\newsym{boldsymbol-eta-H-T-limits}{\eta^{H,T}_\text{limits}}{Matrix of efficiency due to PTO limits in each sea state}
+\newsym{boldsymbol-eta-H-T-rad}{\boldsymbol{\eta}^{H,T}_{\text{rad}}}{Matrix of radiation efficiency in each sea state}
+
+% meem dimensions
+\newsym{a-1}{a_1}{Radius of spar used for MEEM}
+\newsym{a-2}{a_2}{Radius of float used for MEEM}
+\newsym{a-3}{a_3}{Average radius of float and spar used for MEEM}
+\newsym{a-in}{a_{in}}{Inner radius of body used for MEEM}
+\newsym{a-out}{a_{out}}{Outer radius of body used for MEEM}
+\newsym{d-1}{d_1}{Draft of spar used in MEEM}
+\newsym{d-2}{d_2}{Draft of float used in MEEM}
+
+% diameters
+\newsym{D-d}{D_d}{Diameter of damping plate}
+\newsym{D-d-min}{D_{d_{\text{min}}}}{Minimum permissible damping plate diameter}
+\newsym{D-f}{D_f}{Outer diameter of float}
+\newsym{D-f-in}{D_{f,in}}{Inner diameter of float}
+\newsym{D-f-nom}{D_{f,nom}}{Outer diameter of float in nominal RM3 design}
+\newsym{D-s}{D_s}{Outer diameter of spar}
+\newsym{D}{D}{Generic diameter}
+
+% added mass
+\newsym{A-c}{A_c}{Added mass coupling coefficient, representing forces on the float due to the spar's acceleration and vice versa}
+\newsym{A-f}{A_f}{Added mass coefficient of the float due to its own acceleration}
+\newsym{A-h}{A_h}{Diagonal element ($A_f$ or $A_s$) of the added mass matrix \gls{sym-mathbf-A-h-op}, computed via MEEM}
+\newsym{mathbf-A-h}{\mathbf{A}_h}{Added mass matrix}
+\newsym{mathbf-A-h-op}{\mathbf{A}_{h,op}}{Added mass matrix for operational conditions}
+\newsym{mathbf-A-h-st}{\mathbf{A}_{h,st}}{Added mass matrix for storm conditions}
+\newsym{A-m}{A_m}{Added mass coefficient of the merged float-spar system due to its own acceleration}
+\newsym{A-s}{A_s}{Added mass coefficient of the spar due to its own acceleration}
+
+% constraint/metric formulation
+\newsym{mathbf-A-P}{\mathbf{A}_P}{Matrix to recover average power from complex port variables}
+\newsym{mathbf-A-hat-e-2}{\mathbf{A}_{|\gls{sym-hat-e}|^2}}{Matrix to recover squared effort magnitude from complex port variables}
+\newsym{mathbf-A-hat-q-2}{\mathbf{A}_{|\gls{sym-hat-q}|^2}}{Matrix to recover squared flow magnitude from complex port variables}
+\newsym{mathbf-A-M}{\mathbf{A}_M}{Matrix to recover a generic quadratic metric from complex port variables}
+\newsym{mathbf-A-S}{\mathbf{A}_S}{Matrix to recover complex power from complex port variables}
+
+% cascade matrices
+\newsym{mathbf-a}{\mathbf{a}}{Cascade matrix}
+\newsym{mathbf-a-VI-leftarrow-F-dot-X}{\mathbf{a}_{VI \leftarrow F\dot{X}}}{Cascade matrix from PTO mechanical port to generator electrical port}
+\newsym{mathbf-a-F-p-dot-xi-f-leftarrow-VI}{\mathbf{a}_{(F_p\dot{\xi})_f \leftarrow VI}}{Cascade matrix from generator electrical port to float mechanical port}
+\newsym{mathbf-a-F-p-dot-xi-s-leftarrow-VI}{\mathbf{a}_{(F_p\dot{\xi})_s \leftarrow VI}}{Cascade matrix from generator electrical port to spar mechanical port}
+\newsym{mathbf-a-F-dot-X-leftarrow-VI}{\mathbf{a}_{F\dot{X} \leftarrow VI}}{Cascade matrix from generator electrical port to PTO mechanical port}
+\newsym{mathbf-a-F-dot-X-leftarrow-tau-Omega}{\mathbf{a}_{F\dot{X} \leftarrow \tau\Omega}}{Cascade matrix from generator mechanical port to PTO mechanical port}
+\newsym{mathbf-a-tau-Omega-leftarrow-VI}{\mathbf{a}_{\tau\Omega \leftarrow VI}}{Cascade matrix from electrical port to generator mechanical variables}
+\newsym{A-a}{A_a}{First element of a cascade matrix \gls{sym-mathbf-a}}
+\newsym{B-a}{B_a}{Second element of a cascade matrix \gls{sym-mathbf-a}}
+\newsym{C-a}{C_a}{Third element of a cascade matrix \gls{sym-mathbf-a}}
+\newsym{D-a}{D_a}{Fourth element of a cascade matrix \gls{sym-mathbf-a}}
+
+% areas
+\newsym{A-w}{A_w}{Waterplane area}
+\newsym{A-w-f}{A_{w,f}}{Waterplane area of float}
+\newsym{A-w-s}{A_{w,s}}{Waterplane area of spar}
+\newsym{A-wet}{A_{wet}}{Wetted surface area}
+
+% volumes
+\newsym{V-f-struct}{V_{f,\text{struct}}}{}
+\newsym{V-f-struct-max}{V_{f,\text{struct},\text{max}}}{}
+\newsym{V-f-struct-min}{V_{f,\text{struct},\text{min}}}{}
+\newsym{V-s-struct}{V_{s,\text{struct}}}{}
+\newsym{V-s-struct-max}{V_{s,\text{struct},\text{max}}}{}
+\newsym{V-s-struct-min}{V_{s,\text{struct},\text{min}}}{}
+\newsym{V-pto}{V_{pto}}{Volume of power takeoff system}
+\newsym{V-struct}{V_\text{struct}}{Volume of structural material}
+\newsym{V-sub}{V_\text{sub}}{Submerged volume}
+\newsym{V-surf}{V_{\text{surf}}}{Surface volume (above the waterline)}
+
+% damping
+\newsym{B-c}{B_c}{Radiation damping coefficient for float-spar coupling}
+\newsym{mathbf-B-d}{\mathbf{B}_d}{Damping matrix due to drag}
+\newsym{B-f}{B_f}{Radiation damping coefficient for float}
+\newsym{B-h}{B_h}{Diagonal element (\gls{sym-B-f} or \gls{sym-B-s}) of the radiation damping matrix \gls{sym-mathbf-B-h-op}, computed via MEEM}
+\newsym{mathbf-B-h}{\mathbf{B}_h}{Radiation damping matrix}
+\newsym{mathbf-B-h-op}{\mathbf{B}_{h,op}}{Operational radiation damping matrix}
+\newsym{mathbf-B-h-st}{\mathbf{B}_{h,st}}{Storm radiation damping matrix}
+\newsym{B-l}{B_l}{Control damping coefficient at load}
+\newsym{B-l-damp}{B_{l,damp}}{Control damping coefficient at the load in damping control}
+\newsym{B-l-reac}{B_{l,reac}}{Control damping coefficient at the load in reactive control}
+\newsym{B-m}{B_m}{Radiation damping coefficient for merged float-spar}
+\newsym{B-s}{B_s}{Radiation damping coefficient for spar}
+\newsym{mathbf-B-p}{\mathbf{B}_p}{PTO damping matrix}
+\newsym{B}{B}{Damping matrix or coefficient in linear system form}
+
+% stiffnesses
+\newsym{K-f}{K_f}{Hydrostatic stiffness of float}
+\newsym{K-h}{K_h}{Hydrostatic stiffness}
+\newsym{mathbf-K-h}{\mathbf{K}_h}{Hydrostatic stiffness matrix}
+\newsym{mathbf-K-h-op}{\mathbf{K}_{h,op}}{Operational hydrostatic stiffness matrix}
+\newsym{mathbf-K-h-st}{\mathbf{K}_{h,st}}{Storm hydrostatic stiffness matrix}
+\newsym{K-l}{K_l}{Control stiffness at load}
+\newsym{K-l-reac}{K_{l,\mathrm{reac}}}{Control stiffness at load under reactive control}
+\newsym{K-l-damp}{K_{l,\mathrm{damp}}}{Control stiffness at load under damping control}
+\newsym{K-m}{K_m}{Hydrostatic stiffness of merged float-spar}
+\newsym{mathbf-K-p}{\mathbf{K}_p}{PTO stiffness matrix}
+\newsym{K-s}{K_s}{Hydrostatic stiffness of spar}
+
+% excitation coefficients
+\newsym{gamma}{\gamma}{Hydrodynamic excitation coefficient}
+\newsym{Upsilon}{\Upsilon}{Nondimensional helper function for spar excitation coefficient analysis}
+\newsym{gamma-m}{\gamma_m}{Hydrodynamic excitation coefficient for merged float-spar}
+\newsym{vec-gamma}{\vec{\gamma}}{Complex wave-excitation coefficient vector from hydrodynamic forcing}
+\newsym{vec-gamma-d}{\vec{\gamma}_d}{Drag excitation coefficient vector}
+\newsym{gamma-f}{\gamma_f}{Hydrodynamic excitation coefficient for float}
+\newsym{gamma-s}{\gamma_s}{Hydrodynamic excitation coefficient for spar}
+
+% cost
+\newsym{C-1}{C_1}{Single-unit capital cost for economies of scale calculation}
+\newsym{C}{C}{Capital cost (subscript shows cost category)}
+\newsym{C-pto}{C_{pto}}{Capital cost of the PTO}
+\newsym{C-pto-constant}{C_{pto,\text{constant}}}{Constant term in the PTO capital cost}
+\newsym{C-struct}{C_\text{struct}}{Capital cost of structural material}
+\newsym{C-unit}{C_{\mathrm{unit}}}{Unit cost at a particular quantity, for economies of scale calculation}
+\newsym{C-fixed}{C_\text{fixed}}{Capital cost that is modeled as independent of the design}
+\newsym{C-infty}{C_\infty}{Asymptotic Unit Cost as Quantity Approaches Infinity}
+\newsym{N-WEC}{N_{\text{WEC}}}{Number of WECs in array for economies-of-scale calculations (not dynamic interactions)}
+
+% price
+\newsym{p-prime-star}{p^{'}_{(*)}}{Normalized price coefficient for any quantity}
+\newsym{p-s}{p_s}{Price coefficient for structures}
+\newsym{p-star}{p^{'}_{(*)}}{Normalized price coefficient for any quantity}
+\newsym{p-F}{p_F}{Price coefficient for generator force}
+\newsym{p-P}{p_P}{Price coefficient for generator power}
+\newsym{p-P-2}{p_{P,2}}{}
+\newsym{p-F-2}{p_{F,2}}{}
+\newsym{p-s-2}{p_{s,2}}{}
+\newsym{p-prime-0}{p^{'}_0}{}
+\newsym{p-prime-F}{p^{'}_F}{}
+\newsym{p-prime-P}{p^{'}_P}{}
+\newsym{p-prime-s}{p^{'}_s}{}
+
+
+% \newsym{B-k-0-e}{B_{k=0}^e}{}
+
+% powers
+\newsym{P-tau-Omega}{P_{\tau\Omega}}{Active power at the generator mechanical port}
+\newsym{P-tau-Omega-max}{P_{\tau\Omega,\text{max}}}{Maximum allowable mechanical port power at the generator shaft}
+\newsym{S}{S}{Complex power}
+\newsym{S-0}{S_0}{Impedance-matched apparent power in the extension of QCQP to fourth-order apparent power constraints}
+\newsym{P}{P}{Active power}
+\newsym{P-VI}{P_{VI}}{}
+\newsym{p}{p}{Instantaneous time-domain power at any port}
+\newsym{p-avg}{p_{avg}}{Average power at any port}
+\newsym{p-avg-elec}{p_{avg,elec}}{Average electrical power generation after accounting for static conversion efficiency}
+\newsym{overline-P-elec}{\overline{P}_{\text{elec}}}{Annual average electrical power generation}
+\newsym{P-avg-VI}{P_{avg,VI}}{Active power at the generator electrical port}
+\newsym{p-avg-VI}{p_{avg,VI}}{Average power at the generator electrical port}
+\newsym{p-avg-VI-opt}{p_{avg,VI,opt}}{Average power at the generator electrical port under optimal constrained control}
+\newsym{mathbf-P-F-dot-X-ideal}{\mathbf{P}_{F\dot{X},\text{ideal}}}{}
+\newsym{mathbf-P-F-dot-X-no-drag}{\mathbf{P}_{F\dot{X},\text{no drag}}}{}
+\newsym{mathbf-P-H-T-elec}{\mathbf{P}^{H,T}_{\text{elec}}}{}
+\newsym{mathbf-P-H-T-F-dot-X}{\mathbf{P}^{H,T}_{F\dot{X}}}{}
+\newsym{mathbf-P-H-T-F-dot-X-ideal}{\mathbf{P}^{H,T}_{F\dot{X},\text{ideal}}}{}
+\newsym{mathbf-P-H-T-IV}{\mathbf{P}^{H,T}_{IV}}{}
+\newsym{mathbf-P-IV}{\mathbf{P}_{IV}}{}
+\newsym{mathbf-P-IV-no-drag}{\mathbf{P}_{IV, \text{no drag}}}{}
+\newsym{P-max}{P_\text{max}}{Maximum allowable power at the generator electrical port across all sea states}
+\newsym{P-max-elec}{P_{\text{max},\text{elec}}}{Maximum allowable power at the grid electrical port across all sea states}
+\newsym{Q}{Q}{Reactive power}
+\newsym{p-pk}{p_{\text{pk}}}{Peak power over a wave cycle at any port in a given sea state}
+\newsym{p-pk-elec}{p_{\text{pk},\text{elec}}}{}
+\newsym{p-pk-elec-beta}{p_{\text{pk},\text{elec},\beta}}{}
+\newsym{p-pk-VI}{p_{\text{pk},VI}}{Peak power at the generator electrical port}
+
+% forces
+\newsym{F}{F}{Force}
+\newsym{vec-hat-F}{\vec{\hat{F}}}{}
+\newsym{vec-F-d}{\vec{F}_d(t)}{Vector of time-domain drag force on each hydrodynamic degree of freedom}
+\newsym{F-d-t}{F_d(t)}{Time-domain drag force on a generic hydrodynamic degree of freedom}
+\newsym{vec-hat-F-d}{\vec{\hat{F}}_d}{Vector of complex phasor drag force on each hydrodynamic degree of freedom}
+\newsym{vec-F-e}{\vec{F}_e(t)}{Vector of time-domain excitation forces for each hydrodynamic degree of freedom}
+\newsym{vec-hat-F-e}{\vec{\hat{F}}_e}{Vector of complex phasor excitation forces for each hydrodynamic degree of freedom}
+\newsym{mathbf-hat-F-H-T-th}{\mathbf{\hat{F}}^{H,T}_{th}}{}
+\newsym{F-heave}{F_\text{heave}}{Total peak structural force in heave acting on the hull of a body}
+\newsym{F-heave-f}{F_{\text{heave},f}}{Total peak structural force in heave acting on the hull of the float}
+\newsym{F-heave-mult}{F_{\text{heave},\text{mult}}}{Tuning multiplier for heave forces}
+\newsym{F-heave-s}{F_{\text{heave},s}}{Total peak structural force in heave acting on the hull of the spar}
+\newsym{f-k}{f_k}{Helper term for computing the scale factor \gls{sym-N-k} in MEEM}
+\newsym{f-m}{f_{m}}{Helper term for computing the $m$th term in the high-frequency limit of vertical coupling integral \gls{sym-boldsymbol-mathcal-Z} in MEEM}
+\newsym{F-max}{F_\text{max}}{Peak instantaneous force that the generator is capable of producing}
+\newsym{F-p}{F_p}{PTO force for a single degree of freedom}
+\newsym{hat-F-p-guess}{\hat{F}_{p,\text{guess}}}{Resultant powertrain force after running a dynamics iteration for a guessed reflection coefficient when using the implicit optimal control scheme}
+\newsym{hat-F-p}{\hat{F}_p}{Complex phasor force of the PTO on a single body degree of freedom}
+\newsym{hat-F-PTO}{\hat{F}_{PTO}}{Complex phasor PTO force for a single PTO degree of freedom}
+\newsym{vec-F-p}{\vec{F}_p}{Vector of time-domain powertrain forces for each hydrodynamic degree of freedom}
+\newsym{vec-hat-F-p}{\vec{\hat{F}}_p}{Vector of complex phasor powertrain forces for each hydrodynamic degree of freedom}
+\newsym{hat-F-p-beta}{\hat{F}_{p,\beta}}{Complex phasor PTO force in the $\beta$th sea state}
+\newsym{hat-F-p-constr}{\hat{F}_{p,\text{constr}}}{Constrained complex phasor PTO force}
+\newsym{F-p-op}{F_{p,op}}{Operational PTO force}
+\newsym{hat-F-p-unconstrained}{\hat{F}_{p,\text{unconstrained}}}{Unconstrained complex phasor PTO force}
+\newsym{F-PTO}{F_{PTO}}{Vector of time domain PTO forces for each PTO degree of freedom}
+\newsym{vec-hat-F-PTO}{\vec{\hat{F}}_{PTO}}{Vector of complex phasor PTO forces for each PTO degree of freedom}
+\newsym{vec-F-rad}{\vec{F}_{\text{rad}}(t)}{Time-domain vector of radiation forces for each hydrodynamic degree of freedom}
+\newsym{vec-hat-F-rad}{\vec{\hat{F}}_{\text{rad}}}{Hydrodynamic radiation force phasor vector}
+\newsym{vec-F-res}{\vec{F}_{\text{res}}(t)}{Time-domain vector of hydrostatic restoring forces for each hydrodynamic degree of freedom}
+\newsym{vec-hat-F-res}{\vec{\hat{F}}_{\text{res}}}{Hydrostatic restoring force phasor}
+\newsym{F-surge}{F_{\text{surge}}}{}
+\newsym{hat-F-th}{\hat{F}_{th}(t)}{Time-domain Thevenin-equivalent force}
+\newsym{vec-hat-F-th}{\vec{\hat{F}}_{th}}{Complex phasor Thevenin-equivalent force}
+
+
+% reflection coeff
+\newsym{Gamma-beta-opt}{\Gamma_{\beta,opt}}{Optimal reflection coefficient in the $\beta$th sea state}
+\newsym{Gamma-int-mu-star-nu-star}{\Gamma_{\text{int},\mu^*,\nu^*}}{Complex optimal reflection coefficient at the intersection of two active constraint circles in QCQP}
+\newsym{Gamma-mu-nu}{\Gamma_{\mu,\nu}}{Complex reflection coefficient at the intersection of the $\mu$th and $\nu$th constraint circles in QCQP}
+\newsym{Gamma-opt}{\Gamma_\text{opt}}{Complex optimal reflection coefficient}
+\newsym{Gamma}{\Gamma}{Complex reflection coefficient at the generator electrical port}
+
+
+% non-draft vertically oriented bulk dimensions
+\newsym{h-f}{h_f}{Float height, including both above and below water}
+% \newsym{H-infty}{H_\infty}{}
+\newsym{h-s}{h_s}{Spar height, including both above and below water}
+
+% coords
+\newsym{y}{y}{Cartesian coordinate in the direction of wave propagation}
+\newsym{r}{r}{Coordinate in the radial direction}
+\newsym{t}{t}{Time}
+\newsym{theta}{\theta}{}
+\newsym{z}{z}{Cartesian and cylindrical coordinate in the vertical direction}
+\newsym{hat-e-z}{\hat{e}_z}{Unit vector in the vertical direction}
+
+% qcqp
+
+% radii / radially oriented dims
+\newsym{R-p}{R_p}{Radius of the damping plate}
+\newsym{R-x}{R_x}{The smaller of the float radius and the damping plate radius, used for spar hydrodynamic coefficient calculation}
+\newsym{h-0}{h_0}{Perpendicular height of the trapezoidal top and bottom float plates}
+
+% drafts
+\newsym{T-draft}{T}{Draft}
+\newsym{T-s}{T_s}{Draft of spar}
+\newsym{vec-T}{\vec{T}}{Vector of drafts for each hydrodynamic degree of freedom}
+\newsym{T-f-2}{T_{f,2}}{Draft of float, measured at inner diameter}
+
+% structural dimensions
+\newsym{t-d}{t_d}{Structural thickness of damping plate}
+\newsym{t-f-top-eq}{t_{f,\text{top},eq}}{}
+\newsym{h-1-stiff-d}{h_{1,\text{stiff},d}}{Height of the larger damping plate stiffener}
+% \newsym{H-2}{H_2}{}
+\newsym{h-d}{h_d}{Damping plate thickness}
+% \newsym{h-stiff-d}{h_{\text{stiff},d}}{}
+\newsym{h-stiff-f}{h_{\text{stiff},f}}{}
+
+
+% \newsym{T-f}{T_f}{Draft of float}
+% \newsym{t-f}{t_f}{Structural thickness of float plate}
+% \newsym{t-s}{t_s}{}
+
+
+% \newsym{u}{u}{}
+% \newsym{v}{v}{}
+
+% wave vel, relative vel, fluid vel
+\newsym{vec-v-rel}{\vec{v}_{rel}}{Relative velocity vector between body and fluid for drag calculations}
+\newsym{vec-hat-V-rel}{\vec{\hat{V}}_{rel}}{Relative velocity phasor between body and fluid}
+\newsym{hat-V-wave}{\hat{V}_{\text{wave}}}{Wave velocity phasor}
+\newsym{vec-hat-V-wave}{\vec{\hat{V}}_{\text{wave}}}{Wave-velocity phasor vector}
+\newsym{vec-v}{\vec{v}}{Fluid velocity vector field in MEEM}
+\newsym{vec-alpha-v-y}{\vec{\alpha}_v(y)}{Vector of amplitude ratios of the relative WEC-fluid velocity to the WEC velocity as a function of lateral coordinate \gls{sym-y}, used in drag integral calculations}
+
+% weighting coeffs
+\newsym{tilde-w-1-mu-nu-beta}{\tilde{w}_{1\mu\nu\beta}}{First transformed weighting term for the $\mu,\nu$ constraint pair in sea state $\beta$}
+\newsym{tilde-w-2-mu-nu-beta}{\tilde{w}_{2\mu\nu\beta}}{Second transformed weighting term for the $\mu,\nu$ constraint pair in sea state $\beta$}
+\newsym{w-beta}{w_\beta}{Weight assigned to sea state $\beta$ in annual average power calculations}
+
+% \newsym{X}{X}{}
+\newsym{dot-X}{\dot{X}}{}
+\newsym{dot-x}{\dot{x}}{}
+\newsym{hat-dot-X}{\hat{\dot{X}}}{}
+\newsym{vec-X}{\vec{X}}{}
+\newsym{vec-x}{\vec{x}}{}
+% \newsym{x}{x}{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% START OPTIM PAPER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newsym{A}{A}{Structural cross sectional area of the spar for heave loads}
+\newsym{A-sens}{A_\text{sens}}{Matrix for local sensitivity analysis}
+\newsym{b-max}{b_\text{max}}{}
+\newsym{vec-b-sens}{\vec{b}_\text{sens}}{Right hand side vector for sensitivity analysis}
+\newsym{C-design}{C_\text{design}}{Design-dependent capital cost objective}
+\newsym{C-m}{C_m}{}
+\newsym{C-sens}{C_\text{sens}}{}
+% \newsym{D-d-min}{D_{d,\text{min}}}{}
+\newsym{D-d-tu}{D_{d,tu}}{}
+\newsym{D-f-b}{D_{f,b}}{}
+\newsym{d-sens-j}{d_{\text{sens},j}}{}
+% \newsym{E}{E}{}
+% \newsym{eta-pto}{\eta_{pto}}{}
+% \newsym{f}{f}{}
+% \newsym{F-heave-mult}{F_{\text{heave},\text{mult}}}{}
+% \newsym{F-max}{F_\text{max}}{}
+% \newsym{f-max}{f_\text{max}}{}
+% \newsym{f-min}{f_\text{min}}{}
+% \newsym{g}{g}{Vector of nonlinear inequality constraints}
+\newsym{g-i}{g_i}{}
+% \newsym{g-L-1}{g_{L,1}}{}
+% \newsym{g-L-2}{g_{L,2}}{}
+% \newsym{g-L-3}{g_{L,3}}{}
+% \newsym{g-L-4}{g_{L,4}}{}
+% \newsym{g-L-5}{g_{L,5}}{}
+% \newsym{g-L-6}{g_{L,6}}{}
+% \newsym{g-L-7}{g_{L,7}}{}
+% \newsym{g-L-8}{g_{L,8}}{}
+\newsym{g-L-star}{g_{L,*}}{Generic linear-constraint identifier}
+\newsym{vec-g-NL}{\vec{g}_{NL}}{}
+% \newsym{g-NL-1}{g_{NL,1}}{}
+% \newsym{g-NL-13}{g_{NL,13}}{}
+% \newsym{g-NL-14}{g_{NL,14}}{}
+% \newsym{g-NL-15}{g_{NL,15}}{}
+% \newsym{g-NL-16}{g_{NL,16}}{}
+% \newsym{g-NL-17}{g_{NL,17}}{}
+% \newsym{g-NL-18}{g_{NL,18}}{}
+% \newsym{g-NL-19}{g_{NL,19}}{}
+% \newsym{g-NL-2}{g_{NL,2}}{}
+% \newsym{g-NL-20}{g_{NL,20}}{}
+% \newsym{g-NL-21}{g_{NL,21}}{}
+% \newsym{g-NL-22}{g_{NL,22}}{}
+% \newsym{g-NL-23}{g_{NL,23}}{}
+% \newsym{g-NL-239}{g_{NL,239}}{}
+% \newsym{g-NL-3}{g_{NL,3}}{}
+% \newsym{g-NL-4}{g_{NL,4}}{}
+% \newsym{g-NL-5}{g_{NL,5}}{}
+% \newsym{g-NL-6}{g_{NL,6}}{}
+% \newsym{H}{H}{Wave height of equivalent regular wave}
+% \newsym{h}{h}{Vector of nonlinear equality constraints}
+\newsym{h-fs-clear}{h_{fs,\text{clear}}}{Float-spar clearance height}
+% \newsym{h-fs-down}{h_{fs,\text{down}}}{Float-spar downward clearance height}
+% \newsym{h-fs-up}{h_{fs,\text{up}}}{Float-spar upward clearance height}
+\newsym{H-ii}{H_{ii}}{$i$th diagonal element of Hessian matrix}
+% \newsym{h-stiff-d}{h_\text{stiff,d}}{}
+% \newsym{h-stiff-d-2}{h_{\text{stiff},d}}{}
+% \newsym{h-stiff-f}{h_{\text{stiff},f}}{Structural stiffener height for float}
+\newsym{vec-J}{\vec{J}}{Vector of objectives}
+% \newsym{J-1}{J_1}{}
+% \newsym{J-2}{J_2}{}
+% \newsym{J-top}{J^\top}{}
+
+% \newsym{k}{k}{Wavenumber}
+% \newsym{lambda}{\lambda}{Lagrange multiplier}
+% \newsym{m}{m}{}
+% \newsym{N}{N}{}
+% \newsym{N-harmonics}{N_\text{harmonics}}{}
+\newsym{omega-n}{\omega_n}{Natural frequency}
+% \newsym{omega-n-max}{\omega_{n,\text{max}}}{}
+% \newsym{p}{p}{Vector of parameters}
+\newsym{p-0}{p_0}{}
+% \newsym{P-avg}{P_\text{avg}}{}
+% \newsym{P-avg-elec}{P_{\text{avg},\text{elec}}}{}
+\newsym{p-i}{p_i}{}
+\newsym{P-pk-elec}{P_{pk,\text{elec}}}{}
+% \newsym{rho-M}{\rho_M}{}
+% \newsym{s-i}{s_i}{}
+\newsym{vec-s-top}{\vec{s}^\top}{}
+% \newsym{sigma-y}{\sigma_y}{}
+\newsym{T-f-1}{T_{f,1}}{Draft of float, measured at outer diameter}
+% \newsym{T-f-1-2}{T_f^{-1/2}}{}
+\newsym{t-f-b}{t_{f,b}}{}
+% \newsym{t-fb}{t_{fb}}{}
+\newsym{t-s-r}{t_{s,r}}{Structural thickness of spar, measured radially}
+% \newsym{t-sr}{t_{sr}}{}
+% \newsym{w-stiff-d}{w_{\text{stiff},d}}{}
+% \newsym{x}{x}{}
+\newsym{x-0}{x_0}{Initial design-variable value}
+% \newsym{x-1}{x_1}{}
+% \newsym{x-10}{x_{10}}{}
+% \newsym{x-11}{x_{11}}{}
+% \newsym{x-12}{x_{12}}{}
+% \newsym{x-2}{x_2}{}
+% \newsym{x-3}{x_3}{}
+% \newsym{x-4}{x_4}{}
+% \newsym{x-5}{x_5}{}
+% \newsym{x-6}{x_6}{}
+% \newsym{x-7}{x_7}{}
+% \newsym{x-8}{x_8}{}
+% \newsym{x-9}{x_9}{}
+\newsym{vec-x-LB}{\vec{x}_{LB}}{Vector of design variable lower bounds}
+\newsym{vec-x-s}{\vec{x}_s}{}
+\newsym{vec-x-sens}{\vec{x}_\text{sens}}{Solution vector for local sensitivity analysis}
+\newsym{vec-x-UB}{\vec{x}_{UB}}{Vector of design variable upper bounds}
+\newsym{xi-tol}{\xi_{tol}}{}
+\newsym{vec-lambda}{\vec{\lambda}}{Vector of Lagrange multipliers}
+\newsym{vec-nabla}{\vec{\nabla}}{Gradient operator vector}
+\newsym{vec-p}{\vec{p}}{Vector of simulation parameters held constant during optimization}
+\newsym{mathbf-H}{\mathbf{H}}{Hessian matrix of the optimization problem}
+
+%%%%%%%%%%%%%%%% JFM MEEM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \newsym{a}{a}{}
+% \newsym{a-1}{a_1}{}
+% \newsym{mathbf-A-1}{\mathbf{A}_1}{}
+% \newsym{A-11}{A_{11}}{}
+% \newsym{a-2}{a_2}{}
+% \newsym{mathbf-A-2}{\mathbf{A}_2}{}
+\newsym{a-M}{a_M}{}
+\newsym{a-m}{a_m}{}
+% \newsym{mathbf-A-M}{\mathbf{A}_M}{}
+\newsym{mathbf-A-m}{\mathbf{A}_m}{}
+\newsym{a-M-1}{a_{M-1}}{}
+\newsym{a-m-1}{a_{m+1}}{}
+\newsym{a-m-1-2}{a_{m-1}}{}
+\newsym{mathbf-A-M-1}{\mathbf{A}_{M-1}}{}
+\newsym{mathbf-A-m-r}{\mathbf{A}_{m,r}}{}
+\newsym{mathbf-A-m-z}{\mathbf{A}_{m,z}}{}
+\newsym{A-pq}{A_{pq}}{}
+\newsym{mathbf-A-mathrm-r}{\mathbf{A}_\mathrm{r}}{}
+% \newsym{alpha}{\alpha}{}
+\newsym{alpha-A-i-2-leq-m-M}{\alpha_A^{i_{2 \leq m < M}}}{}
+\newsym{alpha-A-i-M}{\alpha_A^{i_M}}{}
+\newsym{alpha-A-i-m-1}{\alpha_A^{i_{m=1}}}{}
+\newsym{alpha-B-i-M}{\alpha_B^{i_M}}{}
+\newsym{alpha-B-i-m}{\alpha_B^{i_m}}{}
+\newsym{alpha-i-m}{\alpha^{i_m}}{}
+\newsym{alpha-i-m-A}{\alpha^{i_m}_A}{}
+\newsym{alpha-i-m-B}{\alpha^{i_m}_B}{}
+\newsym{mathbf-B}{\mathbf{B}}{}
+% \newsym{vec-b}{\vec{b}}{}
+\newsym{vec-b-1}{\vec{b}_1}{}
+\newsym{B-11}{B_{11}}{}
+\newsym{vec-b-2}{\vec{b}_2}{}
+\newsym{vec-b-M}{\vec{b}_M}{}
+\newsym{vec-b-m}{\vec{b}_m}{}
+\newsym{B-pq}{B_{pq}}{}
+\newsym{b-q}{b^q}{}
+\newsym{vec-b-q-1}{\vec{b}^q_1}{}
+\newsym{vec-b-q-2}{\vec{b}^q_2}{}
+\newsym{vec-b-q-M}{\vec{b}^q_M}{}
+\newsym{mathbf-B-mathrm-r}{\mathbf{B}_\mathrm{r}}{}
+\newsym{beta-A-i-2-leq-m-M}{\beta_A^{i_{2 \leq m < M}}}{}
+\newsym{beta-A-i-M}{\beta_A^{i_M}}{}
+\newsym{beta-A-i-m-1}{\beta_A^{i_{m=1}}}{}
+\newsym{beta-B-i-M}{\beta_B^{i_M}}{}
+\newsym{beta-B-i-m}{\beta_B^{i_m}}{}
+\newsym{beta-i-m}{\beta^{i_m}}{}
+\newsym{beta-i-m-A}{\beta^{i_m}_A}{}
+\newsym{beta-i-m-B}{\beta^{i_m}_B}{}
+% \newsym{c}{c}{}
+\newsym{mathbf-C-0}{\mathbf{C}_0}{}
+\newsym{c-1}{c_1}{}
+\newsym{vec-C-1-e}{\vec{C}_1^e}{}
+\newsym{vec-C-1-ell}{\vec{C}_1^\ell}{}
+\newsym{vec-C-1-i-1}{\vec{C}_1^{i_1}}{}
+\newsym{vec-C-1-i-2}{\vec{C}_1^{i_2}}{}
+\newsym{vec-C-1-i-3}{\vec{C}_1^{i_3}}{}
+\newsym{vec-C-1-i-M}{\vec{C}_1^{i_M}}{}
+\newsym{vec-C-1-i-m}{\vec{C}_1^{i_m}}{}
+\newsym{vec-C-1-i-M-1}{\vec{C}_1^{i_{M-1}}}{}
+\newsym{vec-C-1-i-m-1}{\vec{C}_1^{i_{m+1}}}{}
+\newsym{C-1-n-1-i-1}{C_{1{n_1}}^{i_1}}{}
+\newsym{C-1-n-e-e}{C_{1{n_e}}^e}{}
+\newsym{C-1-N-ell-1-ell}{C_{1(N^\ell-1)}^\ell}{}
+\newsym{C-1-n-m-i-m}{C_{1{n_m}}^{i_m}}{}
+\newsym{C-10-e}{C_{10}^e}{}
+\newsym{C-10-ell}{C_{10}^\ell}{}
+\newsym{C-11-ell}{C_{11}^\ell}{}
+\newsym{C-1n-e-e}{C_{1n_e}^e}{}
+\newsym{C-1n-m-i-m}{C_{1n_m}^{i_m}}{}
+\newsym{c-2}{c_2}{}
+\newsym{vec-C-2-ell}{\vec{C}_2^\ell}{}
+\newsym{vec-C-2-i-1}{\vec{C}_2^{i_1}}{}
+\newsym{vec-C-2-i-2}{\vec{C}_2^{i_2}}{}
+\newsym{vec-C-2-i-3}{\vec{C}_2^{i_3}}{}
+\newsym{vec-C-2-i-M}{\vec{C}_2^{i_M}}{}
+\newsym{vec-C-2-i-m}{\vec{C}_2^{i_m}}{}
+\newsym{vec-C-2-i-M-1}{\vec{C}_2^{i_{M-1}}}{}
+\newsym{vec-C-2-i-m-1}{\vec{C}_2^{i_{m+1}}}{}
+\newsym{C-2-N-ell-1-ell}{C_{2(N^\ell-1)}^\ell}{}
+\newsym{C-2-n-m-i-m}{C_{2{n_m}}^{i_m}}{}
+\newsym{C-20-ell}{C_{20}^\ell}{}
+\newsym{C-21-ell}{C_{21}^\ell}{}
+\newsym{C-2n-1-i-1}{C_{2n_1}^{i_1}}{}
+\newsym{C-2n-e-e}{C_{2n_e}^e}{}
+\newsym{C-2n-m-i-m}{C_{2n_m}^{i_m}}{}
+\newsym{c-3}{c_3}{}
+\newsym{vec-C-chi-j}{\vec{C}_\chi^j}{}
+\newsym{C-chi-N-j-1-j}{C_{\chi(N^j-1)}^j}{}
+\newsym{C-chi1-j}{C_{\chi1}^j}{}
+\newsym{C-chi2-j}{C_{\chi2}^j}{}
+\newsym{c-i}{c_i}{}
+\newsym{C-i-2-10}{C^{i_2}_{10}}{}
+\newsym{C-i-2-1n}{C^{i_2}_{1n}}{}
+\newsym{C-i-m-1n}{C^{i_m}_{1n}}{}
+\newsym{C-i-m-1n-m}{C^{i_m}_{1n_m}}{}
+\newsym{C-i-m-2n}{C^{i_m}_{2n}}{}
+\newsym{C-i-m-2n-m}{C^{i_m}_{2n_m}}{}
+% \newsym{mathbb-C-N-i-M-N-e-times-2N-i-M-N-e}{\mathbb{C}^{(N^{i_M} + N^{e}) \times (2N^{i_M} + N^e)}}{}
+% \newsym{mathbb-C-N-mathrm-T}{\mathbb{C}^{N_\mathrm{T}}}{}
+% \newsym{mathbb-C-N-mathrm-T-times-N-mathrm-T}{\mathbb{C}^{N_\mathrm{T}\times N_\mathrm{T}}}{}
+\newsym{c-mathrm-overflow}{c_\mathrm{overflow}}{}
+\newsym{c-p}{c_p}{}
+\newsym{vec-c-p-e}{\vec{c}_p^{\ e}}{}
+\newsym{vec-c-p-i-1}{\vec{c}_p^{\ i_1}}{}
+\newsym{vec-c-p-i-2}{\vec{c}_p^{\ i_2}}{}
+\newsym{vec-c-p-i-M}{\vec{c}_p^{\ i_M}}{}
+\newsym{vec-c-p-i-m}{\vec{c}_p^{\ i_m}}{}
+\newsym{mathbb-C-Q}{\mathbb{C}^Q}{}
+\newsym{chi}{\chi}{Generic Bessel function argument for MEEM numeric overflow discussion}
+% \newsym{d-1}{d_1}{}
+% \newsym{d-2}{d_2}{}
+% \newsym{pi}{\pi}{}
+% \newsym{psi}{\psi}{}
+% \newsym{Q}{Q}{}
+% \newsym{R}{R}{}
+% \newsym{r}{r}{}
+% \newsym{zeta}{\zeta}{}
+
+% JFM MEEM
+\newsym{hat-e-r}{\hat{e}_r}{}
+\newsym{mathrm-t}{\mathrm{t}}{}
+\newsym{d-3}{d_3}{}
+\newsym{d-i}{d_i}{}
+\newsym{d-i-1}{d_{i+1}}{}
+\newsym{d-M}{d_M}{}
+\newsym{d-m}{d_m}{}
+\newsym{d-M-1}{d_{M-1}}{}
+\newsym{d-m-1}{d_{m+1}}{}
+\newsym{d-m-1-2}{d_{m-1}}{}
+\newsym{d-s}{d_\text{s}}{}
+\newsym{d-t}{d_t}{}
+\newsym{delta-pq}{\delta_{pq}}{}
+\newsym{e-z}{e_z}{}
+\newsym{eta-m}{\eta_m}{}
+\newsym{f-n-e}{f_{n_e}}{}
+\newsym{f-n-m}{f_{n_m}}{}
+\newsym{vec-f-pq}{\vec{f}_{pq}}{}
+% \newsym{g}{g}{}
+% \newsym{gamma}{\gamma}{}
+% \newsym{H}{H}{}
+% \newsym{h}{h}{}
+\newsym{H-0}{H_0}{}
+% \newsym{I}{I}{}
+\newsym{mathrm-I-0}{\mathrm{I}_0}{}
+\newsym{i-1}{i_1}{}
+\newsym{mathrm-I-1}{\mathrm{I}_1}{}
+\newsym{i-2}{i_2}{}
+\newsym{i-2-leq-m-M}{i_{2\leq m < M}}{}
+\newsym{i-3}{i_3}{}
+\newsym{i-4}{i_4}{}
+\newsym{mathbf-I-i-m}{\mathbf{I}^{i_m}}{}
+\newsym{mathbf-I-i-m-1}{\mathbf{I}^{i_{m+1}}}{}
+\newsym{i-M}{i_M}{}
+\newsym{i-m}{i_m}{}
+\newsym{i-m-1}{i_{m+1}}{}
+\newsym{I-nu}{I_\nu}{}
+\newsym{I-nu-e}{I_\nu^e}{}
+% \newsym{K}{K}{}
+% \newsym{k}{k}{}
+
+\newsym{K-1}{K_1}{}
+\newsym{K-2}{K_2}{}
+% \newsym{K-nu}{K_\nu}{}
+% \newsym{K-nu-e}{K_\nu^e}{}
+% \newsym{lambda}{\lambda}{}
+\newsym{lambda-0-e}{\lambda_0^e}{}
+\newsym{lambda-e}{\lambda_e}{}
+\newsym{lambda-i-m-n-m}{\lambda^{i_m}_{n_m}}{}
+\newsym{lambda-n-1-i-1}{\lambda_{n_1}^{i_1}}{}
+\newsym{lambda-n-e}{\lambda_n^e}{}
+\newsym{lambda-n-e-e}{\lambda_{n_e}^e}{}
+\newsym{lambda-n-i-m}{\lambda_n^{i_m}}{}
+\newsym{lambda-n-M-i-M}{\lambda_{n_M}^{i_M}}{}
+\newsym{lambda-n-m-i-m}{\lambda_{n_m}^{i_m}}{}
+\newsym{lambda-n-mathrm-s-s}{\lambda_{n_\mathrm{s}}^\text{s}}{}
+\newsym{lambda-n-mathrm-t-t}{\lambda_{n_\mathrm{t}}^\text{t}}{}
+% \newsym{M}{M}{}
+% \newsym{mathcal-M-1}{\mathcal{M}_1}{}
+% \newsym{mathcal-M-2}{\mathcal{M}_2}{}
+\newsym{mathcal-M-p}{\mathcal{M}_p}{}
+\newsym{mathcal-M-q}{\mathcal{M}_q}{}
+% \newsym{n}{n}{}
+\newsym{N-0}{N_0}{}
+\newsym{n-1}{n_1}{}
+\newsym{N-big}{N^{big}}{}
+\newsym{N-e}{N^e}{}
+\newsym{n-e}{n_e}{}
+\newsym{N-i}{N^i}{}
+\newsym{N-i-1}{N^{i_1}}{}
+\newsym{N-i-2}{N^{i_2}}{}
+\newsym{N-i-3}{N^{i_3}}{}
+\newsym{N-i-e}{N^{i_e}}{}
+\newsym{N-i-M}{N^{i_M}}{}
+\newsym{N-i-m}{N^{i_m}}{}
+\newsym{N-i-m-2}{N_{i_m}}{}
+\newsym{N-i-M-1}{N^{i_{M-1}}}{}
+\newsym{N-i-m-1}{N^{i_{m+1}}}{}
+\newsym{N-j}{N^j}{}
+\newsym{n-M}{n_M}{}
+\newsym{n-m}{n_m}{}
+\newsym{N-max}{N^\text{max}}{}
+\newsym{N-n-e}{N_{n_e}}{}
+\newsym{n-p}{n_p}{}
+\newsym{N-mathrm-s}{N^\mathrm{s}}{}
+\newsym{n-mathrm-s}{n_\mathrm{s}}{}
+\newsym{N-T}{N_T}{}
+\newsym{N-mathrm-t}{N^\mathrm{t}}{}
+\newsym{n-mathrm-t}{n_\mathrm{t}}{}
+\newsym{hat-n-zeta-m}{\hat{n}_{\zeta_m}}{}
+% \newsym{nu}{\nu}{}
+\newsym{O}{O}{}
+% \newsym{omega}{\omega}{}
+
+% JFM MEEM phi
+\newsym{Phi}{\Phi}{}
+\newsym{phi}{\phi}{}
+\newsym{phi-mathrm-D}{\phi_\mathrm{D}}{}
+\newsym{phi-e}{\phi^e}{}
+\newsym{phi-e-mathrm-h}{\phi^e_\mathrm{h}}{}
+\newsym{phi-mathrm-I}{\phi_\mathrm{I}}{}
+\newsym{phi-i-1}{\phi^{i_1}}{}
+\newsym{phi-i-1-mathrm-h}{\phi^{i_1}_\mathrm{h}}{}
+\newsym{phi-i-m}{\phi^{i_m}}{}
+\newsym{phi-i-m-1}{\phi^{i_{m+1}}}{}
+\newsym{phi-i-m-mathrm-h}{\phi^{i_m}_\mathrm{h}}{}
+\newsym{phi-i-m-p}{\phi^{i_m}_p}{}
+\newsym{phi-mathrm-p-i-m}{\phi_\mathrm{p}^{i_m}}{}
+\newsym{phi-mathrm-p-i-m-2}{\phi_\mathrm{p}^{{i_{m}}}}{}
+\newsym{phi-mathrm-p-i-m-1}{\phi_\mathrm{p}^{i_{m+1}}}{}
+\newsym{phi-mathrm-R}{\phi_\mathrm{R}}{}
+\newsym{phi-s}{\phi^s}{}
+\newsym{phi-mathrm-s-mathrm-h}{\phi^\mathrm{s}_\mathrm{h}}{}
+\newsym{phi-mathrm-s-mathrm-p}{\phi^\mathrm{s}_\mathrm{p}}{}
+\newsym{Phi-mathrm-T}{\Phi_\mathrm{T}}{}
+\newsym{phi-mathrm-T}{\phi_\mathrm{T}}{}
+\newsym{phi-mathrm-t}{\phi^\mathrm{t}}{}
+\newsym{phi-mathrm-t-mathrm-h}{\phi^\mathrm{t}_\mathrm{h}}{}
+\newsym{phi-mathrm-t-mathrm-p}{\phi^\mathrm{t}_\mathrm{p}}{}
+
+%JFM MEEM R
+\newsym{vec-R-1-ell}{\vec{R}_1^\ell}{}
+\newsym{vec-mathcal-R-1-i-1}{\vec{\mathcal{R}}_1^{i_1}}{}
+\newsym{vec-R-1-i-m}{\vec{R}_1^{i_m}}{}
+\newsym{vec-R-1-i-m-1}{\vec{R}_1^{i_{m+1}}}{}
+\newsym{R-1-n-1-i-1}{R_{1{n_1}}^{i_1}}{}
+\newsym{R-1-n-e-e}{R_{1{n_e}}^e}{}
+\newsym{R-1-N-ell-1-ell}{R_{1(N^\ell-1)}^\ell}{}
+\newsym{R-1-n-m-i-m}{R_{1{n_m}}^{i_m}}{}
+\newsym{R-10-e}{R_{10}^e}{}
+\newsym{R-10-ell}{R_{10}^\ell}{}
+\newsym{R-11-ell}{R_{11}^\ell}{}
+\newsym{R-1n-e-e}{R_{1n_e}^e}{}
+\newsym{R-1n-m-i-m}{R_{1n_m}^{i_m}}{}
+\newsym{vec-R-2-ell}{\vec{R}_2^\ell}{}
+\newsym{vec-R-2-i-m}{\vec{R}_2^{i_m}}{}
+\newsym{vec-R-2-i-m-1}{\vec{R}_2^{i_{m+1}}}{}
+\newsym{R-2-N-ell-1-ell}{R_{2(N^\ell-1)}^\ell}{}
+\newsym{R-2-n-m-i-m}{R_{2{n_m}}^{i_m}}{}
+\newsym{R-20-ell}{R_{20}^\ell}{}
+\newsym{R-21-ell}{R_{21}^\ell}{}
+\newsym{R-2n-m-i-m}{R_{2n_m}^{i_m}}{}
+\newsym{vec-R-chi-j}{\vec{R}_\chi^j}{}
+\newsym{R-chi-N-j-1-j}{R_{\chi(N^j-1)}^j}{}
+\newsym{R-chi0-j}{R_{\chi0}^j}{}
+\newsym{R-chi1-j}{R_{\chi1}^j}{}
+% \newsym{mathbb-R-N-i-1-N-i-2-times-N-i-1-2N-i-2}{\mathbb{R}^{(N^{i_1} + N^{i_{2}}) \times (N^{i_1} + 2N^{i_2})}}{}
+% \newsym{mathbb-R-N-i-m-N-i-m-1-times-2N-i-m-2N-i-m-1}{\mathbb{R}^{(N^{i_m} + N^{i_{m+1}}) \times (2N^{i_m} + 2N^{i_{m+1}})}}{}
+% \newsym{mathbb-R-N-mathrm-T}{\mathbb{R}^{N_\mathrm{T}}}{}
+% \newsym{mathbb-R-Q-times-Q}{\mathbb{R}^{Q \times Q}}{}
+
+\newsym{mathrm-s}{\mathrm{s}}{}
+% \newsym{S-p}{S_p}{}
+% \newsym{T}{T}{}
+% \newsym{t}{t}{}
+\newsym{Theta}{\Theta}{}
+% \newsym{mathbf-v}{\mathbf{v}}{}
+% \newsym{v-q}{v_q}{}
+% \newsym{W-m}{W_m}{}
+\newsym{X-1}{X_1}{}
+\newsym{X-q}{X_q}{}
+\newsym{vec-x-q}{\vec{x}_q}{}
+\newsym{x-q}{x^q}{}
+\newsym{xi-1}{\xi_1}{}
+\newsym{xi-2}{\xi_2}{}
+\newsym{xi-Q}{\xi_Q}{}
+% \newsym{z}{z}{}
+\newsym{Z-0-ell}{Z_0^\ell}{}
+\newsym{Z-1-ell}{Z_1^\ell}{}
+\newsym{vec-Z-ell}{\vec{Z}^\ell}{}
+\newsym{vec-Z-i-1}{\vec{Z}^{i_1}}{}
+\newsym{vec-Z-i-m}{\vec{Z}^{i_m}}{}
+\newsym{vec-Z-i-m-2}{\vec{Z}^{{i_{m}}}}{}
+\newsym{Z-i-m-0}{Z^{i_m}_0}{}
+\newsym{vec-Z-i-m-1}{\vec{Z}^{i_{m+1}}}{}
+\newsym{boldsymbol-mathcal-Z-i-m-1-i-m}{\boldsymbol{\mathcal{Z}}^{i_{m+1}i_m}}{}
+\newsym{boldsymbol-mathcal-Z-i-M-e}{\boldsymbol{\mathcal{Z}}^{i_M e}}{}
+\newsym{boldsymbol-mathcal-Z-i-m-e}{\boldsymbol{\mathcal{Z}}^{i_m e}}{}
+\newsym{boldsymbol-mathcal-Z-i-mi-m-1}{\boldsymbol{\mathcal{Z}}^{i_mi_{m+1}}}{}
+\newsym{boldsymbol-mathcal-Z-ij}{\boldsymbol{\mathcal{Z}}^{ij}}{}
+
+% JFM vertical eigenfunctions
+\newsym{Z-n-1-i-1}{Z_{n_1}^{i_1}}{}
+\newsym{Z-n-e-e}{Z_{n_e}^e}{}
+\newsym{Z-N-ell-1-ell}{Z_{(N^\ell-1)}^\ell}{}
+\newsym{Z-n-m-i-m}{Z_{n_m}^{i_m}}{}
+\newsym{Z-n-m-i-m-2}{Z_{{n_m}}^{i_m}}{}
+\newsym{vec-Z-mathrm-s}{\vec{Z}^\mathrm{s}}{}
+\newsym{Z-mathrm-s-n-mathrm-s}{Z^\mathrm{s}_{n_\mathrm{s}}}{}
+\newsym{boldsymbol-mathcal-Z-s-t}{\boldsymbol{\mathcal{Z}}^{\text{s} \text{t}}}{}
+\newsym{boldsymbol-mathcal-Z-mathrm-st}{\boldsymbol{\mathcal{Z}}^\mathrm{st}}{}
+\newsym{vec-Z-mathrm-t}{\vec{Z}^\mathrm{t}}{}
+\newsym{Z-mathrm-t-n-mathrm-t}{Z^\mathrm{t}_{n_\mathrm{t}}}{}
+\newsym{boldsymbol-mathcal-Z-mathrm-ts}{\boldsymbol{\mathcal{Z}}^\mathrm{ts}}{}
+
+% \newglossary{geomsym}{ggd}{ggn}{Geometry Symbols}
+% \newglossary{dynamicsym}{dgd}{dgn}{Dynamics Symbols}
+% \newglossary{romsym}{rgd}{rgn}{Reduced-Order Model Symbols}
+% \newglossary{phasors}{phd}{phn}{Phasors}
+
+% geometry relevant to pitch stability
+\newsym{BM}{\overline{BM}}{Length of line segment connecting center of buoyancy (B) to metacenter (M)}
+\newsym{GM}{\overline{GM}}{Length of line segment connecting center of gravity (G) and metacenter (M)}
+\newsym{KB}{\overline{KB}}{Length of line segment connecting keel (K) and center of buoyancy (B)}
+\newsym{KG}{\overline{KG}}{Length of line segment connecting keel (K) and center of gravity (G)}
+
+% dynamics coefficients and matrices
+\newsym{M-op}{\mathbf{M}_{op}}{Operational mass matrix}
+\newsym{M-storm}{\mathbf{M}_{storm}}{Storm-condition mass matrix}
+\newsym{A-h-mat}{\mathbf{A}_{h}}{Hydrodynamic added-mass matrix contribution}
+\newsym{B-h-mat}{\mathbf{B}_{h}}{Hydrodynamic radiation damping matrix contribution}
+\newsym{K-h-mat}{\mathbf{K}_{h}}{Hydrostatic restoring stiffness matrix contribution}
+\newsym{B-d-mat}{\mathbf{B}_{d}}{Drag damping matrix contribution}
+\newsym{B-p-mat}{\mathbf{B}_{p}}{PTO damping matrix contribution}
+\newsym{K-p-mat}{\mathbf{K}_{p}}{PTO stiffness matrix contribution}
+
+% reduced-order-model groups
+% \newsym{Pi-1}{\mathbf{\Pi}_{1}}{Primary Buckingham-pi design-space group vector for reduced-order modeling}
+% \newsym{Pi-2}{\mathbf{\Pi}_{2}}{Reduced parameter group vector used by the CEM-facing surrogate model}
+% \newsym{Pi-2-pz}{\mathbf{\Pi}_{2,pz}}{Pole-zero reduced parameter group set}
+% \newsym{Pi-2-hyd}{\mathbf{\Pi}_{2,hyd}}{Hydrodynamics-informed reduced parameter group set}
+% \newsym{Pi-2-pz-zeta-omega-n}{\mathbf{\Pi}_{2,pz}=(\zeta,\omega_n)}{Second-order pole-zero reduced group using damping ratio and natural frequency}
+
+% aor
+% \newsym{tilde-x}{\widetilde{x}}{}
+
+\newsym{z-top}{z_{\text{top}}}{Vertical coordinate of top of body for surge excitation force calculation}
+
+\newsym{T-s-nom}{T_{s,nom}}{}
+\newsym{vec-e}{\vec{e}}{}
+\newsym{gamma-i}{\gamma_i}{}
+\newsym{B-h-ii}{B_{h,ii}}{}
+\newsym{boldsymbol-hat-xi-H-T-f}{\boldsymbol{\hat{\xi}}^{H,T}_{f}}{}
+
+
+% constraint aggregations
+\newsym{mathbf-A-ineq}{\mathbf{A}_{\text{ineq}}}{Inequality-constraint coefficient matrix}
+\newsym{vec-b-ineq}{\vec{b}_{\text{ineq}}}{Inequality-constraint right-hand-side vector}
+\newsym{vec-g}{\vec{g}}{Vector of inequality constraint functions}
+\newsym{vec-h}{\vec{h}}{Vector of equality constraint functions}
+
+% power limits
+\newsym{S-max-k}{S_{max,k}}{Maximum permissible apparent power in of the $k$th apparent power constraint}
+
+% torque force limits
+\newsym{tau-max}{\tau_\text{max}}{}
+\newsym{tau-max-2}{\tau_{max}}{Maximum permissible generator torque}
+
+% xi limits
+\newsym{xi-lin}{\xi_{lin}}{Maximum acceptable body displacement to maintain linear hydrodynamic assumptions}
+\newsym{xi-slam}{\xi_\text{slam}}{General slamming amplitude limit}
+\newsym{xi-s-linear}{\xi_{s,\text{linear}}}{}
+\newsym{xi-s-max}{\xi_{s,\text{max}}}{}
+\newsym{xi-f-linear}{\xi_{f,\text{linear}}}{}
+\newsym{xi-f-max}{\xi_{f,\text{max}}}{}
+\newsym{xi-max-slam}{\xi_{max,slam}}{Maximum permitted position from still water line, above which slamming occurs}
+\newsym{xi-min-slam}{\xi_{min,slam}}{Minimum permitted position from still water line, below which slamming occurs}
+\newsym{xi-f-lin}{\xi_{f,\mathrm{lin}}}{Maximum permissible float displacement amplitude to maintain the assumptions of linear wave theory}
+\newsym{xi-f-slam}{\xi_{f,\mathrm{slam}}}{Maximum permissible float displacement amplitude to prevent slamming}
+\newsym{xi-s-lin}{\xi_{s,\mathrm{lin}}}{Maximum permissible spar displacement amplitude to maintain the assumptions of linear wave theory}
+\newsym{xi-s-slam}{\xi_{s,\mathrm{slam}}}{Maximum permissible spar displacement amplitude to prevent slamming}
+
+
+% x/z limits
+\newsym{x-max}{x_\text{max}}{}
+\newsym{x-min}{x_\text{min}}{}
+\newsym{z-max}{z_\text{max}}{}
+\newsym{z-min}{z_{min}}{}
+\newsym{Delta-z-slam}{\Delta z_{\text{slam}}}{Distance between still water level and body bottom used in slamming limits}
+\newsym{Delta-z-sub}{\Delta z_{\text{sub}}}{Distance between still water level and body top used in submersion limits}
+\newsym{Delta-z-surf}{\Delta z_{\text{surf}}}{Relevant vertical body dimension used in surface-piercing (slamming or submersion) limits}
+
+
+% X PTO limits
+\newsym{X-PTO-max}{X_{PTO,\text{max}}}{Maximum allowable PTO relative displacement}
+\newsym{h-fs-up}{h_{fs,\text{up}}}{Allowable displacement of the float to move upwards relative to the spar}
+\newsym{h-fs-down}{h_{fs,\text{down}}}{Allowable displacement of the float to move downwards relative to the spar}
+
+% QCQP
+\newsym{mathbf-Q-mu}{\mathbf{Q}_\mu}{Quadratic constraint coefficient for the $\mu$-th constraint}
+\newsym{r-mu}{r_\mu}{Radius of the $\mu$-th constraint circle, in QCQP}
+\newsym{S-mu}{S_\mu}{}
+\newsym{d-mu-star-nu-star}{d_{\mu^*\nu^*}}{Quadratic coefficient coupling active constraints $\mu^*$ and $\nu^*$ in the QCQP optimal solution}
+\newsym{Gamma-cl}{\Gamma_{\text{cl}}}{Reflection coefficient at the closest point of a constraint circle in QCQP}
+\newsym{Gamma-int}{\Gamma_{\text{int}}}{Reflection coefficient at the intersection of constraints in QCQP}
+\newsym{a-mu-nu-star}{a_{\mu\nu^*}}{Distance from the center of the $\gls{sym-mu}$th circle to the midpoint of the two intersection points of the $\mu$th and $\nu$th circles in QCQP}
+\newsym{d-mu-nu}{d_{\mu\nu}}{Distance between the centers of the $\mu$th and $\nu$th constraint circles in QCQP}
+\newsym{mathbb-I-mu}{\mathbb{I}_\mu}{Indicator function for feasibility of a candidate reflection coefficient for the $\mu$th constraint in QCQP}
+\newsym{L-mu-beta}{L_{\mu\beta}}{Constraint limit for the $\mu$th constraint in the $\beta$th sea state, for QCQP sensitivity}
+\newsym{r-nu}{r_\nu}{Radius of the $\nu$-th constraint circle in QCQP}
+\newsym{vec-a-mu}{\vec{a}_\mu}{Vector of linear coefficients associated with the $\mu$th constraint in QCQP}
+\newsym{a-mu-nu}{a_{\mu\nu}}{}
+%\newsym{a-mu-star-nu-star}{a_{\mu^*\nu^*}}{}
+\newsym{Gamma-c-mu}{\Gamma_{c,\mu}}{Complex center of the $\mu$th constraint circle in QCQP}
+\newsym{Gamma-c-mu-star}{\Gamma_{c,\mu^*}}{Complex center of the $\mu$th constraint circle in QCQP, when $\mu$ is the only active constraint in the optimal solution}
+\newsym{Gamma-c-nu}{\Gamma_{c,\nu}}{Complex center of the $\nu$th constraint circle in QCQP}
+\newsym{Gamma-c-nu-star}{\Gamma_{c,\nu^*}}{Complex center of the $\nu$th constraint circle in QCQP, when $\nu$ is one of multiple active constraints in the optimal solution}
+\newsym{Gamma-cl-mu}{\Gamma_{cl,\mu}}{Complex reflection coefficient at the closest point of the $\mu$th constraint circle in QCQP}
+\newsym{Gamma-cl-mu-star}{\Gamma_{cl,\mu^*}}{Complex optimal reflection coefficient at the closest point of a single active constraint circle in QCQP}
+\newsym{L-mu}{L_\mu}{}
+\newsym{nu}{\nu}{Index of constraint in QCQP}
+\newsym{C-q-mu}{C_{q,\mu}}{Constant term in the $\mu$th constraint in QCQP}
+\newsym{A-q-mu}{A_{q,\mu}}{Quadratic coefficient of the $\mu$th constraint in QCQP}
+\newsym{mathcal-F}{\mathcal{F}}{Set of feasible points for analytical QCQP}
+\newsym{d-gls-sym-mu-star-gls-sym-nu-star}{d_{\gls{sym-mu}^*,\gls{sym-nu}^*}}{}
+\newsym{d-mu}{d_\mu}{}
+% \newsym{d-mu-nu}{d_{\mu\nu}}{}
+\newsym{d-mu-star}{d_{\mu^*}}{}
+\newsym{g-mu}{g_\mu}{Constraint function for the $\mu$th dynamic inequality constraint in QCQP}
+\newsym{delta-mu-mu-star-beta}{\delta_{\mu,\mu^*_\beta}}{}
+\newsym{delta-nu-nu-star}{\delta_{\nu,\nu^*}}{}
+\newsym{delta-nu-nu-star-beta}{\delta_{\nu,\nu^*_\beta}}{}
+
+% qcqp candidate points
+\newsym{mathcal-C}{\mathcal{C}}{Set of candidate points for analytical QCQP}
+\newsym{mathcal-C-cl}{\mathcal{C}_{cl}}{Set of candidate points for analytical QCQP representing the closest point to the origin of each circle}
+\newsym{mathcal-C-cl-oval}{\mathcal{C}_{cl,\text{oval}}}{Set of candidate points for analytical QCQP representing the closest point to the origin of each oval}
+\newsym{mathcal-C-int}{\mathcal{C}_{int}}{Set of candidate points for analytical QCQP representing the intersections of each circle}
+\newsym{mathcal-C-int-oval-circ}{\mathcal{C}_{int,\text{oval-circ}}}{Set of QCQP candidate points at oval-circle intersections}
+
+% qcqp constraints
+\newsym{b-mu}{b_\mu}{Scalar right-hand-side term associated with the $\mu$th constraint in QCQP}
+\newsym{b-mu-star}{b_{\mu^*}}{Linear term of the active constraint $\mu^*$ in the QCQP optimal solution}
+\newsym{b-nu}{b_\nu}{Scalar right-hand-side term associated with the $\nu$th constraint in QCQP}
+\newsym{b-nu-star}{b_{\nu^*}}{Linear term of the active constraint $\nu^*$ in the QCQP optimal solution}
+\newsym{B-q-mu}{B_{q,\mu}}{Linear coefficient of the $\mu$th constraint in QCQP}
+\newsym{c-mu}{c_\mu}{Constraint offset term for inequality constraint $\mu$}
+\newsym{c-mu-star}{c_{\mu^*}}{Constant term of the active constraint $\mu^*$ in the QCQP optimal solution}
+
+
+% phasors - xi
+\newsym{ddot-vec-xi}{\ddot{\vec\xi}}{}
+\newsym{vec-dot-xi-0}{\vec{\dot{\xi}}_0}{Vector of complex phasor velocities of each body degree of freedom due to wave excitation in the absence of power generation}
+\newsym{vec-hat-dot-xi-0}{\vec{\hat{\dot{\xi}}}_0}{Vector of complex phasor velocities of each body degree of freedom due to wave excitation in the absence of power generation}
+\newsym{hat-xi-f-0}{\hat{\xi}_{f,0}}{Complex phasor displacement of the float due to wave excitation in the absence of power generation}
+\newsym{hat-xi-s-0}{\hat{\xi}_{s,0}}{Complex phasor displacement of the spar due to wave excitation in the absence of power generation}
+% xi
+\newsym{ddot-vec-xi-2}{\ddot{\vec{\xi}}}{}
+\newsym{ddot-xi}{\ddot{\xi}}{}
+\newsym{dot-vec-xi}{\dot{\vec{\xi}}}{}
+\newsym{dot-xi}{\dot{\xi}}{}
+\newsym{hat-dot-xi}{\hat{\dot{\xi}}}{}
+\newsym{hat-xi}{\hat{\xi}}{}
+\newsym{vec-dot-xi}{\vec{\dot{\xi}}}{}
+\newsym{vec-hat-ddot-xi}{\vec{\hat{\ddot{\xi}}}}{}
+\newsym{vec-hat-dot-xi}{\vec{\hat{\dot{\xi}}}}{}
+\newsym{vec-hat-xi}{\vec{\hat{\xi}}}{}
+\newsym{vec-xi}{\vec{\xi}}{}
+\newsym{xi}{\xi}{}
+\newsym{xi-t}{\xi(t)}{Time-domain vertical body position}
+\newsym{dot-xi-Delta}{\dot{\xi}_\Delta}{}
+\newsym{vec-dot-xi-Delta}{\vec{\dot{\xi}}_\Delta}{Vector of the change in oscillation velocities of each hydrodynamic degree of freedom due to the presence of the PTO}
+\newsym{xi-Delta}{\xi_\Delta}{}
+\newsym{ddot-xi-f}{\ddot{\xi}_f}{}
+\newsym{hat-xi-f}{\hat{\xi}_f}{}
+\newsym{xi-f}{\xi_f}{}
+\newsym{hat-xi-f-beta}{\hat{\xi}_{f,\beta}}{}
+\newsym{hat-xi-m}{\hat{\xi}_m}{Oscillation amplitude of the merged float-spar body}
+\newsym{vec-hat-xi-op}{\vec{\hat{\xi}}_{op}}{}
+\newsym{ddot-xi-s}{\ddot{\xi}_s}{}
+\newsym{xi-s}{\xi_s}{}
+\newsym{hat-xi-s}{\hat{\xi}_s}{}
+\newsym{hat-xi-s-beta}{\hat{\xi}_{s,\beta}}{}
+\newsym{vec-hat-xi-st}{\vec{\hat{\xi}}_{st}}{}
+
+
+% phasors - X PTO
+\newsym{hat-X}{\hat{X}}{Compact notation for \gls{sym-hat-X-PTO} used in cascade matrix subscripts for readability}
+\newsym{hat-X-PTO}{\hat{X}_{PTO}}{Complex phasor displacement of the PTO}
+\newsym{dot-X-PTO}{\dot{X}_{PTO}}{PTO relative velocity}
+\newsym{dot-hat-X-PTO}{\dot{\hat{X}}_{PTO}}{Complex phasor of PTO relative velocity}
+\newsym{vec-hat-X-PTO}{\vec{\hat{X}}_{PTO}}{Vector of PTO displacement phasors}
+\newsym{vec-hat-dot-X-PTO}{\vec{\hat{\dot{X}}}_{PTO}}{Vector of PTO velocity phasors}
+
+
+% phasors - Omega
+\newsym{Omega}{\Omega}{Generator rotational speed}
+\newsym{hat-Omega}{\hat{\Omega}}{Generator rotational speed phasor}
+
+
+% phasors - torque
+\newsym{hat-tau}{\hat{\tau}}{Complex phasor of torque at the generator mechanical port}
+\newsym{tau}{\tau}{Generator torque}
+
+% phasors - voltage
+\newsym{hat-V-s-th}{\hat{V}_{s,th}}{Thevenin-equivalent source voltage phasor as viewed from the generator electrical port}
+\newsym{hat-V-s-th-beta}{\hat{V}_{s,th,\beta}}{Thevenin-equivalent source voltage phasor as viewed from the generator electrical port in the $\beta$th sea state}
+\newsym{V}{V}{Generator quadrature voltage}
+\newsym{hat-V}{\hat{V}}{Generator quadrature voltage phasor}
+
+
+\newsym{hat-F-p-st}{\hat{F}_{p,st}}{Complex phasor of PTO force on the floating body in the storm loadcase}
+
+% phasors - current
+\newsym{hat-I}{\hat{I}}{Generator quadrature current phasor}
+\newsym{hat-I-p}{\hat{I}_p}{Complex phasor generator current in the particular solution of the system dynamics (chosen here to be the unconstrained impedance-matched solution)}
+
+% generic flow phasor
+\newsym{hat-q}{\hat{q}}{Flow phasor at any port}
+\newsym{q}{q}{Port flow variable}
+\newsym{q-t}{q(t)}{Time-domain port flow variable}
+\newsym{vec-q}{\vec{q}}{Vector of flow phasors at any ports}
+
+% generic effort phasor
+\newsym{hat-e}{\hat{e}}{Complex phasor of a generic effort port variable}
+\newsym{e}{e}{Port effort variable}
+\newsym{e-t}{e(t)}{Time-domain port effort variable}
+\newsym{e-1}{e_1}{Effort at port 1}
+\newsym{e-i}{e_i}{Effort at the $i$th port}
+\newsym{e-j}{e_j}{Effort at the $j$th port}
+
+% wave elevation zeta
+\newsym{hat-zeta}{\hat{\zeta}}{Wave elevation phasor}
+\newsym{zeta}{\zeta(t)}{Time-domain wave elevation}
+\newsym{zeta-y-t}{\zeta(y,t)}{Wave elevation at horizontal coordinate y and time t}
+\newsym{tilde-zeta}{\tilde{\zeta}}{}
+
+
+% impedances
+\newsym{vec-Z-i-th}{\vec{Z}_{i,th}}{Vector of Th\'{e}venin-equivalent intrinsic mechanical impedances}
+% impedance
+\newsym{Z-i}{Z_i}{Intrinsic mechanical impedance scalar}
+\newsym{mathbf-Z-i}{\mathbf{Z}_i}{Intrinsic impedance matrix}
+\newsym{Z-i-c}{Z_{i,c}}{}
+\newsym{Z-i-f}{Z_{i,f}}{Mechanical intrinsic impedance of float}
+\newsym{Z-i-s}{Z_{i,s}}{Mechanical intrinsic impedance of spar}
+\newsym{Z-i-th}{Z_{i,th}}{Thevenin-equivalent intrinsic mechanical impedance}
+\newsym{Z-l}{Z_l}{Control electrical impedance at load}
+\newsym{Z-l-reac}{Z_{l,reac}}{Control electrical impedance at load in reactive control}
+\newsym{mathbf-Z-p}{\mathbf{Z}_p}{Powertrain impedance matrix}
+\newsym{Z-s-th}{Z_{s,th}}{Thevenin-equivalent electrical source impedance}
+\newsym{Z-s-th-beta}{Z_{s,th,\beta}}{Thevenin-equivalent electrical source impedance in the $\beta$th sea state}
+\newsym{Z-shaft}{Z_{shaft}}{Mechanical impedance of drivetrain shaft and transmission system}
+\newsym{Z-u}{Z_u}{Control mechanical impedance}
+\newsym{Z-w}{Z_w}{Electrical impedance of generator winding}
+\newsym{mathbf-Z-H-T-i-th}{\mathbf{Z}^{H,T}_{i,th}}{}
+\newsym{mathbf-Z}{\mathbf{Z}}{Impedance matrix}
+
+
+% drag
+\newsym{vec-hat-p-d}{\vec{\hat{p}}_d}{Vector of complex phasor of drag pressure on each hydrodynamic degree of freedom}
+\newsym{vec-p-d}{\vec{p}_d(t)}{Vector of time-domain pressure due to drag for each hydrodynamic degree of freedom}
+\newsym{vec-R}{\vec{R}}{Vector of outer radii of each body, used for drag integral}
+\newsym{vec-r}{\vec{r}}{Amplitude ratio of the incident wave velocity and WEC velocity, for drag integral calculation}
+\newsym{vec-R-in}{\vec{R}_{in}}{Vector of inner radii of each body, used for drag integral}
+\newsym{w-y}{w(y)}{}
+\newsym{vec-w-y}{\vec{w}(y)}{Vector of local strip widths for each body, used for drag integral}
+\newsym{I-prime}{I'}{Alternative drag integral to avoid singularities}
+\newsym{vec-v-wave}{\mathbf{v}_{wave}}{}
+\newsym{vec-hat-V-rel-2}{\hat{\mathbf{V}}_{rel,2}}{}
+\newsym{I-B}{I_B}{Real-valued nondimensional integral for drag damping}
+\newsym{I-G}{I_G}{Complex-valued nondimensional integral for drag excitation}
+\newsym{C-d}{C_d}{Drag coefficient}
+\newsym{vec-C-d}{\vec{C}_d}{Vector of drag coefficients for each hydrodynamic degree of freedom}
+\newsym{C-d-f}{C_{d,f}}{Drag coefficient for float}
+\newsym{C-d-s}{C_{d,s}}{Drag coefficient for spar}
+\newsym{kappa}{\kappa}{Nondimensional wavelength for drag integral}
+% \newsym{l}{l}{}
+\newsym{vec-Lambda-k-e}{\vec{\Lambda_k^e}}{Radial eigenfunction for the $k$th eigenmode in the exterior region in MEEM}
+\newsym{mathbf-M}{\mathbf{M}}{Mass matrix}
+\newsym{m-0}{m_0}{Wavenumber}
+\newsym{m-bal}{m_{bal}}{Mass of ballast}
+\newsym{m-f}{m_f}{Mass of float}
+\newsym{m-s}{m_s}{Mass of spar}
+\newsym{mu}{\mu}{Index of constraint in QCQP}
+\newsym{N}{N}{Number of eigenmodes used in the innermost region in MEEM}
+\newsym{n}{n}{Index of eigenmode in the innermost region in MEEM}
+\newsym{vec-n}{\vec{n}}{Null space vector of dynamics}
+\newsym{N-harmonics}{N_{harmonics}}{Number of harmonics used in MEEM for all fluid regions}
+\newsym{N-k}{N_k}{Normalization term for the vertical eigenfunction in the exterior region in MEEM}
+
+
+
+% other
+\newsym{o}{o}{}
+\newsym{alpha}{\alpha}{Dimensionless damping-plate geometry ratio}
+\newsym{b}{b}{Right-hand-side vector element in linear system form}
+\newsym{beta}{\beta}{}
+\newsym{beta-1}{\beta_1}{}
+\newsym{beta-2}{\beta_2}{}
+\newsym{a-b}{a^b}{}
+\newsym{lambda-mu}{\lambda_\mu}{Lagrange multiplier of the $\mu$th constraint in QCQP}
+\newsym{Delta}{\Delta}{}
+\newsym{delta-ij}{\delta_{ij}}{Kronecker delta}
+\newsym{delta-n-1n-2}{\delta_{n_1n_2}}{}
+\newsym{I}{I}{}
+\newsym{J}{J}{}
+\newsym{vec-x-o}{\vec{x}_o}{}
+\newsym{vec-x-opt}{\vec{x}_{opt}}{Vector of optimal design variables}
+\newsym{vec-x-p}{\vec{x}_p}{}
+
+\newsym{x-shape}{x_\text{shape}}{}
+
+\newsym{Y}{Y}{}
+\newsym{Z}{Z}{}
+\newsym{Z-j}{Z_j}{}
+
+
+% generic / mathematics
+\newsym{pi}{\pi}{Mathematical constant 3.14159...}
+\newsym{mathbb-R}{\mathbb{R}}{Set of real numbers}
+\newsym{s}{s}{Laplace variable}
+\newsym{mathrm-H-0-1}{\mathrm{H}_0^1}{Hankel function of the first kind, order zero}
+\newsym{vec-zero}{\vec{0}}{Vector of zeros}
+\newsym{k-generic-index}{k}{Generic index}
+\newsym{mathrm-diag}{\mathrm{diag}}{Operator to create a diagonal matrix from a vector}
+\newsym{mathbb-C}{\mathbb{C}}{Set of complex numbers}
+\newsym{epsilon}{\epsilon}{Small positive numerical tolerance}
+\newsym{f}{f}{Generic scalar function}
+\newsym{mathbf-I}{\mathbf{I}}{Identity matrix}
+\newsym{mathrm-J-1}{\mathrm{J}_1}{Bessel function of the first kind of order one}
+\newsym{mathrm-K-1}{\mathrm{K}_1}{Modified Bessel function of the second kind of order one}
+\newsym{delta}{\delta}{Kronecker delta}
+\newsym{Sigma}{\Sigma}{Grand sum operator (sum of all elements in a matrix)}
+\newsym{mathrm-K-0}{\mathrm{K}_0}{}
+\newsym{a}{a}{Generic scalar coefficient}
+\newsym{x}{x}{Generic scalar variable}
+\newsym{j}{j}{Generic integer index}
+
+% wave environment
+\newsym{T-p}{T_p}{Peak period of an irregular wave spectrum}
+\newsym{T-e}{T_e}{Energy period of irregular waves}
+\newsym{T-period}{T}{Period of equivalent regular wave}
+\newsym{omega}{\omega}{Angular frequency of equivalent regular wave}
+\newsym{rho-w}{\rho_w}{Density of water}
+\newsym{T-struct}{T_\text{struct}}{}
+\newsym{BW}{BW}{Half-power bandwidth of the JPD of a given location}
+\newsym{k-wavenumber}{k}{Wavenumber of incident wave}
+\newsym{H}{H}{Wave height of equivalent regular wave}
+\newsym{h}{h}{Water depth}
+\newsym{g}{g}{Acceleration due to gravity}
+\newsym{H-s}{H_s}{Significant wave height of irregular waves}
+\newsym{H-s-struct}{H_{s,\text{struct}}}{Significant wave height used for structural checks in the storm loadcase}
+\newsym{mathbf-J-H-T-wave}{\mathbf{J}^{H,T}_\text{wave}}{Matrix of incident energy density in each sea state}
+\newsym{J-wave}{J_\text{wave}}{Incident wave energy flux at a location}
+\newsym{N-sea}{N_{\text{sea}}}{Number of sea states in JPD with nonzero probability}
+\newsym{V-g}{V_g}{Group velocity of incident regular wave}
+\newsym{mathbf-CW-H-T-max}{\mathbf{CW}^{H,T}_{\text{max}}}{Matrix of maximal capture widths in each sea state}
+
+
+
+% structures
+\newsym{F-tube}{F_\text{tube}}{Structural force in each of the four tubes connecting the damping plate to the spar}
+\newsym{W}{W}{Vertical load applied to each trapezoidal float top plate, equal to the heave force divided by number of float sections}
+\newsym{t-eq}{t_{eq}}{Equivalent thickness of stiffened plate}
+\newsym{rho}{\rho}{Effective breadth ratio of a stiffened plate, used to measure the validity of using the equivalent-thickness method}
+\newsym{rho-lambda}{\rho_\lambda}{Component of the effective breadth ratio \gls{sym-rho} related to the load-distribution factor \gls{sym-lambda}}
+\newsym{rho-M}{\rho_M}{Density of structural material}
+\newsym{r-0}{r_0}{Radius of load distribution on float top plate due to welded join with the spar attachment tube}
+\newsym{omega-s}{\omega_s}{Intermediate value in spar combined loading structural calculation}
+\newsym{psi}{\psi}{Load distrubution factor for stiffened plate effective breadth ratio calculation}
+\newsym{P-r}{P_r}{Material constant for strength reduction in combined loading}
+\newsym{M-top}{M_\text{top}}{Bending moment per unit width of the float top plate}
+\newsym{M-bot}{M_\text{bot}}{Bending moment per unit width of the float bottom plate}
+\newsym{lambda}{\lambda}{Slenderness factor for stiffened plate effective breadth ratio calculation}
+\newsym{K-end}{K_{end}}{End fixity coefficient for spar column buckling}
+\newsym{K-tube}{K_\text{tube}}{Effective mechanical stiffness of tube connecting damping plate to spar}
+\newsym{k-buckle}{k_\text{buckle}}{Coefficient for plate buckling}
+\newsym{sigma-s}{\sigma_s}{Structural stress of the spar column}
+\newsym{rho-psi}{\rho_\psi}{Portion of the effective breadth ratio \gls{sym-rho} related to the load distribution factor \gls{sym-psi}}
+\newsym{w}{w}{Effective structural width for plates (distance between stiffeners)}
+\newsym{h-stiff}{h_{\textrm{stiff}}}{Height of a structural stiffener for any component}
+\newsym{b-1}{b_1}{Smaller base dimension of the float and bottom plate trapezoid}
+\newsym{b-2}{b_2}{Larger base dimension of the float and bottom plate trapezoid}
+\newsym{D-eq}{D_{eq}}{Equivalent flexural rigidity of a stiffened plate}
+\newsym{E}{E}{Modulus of elasticity (Young's modulus) of structural material}
+\newsym{f-1}{f_1}{Maximum compression stress along the width of a stiffened plate, for calculating the effective breadth ratio}
+\newsym{f-2}{f_2}{Maximum tension stress along the width of a stiffened plate (or minimum compression stress, if there is no tension), for calculating the effective breadth ratio}
+\newsym{F-crit}{F_\text{crit}}{Critical buckling load}
+\newsym{L}{L}{Beam length in a buckling calculation}
+\newsym{nu-poisson}{\nu}{Poisson's ratio of structural material}
+\newsym{sigma}{\sigma}{Structural stress}
+\newsym{sigma-buckle}{\sigma_\text{buckle}}{}
+\newsym{sigma-cent}{\sigma_\text{cent}}{Float plate stress at center of top plate}
+\newsym{sigma-edge}{\sigma_\text{edge}}{Float plate stress at edge of top plate}
+\newsym{sigma-r}{\sigma_r}{Plate stress in radial direction}
+\newsym{sigma-theta}{\sigma_\theta}{Plate stress in circumferential direction}
+\newsym{sigma-Y}{\sigma_Y}{Structural yield stress}
+\newsym{delta-plate}{\delta_\text{plate}}{Deflection of damping plate}
+\newsym{delta-tube}{\delta_\text{tube}}{Deflection of damping plate connection tube}
+\newsym{zeta-s}{\zeta_s}{Intermediate value in spar combined loading structural calculation}
+\newsym{S-eq}{S_{eq}}{Equivalent section modulus of stiffened plate}
+\newsym{thick}{t}{Structural thickness}
+
+% PTO
+\newsym{R}{R}{Equivalent radius for a static linear-rotational transmission, including any gear ratio}
+\newsym{mathbf-h-kin}{\mathbf{h}_{\text{kin}}}{Hybrid matrix of kinematics}
+\newsym{R-gear}{R_{\text{gear}}}{Equivalent radius of gear, pinion, or other linear-to-rotational drivetrain component}
+\newsym{mathbf-h}{\mathbf{h}}{Hybrid matrix}
+
+\newsym{p-min}{p_{\text{min}}}{Minimum instantaneous power over a wave period}
+\newsym{k-tau}{k_\tau}{Torque coefficient of generator}
+\newsym{mathbf-T-kin}{\mathbf{T}_{kin}}{Kinematics matrix}
+
+
+\newsym{G}{G}{Vertical coordinate of center of gravity}
+
+
+
+
+% aor - consider making aor notation match jfm
+
+% matrices / outputs
+\newsym{mathbf-A}{\mathbf{A}}{Matrix in MEEM, contains information about homogeneous potentials}
+\newsym{c}{c}{MEEM output vector to obtain hydrodynamic coefficients from eigencoefficients}
+\newsym{vec-c}{\vec{c}}{MEEM output vector to obtain hydrodynamic coefficients from eigencoefficients}
+\newsym{c-0}{c_0}{Constant term in the MEEM hydrodynamic output expression}
+\newsym{vec-b}{\vec{b}}{Right-hand side vector in MEEM matrix solve, contains information about particular potentials}
+\newsym{b-N-2M-1}{b_{N+2M+1}}{}
+
+
+% eigenmode counting
+\newsym{K}{K}{Number of eigenmodes used in the exterior region in MEEM}
+\newsym{k}{k}{Index of eigenmode in the exterior region in MEEM}
+\newsym{M}{M}{Number of eigenmodes used in the interior region in MEEM}
+\newsym{m}{m}{Index of eigenmode in the interior region in MEEM}
+\newsym{k-index}{k}{Index of eigenmode in the exterior fluid region in MEEM}
+
+% velocity potential
+\newsym{phi-p}{\phi_p}{Particular potential in MEEM}
+\newsym{phi-h}{\phi_h}{Homogeneous potential in MEEM}
+\newsym{phi-i1}{\phi^{i1}}{Radiation velocity potential in the interior fluid region under the spar in MEEM}
+\newsym{phi-i2}{\phi^{i2}}{Radiation velocity potential in the interior fluid region under the float in MEEM}
+
+% eigencoefficients
+\newsym{C-1n-i1}{C_{1n}^{i1}}{Eigencoefficient for the $n$th mode of the $i1$st fluid region}
+\newsym{C-1m-i2}{C_{1m}^{i2}}{First eigencoefficient for the $m$th mode of the $i2$th fluid region}
+\newsym{C-2m-i2}{C_{2m}^{i2}}{Second eigencoefficient for the $m$th mode of the $i2$th fluid region}
+\newsym{B-k-e}{B_k^e}{Eigencoefficient for the $k$-th coefficient of the exterior fluid region in MEEM}
+\newsym{vec-C-1m-i2}{\vec{C}_{1m}^{i2}}{}
+\newsym{alpha-generic}{\alpha}{Generic eigencoefficient to demonstrate properties of orthogonality used in MEEM}
+\newsym{vec-C-1n-i1}{\vec{C}_{1n}^{i1}}{}
+% \newsym{mathbb-C-2-times-2}{\mathbb{C}^{2\times 2}}{}
+% \newsym{vec-C-2m-i2}{\vec{C_{2m}^{i2}}}{}
+\newsym{vec-C-2m-i2}{\vec{C}_{2m}^{i2}}{}
+% \newsym{vec-C-1m-i2}{\vec{C_{1m}^{i2}}}{}
+% \newsym{vec-C-1n-i1}{\vec{C_{1n}^{i1}}}{}
+
+
+% vertical eigenfunctions
+\newsym{Z-m-i2}{Z_{m}^{i2}}{Vertical eigenfunction for the $m$th mode of the $i2$th fluid region}
+\newsym{Z-n-i1}{Z_{n}^{i1}}{Vertical eigenfunction for the $n$th mode of the $i1$st fluid region}
+\newsym{Z-k-e}{Z_k^e}{Vertical eigenfunction for the $k$th mode of the exterior ($e$) fluid region}
+\newsym{Z-0-e}{Z_0^e}{}
+
+% vectors of vertical eigenfunctions
+\newsym{vec-Z-n-i1}{\vec{Z}_n^{i1}}{Vector of vertical eigenfunctions for modes $n=0$ to $n=N-1$ for the innermost fluid region ($i1$)}
+\newsym{vec-Z-m-i2}{\vec{Z}_m^{i2}}{Vector of vertical eigenfunctions for modes $m=0$ to $m=M-1$ for the interior fluid region under the float ($i2$)}
+\newsym{vec-Z-k-e}{\vec{Z}_k^e}{Vector of vertical eigenfunctions for modes $k=0$ to $k=K-1$ for the exterior fluid region ($e$)}
+
+% radial eigenfunctions
+\newsym{R-1n-i1}{R_{1n}^{i1}}{Radial eigenfunction for the $n$th mode of the $i1$st fluid region}
+\newsym{R-1m-i2}{R_{1m}^{i2}}{First radial eigenfunction for the $m$th mode of the $i2$th fluid region}
+\newsym{R-2m-i2}{R_{2m}^{i2}}{Second radial eigenfunction for the $m$th mode of the $i2$th fluid region}
+\newsym{Lambda-k-e}{\Lambda_{k}^{e}}{Radial eigenfunction for the $k$th mode of the exterior fluid region}
+\newsym{R-r}{R(r)}{Radial eigen-function}
+
+% radial eigenfunction vectors
+\newsym{vec-B-k-e}{\vec{B_k^e}}{Vector of exterior-region radial-eigenfunction coefficients}
+\newsym{vec-R-1m-i2}{\vec{R}_{1m}^{i2}}{}
+\newsym{vec-R-1n-i1}{\vec{R}_{1n}^{i1}}{}
+\newsym{vec-R-2m-i2}{\vec{R}_{2m}^{i2}}{}
+
+% eigenvalues
+\newsym{lambda-n-i1}{\lambda_{n}^{i1}}{Eigenvalue for the $n$th mode of the $i1$st fluid region}
+\newsym{lambda-m-i2}{\lambda_{m}^{i2}}{Eigenvalue for the $m$th mode of the $i2$th fluid region}
+\newsym{m-k}{m_k}{Eigenvalue of the $k$th eigenmode in the exterior region in MEEM}
+\newsym{lambda-m}{\lambda_m}{Eigenvalue of the $m$th eigenmode of the interior region in MEEM}
+
+% vectors of eigenvalues
+\newsym{vec-lambda-m}{\vec{\lambda}_{m}^{i2}}{Vector of eigenvalues for all $m=1$ to $m=M-1$ modes of the $i2$th fluid region}
+\newsym{vec-lambda-n}{\vec{\lambda}_{n}^{i1}}{Vector of eigenvalues for all $n=1$ to $n=N-1$ modes of the $i1$st fluid region}
+\newsym{vec-m-k}{\vec{m}_{k}}{Vector of eigenvalues for all $k=1$ to $k=K-1$ modes of the exterior ($e$) fluid region}
+
+% meem numerics
+\newsym{Delta-z-f}{\Delta z_f}{Value of \gls{sym-Delta-z-min} for the float}
+\newsym{Delta-z-min}{\Delta z_{\text{min}}}{Minimum fluid region height in MEEM, below which the eigenfunctions experience numeric overflow unless exponentially scaled}
+\newsym{Delta-z-s}{\Delta z_s}{Value of \gls{sym-Delta-z-min} for the spar}
+\newsym{chi-max}{\chi_{max}}{Maximum admissible value of $\chi$ before numeric overflow occurs}
+
+
+% meem integrals
+\newsym{boldsymbol-mathcal-R}{\boldsymbol{\mathcal{R}}}{Integrals of radial eigenfunctions used to calculate the \gls{sym-vec-c} output vector in MEEM}
+\newsym{boldsymbol-mathcal-Z}{\boldsymbol{\mathcal{Z}}}{Coupling integrals of vertical eigenfunctions used to calculate the \gls{sym-mathbf-A} matrix in MEEM}
+\newsym{boldsymbol-mathcal-Z-m-k-0}{\boldsymbol{\mathcal{Z}}_{m,k=0}}{}
+
+% could be either
+\newsym{mathbf-x}{\mathbf{x}}{}
+\newsym{mathbf-X}{\mathbf{X}}{}
+
+% maybe duplicate?
+% sym-hat-F
+% sym-hat-F-p-guess
+% sym-hat-F-PTO
+
+% % needs checking
+% sym-r-mu-2 % is the same as r mu, there are no stars
+% sym-b-mu-2 % is the same as b mu, I already fixed stars
+% sym-b-nu-2 % is the same as b nu, I already fixed stars
+% sym-Gamma-cl-mu-2 the one that was sym-Gamma-cl-mu is now sym-Gamma-cl-mu-star, and sym-Gamma-cl-mu-2 is now sym-Gamma-cl-mu
+% sym-Gamma-c-mu-2 %%%%%%%%
+% sym-Gamma-c-nu-2 %%%%%%%%%%
+
+
+% % needs manual change
+% sym-R-1-N-1-i1 % this and two below: paper should use R i1 generally
+% sym-R-10-i1
+% sym-R-11-i1
+% sym-R-i1-1n % flip order
+% sym-phi-i1 % change to phi-i-1

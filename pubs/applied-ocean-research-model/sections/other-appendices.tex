@@ -3,7 +3,7 @@
 \section{Additional Hydrodynamics Details}
 \label{sec:appendix-additional-hydro}
 \subsection{Spar Coefficients}
-As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides MEEM.
+As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides \gls{acr-meem}.
 We approximate the spar added mass coefficient $\gls{sym-A-s}$ as a frequency-independent quantity using a formula that \citet{philip_damping_2012} proposes based on the displaced water volume in the spherical projection of the damping plate:
 \begin{equation}\label{eq:As}
  \gls{sym-A-s} =\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3\left(1 - \frac{3}{4}\gls{sym-r}^2\sqrt{1-\gls{sym-r}^2} - \frac{1}{4}(1-\sqrt{1-\gls{sym-r}^2})^2(2+\sqrt{1-\gls{sym-r}^2})\right),
@@ -20,8 +20,8 @@ This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\gls{s
     \end{figure}
 \fi
 
-The other spar coefficients are calculated by fitting and interpolating data from WAMIT for the nominal design, then adjusting for known dimensional scalings based on differences from the nominal design.
-To derive the dimensional scalings, we use the numerical results that \citet{olaya_hydrodynamic_2015} present for a variant of MEEM that incorporates the damping plate.
+The other spar coefficients are calculated by fitting and interpolating data from \gls{acr-wamit} for the nominal design, then adjusting for known dimensional scalings based on differences from the nominal design.
+To derive the dimensional scalings, we use the numerical results that \citet{olaya_hydrodynamic_2015} present for a variant of \gls{acr-meem} that incorporates the damping plate.
 By plotting the data for a variety of geometries on a single plot and scaling the axes by dimensionless geometric ratios until the points begin to overlap as a single trend,
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
@@ -55,13 +55,13 @@ This intends to lower the likelihood of creating saturation behavior (where a di
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Dynamics and Control Module Details}
+\section{\gls{acr-dyn} and \gls{acr-ctl} Module Details}
 This section provides supplementary derivations and implementation details for the dynamics and control module.
 
 \subsection{Multiport Model Details}
 \input{sections/multiport-appendix}
 
-\subsection{Optimal Control Details}
+\subsection{\gls{acr-oc} Details}
 \input{sections/optimal-control-appendix}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,30 +91,30 @@ A future refinement could explicitly reconstruct the time-domain drag force from
 \subsection{Dynamic Validation}
 \label{sec:appendix-dynamic-validation}
 
-\subsubsection{WEC-Sim}
-The drag describing function and MEEM hydrodynamic coefficients have a minor effect assuming a 1-DOF system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-DOF system (38.2\% and 28.6\% respectively).
-Meanwhile, the error is extremely low in the 2-DOF system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
-This indicates that the larger error in the 2-DOF-drag-MEEM case is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF.
+\subsubsection{\gls{acr-wec}-Sim}
+The drag describing function and \gls{acr-meem} hydrodynamic coefficients have a minor effect assuming a 1-\gls{acr-dof} system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-\gls{acr-dof} system (38.2\% and 28.6\% respectively).
+Meanwhile, the error is extremely low in the 2-\gls{acr-dof} system enforcing the same hydrodynamic coefficients as \gls{acr-wec}-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
+This indicates that the larger error in the 2-\gls{acr-dof}-drag-\gls{acr-meem} case is not an error in the 2-\gls{acr-dof} dynamic model itself, but in the way that a 2-\gls{acr-dof} model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each \gls{acr-dof}.
 The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
 
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
-For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
+A \gls{acr-wec}-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the \gls{acr-wec}-Sim \gls{acr-rm3} tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+For consistency, MDOcean also uses this alternate geometry for \gls{acr-wec}-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
 %\Cref{tab:dynamic-validation} and
 \Cref{fig:dynamic-validation} compares the results.
 The $\gls{sym-C-d}=0$ simulation with identical hydrodynamic coefficients (top left of \Cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions.
 The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
-This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of \gls{acr-wec}-Sim's numerical integration and post-processing.
 For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
 An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $\gls{sym-T-period}>12 \gls{sym-s}$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
 Turning on drag ($\gls{sym-C-d}=1$, top right of \Cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
 While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
 
-Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's MEEM hydrodynamic coefficients on its dynamic power production.
-The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the MEEM hydro coefficients has minimal effect on the overall dynamic response.
+Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's \gls{acr-meem} hydrodynamic coefficients on its dynamic power production.
+The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the \gls{acr-meem} hydro coefficients has minimal effect on the overall dynamic response.
 Finally, the bottom right corner of \Cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
-Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+\gls{acr-pwr} is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
 This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \Cref{sec:dynamic-validation}.
 Meanwhile, MDOcean underpredicts the peak power by around 25\%.
 Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
@@ -176,7 +176,7 @@ While most signals show good agreement between the models, interestingly, large 
 \end{landscape}
 The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worse at mid-range frequencies.
 Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
-The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
+The \gls{acr-wec}-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
 
 We also validate the describing function approximation for the drag force.
@@ -186,40 +186,40 @@ This confirms that higher harmonics have a negligible impact on the system and t
 The particular describing function relation used for drag assumes that the drag force has the form
 $\gls{sym-F-d-t} \sim |\cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})|
                        \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
-\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresponding to the four corners of the JPD.
+\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresponding to the four corners of the \gls{acr-jpd}.
 The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/position_THD_contour.pdf}]{figs/from-matlab/position_THD_contour.pdf}
-    \caption{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
+    \caption{Total Harmonic Distortion of Float Displacement in \gls{acr-wec}-Sim Simulations with Drag}
     \label{fig:wecsim-thd}
 \end{figure}
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_force_desc_fcn.pdf}]{figs/from-matlab/drag_force_desc_fcn.pdf}
-    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
+    \caption{Comparison of Assumed and Actual Drag Force Signal \gls{acr-shp}}
     \label{fig:wecsim-drag-waveform}
 \end{figure}
 
 \subsubsection{Reference Model Report}
 While the original reference model report \citep{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients,
 it does record the mechanical power for each sea state.
-\Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
+\Cref{fig:report-power-validation} compares these values against those predicted by \gls{acr-wec}-Sim and MDOcean.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
-    \caption{Comparison of mechanical power for RM3 report \cite{RM3} and MDOcean}
+    \caption{Comparison of mechanical power for \gls{acr-rm3} report \cite{RM3} and MDOcean}
     \label{fig:report-power-validation}
 \end{figure}
-Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
+Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided \gls{acr-wec}-Sim hydrodynamic coefficients,
 and that the power multiplier mentioned in \Cref{sec:dynamic-validation} has not been applied in the figure.
 We observe a rather poor match, with MDOcean underestimating power in the low-period sea states and overestimating in the high-period sea states.
 The discrepancy is of minimal concern for the reasons described in \Cref{sec:dynamic-validation}.
 Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Power Matrix Decomposition}
+\subsection{\gls{acr-pwr} Matrix Decomposition}
 \label{sec:appendix-power-decomposition}
 
 The efficiency matrices introduced in \Cref{eq:power-matrix-decomposition} are defined as follows.
@@ -228,10 +228,10 @@ The wave power density $\gls{sym-mathbf-J-H-T-wave}$ and maximum capture width  
 \mathbf{J}^{H,T}_{wave} = \frac{\gls{sym-rho-w} \gls{sym-g}^2}{64\gls{sym-pi}} \gls{sym-T-e} \gls{sym-H-s}^2, \qquad
 \mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max} = \frac{\gls{sym-g} \gls{sym-T-e}^2}{4\gls{sym-pi}^2}.
 \end{equation}
-The maximum capture width matrix represents the radiation limit determined by the WEC mode of motion
+The maximum capture width matrix represents the radiation limit determined by the \gls{acr-wec} mode of motion
 (heave in this case; for surge or pitch the value would be doubled due to the asymmetry of the outgoing wave field).
 
-The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$ (computed with $\gls{sym-C-d-f}=\gls{sym-C-d-s}=0$, ideal PTO):
+The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$ (computed with $\gls{sym-C-d-f}=\gls{sym-C-d-s}=0$, ideal \gls{acr-pto}):
 \begin{equation}
 \gls{sym-boldsymbol-eta-H-T-rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}}, \qquad
 \gls{sym-boldsymbol-eta-H-T-drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
@@ -248,7 +248,7 @@ The product of the first four matrices is the theoretical ideal mechanical power
 \begin{equation}
     \mathbf{P}^{H,T}_{F\dot{X},\text{ideal}} = \mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}\,\gls{sym-boldsymbol-eta-H-T-rad}\,\gls{sym-boldsymbol-eta-H-T-drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\gls{sym-mathbf-Z-H-T-i-th})}.
 \end{equation}
-The remaining two efficiency matrices capture the loss to dynamic constraints and to PTO electrical inefficiency:
+The remaining two efficiency matrices capture the loss to dynamic constraints and to \gls{acr-pto} electrical inefficiency:
 \begin{equation}
     \gls{sym-boldsymbol-eta-H-T-limits} = \frac{\gls{sym-mathbf-P-H-T-F-dot-X}}{\mathbf{P}^{H,T}_{F\dot{X},\text{ideal}}}, \qquad
     \gls{sym-boldsymbol-eta-H-T-elec} = \gls{sym-eta} \frac{\mathbf{P}^{H,T}_{IV}}{\gls{sym-mathbf-P-H-T-F-dot-X}}.
@@ -259,50 +259,50 @@ The current decomposition preserves multiplicativity, which is the key advantage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Economics Module Details}
+\section{\gls{acr-econ} Module Details}
 \label{sec:appendix-econ}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{RM3 Cost Breakdown Structure}
+\subsection{\gls{acr-rm3} \gls{acr-cbs}}
 \label{sec:appendix-econ-cbs}
 
-The MDOcean economic model is calibrated against the RM3 Cost Breakdown Structure (CBS) of \citet{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
+The MDOcean economic model is calibrated against the \gls{acr-rm3} \gls{acr-cbs} of \citet{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
 Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\gls{sym-N-WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \Cref{eq:cost-power-law}.
 
 \begin{table}[htbp]
     \centering
 
-    \caption{Cost Breakdown Structure}
+    \caption{\gls{acr-cbs}}
     \label{tab:CBS}
     \expanded{
         \noexpand\tabular{\TableColumnSpecs{aor:cbs}}
     }
-         CBS Category&  Nominal \% for $\gls{sym-N-WEC}=1$& Nominal \% for $\gls{sym-N-WEC}=100$&Scales with design?\\\hline
+         \gls{acr-cbs} Category&  Nominal \% for $\gls{sym-N-WEC}=1$& Nominal \% for $\gls{sym-N-WEC}=100$&Scales with design?\\\hline
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
-         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
+         1.3 - \gls{acr-moor}/Foundation&  3\%&  12\%&No\\
          1.4 - Structural&  17\%&  46\%&$\gls{sym-V}_{\text{struct}}$\\
-         1.5 - Power Take Off&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
+         1.5 - \gls{acr-pwr} Take Off&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
          1.7 - Installation&  34\%&  10\%&No\\
          1.8 - Decommissioning&  9\%&  9\%&No\\
          1.9 - Contingency&  9\%&  9\%&No\\
- \textbf{Total 1.1-1.9 (CAPEX)}& 93.3\%& 97.6\%&-\\\hline
+ \textbf{Total 1.1-1.9 (\gls{acr-capex})}& 93.3\%& 97.6\%&-\\\hline
  2.1 - Insurance& 1.3\%& 0.4\%&No\\
  2.2 - Environmental/Regulatory& 4.1\%& 0.3\%&No\\
  2.3 - Marine Operations& 0.2\%& 0.3\%&No\\
  2.4 - Shoreside Operations& 0.8\%& 0.2\%&No\\
  2.5 - Replacement Parts& 0.3\%& 1.0\%&No\\
  2.6 - Consumables& $<$0.1\%& 0.2\%&No\\
- \textbf{Total 2.1-2.6 (OPEX)}& 6.7\%& 2.4\%&-\\
+ \textbf{Total 2.1-2.6 (\gls{acr-opex})}& 6.7\%& 2.4\%&-\\
     \endtabular
     \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Power-Law Scaling with Number of Devices}
+\subsection{\gls{acr-pwr}-Law Scaling with Number of Devices}
 \label{sec:appendix-econ-power-law}
 
-The per-WEC unit costs and prices in \Cref{eq:unit-cost}
+The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
 ($\gls{sym-C}_{\text{fixed}}$,
  $\gls{sym-C}_{pto,\text{constant}}$, 
  $\gls{sym-p}_{\gls{sym-P}}$,
@@ -317,33 +317,33 @@ where $\gls{sym-C-infty}$ is the asymptotic large-scale unit cost,
 $\gls{sym-C-1}$ is the single-unit cost,
 and $\gls{sym-beta}$ is the rate of decrease.
 
-The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta}$ for each CBS category
-were obtained by curve-fitting \Cref{eq:cost-power-law} to the CBS estimates
+The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta}$ for each \gls{acr-cbs} category
+were obtained by curve-fitting \Cref{eq:cost-power-law} to the \gls{acr-cbs} estimates
 for $\gls{sym-N-WEC} \in \{1, 10, 50, 100\}$ \citep{neary_reference_2014},
 and are tabulated in \Cref{tab:econ-model-values}.
 
 \begin{table}[h]
     \centering
-    \caption{Cost model values for each CBS category}
+    \caption{Cost model values for each \gls{acr-cbs} category}
     \label{tab:econ-model-values}
     \expanded{
         \noexpand\tabular{\TableColumnSpecs{aor:econ-model-values}}
     }
-         CBS Category& Expo. $\gls{sym-beta}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
-         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. CAPEX& 0.741& 1.24 \$M &13.92 \$M\\
-         \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
-         \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
- \textbf{2.1-2.6} - OPEX&0.557& 0&1.193 \$M\\
+         \gls{acr-cbs} Category& Expo. $\gls{sym-beta}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
+         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. \gls{acr-capex}& 0.741& 1.24 \$M &13.92 \$M\\
+         \textbf{1.4} - Structural \gls{acr-capex} & 0.481& 2.387 \$/kg&4.294 \$/kg\\
+         \textbf{1.5} - \gls{acr-pwr} Take Off \gls{acr-capex}& 0.206& Constant: 92.59 \$k \gls{acr-pwr}: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k \gls{acr-pwr}: 1.355 \$/W Force: 0.0204 \$/N\\
+ \textbf{2.1-2.6} - \gls{acr-opex}&0.557& 0&1.193 \$M\\
     \endtabular
     \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Linear PTO Cost Scaling}
+\subsection{Linear \gls{acr-pto} Cost Scaling}
 \label{sec:appendix-econ-pto-scaling}
 
-Linear PTO cost scaling is common for WEC techno-economic analysis.
-The RM3 cost numbers \citep{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
-The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \citep{nakhai_techno-economic_2022}.
+Linear \gls{acr-pto} cost scaling is common for \gls{acr-wec} techno-economic analysis.
+The \gls{acr-rm3} cost numbers \citep{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic \gls{acr-pto} (except for the riser cable and control system, whose cost does not scale with power).
+The \gls{acr-nrel} System Advisory Model assumes that hydraulic \gls{acr-pto} cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \citep{nakhai_techno-economic_2022}.
 %the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
 % \begin{equation}
 %     \gls{sym-C}_{gen} = \begin{cases}
@@ -355,17 +355,17 @@ The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly l
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Economic Validation}
 \label{sec:appendix-econ-validation}
-\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \citet{RM3} reference values.
+\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (\gls{acr-capex}, \gls{acr-opex}, and \gls{acr-lcoe}) against the number of \glspl{acr-wec} in the farm, comparing MDOcean results against the \citet{RM3} reference values.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/cost_vs_N_WEC.pdf}]{figs/from-matlab/cost_vs_N_WEC.pdf}
-    \caption{Validation for cost scaling with number of WECs}
+    \caption{Validation for cost scaling with number of \glspl{acr-wec}}
     \label{fig:econ-nwec-validate}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Structures Module Details}
+\section{\gls{acr-str} Module Details}
 \label{sec:appendix-structures}
 Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
 It outputs a factor of safety for each limit case.
@@ -462,7 +462,7 @@ For trapezoids, one then expects approximate rectangles ($\gls{sym-b-2}/\gls{sym
 short trapezoids ($\gls{sym-h-0}<\gls{sym-b-1})$ to have $x_{\text{min}}=\gls{sym-h-0}$,
 tall trapezoids ($\gls{sym-h-0}\gg \gls{sym-b-2}$) to have $x_{\text{min}}=\gls{sym-b-1}$,
 and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
-The nominal RM3 design falls into this intermediate case,
+The nominal \gls{acr-rm3} design falls into this intermediate case,
 with $\gls{sym-b-1}\approx1.7$~\gls{sym-m},
 $\gls{sym-b-2}\approx5.2$~\gls{sym-m},
 and $\gls{sym-h-0}\approx6.8$~\gls{sym-m}.
@@ -520,13 +520,13 @@ Under these conditions, either the stress at the center $\gls{sym-sigma-cent}$ o
 \end{equation}
 using $\gls{sym-beta-1}$ and $\gls{sym-beta-2}$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
-However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design \citep{RM3,previsic_reference_2011}.
+However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal \gls{acr-rm3} design \citep{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \Cref{tab:struct-calc-vs-scale}.
 
 \subsubsection{Other Float Plates}
 The other float plates besides the top and bottom ones experience only the edge reaction moments that the top and bottom plates apply at their interface, with no additional external loads in heave.
-Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design.
+Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal \gls{acr-rm3} design.
 This prevents the need for a separate structural analysis of the side plates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -589,7 +589,7 @@ where $\gls{sym-E}$ is the Young's modulus, $\gls{sym-I}$ is the second moment o
 and $\gls{sym-L}$ is the beam length, set to $\gls{sym-h-s}$ the full spar height.
 The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
 \begin{equation}
-    FOS = \frac{\gls{sym-sigma}_{s,\text{max}}}{\gls{sym-sigma-s}}
+    FOS = \frac{\gls{sym-sigma}_{\gls{sym-s},\text{max}}}{\gls{sym-sigma-s}}
     = \frac{
                 \gls{sym-sigma-Y} \frac{
                                         \gls{sym-zeta-s} + \sqrt{
@@ -679,7 +679,7 @@ meaning that local buckling of the tube as a plate element is not a concern \cit
 $\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$\gls{sym-m}^3$  \\ 
 $\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$\gls{sym-s}^2$  \\ 
 $\gls{sym-h}$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
+\gls{acr-jpd}& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
 $\gls{sym-H-s}$ & Significant wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
 $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
 $\gls{sym-T-e}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
@@ -687,7 +687,7 @@ $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57
 $\gls{sym-sigma-Y}$ & Material yield strength& 248 & MPa  \\ 
 $\gls{sym-rho-M}$ & Material density& 7850 & kg/$\gls{sym-m}^3$  \\ 
 $\gls{sym-E}$& Material Young's modulus& 200 & GPa  \\ 
-$\text{cost}_M$ & Material cost& 1.89 & \$/kg \\ 
+$\text{cost}_{\gls{sym-M}}$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
 %$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
 %$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
@@ -697,7 +697,7 @@ $\text{cost}_M$ & Material cost& 1.89 & \$/kg \\
 $FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
 $D_{d_{\text{min}}}$ & Minimum damping plate diameter & 30 & m  \\ 
 $FCR$ & Fixed charge rate& 10.8 & \%  \\ 
-$\gls{sym-N-WEC}$ & Number of WECs in array& 100 & -  \\ 
+$\gls{sym-N-WEC}$ & Number of \glspl{acr-wec} in array& 100 & -  \\ 
 $\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\ 
 $\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 
 $\gls{sym-h-d}/{\gls{sym-D-s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 

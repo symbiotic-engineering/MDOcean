@@ -1,9 +1,9 @@
 %\appendix
 
-\section{Matched Eigenfunction Expansion Method}
+\section{\gls{acr-meem}}
 \label{sec:appendix-meem-details}
-As introduced in \Cref{sec:hydro-meem}, the hydrodynamic coefficients are computed semi-analytically using MEEM.
-This section explains the MEEM formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented by \citet{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder MEEM radiation solution in the study by \citet{yeung_added_1981}.
+As introduced in \Cref{sec:hydro-meem}, the hydrodynamic coefficients are computed semi-analytically using \gls{acr-meem}.
+This section explains the \gls{acr-meem} formulation and solution methodology for the radiation of a dual truncated concentric cylinder geometry, originally presented by \citet{mavrakos_hydrodynamic_2004,chau_inertia_2010,chau_inertia_2012} as an extension of the single-cylinder \gls{acr-meem} radiation solution in the study by \citet{yeung_added_1981}.
 Further numeric and realization details of the authors' implementation may be found in references \citet{bimali_matrix_2026,best_openflash_2026,mccabe_open-source_2024}.
 The computation involves splitting the fluid domain into regions, approximating an infinite series by truncation, and solving a matrix equation to enforce the continuity of potential and velocity across regions.
 
@@ -24,7 +24,7 @@ Extension to many regions is discussed in section 3.4.
 \begin{figure}[htb]
 \centering
 \includegraphics[\FigureOptions{aor:figs/from-matlab/meem_dims.pdf}]{figs/from-matlab/meem_dims.pdf}
-\caption{Fluid regions and dimensions used in the dual concentric cylinder MEEM}
+\caption{Fluid regions and dimensions used in the dual concentric cylinder \gls{acr-meem}}
 \label{fig:meem-regions}
 \end{figure}
 
@@ -286,7 +286,7 @@ In \Cref{tab:MEEM-eigenfunctions},  $\gls{sym-mathrm-I-0}$,  $\gls{sym-mathrm-K-
 }
 
 \newcommand{\RintTwoDefn}{
-    $\displaystyle \gls{sym-boldsymbol-mathcal-R}_{2m} = \int\limits_{\gls{sym-a-in}}^{\gls{sym-a-out}} \gls{sym-vec-R}_{2m}(\gls{sym-r})rdr$
+    $\displaystyle \gls{sym-boldsymbol-mathcal-R}_{2\gls{sym-m}} = \int\limits_{\gls{sym-a-in}}^{\gls{sym-a-out}} \gls{sym-vec-R}_{2\gls{sym-m}}(\gls{sym-r})rdr$
 }
 
 \newcommand{\ZmnDefn}{
@@ -470,13 +470,13 @@ $
     \caption{Eigenfunction integrals}
     \label{tab:meem-integrals}
     \begin{tabular}{|M{0.16\linewidth}|M{0.05\linewidth}|M{0.20\linewidth}|M{0.48\linewidth}|} \hline 
-        \multicolumn{2}{|M{0.21\linewidth}|}{Integral}           & $m,j=0$                       & $m,j\geq1$            \\ \hline 
+        \multicolumn{2}{|M{0.21\linewidth}|}{Integral}           & $\gls{sym-m},\gls{sym-j}=0$                       & $\gls{sym-m},\gls{sym-j}\geq1$            \\ \hline 
         \multicolumn{2}{|M{0.21\linewidth}|}{\RintOneDefn}       & \RintOneJzero                 & \RintOneJOne          \\ \hline 
         \multicolumn{2}{|M{0.21\linewidth}|}{\RintTwoDefn}       & \RintTwoJzero                 & \RintTwoJOne          \\ \hline 
-        \multirow{6}{*}{\ZmnDefn}   & \multirow{2}{*}{$n=0$}     & \multirow{2}{*}{\ZnZeroMZero} & \ZnZeroMOne           \\ \cline{2-4} 
-                                    & \multirow{3}{*}{$n\geq1$}  & \multirow{3}{*}{\ZnOneMZero}  & \ZnOneMOne            \\ \hline
-        \multirow{9}{*}{\ZmkDefn}   & \multirow{2}{*}{$k=0$}     & \multirow{2}{*}{\ZmZeroKZero} & \ZmOneKZero           \\ \cline{2-4}
-                                    & \multirow{4}{*}{$k\geq1$}  & \multirow{4}{*}{\ZkOneMZero}  & \ZkOneMOne            \\ \hline
+        \multirow{6}{*}{\ZmnDefn}   & \multirow{2}{*}{$\gls{sym-n}=0$}     & \multirow{2}{*}{\ZnZeroMZero} & \ZnZeroMOne           \\ \cline{2-4} 
+                                    & \multirow{3}{*}{$\gls{sym-n}\geq1$}  & \multirow{3}{*}{\ZnOneMZero}  & \ZnOneMOne            \\ \hline
+        \multirow{9}{*}{\ZmkDefn}   & \multirow{2}{*}{$\gls{sym-k-generic-index}=0$}     & \multirow{2}{*}{\ZmZeroKZero} & \ZmOneKZero           \\ \cline{2-4}
+                                    & \multirow{4}{*}{$\gls{sym-k-generic-index}\geq1$}  & \multirow{4}{*}{\ZkOneMZero}  & \ZkOneMOne            \\ \hline
     \end{tabular}
 \end{table}
 
@@ -484,7 +484,7 @@ $
 \subsection{Matching Across Fluid Boundaries}
 \label{sec:appendix-meem-matching}
 
-The eigencoefficients must be selected to enforce the radial velocity body boundary condition and the matching of the potentials and radial velocities at the edges of each region, earning this technique the name Matched Eigenfunction Expansion Method (MEEM).
+The eigencoefficients must be selected to enforce the radial velocity body boundary condition and the matching of the potentials and radial velocities at the edges of each region, earning this technique the name \gls{acr-meem}.
 The radiation problem was first solved this way for a floating cylinder in 1980 \citep{yeung_added_1981}.
 
 First, the infinite sums in $\gls{sym-phi-h}$ must be truncated.
@@ -495,19 +495,19 @@ As-is, this is not enough equations ($4 < \gls{sym-N}+2\gls{sym-M}+\gls{sym-K}$)
 We must leverage eigenfunction orthogonality to get enough equations.
 The first equation will turn into $\gls{sym-N}$ equations; the second and third each give $\gls{sym-M}$; the fourth $\gls{sym-K}$.
 The transformation uses the following property of orthogonality.
-Consider a generic function $\gls{sym-Y}(x)$ expressed as a series with coefficients $\gls{sym-alpha-generic}$ and basis functions $e(x)$: $\gls{sym-Y}(x)=\sum_i \gls{sym-alpha-generic}_i \gls{sym-e-i}(x)$.
-If $\gls{sym-e-j}(x)$ is orthogonal to $\gls{sym-e-i}(x)$ from $x = \gls{sym-a}$ to $\gls{sym-b}$, then:
+Consider a generic function $\gls{sym-Y}(\gls{sym-x})$ expressed as a series with coefficients $\gls{sym-alpha-generic}$ and basis functions $e(\gls{sym-x})$: $\gls{sym-Y}(\gls{sym-x})=\sum_i \gls{sym-alpha-generic}_i \gls{sym-e-i}(\gls{sym-x})$.
+If $\gls{sym-e-j}(\gls{sym-x})$ is orthogonal to $\gls{sym-e-i}(\gls{sym-x})$ from $\gls{sym-x} = \gls{sym-a}$ to $\gls{sym-b}$, then:
 
 \begin{equation}
 \begin{aligned}
-       & \int\limits_a^b Y (x)e_j (x)dx = (b-a) <Y,e_j>= (b-a)<\sum_i \gls{sym-alpha-generic}_i e_i, e_j> \\ &= (b-a) \sum_i \gls{sym-alpha-generic}_i <e_i,e_j> = (b-a) \sum_i \gls{sym-alpha-generic}_i \delta_{ij} = (b-a) \gls{sym-alpha-generic}_j
+       & \int\limits_{\gls{sym-a-b}} \gls{sym-Y} (\gls{sym-x})\gls{sym-e-j} (\gls{sym-x})dx = (\gls{sym-b}-\gls{sym-a}) <\gls{sym-Y},\gls{sym-e-j}>= (\gls{sym-b}-\gls{sym-a})<\sum_i \gls{sym-alpha-generic}_i \gls{sym-e-i}, \gls{sym-e-j}> \\ &= (\gls{sym-b}-\gls{sym-a}) \sum_i \gls{sym-alpha-generic}_i <\gls{sym-e-i},\gls{sym-e-j}> = (\gls{sym-b}-\gls{sym-a}) \sum_i \gls{sym-alpha-generic}_i \gls{sym-delta-ij} = (\gls{sym-b}-\gls{sym-a}) \gls{sym-alpha-generic}_{\gls{sym-j}}
 \end{aligned}
 \end{equation}
 
 where $<\cdot,\cdot>$ is the inner product and $\gls{sym-delta-ij}$ is Kronecker's delta.
 In the current hydrodynamics problem, the basis functions are the vertical eigenfunctions $\gls{sym-Z-n-i1}$, $\gls{sym-Z-m-i2}$, and $\gls{sym-Z-k-e}$.
 Orthogonality of each eigenfunction can be verified with the inner product.
-In the first region, for example, $<Z_{n_1}^{i_1},Z_{n_2}^{i_1}>=\delta_{n_1 n_2}$.
+In the first region, for example, $<\gls{sym-Z-n-1-i-1},Z_{n_2}^{i_1}>=\delta_{n_1 n_2}$.
 Note that eigenfunctions of different domains are not orthogonal, and their inner products will be expressed as coupling integrals in \Cref{tab:meem-integrals}.
 
 For each of the four matching equations, the property of orthogonality applies only after multiplying by the appropriate eigenfunction and integrating over appropriate bounds.
@@ -522,14 +522,14 @@ Other combinations of eigenfunction multiplication or integration besides those 
 \subsection{Block Matrix Structure}
 
 Once orthogonality is applied, the matching equations create a linear system $\gls{sym-mathbf-A}\gls{sym-vec-x}=\gls{sym-vec-b}$ where $\gls{sym-mathbf-A}$ is a complex sparse $(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$x$(\gls{sym-N}+2\gls{sym-M}+\gls{sym-K})$ square matrix corresponding to the homogeneous case, $\gls{sym-vec-x}=[\gls{sym-vec-C-1n-i1}, \gls{sym-vec-C-1m-i2}, \gls{sym-vec-C-2m-i2}, \vec{\gls{sym-B}_{\gls{sym-k-index}}^{e}}]$ is the complex eigencoefficient vector, and $\gls{sym-vec-b}$ is the real boundary condition vector corresponding to the particular case.
-We elaborate on the block structure of the A-matrix and b-vector, an implementation detail that prior discussion of MEEM overlooks.
+We elaborate on the block structure of the A-matrix and b-vector, an implementation detail that prior discussion of \gls{acr-meem} overlooks.
 The A-matrix and b-vector block structures are shown in \Cref{tab:MEEM-A-matrix,tab:MEEM-b-vector} respectively.
 They are written in compact notation using row vectors of basis functions, so $\gls{sym-vec-R-1n-i1}=[R_{10}^{i1}, R_{11}^{i1},\dots, R_{1(N-1)}^{i1}]$ and so on.
 Each basis function is evaluated at the radius described to the left of its row in the table. $0_{ij}$ and $1_{ij}$ are the $i$ x $\gls{sym-j}$ matrices of zeros and ones respectively; diag($\cdot$) constructs a diagonal matrix from a vector; and $\odot$ is the Hadamard (element-wise) product.
 
 \begin{table}[htbp]
     \centering
-    \caption{MEEM A-matrix}
+    \caption{\gls{acr-meem} A-matrix}
     \label{tab:MEEM-A-matrix}
     \begin{tabular}{|M{0.12\linewidth}|c||c|c|c|c|}\hline
  & & $\gls{sym-vec-C-1n-i1}$& $\gls{sym-vec-C-1m-i2}$& $\gls{sym-vec-C-2m-i2}$&$\gls{sym-vec-B-k-e}$\\\hline
@@ -542,8 +542,8 @@ Each basis function is evaluated at the radius described to the left of its row 
                         }
             &N
             &  $(\gls{sym-h}-\gls{sym-d-1})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1n-i1})$
-            &  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{N1}\gls{sym-vec-R-1m-i2}$
-            &  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{N1}\gls{sym-vec-R-2m-i2}$& $0_{NK}$
+            &  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{\gls{sym-N}1}\gls{sym-vec-R-1m-i2}$
+            &  $-\gls{sym-boldsymbol-mathcal-Z}_{nm}\odot 1_{\gls{sym-N}1}\gls{sym-vec-R-2m-i2}$& $0_{NK}$
           \\ \hline
             \shortstack{
                             $\gls{sym-phi-i2}=\gls{sym-phi-e}$
@@ -553,7 +553,7 @@ Each basis function is evaluated at the radius described to the left of its row 
             &M
             &  $0_{MN}$&  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-1m-i2})$
             &  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\gls{sym-vec-R-2m-i2})$
-            & $-\gls{sym-boldsymbol-mathcal-Z}_{mk}\odot 1_{M1}\vec{\Lambda}_{\gls{sym-k-index}}$
+            & $-\gls{sym-boldsymbol-mathcal-Z}_{mk}\odot 1_{\gls{sym-M}1}\vec{\Lambda}_{\gls{sym-k-index}}$
           \\ \hline
             \shortstack{
                             $\frac{\partial}{\partial \gls{sym-r}}
@@ -563,7 +563,7 @@ Each basis function is evaluated at the radius described to the left of its row 
                             at $\gls{sym-r}=\gls{sym-a-1}$
                         }
             &M
-            &  $- \gls{sym-boldsymbol-mathcal-Z}_{mn} \odot 1_{M1} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1n-i1}$
+            &  $- \gls{sym-boldsymbol-mathcal-Z}_{mn} \odot 1_{\gls{sym-M}1} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1n-i1}$
             &  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2})$
             &  $(\gls{sym-h}-\gls{sym-d-2})~\gls{sym-mathrm-diag}(\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2})$
             & $0_{MK}$
@@ -577,8 +577,8 @@ Each basis function is evaluated at the radius described to the left of its row 
                         }
                 &K
             &  $0_{KN}$
-            &  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2}$
-            &  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{K1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2}$
+            &  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{\gls{sym-K}1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-1m-i2}$
+            &  $-\gls{sym-boldsymbol-mathcal-Z}_{km} \odot 1_{\gls{sym-K}1}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-vec-R-2m-i2}$
             & $\gls{sym-h}~\gls{sym-mathrm-diag}
             (\frac{\partial}{\partial \gls{sym-r}} \gls{sym-vec-Lambda-k-e})$
         \\ \hline
@@ -587,7 +587,7 @@ Each basis function is evaluated at the radius described to the left of its row 
 
 \begin{table}[htbp]
     \centering
-    \caption{MEEM b-vector}
+    \caption{\gls{acr-meem} b-vector}
     \label{tab:MEEM-b-vector}
     \begin{tabular}{|c|c|} \hline
          N& $\displaystyle
@@ -666,12 +666,17 @@ Once the eigencoefficients have been calculated by solving the linear system for
         R_{j_1} (r)R_{j_2} (r)rdr
     \right] \nonumber
 \end{alignat}
-where the generic indices $j_1$ and $j_2$ are used to represent $\gls{sym-n}$ or $\gls{sym-m}$ depending on the region.
+where the generic indices $\gls{sym-j}_1$ and $\gls{sym-j}_2$ are used to represent $\gls{sym-n}$ or $\gls{sym-m}$ depending on the region.
 For regions with multiple radial eigenfunctions or surfaces covering multiple fluid regions, summation over each eigenfunction and region respectively is implied.
 After substituting the eigenfunctions from \Cref{tab:MEEM-eigenfunctions} into \Cref{eq:meem-c-derivation}, all $\gls{sym-z}$-dependent quantities are evaluated at the body draft on the integration surface, $\gls{sym-z}=-d$.
 This means $\frac{\partial \gls{sym-phi-p}}{\partial \gls{sym-z}}=1$, and $\gls{sym-Z-j}(\gls{sym-z})$ simplifies to
 \begin{equation}
-    Z_j (z=-d) = \begin{cases}1,& j=0\\ \sqrt2(-1)^j,& j \geq 1\end{cases}
+    \gls{sym-Z-j} (\gls{sym-z}=-d) =
+    \begin{cases}
+        1,& \gls{sym-j}=0
+        \\
+        \sqrt2(-1)^{\gls{sym-j}},& \gls{sym-j} \geq 1
+    \end{cases}
 \end{equation}
 The third and fourth integrals of \Cref{eq:meem-c-derivation} vanish, and the second integral is the radial eigenfunction integral $\gls{sym-boldsymbol-mathcal-R}$ expressed previously in \Cref{tab:meem-integrals}.
 
@@ -682,7 +687,7 @@ The radiation coefficients are thus computed as
 \end{equation}
 with output constant $\gls{sym-c-0}$ and output row vector $\gls{sym-vec-c}$ defined in \Cref{eq:c0,tab:MEEM-c-vector} respectively:
 \begin{equation}\label{eq:c0}
-    c_0 =  \frac{\left({a^2_{out}}-{a^2_{in}}\right)\,\left(-{a^2_{in}}-{a^2_{out}}+4 (h-d)^2\right)}{16\,\left(h - d\right)}
+    \gls{sym-c-0} =  \frac{\left({\gls{sym-a-out}}-{\gls{sym-a-in}}\right)\,\left(-{\gls{sym-a-in}}-{\gls{sym-a-out}}+4 (\gls{sym-h}-d)^2\right)}{16\,\left(\gls{sym-h} - d\right)}
 \end{equation}
 \begin{table}[h]
     \centering
@@ -690,8 +695,8 @@ with output constant $\gls{sym-c-0}$ and output row vector $\gls{sym-vec-c}$ def
     \label{tab:MEEM-c-vector}
 \begin{tabular}{|l|c|c|c|c|} \hline
           Body&N&  M&  M& K\\ \hline
-          Float&$0_{1\gls{sym-N}}$&  $\gls{sym-vec-Z-m-i2}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{1m}$&  $\gls{sym-vec-Z-m-i2}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{2m}$& $0_{1\gls{sym-K}}$\\ \hline
-          Spar& $\gls{sym-vec-Z-n-i1}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{1n}$& $0_{1\gls{sym-M}}$& $0_{1\gls{sym-M}}$&$0_{1\gls{sym-K}}$\\\hline
+          Float&$0_{1\gls{sym-N}}$&  $\gls{sym-vec-Z-m-i2}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{1\gls{sym-m}}$&  $\gls{sym-vec-Z-m-i2}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{2\gls{sym-m}}$& $0_{1\gls{sym-K}}$\\ \hline
+          Spar& $\gls{sym-vec-Z-n-i1}(\gls{sym-z}=-d) \odot\gls{sym-boldsymbol-mathcal-R}_{1\gls{sym-n}}$& $0_{1\gls{sym-M}}$& $0_{1\gls{sym-M}}$&$0_{1\gls{sym-K}}$\\\hline
     \end{tabular}
     \end{table}
 The appropriate dimensions are
@@ -713,7 +718,7 @@ The appropriate dimensions are
 \end{equation}
 to obtain the hydrodynamic coefficients of the float or the spar respectively.
 
-Using the A-matrix and b- and c-vectors, the MEEM solution directly calculates radiation coefficients $\gls{sym-B-h}$ and $\gls{sym-A-h}$.
+Using the A-matrix and b- and c-vectors, the \gls{acr-meem} solution directly calculates radiation coefficients $\gls{sym-B-h}$ and $\gls{sym-A-h}$.
 The hydrostatic stiffness $\gls{sym-K-h}$ and the excitation coefficient $\gls{sym-gamma}$ are calculated as follows:
 \begin{equation}\label{eq:gamma-K}
     |\gls{sym-gamma}|  = \sqrt{\frac{ 4 \gls{sym-rho-w} \gls{sym-g} \gls{sym-V-g}  \gls{sym-B-h}} {\gls{sym-m-0}}}, \quad % excitation
@@ -727,10 +732,10 @@ Note that while the excitation magnitude $|\gls{sym-gamma}|$ depends on the radi
 
 \subsection{Verification and Validation}
 
-Hydro coefficient results are verified by comparing to a benchmark shallow-water concentric-cylinder MEEM solution in \citet{chau_inertia_2012}.
+Hydro coefficient results are verified by comparing to a benchmark shallow-water concentric-cylinder \gls{acr-meem} solution in \citet{chau_inertia_2012}.
 Excellent agreement is observed, shown in \Cref{fig:meem-yeung-validation}.
 The results are also experimentally validated in the studies \citet{chau_inertia_2012,son_performance_2016}.
-Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to WAMIT results for RM3 in deep water.
+Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to \gls{acr-wamit} results for \gls{acr-rm3} in deep water.
 
 \begin{figure}[htbp]
     \centering
@@ -742,7 +747,7 @@ Previously in \Cref{sec:dynamic-validation}, the N=M=K=11 case was compared to W
 \subsection{Convergence}
 
 As $\gls{sym-N},\gls{sym-M},\gls{sym-K}\rightarrow\infty$, matching quality improves, and hydro coefficients converge toward their true values.
-Previous MEEM papers use $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=50$ to obtain 4-digit matching accuracy without elaborating on convergence properties \citep{chau_inertia_2012}.
+Previous \gls{acr-meem} papers use $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=50$ to obtain 4-digit matching accuracy without elaborating on convergence properties \citep{chau_inertia_2012}.
 We observe that potential matching converges faster than velocity matching.
 \Cref{fig:meem-matching} shows the matching behavior for $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=11$, where potential matches well but velocity still has noticeable mismatch.
 \begin{figure}[htbp]
@@ -752,12 +757,12 @@ We observe that potential matching converges faster than velocity matching.
     \label{fig:meem-matching}
 \end{figure}
 
-Hydro coefficient convergence depends on the geometry: the benchmark shallow-water geometry of \citep{chau_inertia_2012} converges to within 0.25\% with only $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=4$, but RM3 requires $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}>10$, shown in \Cref{fig:meem-convergence}.
+Hydro coefficient convergence depends on the geometry: the benchmark shallow-water geometry of \citep{chau_inertia_2012} converges to within 0.25\% with only $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=4$, but \gls{acr-rm3} requires $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}>10$, shown in \Cref{fig:meem-convergence}.
 There, damping converges well at low frequencies but requires more harmonics at higher frequencies, while added mass has similar convergence across frequencies.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/meem_convergence_vs_omega.pdf}]{figs/from-matlab/meem_convergence_vs_omega.pdf}
-    \caption{Convergence for $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=(5,10,20,30)$ for RM3}
+    \caption{Convergence for $\gls{sym-N}=\gls{sym-M}=\gls{sym-K}=(5,10,20,30)$ for \gls{acr-rm3}}
     \label{fig:meem-convergence}
 \end{figure}
 
@@ -774,7 +779,7 @@ Since $\gls{sym-N-harmonics}=10$ gives adequate convergence for most geometries,
 In future work, if high-accuracy solutions are desired for large bodies close to the sea floor, exponentially scaled Bessel functions could be used instead, with symbolic cancellation of the exponential scaler from the eigenfunction numerator and denominator.
 
 Likewise, the vertical eigenfunction $\gls{sym-Z-k-e}$ for $\gls{sym-k-index}=0$ contains the $\cosh$ and $\sinh$ functions, which diverge for large values of $\gls{sym-m-0}\gls{sym-h}$ (high frequencies or deep water).
-Since the largest relevant value of $\gls{sym-m-0}\gls{sym-h}$ depends on the site rather than on the WEC design, it is not possible to add geometric constraints to prevent overflow as it was above.
+Since the largest relevant value of $\gls{sym-m-0}\gls{sym-h}$ depends on the site rather than on the \gls{acr-wec} design, it is not possible to add geometric constraints to prevent overflow as it was above.
 Therefore, the limit is derived analytically. %\hl{This formula hasn't been numerically checked yet}
 \begin{equation}
     \lim_{\gls{sym-m-0}\gls{sym-h}\rightarrow\infty} \gls{sym-Z-0-e} (\gls{sym-z})= \frac{\cosh^2 (\gls{sym-m-0}\gls{sym-h})}{\sqrt{2\gls{sym-m-0}\gls{sym-h}}}\exp\left(1+\frac{\gls{sym-z}}{\gls{sym-h}}\right)
@@ -794,7 +799,7 @@ Plugging this into the first element of the bottom block of the b-vector (positi
 With the standard expression, values for inputs above $\frac{1}{2}$ become \texttt{NaN}, which poses problems in deep water.
 With the asymptotic approximation, we are able to avoid \texttt{NaN}s for the zone $\frac{1}{2}<\gls{sym-m-0}\gls{sym-h}/\textrm{acosh(realmax})<\frac{\gls{sym-h}}{\gls{sym-d-2}}$.
 Above this threshold, \texttt{NaN}s occur even with the approximation, and the value in the b-vector is set to zero.
-This introduces negligible error because in this range, the magnitude of the true value is less than $10^{-300}$ for the nominal RM3 geometry.
+This introduces negligible error because in this range, the magnitude of the true value is less than $10^{-300}$ for the nominal \gls{acr-rm3} geometry.
 The asymptotic approximation is accurate for values of $\gls{sym-m-0}\gls{sym-h}/\textrm{acosh(realmax)}$ as low as $10^{-2}$,
 though it is only applied for values above $\frac{1}{2}$.
 
@@ -803,7 +808,7 @@ The corresponding limit for the vertical coupling integral is:
 \begin{equation}
 \begin{aligned}
     \lim_{\gls{sym-m-0}\gls{sym-h}\rightarrow\infty}
-    \gls{sym-boldsymbol-mathcal-Z}_{m,k=0}
+    \gls{sym-boldsymbol-mathcal-Z}_{\gls{sym-m},\gls{sym-k-generic-index}=0}
     &
     %= \int_{-h}^{-d_2} \vec{Z}_m^{i2 ~T}\vec{Z}_0^{\textit{e}} dz
     = \gls{sym-h}~\frac{
@@ -833,7 +838,7 @@ The corresponding limit for the vertical coupling integral is:
 
 A final numerical subtlety worth discussing is finite precision effects in calculating $\gls{sym-m-k}$.
 Bounds of $180^\textrm{o}\cdot[\gls{sym-k-index}-\frac{1}{2}, \gls{sym-k-index}]$
-are placed on $\gls{sym-m-k}h$ in a root-finding algorithm to ensure the $\gls{sym-k-index}$th root is identified.
+are placed on $\gls{sym-m-k}\gls{sym-h}$ in a root-finding algorithm to ensure the $\gls{sym-k-index}$th root is identified.
 Without these bounds, sometimes the \texttt{fsolve} solver would wrongly converge to values where the residual approaches
 $+\infty$ from one side and $-\infty$ from the other
 (asymptotes of $\tan()$) rather than true zeroes.
@@ -841,7 +846,7 @@ Degrees are used instead of radians so asymptotes occur at rational values.
 
 \subsection{Runtime and Computational Cost Scaling}
 
-The runtime of the MEEM method is the time required to find the eigencoefficients, then obtain the hydrodynamic coefficients from eigencoefficients.
+The runtime of the \gls{acr-meem} method is the time required to find the eigencoefficients, then obtain the hydrodynamic coefficients from eigencoefficients.
 First, a nonlinear root-finding algorithm runs $\gls{sym-K}-1$ times to generate the $\gls{sym-m-k}$ inputs used in the A-matrix and b-vector.
 Then $3\gls{sym-N}+8\gls{sym-M}+2\gls{sym-K}-11$ Bessel functions must be evaluated for the radial terms of the A-matrix.
  (Note that this would reduce to $2\gls{sym-N}+8\gls{sym-M}+2\gls{sym-K}-10$ evaluations if the definition of the $\gls{sym-R-1n-i1}(\gls{sym-r})$ eigenfunction were modified to use a scale factor based on $\gls{sym-a-1}$ rather than $\gls{sym-a-2}$, although this enhancement is not pursued here to maintain consistency with previous work).
@@ -855,4 +860,4 @@ Most of the time is spent evaluating Bessel functions, so future code optimizati
 \citet{chau_inertia_2012} proposes using the sparsity pattern to reduce matrix size from N+2M+K to 2M, but this seems low impact since the linear solve only takes a few percent of compute time and the reduced matrix would require an equal number of Bessel evaluations.
 On the other hand, matrix size in a boundary element method solver is much larger (meshes may have 1000s of panels) and the linear solve can drive computation cost.
 On the same machine, Capytaine boundary element method for the same geometry takes an average of 323 ms for a 710 panel mesh (1\% convergence). %\hl{the 323 ms capy number came from my laptop not from the lab computer}
-Thus, MEEM achieves a 10x time reduction over Capytaine.
+Thus, \gls{acr-meem} achieves a 10x time reduction over Capytaine.

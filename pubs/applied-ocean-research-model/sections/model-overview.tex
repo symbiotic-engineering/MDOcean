@@ -2,12 +2,12 @@
 \label{sec:model-structure}
 
 \ifdefined\DISSERTATION
-    The overall scope of WEC design includes the selection of discrete architecture choices, such the type of device and PTO (top row of \Cref{fig:design-scope});
+    The overall scope of \gls{acr-wec} design includes the selection of discrete architecture choices, such the type of device and \gls{acr-pto} (top row of \Cref{fig:design-scope});
     continuous design variables in the physical domain, such as dimensions (second row of \Cref{fig:design-scope});
     static analysis to evaluate the properties of these physical designs (blue boxes in third row of \Cref{fig:design-scope});
     dynamic analysis to quantify the effect of these static properties on coupled dynamic properties like power production (blue dotted outline of \Cref{fig:design-scope});
     and performance analysis to evaluate the viability of the design based on its static and dynamic properties (far right of \Cref{fig:design-scope}).
-    MDOcean performs static analysis for a single type of floating body (an RM3-like two-body point absorber)
+    MDOcean performs static analysis for a single type of floating body (an \gls{acr-rm3}-like two-body point absorber)
     as well as dynamic analysis and optimal control for the full coupled system,
     assuming that the static properties for other components (e.g. drivetrain, generator) are known or swept inputs.
 
@@ -15,9 +15,9 @@
         \begin{figure}
         \centering
         \includegraphics[width=\textwidth]{figs/two_port_dimension_coeff_chain.pdf}
-        \caption{Flowchart showing the full WEC design space and the scope of MDOcean's static, dynamic, and optimal control analyses.
+        \caption{Flowchart showing the full \gls{acr-wec} design space and the scope of MDOcean's static, dynamic, and optimal control analyses.
         For visual clarity, some dependencies are omitted, such as that of the constraint limits on static analyses.
-        These dependencies are included in the XDSM diagram in \Cref{fig:n2}.}
+        These dependencies are included in the \gls{acr-xdsm} diagram in \Cref{fig:n2}.}
         \label{fig:design-scope}
         \end{figure}
     \end{foldoutpage}
@@ -29,24 +29,24 @@ The hydrodynamics module evaluates frequency-domain hydrodynamic coefficients us
 The dynamics and control module combines hydrodynamic coefficients, mass properties, and generator ratings to compute system response, loads, and power production using a quasi-linear frequency-domain model with approximate drag and saturation nonlinearities.
 Both operational and extreme (storm) conditions are considered.
 The structures module evaluates stress and factor-of-safety constraints under yield, ultimate, buckling, and fatigue criteria.
-Finally, the economics module estimates capital cost (PTO and structure) and levelized cost of energy using power production and material usage.
+Finally, the economics module estimates capital cost (\gls{acr-pto} and structure) and levelized cost of energy using power production and material usage.
 
 Although this work does not perform optimization, the model is developed to support system-level design optimization.
-The module coupling structure is illustrated in the XDSM diagram in \Cref{fig:n2}.
-Inputs and outputs are organized according to standard MDO conventions \citep{lambe_extensions_2012}, and an optimizer would update design variables $\gls{sym-vec-x}$ using objective $\gls{sym-J}$ and constraints $\gls{sym-g}$ until convergence to $\gls{sym-vec-x}^*$.
+The module coupling structure is illustrated in the \gls{acr-xdsm} diagram in \Cref{fig:n2}.
+Inputs and outputs are organized according to standard \gls{acr-mdo} conventions \citep{lambe_extensions_2012}, and an optimizer would update design variables $\gls{sym-vec-x}$ using objective $\gls{sym-J}$ and constraints $\gls{sym-g}$ until convergence to $\gls{sym-vec-x}^*$.
 
 
 \begin{figure*}[htbp]
 \centering
 \includegraphics[\FigureOptions{aor:figs/from-matlab/xdsm.pdf}]{figs/from-matlab/xdsm.pdf}
-\caption{Simplified XDSM diagram}
+\caption{Simplified \gls{acr-xdsm} diagram}
 \label{fig:n2}
 \end{figure*}
 %
 \begin{figure*}[b!]
 \centering
 \includegraphics[\FigureOptions{aor:figs/from-matlab/control_analysis_flowcharts.pdf}]{figs/from-matlab/control_analysis_flowcharts.pdf}
-\caption{Optimization architectures organized by analysis method (MDF and SAND) and control method (explicit, implicit, simultaneous, and nested).}
+\caption{Optimization architectures organized by analysis method (\gls{acr-mdf} and \gls{acr-sand}) and control method (explicit, implicit, simultaneous, and nested).}
 \label{fig:control-arch}
 \end{figure*}
 
@@ -54,7 +54,7 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     \paragraph{Absence of Feedback Coupling}
     The lack of variables in the lower left portion of the diagram indicates that there is no feedback coupling between modules, so an external solver to enforce consistency is not necessary.
     This helps decrease the simulation computation time and is appealing for optimization.
-    \paragraph{Presence of Design Variable and Feed-Forward Coupling}
+    \paragraph{Presence of \gls{acr-dv} and Feed-Forward Coupling}
     The fact that the same design variable group is an input to multiple modules indicates the presence of design variable coupling.
     Most heavily coupled are the bulk dimensions, which are input to the geometry, hydrodynamics, and structural modules.
     Thicknesses and generator ratings are each input to two modules, with thicknesses coupling geometry and structures and generator ratings coupling dynamics and economics.
@@ -62,10 +62,10 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     
     Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
     For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \citep{wright_coordinate_2015}, and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \citep{azarm_monotonicity-based_1988,papalambros_principles_2017}.
-    The present coupling of WEC disciplines is non-convex and non-monotonic, so concurrent optimization is required to obtain the system optimal design.
+    The present coupling of \gls{acr-wec} disciplines is non-convex and non-monotonic, so concurrent optimization is required to obtain the system optimal design.
     Non-monotonicity means that perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables, objective, and constraints computed in other modules.
     Non-convexity arises from the presence of both positive and negative curvature in the coupled variable space, leading to multiple local optima.
-    With an objective $\gls{sym-J}$ of LCOE, for example, while an increase in hydrodynamic damping generally increases power production (beneficial to $\gls{sym-J}$), it also increases structural loading (detrimental to $\gls{sym-g}$), and the larger bulk dimensions required to achieve that higher damping may produce higher stresses (detrimental to $\gls{sym-g}$) and increase the required structural material (detrimental to $\gls{sym-J}$).
+    With an objective $\gls{sym-J}$ of \gls{acr-lcoe}, for example, while an increase in hydrodynamic damping generally increases power production (beneficial to $\gls{sym-J}$), it also increases structural loading (detrimental to $\gls{sym-g}$), and the larger bulk dimensions required to achieve that higher damping may produce higher stresses (detrimental to $\gls{sym-g}$) and increase the required structural material (detrimental to $\gls{sym-J}$).
     Thus, it would be sub-optimal to optimize the hydrodynamics module strictly for damping or power production followed by a separate optimization considering structures and economics.
     Furthermore, while even in a unified optimization it may be tempting to calculate the structural thicknesses within the structures module as the minimum required to sustain loads without failure, it is important to keep structural thicknesses as design variables because they also contribute to the hydrostatic constraints computed in the geometry module.
     If active, these constraints would make the system-level optimum material thickness larger than what is structurally necessary.
@@ -73,41 +73,41 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     
     \paragraph{Multiple-Discipline-Feasible Analysis Architecture}
     All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
-    The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
+    The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the \gls{acr-xdsm} diagram as the orange box.
     The dynamics iteration occurs separately for each outer iteration of the optimizer.
-    This structure is known as the multiple discipline feasible (MDF) architecture.
-    In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (SAND) architecture \citep{martins_multidisciplinary_2013}.
-    SAND generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
-    The WecOptTool control co-optimization software pursues the SAND strategy by collocating the dynamics constraints with the pseudo-spectral method \citep{coe_initial_2020}.
+    This structure is known as the multiple discipline feasible (\gls{acr-mdf}) architecture.
+    In principle, it is possible to remove the dynamics iteration and instead incorporate the nonlinear dynamics as a residual equality constraint within the optimization, which is known as the simultaneous analysis and design (\gls{acr-sand}) architecture \citep{martins_multidisciplinary_2013}.
+    \gls{acr-sand} generally decreases the runtime of the simulation (analysis) but requires more optimization iterations, since it is the optimization rather than the simulation that must converge residuals. 
+    The WecOptTool control co-optimization software pursues the \gls{acr-sand} strategy by collocating the dynamics constraints with the pseudo-spectral method \citep{coe_initial_2020}.
     
-    Readers familiar with trajectory optimization should note that the choice of MDF versus SAND as an MDO architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (MDF and shooting) versus optimization (SAND and collocation) \citep{tedrake_underactuated_2024}.
-    In MDO, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
+    Readers familiar with trajectory optimization should note that the choice of \gls{acr-mdf} versus \gls{acr-sand} as an \gls{acr-mdo} architecture parallels that of shooting versus collocation as a transcription method, in the sense that one chooses to enforce governing equations with simulation (\gls{acr-mdf} and shooting) versus optimization (\gls{acr-sand} and collocation) \citep{tedrake_underactuated_2024}.
+    In \gls{acr-mdo}, the appropriate decision depends on characteristics of all modules, not merely the module whose governing equations are in question.
     As \Cref{sec:sim-runtime} will demonstrate, the hydrodynamics module, not dynamics and controls, is the dominant computational cost of the simulation.
     This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
-    For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
-    Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
+    For this reason, \gls{acr-sand} would likely increase the runtime of the full optimization, motivating MDOcean's selection of \gls{acr-mdf} as the more suitable architecture.
+    Another advantage of \gls{acr-mdf} over \gls{acr-sand} is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
     
-    \paragraph{Control Optimization Architecture}
+    \paragraph{\gls{acr-ctl} Optimization Architecture}
     In control co-design, the nested and simultaneous architectures are often contrasted \citep{sundarrajan_towards_2021,herber_nested_2018}.
-    The nested architecture, known as ``asymmetric subspace optimization'' in MDO literature \citep{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
+    The nested architecture, known as ``asymmetric subspace optimization'' in \gls{acr-mdo} literature \citep{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
     This takes advantage of the fact that the inner optimization is often convex and can be solved quickly.
     On the other hand, the simultaneous architecture uses a single optimizer to optimize design and control variables concurrently, creating a larger (typically non-convex) optimization problem and avoiding the difficulty of inner loop infeasibility that may arise in the nested approach \citep{herber_nested_2018}. 
     We presently distinguish two additional types of control co-design architectures in which the controller is not numerically optimized and instead obtained through an optimal control law.
     The optimal control law can be either explicitly derived and applied in the simulation (``explicit'' or analytical), or implicitly solved for by numerically zeroing the residual of an analytical optimal control condition (``implicit'' or semi-analytical).
     
-    Each of these four control architectures can coexist with both MDF and SAND analysis architectures, shown in \Cref{fig:control-arch}.
+    Each of these four control architectures can coexist with both \gls{acr-mdf} and \gls{acr-sand} analysis architectures, shown in \Cref{fig:control-arch}.
     The analysis architecture determines whether it is a solver or an optimization constraint which handles the dynamic residuals to converge the state, while the control architecture determines whether control variables are determined via simulation, residual solve, or simultaneous/nested optimization.
     In the ``implicit'' control diagram, the plural ``residuals'' is used rather than ``residual'' to convey that there exist residuals on the optimal control conditions to determine the control variables, in addition to those on the dynamic equations to determine the state variables.
-    While the implicit-SAND and simultaneous-SAND block diagrams look nearly identical, the former determines the control variables via residuals of pre-determined optimality conditions expressed as constraints to the optimizer, while the latter determines them to maximize the optimization objective without a-priori knowledge of the optimal control conditions.
+    While the implicit-\gls{acr-sand} and simultaneous-\gls{acr-sand} block diagrams look nearly identical, the former determines the control variables via residuals of pre-determined optimality conditions expressed as constraints to the optimizer, while the latter determines them to maximize the optimization objective without a-priori knowledge of the optimal control conditions.
     
     In WecOptTool, the pseudo-spectral optimizer determines the state and control variables for a fixed design without using previously-known optimality conditions.
-    Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-SAND or nested-SAND respectively \citep{coe_initial_2020}.
+    Depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, WecOptTool would be considered either simultaneous-\gls{acr-sand} or nested-\gls{acr-sand} respectively \citep{coe_initial_2020}.
     
-    For MDOcean, we choose the explicit-MDF architecture.
-    Like the implicit-MDF architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
+    For MDOcean, we choose the explicit-\gls{acr-mdf} architecture.
+    Like the implicit-\gls{acr-mdf} architecture, it minimizes computational cost by avoiding the need to include control variables in an optimization and lowering the number of dynamic constraints which the optimizer must consider.
     This is possible due to the semi-analytical dynamics and control module, where the optimal constrained control conditions are derived analytically.
-    Explicit-MDF is chosen over implicit-MDF because it avoids the latter's numerical root-finding and is thus faster, as \Cref{sec:mod-freq-domain} will detail.
-    An early version of MDOcean used the implicit-MDF architecture, which is described in \Cref{sec:appendix-qp-numerical} for completeness.
+    Explicit-\gls{acr-mdf} is chosen over implicit-\gls{acr-mdf} because it avoids the latter's numerical root-finding and is thus faster, as \Cref{sec:mod-freq-domain} will detail.
+    An early version of MDOcean used the implicit-\gls{acr-mdf} architecture, which is described in \Cref{sec:appendix-qp-numerical} for completeness.
 \else
     The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration.
     This improves computational efficiency and is advantageous for optimization.
@@ -116,27 +116,27 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     
     This coupling is both non-convex (e.g., larger bulk dimensions raise power but also raise structural loads and material requirements) and non-monotonic, motivating concurrent rather than sequential optimization.
     
-    \paragraph{MDO Architecture}
+    \paragraph{\gls{acr-mdo} Architecture}
     All modules except dynamics are explicit.
     The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation.
-    This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
+    This leads to a multiple-discipline feasible (\gls{acr-mdf}) architecture, where dynamics convergence is handled within each simulation call.
     
-    An alternative simultaneous analysis and design (SAND) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
+    An alternative simultaneous analysis and design (\gls{acr-sand}) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
     However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
-    For this reason, MDF is adopted.
+    For this reason, \gls{acr-mdf} is adopted.
     
-    \paragraph{Control Co-Design Architecture}
-    Control co-design problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
+    \paragraph{\gls{acr-ccd} Architecture}
+    \gls{acr-ctl} co-design problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
     In the nested approach, control is optimized in an inner loop, while in the simultaneous approach control and design variables are optimized together.
     In addition, optimal control-based formulations may determine control either explicitly or implicitly via optimality conditions. 
     
-    These control formulations can be combined with both MDF and SAND analysis architectures.
-    MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
+    These control formulations can be combined with both \gls{acr-mdf} and \gls{acr-sand} analysis architectures.
+    MDOcean uses an implicit-\gls{acr-mdf} architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
     The implicit formulation is preferred over explicit alternatives due to the structure of the derived optimal control conditions (\Cref{sec:mod-freq-domain}).
     It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
-    \citep{mccabe_dissertation_2026} provides detailed architecture rationale, coupling analysis, and the relation to MDO literature.
+    \citep{mccabe_dissertation_2026} provides detailed architecture rationale, coupling analysis, and the relation to \gls{acr-mdo} literature.
     
-    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-MDF formulation used in this study highlighted.
+    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-\gls{acr-mdf} formulation used in this study highlighted.
 \fi
 
 

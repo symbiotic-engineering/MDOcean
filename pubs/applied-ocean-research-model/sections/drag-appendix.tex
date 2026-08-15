@@ -26,7 +26,7 @@ Plugging the describing function \Cref{eq:drag-pressure} into the drag force int
     \gls{sym-vec-F-d} = -\gls{sym-mathbf-B-d} \gls{sym-vec-hat-dot-xi}
     + \gls{sym-vec-gamma-d} \gls{sym-hat-zeta}
 \end{equation}
-The excitation term arises from the use of the relative velocity rather than direct WEC velocity, which is often overlooked in WEC models and has important implications for the phase of the drag force.
+The excitation term arises from the use of the relative velocity rather than direct \gls{acr-wec} velocity, which is often overlooked in \gls{acr-wec} models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $\gls{sym-y}$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{subsec:appendix-drag-others}.
 The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag damping matrix $\gls{sym-mathbf-B-d}$ and complex drag excitation vector $\gls{sym-vec-gamma-d}$ defined as follows:
 \begin{equation}\label{eq:drag-coeffs}
@@ -36,15 +36,15 @@ The coefficients in \Cref{eq:drag-damping-excitation} include real diagonal drag
 \end{aligned}
 \end{equation}
 where we use radii vectors $\gls{sym-vec-R}=[\gls{sym-D-f}/2,\gls{sym-D-d}/2]$ and $\gls{sym-vec-R-in}=[\gls{sym-D-f-in},0]$ to represent the float and spar.
-$\gls{sym-vec-alpha-v-y}$ is the amplitude ratio of the relative velocity and WEC velocity:
+$\gls{sym-vec-alpha-v-y}$ is the amplitude ratio of the relative velocity and \gls{acr-wec} velocity:
 \begin{equation}\label{eq:drag-alpha-definitions}
     \gls{sym-vec-alpha-v-y} = \frac{|\gls{sym-vec-hat-V-rel}(\gls{sym-y})|}{|\gls{sym-vec-dot-xi}|} = \sqrt{1 + \gls{sym-vec-r}^{\, 2} \exp(-2\gls{sym-k-wavenumber}\gls{sym-y}) - 2 \gls{sym-vec-r} \exp(-\gls{sym-k-wavenumber}\gls{sym-y})  \sin\angle \gls{sym-vec-dot-xi}}
 \end{equation}
-and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-dot-xi}|$ is the amplitude ratio of the incident wave velocity and WEC velocity.
+and $\gls{sym-vec-r} = |\gls{sym-hat-V-wave}|/ |\gls{sym-vec-dot-xi}|$ is the amplitude ratio of the incident wave velocity and \gls{acr-wec} velocity.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Nondimensional Drag Integrals $\gls{sym-I-B}$ and $\gls{sym-I-G}$}
-The drag coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$ are expressed in \Cref{eq:drag-coeffs} as dimensional integrals over the width of the WEC.
+The drag coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$ are expressed in \Cref{eq:drag-coeffs} as dimensional integrals over the width of the \gls{acr-wec}.
 Here we present an alternative form of the coefficients in terms of nondimensionalized integral functions, which we refer to as $\gls{sym-I-B}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa})$ and $\gls{sym-I-G}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa})$:
 \begin{equation}\label{eq:drag-integrals-IB-IG}
 \begin{aligned}
@@ -62,9 +62,9 @@ Here we present an alternative form of the coefficients in terms of nondimension
 where the nondimensional integral functions $\gls{sym-I-B}$ (real) and $\gls{sym-I-G}$ (complex) are defined as:
 \begin{equation}\label{eq:definition-IB-IG}
 \begin{aligned}
-    \gls{sym-I-B}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa}) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+\gls{sym-r}^2\exp(-2\gls{sym-kappa} x)-2\gls{sym-r}\sin\gls{sym-theta} \exp(-\gls{sym-kappa} x)} dx
+    \gls{sym-I-B}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa}) &= \int_{-1}^1 \sqrt{1-\gls{sym-x}^2}\sqrt{1+\gls{sym-r}^2\exp(-2\gls{sym-kappa} \gls{sym-x})-2\gls{sym-r}\sin\gls{sym-theta} \exp(-\gls{sym-kappa} \gls{sym-x})} dx
     \\
-    \gls{sym-I-G}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa}) &= \int_{-1}^1 \sqrt{1-x^2}\sqrt{1+\gls{sym-r}^2\exp(-2\gls{sym-kappa} x)-2\gls{sym-r}\sin\gls{sym-theta} \exp(-\gls{sym-kappa} x)} \exp(-i\gls{sym-kappa}x) dx
+    \gls{sym-I-G}(\gls{sym-r},\gls{sym-theta},\gls{sym-kappa}) &= \int_{-1}^1 \sqrt{1-\gls{sym-x}^2}\sqrt{1+\gls{sym-r}^2\exp(-2\gls{sym-kappa} \gls{sym-x})-2\gls{sym-r}\sin\gls{sym-theta} \exp(-\gls{sym-kappa} \gls{sym-x})} \exp(-i\gls{sym-kappa}\gls{sym-x}) dx
 \end{aligned}
 \end{equation}
 
@@ -96,20 +96,20 @@ The integrals must be evaluated numerically, except for special limit cases for 
 The limit cases in question include $\gls{sym-r} \rightarrow 0$ (the body velocity dominates the incident wave velocity) and $\gls{sym-kappa} \rightarrow 0$ (the body diameter is small with respect to the wavelength), with the following expressions:
 \begin{equation}
 \begin{aligned}
-    \lim_{r\rightarrow 0} \gls{sym-I-B}(r,\theta,\kappa) = \frac{\pi}{2},
+    \lim_{\gls{sym-hat-e-r}\rightarrow 0} \gls{sym-I-B}(\gls{sym-hat-e-r},\gls{sym-theta},\gls{sym-kappa}) = \frac{\gls{sym-pi}}{2},
     \qquad
-    \lim_{r\rightarrow 0} \gls{sym-I-G}(r,\theta,\kappa) =
+    \lim_{\gls{sym-hat-e-r}\rightarrow 0} \gls{sym-I-G}(\gls{sym-hat-e-r},\gls{sym-theta},\gls{sym-kappa}) =
     \begin{cases}
     \displaystyle\frac{\gls{sym-pi} \gls{sym-mathrm-J-1}(\gls{sym-kappa})}{\gls{sym-kappa}} & \textrm{if } \gls{sym-kappa} \neq 0 \\
     \displaystyle\frac{\gls{sym-pi}}{2} & \textrm{if } \gls{sym-kappa} = 0
     \end{cases} \\
-    \lim_{\kappa \rightarrow 0} \gls{sym-I-B}(r,\theta,\kappa) =  \lim_{\kappa \rightarrow 0} \gls{sym-I-G}(r,\theta,\kappa) = \frac{\pi}{2}\sqrt{1+r^2-2r\sin\theta},
+    \lim_{\gls{sym-kappa} \rightarrow 0} \gls{sym-I-B}(\gls{sym-hat-e-r},\gls{sym-theta},\gls{sym-kappa}) =  \lim_{\gls{sym-kappa} \rightarrow 0} \gls{sym-I-G}(\gls{sym-hat-e-r},\gls{sym-theta},\gls{sym-kappa}) = \frac{\gls{sym-pi}}{2}\sqrt{1+\gls{sym-hat-e-r}^2-2\gls{sym-hat-e-r}\sin\gls{sym-theta}},
 \end{aligned}
 \end{equation}
 where $\gls{sym-mathrm-J-1}$ is the Bessel function of the first kind of order 1.
 An important edge case occurs at the origin of the polar plots in \Cref{fig:drag-integrals}, when $\gls{sym-r} \rightarrow \infty$ (the incident wave velocity dominates the body velocity, so $|\gls{sym-hat-dot-xi}|\rightarrow 0$).
 Here, the integrals as defined in \Cref{eq:definition-IB-IG} diverge, and the form of \Cref{eq:drag-integrals-IB-IG} does not apply.
-Instead, when $\gls{sym-r}\rightarrow \infty$, we apply an alternative convention that replaces the WEC speed in \Cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals, $\gls{sym-I-prime} = \gls{sym-I}/\gls{sym-r}$:
+Instead, when $\gls{sym-r}\rightarrow \infty$, we apply an alternative convention that replaces the \gls{acr-wec} speed in \Cref{eq:drag-integrals-IB-IG} with the incident wave speed and uses a primed form of the integrals, $\gls{sym-I-prime} = \gls{sym-I}/\gls{sym-r}$:
 \begin{equation}
 \begin{aligned}
     \gls{sym-mathbf-B-d} &= \frac{8}{3\gls{sym-pi}} \gls{sym-rho-w} \gls{sym-R}^2 \gls{sym-C-d} |\gls{sym-hat-V-wave}|
@@ -126,17 +126,12 @@ Instead, when $\gls{sym-r}\rightarrow \infty$, we apply an alternative conventio
 The relevant limits are then:
 \begin{equation}
 \begin{aligned}
-    \lim_{r\rightarrow \infty} I_B'(r,\theta,\kappa) = 0,
+    \lim_{\gls{sym-hat-e-r}\rightarrow \infty} \gls{sym-I-B}'(\gls{sym-hat-e-r},\gls{sym-theta},\gls{sym-kappa}) = 0,
     \qquad
-    \lim_{r\rightarrow \infty} I_G'(r,\theta,\kappa) =
+    \lim_{\gls{sym-hat-e-r}\rightarrow \infty} \gls{sym-I-G}'(\gls{sym-hat-e-r},\gls{sym-theta},\gls{sym-kappa}) =
     \begin{cases}
-<<<<<<< HEAD
-    \frac{\gls{sym-pi} \gls{sym-mathrm-J-1}((1i-1)\gls{sym-kappa})}{(1i-1)\gls{sym-kappa}} & \textrm{if } \gls{sym-kappa} \neq 0 \\
-    \frac{\gls{sym-pi}}{2} & \textrm{if } \gls{sym-kappa} = 0
-=======
-    \displaystyle\frac{\pi J_1((1i-1)\kappa)}{(1i-1)\kappa} & \textrm{if } \kappa \neq 0 \\
-    \displaystyle\frac{\pi}{2} & \textrm{if } \kappa = 0
->>>>>>> origin/param-fig-flip
+    \displaystyle\frac{\gls{sym-pi} \gls{sym-mathrm-J-1}((1i-1)\gls{sym-kappa})}{(1i-1)\gls{sym-kappa}} & \textrm{if } \gls{sym-kappa} \neq 0 \\
+    \displaystyle\frac{\gls{sym-pi}}{2} & \textrm{if } \gls{sym-kappa} = 0
     \end{cases}
 \end{aligned}
 \end{equation}
@@ -144,19 +139,19 @@ The relevant limits are then:
 %%%%%%%%%%%%%%%
 \subsubsection{Comparison to Other Drag Formulations}
 \label{subsec:appendix-drag-others}
-\citet{quartier_influence_2021} propose a WEC drag model that also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
-While this representation yields identical results for a floating WEC in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
+\citet{quartier_influence_2021} propose a \gls{acr-wec} drag model that also utilizes describing functions with the relative velocity but groups the drag force into damping and stiffness terms rather than damping and excitation terms.
+While this representation yields identical results for a floating \gls{acr-wec} in the frequency domain, it misleadingly implies that a body fixed at the still water line would experience no drag force from incident waves.
 In other words, it fails to account for the edge case of $\gls{sym-r} \rightarrow \infty$ described above, where the drag force is purely an excitation force and cannot be expressed as a damping or stiffness.
 Furthermore, the drag ``damping'' term in the grouping of \citet{quartier_influence_2021} includes not just forces with a dissipative effect on the body but also the portion of nonlinear drag excitation forces that are in phase with the body velocity.
 This creates the confusing possibility for negative apparent damping coefficients, leading to false concerns about violating energy conservation if erroneously interpreted as a true damping coefficient.
 The damping-excitation grouping chosen in \Cref{sec:drag} avoids this confusion and guarantees positive values of the damping coefficient $\gls{sym-mathbf-B-d}$.
 
-Another improvement over \citet{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the WEC in the direction of wave propagation $\gls{sym-y}$.
-\citet{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the WEC, which is only accurate when the incident wavelength far exceeds the WEC width.
+Another improvement over \citet{quartier_influence_2021} is that the present model considers the fact that the incident wave velocity, and thus the relative velocity, differs across the width of the \gls{acr-wec} in the direction of wave propagation $\gls{sym-y}$.
+\citet{quartier_influence_2021} more simplistically assumes that the wave velocity at all points equals that at the center of the \gls{acr-wec}, which is only accurate when the incident wavelength far exceeds the \gls{acr-wec} width.
 This means that \citet{quartier_influence_2021} captures only the Froude-Krylov-like component of the drag excitation, neglecting the diffraction-like component.
 Early MDOcean simulations that used the \citet{quartier_influence_2021} formulation found this approximation to be unacceptable, producing unstable dynamics (negative drag damping coefficients whose absolute value exceeds the radiation damping) at high frequencies and large wave heights in the operational regime.
 The strip-theory approach presented in \Cref{sec:drag} avoids this issue.
-Comparisons against WEC-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \citep{quartier_influence_2021}.
+Comparisons against \gls{acr-wec}-Sim confirm that even without strip theory, assuming that the relative velocity is perfectly in phase with the body velocity (i.e. a drag force of purely damping and in-phase excitation, with no stiffness or out-of-phase excitation) yields more accurate results than the drag formulation used in the study \citep{quartier_influence_2021}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Iterative Solution}
@@ -183,7 +178,7 @@ Compared to numerical optimal control nested inside the drag solve, combining th
 However, it has the disadvantage that the error signal couples drag nonlinearities with constraint violations, which can potentially lead to slower convergence.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Optimal Control Condition}
+\subsubsection{\gls{acr-oc} Condition}
 Note that in the quasi-linear formulation, the lack of complete linearity means that the complex-conjugate reactive controller is technically no longer optimal in the unconstrained case.
 The optimal load damping $\gls{sym-B-l}$ is derived by setting
 \begin{equation}

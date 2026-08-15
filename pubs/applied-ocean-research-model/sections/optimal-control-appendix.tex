@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ifdefined\DISSERTATION
-    \subsubsection{Indirect Optimal Control Solution Procedure}
+    \subsubsection{Indirect \gls{acr-oc} Solution Procedure}
     \label{sec:appendix-qp-numerical}
     The indirect optimal control approach applies optimality conditions and then numerically solves the resulting equations.
     The optimality conditions depend on the active set of constraints.
@@ -18,10 +18,10 @@
     In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
     When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint (s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
     Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of active set possibilities instead of a continuous control domain as it would be in a direct optimal control method.
-    The main advantage of the indirect approach is its ability to handle arbitrary nonlinear\footnote{Nonlinear meaning greater than second order in an optimization sense, not in a dynamic sense, because the dynamics are already quasi-linearized here} constraints, although for the quadratic constraints considered here, the analytical approach described in \Cref{sec:appendix-qp-solution} is more efficient.
+    The main advantage of the indirect approach is its ability to handle arbitrary nonlinear\footnote{\gls{acr-nl} meaning greater than second order in an optimization sense, not in a dynamic sense, because the dynamics are already quasi-linearized here} constraints, although for the quadratic constraints considered here, the analytical approach described in \Cref{sec:appendix-qp-solution} is more efficient.
 \fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Analytical Quadratic Program for Constrained Power Maximization}
+\subsubsection{\gls{acr-an} \gls{acr-qp} for Constrained \gls{acr-pwr} Maximization}
 \label{sec:appendix-qp-solution}
 This section describes the analytical solution process for the constrained optimal control problem \Cref{eq:opt-problem} introduced in \Cref{sec:optimal-control}.
 
@@ -253,7 +253,7 @@ This can occur when $\gls{sym-mathbf-Q-mu} = 0$ (the constraint on $\gls{sym-vec
 The same types of critical points (now consisting of line-line, circle-line, and circle-circle intersections, as well as the closest point on each circle and line) apply, but for implementation simplicity, we replace $\gls{sym-A-q-mu}$ with a small positive $\gls{sym-epsilon}$ in this case and use the quadratic implementation.
 
 %%%%%%%%%%%%%%%
-\paragraph{Quartic Apparent Power Constraints}
+\paragraph{Quartic Apparent \gls{acr-pwr} Constraints}
 \label{sec:appendix-mag-S-constraints}
 While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\gls{sym-vec-x}$, constraints on the magnitude of apparent power $|\gls{sym-S}|<|\gls{sym-S}_{\text{max}}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\gls{sym-vec-x}$ and thus $\gls{sym-Gamma}$.
 This results in a ``Cassini oval'' curve \citep{weisstein_cassini_2026} on the complex plane of $\gls{sym-Gamma}$, which consists of two closed curves when $|\gls{sym-S}_{\text{max}}|<|\gls{sym-S-0}|$ and one curve when $|\gls{sym-S}_{\text{max}}|\geq|\gls{sym-S-0}|$, where $|\gls{sym-S-0}|$ is the apparent power of the unconstrained optimum.
@@ -294,12 +294,12 @@ The key practical implication is that any locally optimal solution is also globa
 
 After reducing to the $\gls{sym-Gamma}$ parameterization, the power objective $|\gls{sym-Gamma}|^2$ is a sum of squares and therefore convex.
 Even though the original power matrix $\gls{sym-mathbf-A-P}$ (see \Cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \citet{bacelli_numerical_2015} show that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\gls{sym-Gamma}$ in \Cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.
-Nonlinear dynamics can reintroduce non-convexity and should be checked on a case-by-case basis.
+\gls{acr-nl} dynamics can reintroduce non-convexity and should be checked on a case-by-case basis.
 
 The inequality constraints are more problematic.
 A constraint is convex if the set of points satisfying it forms a convex region.
 In the $\gls{sym-Gamma}$ plane, a convex constraint corresponds to a circle whose feasible region is the \emph{interior} ($\gls{sym-S-mu}=1$ in \Cref{eq:disc-constraint}), while a non-convex constraint corresponds to a circle whose feasible region is the \emph{exterior} ($\gls{sym-S-mu}=-1$).
-Constraints on the effort and flow magnitude (e.g., force limits $|\hat{F} |\leq \gls{sym-F-max}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
+Constraints on the effort and flow magnitude (e.g., force limits $|\gls{sym-hat-F-PTO} |\leq \gls{sym-F-max}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
 \citet{mccabe_force-limited_2024} visualize the feasible regions for families of such constraints on the complex $\gls{sym-Gamma}$ plane.
 They show that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
 The quadratic matrices $\gls{sym-mathbf-Q-mu}$ in \Cref{tab:qp-constraints} confirm this: $\gls{sym-mathbf-A-hat-q-2}$ and $\gls{sym-mathbf-A-hat-e-2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
@@ -308,14 +308,14 @@ Future work should investigate semidefinite relaxations of these non-convex cons
 It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.
 
 %%%%%%%%%%%%%%%
-\paragraph{Comparison to Other WEC Constrained Control Formulations}
+\paragraph{Comparison to Other \gls{acr-wec} Constrained \gls{acr-ctl} Formulations}
 Notably, $\gls{sym-Gamma}$ is equal to the reflection coefficient at the generator electrical port, which is commonly used in microwave circuit design to quantify impedance mismatch.
-\citet{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for WECs.
+\citet{mccabe_force-limited_2024,coe_co-design_2025} further discuss the reflection coefficient for \glspl{acr-wec}.
 
 Similar graphical interpretations of constraints for wave energy converters are presented by \citet{mccabe_force-limited_2024,merigaud_geometrical_2023,bacelli_geometric_2013}, with all three visualizing quadratic constraints as circles on the 2D plane.
 \citet{mccabe_force-limited_2024} focus on force/current limits but discuss amplitude, phase voltage, and apparent power constraints as well.
 \citet{merigaud_geometrical_2023} consider exclusively amplitude limits while \citet{bacelli_geometric_2013} cover amplitude and force limits.
-\citet{mccabe_force-limited_2024} use Smith charts to show constraints directly in $\gls{sym-Gamma}$ space as we do here, while \citet{merigaud_geometrical_2023} work in the complex plane of the hydrodynamic transmission coefficient and \citet{bacelli_geometric_2013} in that of the PTO force.
+\citet{mccabe_force-limited_2024} use Smith charts to show constraints directly in $\gls{sym-Gamma}$ space as we do here, while \citet{merigaud_geometrical_2023} work in the complex plane of the hydrodynamic transmission coefficient and \citet{bacelli_geometric_2013} in that of the \gls{acr-pto} force.
 \citet{bacelli_geometric_2013} also extend the formulation to capture higher harmonics (nonsinusoidal forces), where the exact constraint cannot be easily represented geometrically but sufficient conditions for constraint violation and satisfaction in the higher dimensional space can be represented as hyperspheres and hyperellipsoids.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -326,8 +326,8 @@ To support the discussion in \Cref{sec:discussion}, this section derives the sca
 
 The constraint limits are
 $\gls{sym-tau}_{\text{max}}$, $\gls{sym-P}_{\gls{sym-tau}\gls{sym-Omega},\text{max}}$, $\gls{sym-xi}_{\gls{sym-f},\text{max}}$, $\gls{sym-xi}_{\gls{sym-s},\text{max}}$, and $\gls{sym-X-PTO-max}$, which we collectively denote as $\gls{sym-L-mu}$.
-The dependence of power on the first two limits (PTO sizing variables) is of more immediate relevance than the last three (amplitude limits) because the former can be independently manipulated through PTO design, while the latter can only be manipulated by changing the bulk dimensions.
-The sensitivity of power to bulk dimensions is substantially more complex than the sensitivity to constraint limits for reasons discussed in \Cref{sec:appendix-dimension-sensitivity}, so we focus on the PTO sizing sensitivities here.
+The dependence of power on the first two limits (\gls{acr-pto} sizing variables) is of more immediate relevance than the last three (amplitude limits) because the former can be independently manipulated through \gls{acr-pto} design, while the latter can only be manipulated by changing the bulk dimensions.
+The sensitivity of power to bulk dimensions is substantially more complex than the sensitivity to constraint limits for reasons discussed in \Cref{sec:appendix-dimension-sensitivity}, so we focus on the \gls{acr-pto} sizing sensitivities here.
 
 In a given sea state, the global sensitivity of optimal power to a constraint limit can be quantified using parametric programming theory, where a local sensitivity is found parametrically and then integrated over the parameter space to find the global parameter relationship.
 The local sensitivity of power to a constraint parameter
@@ -549,12 +549,12 @@ Both Kronecker delta functions are implicitly functions of the constraint limit 
 % $\gls{sym-delta}_{\gls{sym-nu},\gls{sym-nu}^*}$ is monotonially decreasing with $\gls{sym-b-mu}$.
 
 %%%%%%%%%%%%%%%
-\paragraph{Average Power as a Function of Constraint Limits}
+\paragraph{Average \gls{acr-pwr} as a Function of Constraint Limits}
 The results just obtained establish conditions for the convexity of power in a single sea state to the constraint limit in that sea state, which we now make explicit by adding a $\gls{sym-beta}$ subscript to all sea state dependent quantities.
-For LCOE, we are interested in the weighted average power across sea states as a function of the constraint limits.
+For \gls{acr-lcoe}, we are interested in the weighted average power across sea states as a function of the constraint limits.
 All constraint limits are independent of the sea state ($\gls{sym-L-mu-beta}=\gls{sym-L-mu}$), with the exception of the amplitude limits due to slamming.
 \Cref{sec:appendix-slam} will show that the slamming limits are a function of $\gls{sym-Delta-z-slam}/\gls{sym-H}$, which depends explicitly on the wave height, and $\gls{sym-theta}$, which depends implicitly on both the wave period and wave height through the guessed phase $\angle\gls{sym-xi}$.
-Since the PTO sizing limits are of primary relevance, the following derivation assumes that the constraint limits are independent of the sea state to simplify the expression, although sea-state-dependent limits can easily be accommodated by adding a $\gls{sym-beta}$ index on $\gls{sym-b-mu}$ and carrying it through the derivation.
+Since the \gls{acr-pto} sizing limits are of primary relevance, the following derivation assumes that the constraint limits are independent of the sea state to simplify the expression, although sea-state-dependent limits can easily be accommodated by adding a $\gls{sym-beta}$ index on $\gls{sym-b-mu}$ and carrying it through the derivation.
 
 From \Cref{eq:power-elec-sum,eq:gamma-opt-summary}, the average power can be written as:
 \begin{equation}\label{eq:power-elec-sensitivity}
@@ -563,7 +563,7 @@ From \Cref{eq:power-elec-sum,eq:gamma-opt-summary}, the average power can be wri
     \cdot |\gls{sym-Gamma-beta-opt}|^2
 \end{equation}
 where $\overline{\gls{sym-P}}_{\text{elec},0}$ is the power available if all sea states were unconstrained (impedance-matched) and
-$\gls{sym-w-beta}=JPD_{\gls{sym-beta}} \cdot
+$\gls{sym-w-beta}=\gls{acr-jpd}_{\gls{sym-beta}} \cdot
     \frac{|\gls{sym-hat-V-s-th-beta}|^2}
          {8\Re (\gls{sym-Z-s-th-beta})}$ is a constant weight for each sea state.
 The second term represents power lost to constraint-induced impedance mismatch and depends on the constraint limits through \Cref{eq:gamma-opt-summary}.
@@ -655,7 +655,7 @@ because bulk dimensions affect $\gls{sym-mathbf-Q-mu}, \gls{sym-vec-a-mu}$, and 
 The sensitivity formula would become significantly more complex and less intuitive with these additional terms,
 and more importantly, the Th\'{e}venin-to-dimension derivatives are not currently available in MDOcean because they depend on the hydrodynamic coefficient-to-dimension derivatives.
 Application of the adjoint method has recently enabled efficient computation of hydrodynamic coefficient derivatives in the context of a numerical boundary element method solver \citep{khanal_fully_2025},
-but the adjoint method has not yet been implemented for the semi-analytical MEEM model used here.
+but the adjoint method has not yet been implemented for the semi-analytical \gls{acr-meem} model used here.
 Implementing the adjoint for a linear solve is relatively straightforward in a multidisciplinary design optimization package like OpenMDAO,
 and would unlock a fully semi-analytical differentiation workflow.
 
