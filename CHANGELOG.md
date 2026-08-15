@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
+### Fixed
+- Sensitivities: rename mixed-up param sens figures (manually, since the root cause is still unknown)
+
 ## [v1.4.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.2) - 2026-8-11
 ### Added
 - Figures: add a TikZ block diagram showing static analyses and dynamics including five two-ports
