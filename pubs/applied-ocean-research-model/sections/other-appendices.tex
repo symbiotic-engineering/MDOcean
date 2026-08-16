@@ -3,13 +3,13 @@
 \section{Additional Hydrodynamics Details}
 \label{sec:appendix-additional-hydro}
 \subsection{Spar Coefficients}
-As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides MEEM.
-We approximate the spar added mass coefficient $A_s$ as a frequency-independent quantity using a formula that \citet{philip_damping_2012} proposes based on the displaced water volume in the spherical projection of the damping plate:
+As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides \gls{acr-meem}.
+We approximate the spar added mass coefficient $\gls{sym-A-s}$ as a frequency-independent quantity using a formula that \citet{philip_damping_2012} proposes based on the displaced water volume in the spherical projection of the damping plate:
 \begin{equation}\label{eq:As}
- A_s =\frac{1}{3}\rho_w D_d^3\left(1 - \frac{3}{4}r^2\sqrt{1-r^2} - \frac{1}{4}(1-\sqrt{1-r^2})^2(2+\sqrt{1-r^2})\right),
+ \gls{sym-A-s} =\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3\left(1 - \frac{3}{4}\gls{sym-r}^2\sqrt{1-\gls{sym-r}^2} - \frac{1}{4}(1-\sqrt{1-\gls{sym-r}^2})^2(2+\sqrt{1-\gls{sym-r}^2})\right),
 \end{equation}
-where $r = D_s/D_d$.
-This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\rho_w D_d^3$ at $r=0$) to a pure column limit ($\frac{1}{6}\rho_w D_d^3$ at $r=1$).
+where $\gls{sym-r} = \gls{sym-D-s}/\gls{sym-D-d}$.
+This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3$ at $\gls{sym-r}=0$) to a pure column limit ($\frac{1}{6}\gls{sym-rho-w} \gls{sym-D-d}^3$ at $\gls{sym-r}=1$).
 \ifdefined\DISSERTATION
     The trend is shown in \figureautorefname~\ref{fig:spar_added_mass}.
     \begin{figure}
@@ -20,17 +20,17 @@ This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\rho_w
     \end{figure}
 \fi
 
-The other spar coefficients are calculated by fitting and interpolating data from WAMIT for the nominal design, then adjusting for known dimensional scalings based on differences from the nominal design.
-To derive the dimensional scalings, we use the numerical results that \citet{olaya_hydrodynamic_2015} present for a variant of MEEM that incorporates the damping plate.
+The other spar coefficients are calculated by fitting and interpolating data from \gls{acr-wamit} for the nominal design, then adjusting for known dimensional scalings based on differences from the nominal design.
+To derive the dimensional scalings, we use the numerical results that \citet{olaya_hydrodynamic_2015} present for a variant of \gls{acr-meem} that incorporates the damping plate.
 By plotting the data for a variety of geometries on a single plot and scaling the axes by dimensionless geometric ratios until the points begin to overlap as a single trend,
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
-|\gamma_s| = \rho g \pi D_s^2/4 |H_0(kR_x)| \exp(-k e_1) kh \alpha \max(1,\alpha) 
-\sqrt{\frac{\Upsilon\left(\frac{kh R_x \alpha^3}{\beta R_p}\right)}
-           {\beta\left(1+\frac{\beta}{\alpha}\right)}}
+|\gls{sym-gamma-s}| = \gls{sym-rho-w} \gls{sym-g} \gls{sym-pi} \gls{sym-D-s}^2/4 |\gls{sym-mathrm-H-0-1}(\gls{sym-k-wavenumber}\gls{sym-R-x})| \exp(-\gls{sym-k-wavenumber} \gls{sym-e-1}) \gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-alpha} \max(1,\gls{sym-alpha})
+\sqrt{\frac{\gls{sym-Upsilon}\left(\frac{\gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-R-x} \gls{sym-alpha}^3}{\gls{sym-beta-olaya} \gls{sym-R-p}}\right)}
+           {\gls{sym-beta-olaya}\left(1+\frac{\gls{sym-beta-olaya}}{\gls{sym-alpha}}\right)}}
 \end{equation}
-where $\Upsilon(\cdot)$ indicates a nonlinear relationship to be interpolated from data, and $\alpha$, $\beta$,  $e_1$, $R_p$, and $R_x$ are dimensions and nondimensional ratios defined in \citet{olaya_hydrodynamic_2015}.
-\Cref{fig:olaya-hydro-data} shows this nonlinear relationship, which has collapsed remarkably well for the variety of $\alpha$ and $\beta$ values.
+where $\gls{sym-Upsilon}(\cdot)$ indicates a nonlinear relationship to be interpolated from data, and $\gls{sym-alpha}$, $\gls{sym-beta-olaya}$,  $\gls{sym-e-1}$, $\gls{sym-R-p}$, and $\gls{sym-R-x}$ are dimensions and nondimensional ratios defined in \citet{olaya_hydrodynamic_2015}.
+\Cref{fig:olaya-hydro-data} shows this nonlinear relationship, which has collapsed remarkably well for the variety of $\gls{sym-alpha}$ and $\gls{sym-beta-olaya}$ values.
 Case numbers in the legend refer to the numerical parameters used by \citet[Section~V.]{olaya_hydrodynamic_2015}
 \begin{figure}[htbp]
 \centering
@@ -44,24 +44,24 @@ The dip at mid frequencies shows the excitation and damping coefficients experie
 Computing the float coefficients in a different way than the spar and coupling coefficients introduces the possibility of violating physical requirements of the solution.
 In particular, the damping matrix must be positive definite because it represents a dissipative force where outgoing waves remove energy from the system, and the added mass matrix must be positive definite because it represents the kinetic energy of the fluid which must be non-negative.
 \begin{equation}\label{eq:open-loop-stabilty}
-    \det(\mathbf{A}_{h,op})=A_f A_s - A_c^2>0 \,, \quad
-    \det(\mathbf{B}_{h,op})=B_f B_s - B_c^2>0
+    \det(\gls{sym-mathbf-A-h-op})=\gls{sym-A-f} \gls{sym-A-s} - \gls{sym-A-c}^2>0 \,, \quad
+    \det(\gls{sym-mathbf-B-h-op})=\gls{sym-B-f} \gls{sym-B-s} - \gls{sym-B-c}^2>0
 \end{equation}
 This positive-definiteness may be violated for certain combinations of coefficients and can cause the system dynamics to become unstable.
 Even when other forces such as body inertia, drag, friction, and control stabilize the system, violation of the conditions of \Cref{eq:open-loop-stabilty} can artificially inflate power production.
 These conditions must be checked for each sea state and the coefficients adjusted if needed.
-MDOcean chooses to decrease the magnitude of the coupling coefficients $|A_c|$ and $|B_c|$ if a violation occurs because the coupling coefficients are hypothesized to correlate less strongly than the float and spar coefficients with the float and spar dimensions respectively.
+MDOcean chooses to decrease the magnitude of the coupling coefficients $|\gls{sym-A-c}|$ and $|\gls{sym-B-c}|$ if a violation occurs because the coupling coefficients are hypothesized to correlate less strongly than the float and spar coefficients with the float and spar dimensions respectively.
 This intends to lower the likelihood of creating saturation behavior (where a dimension can be perturbed without influencing power production) that could interfere with a gradient-based optimization routine.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Dynamics and Control Module Details}
+\section{\gls{acr-dyn} and \gls{acr-ctl} Module Details}
 This section provides supplementary derivations and implementation details for the dynamics and control module.
 
 \subsection{Multiport Model Details}
 \input{sections/multiport-appendix}
 
-\subsection{Optimal Control Details}
+\subsection{\gls{acr-oc} Details}
 \input{sections/optimal-control-appendix}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,7 +81,7 @@ This section provides supplementary derivations and implementation details for t
 \Cref{eq:peak-fluid-force} approximates the peak fluid force by the magnitude of its fundamental harmonic phasor.
 This approximation can either under- or overestimate the true peak depending on whether the higher-harmonic content (primarily from the drag describing function) interferes constructively or destructively with the fundamental.
 
-The fundamental amplitudes are also used for the peak float and spar displacements $\max_t|\xi_f(t)|$ and $\max_t|\xi_s(t)|$ in both load cases.
+The fundamental amplitudes are also used for the peak float and spar displacements $\max_{\gls{sym-t}}|\gls{sym-xi-f}(\gls{sym-t})|$ and $\max_{\gls{sym-t}}|\gls{sym-xi-s}(\gls{sym-t})|$ in both load cases.
 The fundamental is more accurate for displacements than for forces because the second-order plant dynamics filter out high-frequency inputs, attenuating drag-induced harmonics in the displacement response.
 
 A future refinement could explicitly reconstruct the time-domain drag force from the describing function and track its peak directly, at the cost of either time-domain integration or additional Fourier-component bookkeeping in the frequency-domain formulation.
@@ -91,39 +91,39 @@ A future refinement could explicitly reconstruct the time-domain drag force from
 \subsection{Dynamic Validation}
 \label{sec:appendix-dynamic-validation}
 
-\subsubsection{WEC-Sim}
-The drag describing function and MEEM hydrodynamic coefficients have a minor effect assuming a 1-DOF system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-DOF system (38.2\% and 28.6\% respectively).
-Meanwhile, the error is extremely low in the 2-DOF system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
-This indicates that the larger error in the 2-DOF-drag-MEEM case is not an error in the 2-DOF dynamic model itself, but in the way that a 2-DOF model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each DOF.
+\subsubsection{\gls{acr-wec}-Sim}
+The drag describing function and \gls{acr-meem} hydrodynamic coefficients have a minor effect assuming a 1-\gls{acr-dof} system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-\gls{acr-dof} system (38.2\% and 28.6\% respectively).
+Meanwhile, the error is extremely low in the 2-\gls{acr-dof} system enforcing the same hydrodynamic coefficients as \gls{acr-wec}-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
+This indicates that the larger error in the 2-\gls{acr-dof}-drag-\gls{acr-meem} case is not an error in the 2-\gls{acr-dof} dynamic model itself, but in the way that a 2-\gls{acr-dof} model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each \gls{acr-dof}.
 The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
 
-A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim RM3 tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
-For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
+A \gls{acr-wec}-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the \gls{acr-wec}-Sim \gls{acr-rm3} tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+For consistency, MDOcean also uses this alternate geometry for \gls{acr-wec}-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
-%\Cref{tab:dynamic-validation} and 
+%\Cref{tab:dynamic-validation} and
 \Cref{fig:dynamic-validation} compares the results.
-The $C_d=0$ simulation with identical hydrodynamic coefficients (top left of \Cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions. 
+The $\gls{sym-C-d}=0$ simulation with identical hydrodynamic coefficients (top left of \Cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions.
 The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
-This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of \gls{acr-wec}-Sim's numerical integration and post-processing.
 For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
-An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $T>12 s$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
-Turning on drag ($C_d=1$, top right of \Cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
+An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $\gls{sym-T-period}>12 \gls{sym-s}$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+Turning on drag ($\gls{sym-C-d}=1$, top right of \Cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
 While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
 
-Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's MEEM hydrodynamic coefficients on its dynamic power production.
-The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the MEEM hydro coefficients has minimal effect on the overall dynamic response.
+Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's \gls{acr-meem} hydrodynamic coefficients on its dynamic power production.
+The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the \gls{acr-meem} hydro coefficients has minimal effect on the overall dynamic response.
 Finally, the bottom right corner of \Cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
-Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+\gls{acr-pwr} is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
 This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \Cref{sec:dynamic-validation}.
 Meanwhile, MDOcean underpredicts the peak power by around 25\%.
 Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
 
 % \begin{table}[htbp]
 %     \centering
-%     \begin{tabular}{|c|c|c|} \hline 
-%          Power Percent Error: Average, Maximum&  $C_d=0$& $C_d=1$\\ \hline 
-%          WAMIT&  1.90\%, 1.96\%& 5.21\%, -70\%\\ \hline 
+%     \begin{tabular}{|c|c|c|} \hline
+%          Power Percent Error: Average, Maximum&  $\gls{sym-C-d}=0$& $\gls{sym-C-d}=1$\\ \hline
+%          WAMIT&  1.90\%, 1.96\%& 5.21\%, -70\%\\ \hline
 %          MEEM&  -6.30\%, -14\%& -2.79\%, -80\%\\ \hline
 %     \end{tabular}
 %     \caption{Dynamic validation showing error in a variety of modeling assumptions}
@@ -135,12 +135,12 @@ Error scales more closely with wave period than wave height for periods under 12
 \centering
 \begin{tabular}{c m{1em} | M{.47\linewidth} | M{.47\linewidth} }
   && \multicolumn{2}{c}{Drag Coefficient}\\
-         && $C_d=0$& $C_d=1$\\ \hline
-    \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}& 
-    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf} 
+         && $\gls{sym-C-d}=0$& $\gls{sym-C-d}=1$\\ \hline
+    \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}&
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf}
   & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf}
-\\ &\rot{Different} & 
-    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf} 
+\\ &\rot{Different} &
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf}
   & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf} \\
 \end{tabular}
 \caption{Dynamic validation showing error in unsaturated mechanical power generation for a variety of modeling assumptions}
@@ -152,7 +152,7 @@ Error scales more closely with wave period than wave height for periods under 12
 
 Besides mechanical power, a variety of other signals including amplitudes, phases, and forces are compared between the models.
 While most signals show good agreement between the models, interestingly, large errors are observed in the drag forces, although these errors do not cause significant deviations in the overall system response.
-\Cref{fig:drag-validation} compares the drag force on the float and spar in each model using identical hydro coefficients and $C_d=1$.
+\Cref{fig:drag-validation} compares the drag force on the float and spar in each model using identical hydro coefficients and $\gls{sym-C-d}=1$.
 
 \begin{landscape}
 \begingroup
@@ -161,11 +161,11 @@ While most signals show good agreement between the models, interestingly, large 
 \begin{tabular}{c m{1em} | M{.47\linewidth} | M{.47\linewidth} }
   && \multicolumn{2}{c}{Drag Force}\\
          && Magnitude& Phase\\ \hline
-    \multirow{2}{*}[-3em]{\rot{Body}} &\rot{Float}& 
-    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf} 
+    \multirow{2}{*}[-3em]{\rot{Body}} &\rot{Float}&
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf}
   & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf}
-\\ &\rot{Spar} & 
-    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf} 
+\\ &\rot{Spar} &
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf}
   & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf} \\
 \end{tabular}
 \caption{Drag force comparison showing large errors in drag force, despite low errors in amplitude and power}
@@ -176,177 +176,196 @@ While most signals show good agreement between the models, interestingly, large 
 \end{landscape}
 The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worse at mid-range frequencies.
 Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
-The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
+The \gls{acr-wec}-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
 
 We also validate the describing function approximation for the drag force.
-The general application of the describing function technique requires that the fundamental frequency $\omega$ contains the vast majority of the energy, resulting in body displacements of the form $\xi(t) \sim \cos(\omega t+\phi)$.
-\Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $C_d=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
+The general application of the describing function technique requires that the fundamental frequency $\gls{sym-omega}$ contains the vast majority of the energy, resulting in body displacements of the form $\gls{sym-xi}(\gls{sym-t}) \sim \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
+\Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $\gls{sym-C-d}=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
 This confirms that higher harmonics have a negligible impact on the system and that the describing function method is a valid approach for modeling drag in this context.
-The particular describing function relation used for drag assumes that the drag force has the form $F_d(t) \sim |\cos(\omega t+\phi)|\cos(\omega t+\phi)$.
-\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresponding to the four corners of the JPD.
+The particular describing function relation used for drag assumes that the drag force has the form
+$\gls{sym-F-d-t} \sim |\cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})|
+                       \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
+\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresponding to the four corners of the \gls{acr-jpd}.
 The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/position_THD_contour.pdf}]{figs/from-matlab/position_THD_contour.pdf}
-    \caption{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
+    \caption{Total Harmonic Distortion of Float Displacement in \gls{acr-wec}-Sim Simulations with Drag}
     \label{fig:wecsim-thd}
 \end{figure}
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_force_desc_fcn.pdf}]{figs/from-matlab/drag_force_desc_fcn.pdf}
-    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
+    \caption{Comparison of Assumed and Actual Drag Force Signal \gls{acr-shp}}
     \label{fig:wecsim-drag-waveform}
 \end{figure}
 
 \subsubsection{Reference Model Report}
-While the original reference model report \citep{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients, 
+While the original reference model report \citep{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients,
 it does record the mechanical power for each sea state.
-\Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
+\Cref{fig:report-power-validation} compares these values against those predicted by \gls{acr-wec}-Sim and MDOcean.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
-    \caption{Comparison of mechanical power for RM3 report \cite{RM3} and MDOcean}
+    \caption{Comparison of mechanical power for \gls{acr-rm3} report \cite{RM3} and MDOcean}
     \label{fig:report-power-validation}
 \end{figure}
-Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
+Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided \gls{acr-wec}-Sim hydrodynamic coefficients,
 and that the power multiplier mentioned in \Cref{sec:dynamic-validation} has not been applied in the figure.
 We observe a rather poor match, with MDOcean underestimating power in the low-period sea states and overestimating in the high-period sea states.
 The discrepancy is of minimal concern for the reasons described in \Cref{sec:dynamic-validation}.
 Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Power Matrix Decomposition}
+\subsection{\gls{acr-pwr} Matrix Decomposition}
 \label{sec:appendix-power-decomposition}
 
 The efficiency matrices introduced in \Cref{eq:power-matrix-decomposition} are defined as follows.
-The wave power density $\mathbf{J}^{H,T}_{wave}$ and maximum capture width  $\mathbf{CW}^{H,T}_{max}$ are independent of design:
+The wave power density $\gls{sym-mathbf-J-H-T-wave}$ and maximum capture width  $\gls{sym-mathbf-CW-H-T-max}$ are independent of design:
 \begin{equation}
-\mathbf{J}^{H,T}_{wave} = \frac{\rho_w g^2}{64\pi} T_e H_s^2, \qquad
-\mathbf{CW}^{H,T}_{max} = \frac{g T_e^2}{4\pi^2}.
+\mathbf{J}^{H,T}_{wave} = \frac{\gls{sym-rho-w} \gls{sym-g}^2}{64\gls{sym-pi}} \gls{sym-T-e} \gls{sym-H-s}^2, \qquad
+\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max} = \frac{\gls{sym-g} \gls{sym-T-e}^2}{4\gls{sym-pi}^2}.
 \end{equation}
-The maximum capture width matrix represents the radiation limit determined by the WEC mode of motion
+The maximum capture width matrix represents the radiation limit determined by the \gls{acr-wec} mode of motion
 (heave in this case; for surge or pitch the value would be doubled due to the asymmetry of the outgoing wave field).
 
-The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{P}_{F\dot{X},\text{no drag}}$ (computed with $C_{d,f}=C_{d,s}=0$, ideal PTO):
+The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$ (computed with $\gls{sym-C-d-f}=\gls{sym-C-d-s}=0$, ideal \gls{acr-pto}):
 \begin{equation}
-\mathbf{\eta}^{H,T}_{rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}}, \qquad
-\mathbf{\eta}^{H,T}_{drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
+\gls{sym-boldsymbol-eta-H-T-rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}}, \qquad
+\gls{sym-boldsymbol-eta-H-T-drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
 \end{equation}
-$\mathbf{\eta}^{H,T}_{\text{drag}}$ may exceed 1 at frequencies where the drag-free system is so undamped that the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability; in such cases a sub-optimal controller is substituted, which lowers $\mathbf{P}_{F\dot{X},\text{no drag}}$ (the denominator) rather than raising the numerator.
-In cases where the unconstrained controller is stable, $\mathbf{\eta}^{H,T}_{\text{drag}} \leq 1$ is guaranteed.
+$\gls{sym-boldsymbol-eta-H-T-drag}$ may exceed 1 at frequencies where the drag-free system is so undamped that
+the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability;
+in such cases a sub-optimal controller is substituted, which lowers
+$\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$
+(the denominator) rather than raising the numerator.
+In cases where the unconstrained controller is stable,
+$\gls{sym-boldsymbol-eta-H-T-drag} \leq 1$ is guaranteed.
 
 The product of the first four matrices is the theoretical ideal mechanical power:
 \begin{equation}
-    \mathbf{P}^{H,T}_{F\dot{X},\text{ideal}} = \mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{H,T}_{max}\,\mathbf{\eta}^{H,T}_{rad}\,\mathbf{\eta}^{H,T}_{drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\mathbf{Z}^{H,T}_{i,th})}.
+    \mathbf{P}^{H,T}_{F\dot{X},\text{ideal}} = \mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}\,\gls{sym-boldsymbol-eta-H-T-rad}\,\gls{sym-boldsymbol-eta-H-T-drag} = \frac{|\mathbf{\hat{F}}^{H,T}_{th}|^2}{8\Re(\gls{sym-mathbf-Z-H-T-i-th})}.
 \end{equation}
-The remaining two efficiency matrices capture the loss to dynamic constraints and to PTO electrical inefficiency:
+The remaining two efficiency matrices capture the loss to dynamic constraints and to \gls{acr-pto} electrical inefficiency:
 \begin{equation}
-    \mathbf{\eta}^{H,T}_{limits} = \frac{\mathbf{P}^{H,T}_{F\dot{X}}}{\mathbf{P}^{H,T}_{F\dot{X},\text{ideal}}}, \qquad
-    \mathbf{\eta}^{H,T}_{elec} = \eta \frac{\mathbf{P}^{H,T}_{IV}}{\mathbf{P}^{H,T}_{F\dot{X}}}.
+    \gls{sym-boldsymbol-eta-H-T-limits} = \frac{\gls{sym-mathbf-P-H-T-F-dot-X}}{\mathbf{P}^{H,T}_{F\dot{X},\text{ideal}}}, \qquad
+    \gls{sym-boldsymbol-eta-H-T-elec} = \gls{sym-eta} \frac{\mathbf{P}^{H,T}_{IV}}{\gls{sym-mathbf-P-H-T-F-dot-X}}.
 \end{equation}
 
-Although it would be possible to formulate alternative variants such as $\mathbf{\eta}^{H,T}_{\text{drag},\text{var}} = \mathbf{P}_{IV}/\mathbf{P}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
+Although it would be possible to formulate alternative variants such as $\gls{sym-boldsymbol-eta-H-T}_{\text{drag},\text{var}} = \gls{sym-mathbf-P-IV}/\mathbf{\gls{sym-P}}_{IV,\text{no drag}}$ that capture the full effect of drag on the saturated system, such matrices would represent independent sensitivities and could not be multiplied together to recover the overall power matrix.
 The current decomposition preserves multiplicativity, which is the key advantage of the formulation in \Cref{eq:power-matrix-decomposition}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Economics Module Details}
+\section{\gls{acr-econ} Module Details}
 \label{sec:appendix-econ}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{RM3 Cost Breakdown Structure}
+\subsection{\gls{acr-rm3} \gls{acr-cbs}}
 \label{sec:appendix-econ-cbs}
 
-The MDOcean economic model is calibrated against the RM3 Cost Breakdown Structure (CBS) of \citet{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
-Percentages are shown for both single-device ($N_{WEC}=1$) and array ($N_{WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \Cref{eq:cost-power-law}.
+The MDOcean economic model is calibrated against the \gls{acr-rm3} \gls{acr-cbs} of \citet{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
+Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\gls{sym-N-WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \Cref{eq:cost-power-law}.
 
 \begin{table}[htbp]
     \centering
 
-    \caption{Cost Breakdown Structure}
+    \caption{\gls{acr-cbs}}
     \label{tab:CBS}
     \expanded{
         \noexpand\tabular{\TableColumnSpecs{aor:cbs}}
     }
-         CBS Category&  Nominal \% for $N_{WEC}=1$& Nominal \% for $N_{WEC}=100$&Scales with design?\\\hline
+         \gls{acr-cbs} Category&  Nominal \% for $\gls{sym-N-WEC}=1$& Nominal \% for $\gls{sym-N-WEC}=100$&Scales with design?\\\hline
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
-         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
-         1.4 - Structural&  17\%&  46\%&$V_{\text{struct}}$\\
-         1.5 - Power Take Off&  4\%&  11\%&$F_{\text{max}}, P_{pk,\text{elec}}$\\
+         1.3 - \gls{acr-moor}/Foundation&  3\%&  12\%&No\\
+         1.4 - Structural&  17\%&  46\%&$\gls{sym-V}_{\text{struct}}$\\
+         1.5 - \gls{acr-pwr} Take Off&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
          1.7 - Installation&  34\%&  10\%&No\\
          1.8 - Decommissioning&  9\%&  9\%&No\\
          1.9 - Contingency&  9\%&  9\%&No\\
- \textbf{Total 1.1-1.9 (CAPEX)}& 93.3\%& 97.6\%&-\\\hline
+ \textbf{Total 1.1-1.9 (\gls{acr-capex})}& 93.3\%& 97.6\%&-\\\hline
  2.1 - Insurance& 1.3\%& 0.4\%&No\\
  2.2 - Environmental/Regulatory& 4.1\%& 0.3\%&No\\
  2.3 - Marine Operations& 0.2\%& 0.3\%&No\\
  2.4 - Shoreside Operations& 0.8\%& 0.2\%&No\\
  2.5 - Replacement Parts& 0.3\%& 1.0\%&No\\
  2.6 - Consumables& $<$0.1\%& 0.2\%&No\\
- \textbf{Total 2.1-2.6 (OPEX)}& 6.7\%& 2.4\%&-\\
+ \textbf{Total 2.1-2.6 (\gls{acr-opex})}& 6.7\%& 2.4\%&-\\
     \endtabular
     \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Power-Law Scaling with Number of Devices}
+\subsection{\gls{acr-pwr}-Law Scaling with Number of Devices}
 \label{sec:appendix-econ-power-law}
 
-The per-WEC unit costs and prices in \Cref{eq:unit-cost} ($C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $p_{P}$, $p_{F}$, $p_{s}$) each decrease with the number of devices $N_{WEC}$ according to
+The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
+($\gls{sym-C}_{\text{fixed}}$,
+ $\gls{sym-C}_{pto,\text{constant}}$, 
+ $\gls{sym-p}_{\gls{sym-P}}$,
+ $\gls{sym-p}_{\gls{sym-F}}$,
+ $\gls{sym-p}_{\gls{sym-s}}$)
+each decrease with the number of devices $\gls{sym-N-WEC}$ according to
 \begin{equation}\label{eq:cost-power-law}
-    C = C_\infty+( C_1-C_\infty) \cdot (N_{WEC})^{-\beta},
+    \gls{sym-C} = \gls{sym-C-infty}+ (\gls{sym-C-1} - \gls{sym-C-infty})
+                    \cdot (\gls{sym-N-WEC})^{-\gls{sym-beta-expo}},
 \end{equation}
-where $C_\infty$ is the asymptotic large-scale unit cost, $C_1$ is the single-unit cost, and $\beta$ is the rate of decrease.
+where $\gls{sym-C-infty}$ is the asymptotic large-scale unit cost,
+$\gls{sym-C-1}$ is the single-unit cost,
+and $\gls{sym-beta-expo}$ is the rate of decrease.
 
-The values of $C_\infty$, $C_1$, and $\beta$ for each CBS category were obtained by curve-fitting \Cref{eq:cost-power-law} to the CBS estimates for $N_{WEC} \in \{1, 10, 50, 100\}$ \citep{neary_reference_2014}, and are tabulated in \Cref{tab:econ-model-values}.
+The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta-expo}$ for each \gls{acr-cbs} category
+were obtained by curve-fitting \Cref{eq:cost-power-law} to the \gls{acr-cbs} estimates
+for $\gls{sym-N-WEC} \in \{1, 10, 50, 100\}$ \citep{neary_reference_2014},
+and are tabulated in \Cref{tab:econ-model-values}.
 
 \begin{table}[h]
     \centering
-    \caption{Cost model values for each CBS category}
+    \caption{Cost model values for each \gls{acr-cbs} category}
     \label{tab:econ-model-values}
     \expanded{
         \noexpand\tabular{\TableColumnSpecs{aor:econ-model-values}}
     }
-         CBS Category& Expo. $\beta$&Unit cost at scale $C_{\infty}$&Single-unit cost \newline $C_1$\\\hline
-         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. CAPEX& 0.741& 1.24 \$M&13.92 \$M\\
-         \textbf{1.4} - Structural CAPEX & 0.481& 2.387 \$/kg&4.294 \$/kg\\
-         \textbf{1.5} - Power Take Off CAPEX& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N&Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
- \textbf{2.1-2.6} - OPEX&0.557& 0&1.193 \$M\\
+         \gls{acr-cbs} Category& Expo. $\gls{sym-beta-expo}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
+         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. \gls{acr-capex}& 0.741& 1.24 \$M &13.92 \$M\\
+         \textbf{1.4} - Structural \gls{acr-capex} & 0.481& 2.387 \$/kg&4.294 \$/kg\\
+         \textbf{1.5} - \gls{acr-pwr} Take Off \gls{acr-capex}& 0.206& Constant: 92.59 \$k \gls{acr-pwr}: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k \gls{acr-pwr}: 1.355 \$/W Force: 0.0204 \$/N\\
+ \textbf{2.1-2.6} - \gls{acr-opex}&0.557& 0&1.193 \$M\\
     \endtabular
     \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Linear PTO Cost Scaling}
+\subsection{Linear \gls{acr-pto} Cost Scaling}
 \label{sec:appendix-econ-pto-scaling}
 
-Linear PTO cost scaling is common for WEC techno-economic analysis.
-The RM3 cost numbers \citep{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic PTO (except for the riser cable and control system, whose cost does not scale with power).
-The NREL System Advisory Model assumes that hydraulic PTO cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \citep{nakhai_techno-economic_2022}.
+Linear \gls{acr-pto} cost scaling is common for \gls{acr-wec} techno-economic analysis.
+The \gls{acr-rm3} cost numbers \citep{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic \gls{acr-pto} (except for the riser cable and control system, whose cost does not scale with power).
+The \gls{acr-nrel} System Advisory Model assumes that hydraulic \gls{acr-pto} cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \citep{nakhai_techno-economic_2022}.
 %the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
 % \begin{equation}
-%     C_{gen} = \begin{cases}
-%     80.86 \tau + 1032, & 0~\leq\tau <47~\text{Nm, ~~~~induction generator} \\
-%     9.151 \tau + 4386, & 47\leq\tau \leq 4000~\text{Nm, permanent magnet generator}
+%     \gls{sym-C}_{gen} = \begin{cases}
+%     80.86 \gls{sym-tau} + 1032, & 0~\leq\gls{sym-tau} <47~\text{Nm, ~~~~induction generator} \\
+%     9.151 \gls{sym-tau} + 4386, & 47\leq\gls{sym-tau} \leq 4000~\text{Nm, permanent magnet generator}
 %     \end{cases}
 % \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Economic Validation}
 \label{sec:appendix-econ-validation}
-\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (CAPEX, OPEX, and LCOE) against the number of WECs in the farm, comparing MDOcean results against the \citet{RM3} reference values.
+\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (\gls{acr-capex}, \gls{acr-opex}, and \gls{acr-lcoe}) against the number of \glspl{acr-wec} in the farm, comparing MDOcean results against the \citet{RM3} reference values.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/cost_vs_N_WEC.pdf}]{figs/from-matlab/cost_vs_N_WEC.pdf}
-    \caption{Validation for cost scaling with number of WECs}
+    \caption{Validation for cost scaling with number of \glspl{acr-wec}}
     \label{fig:econ-nwec-validate}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Structures Module Details}
+\section{\gls{acr-str} Module Details}
 \label{sec:appendix-structures}
 Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
 It outputs a factor of safety for each limit case.
@@ -369,53 +388,53 @@ To analyze these compound sections, equivalent properties can be established tha
     \label{fig:stiffened-plate}
 \end{figure}
 
-Specifically, the equivalent thickness of the plate $t_{eq}$ is derived by equating the stiffened section's second moment of area per unit width with that of a uniform section:
+Specifically, the equivalent thickness of the plate $\gls{sym-t-eq}$ is derived by equating the stiffened section'\gls{sym-s} second moment of area per unit width with that of a uniform section:
 \begin{equation}
-    \int z^2dz = \frac{t_{eq}^3}{12}
+    \int \gls{sym-z}^2dz = \frac{\gls{sym-t-eq}^3}{12}
 \end{equation}
-Next, deflection of the stiffened plate is equal to the deflection of the equivalent unstiffened plate with flexural rigidity $D_{eq}$:
+Next, deflection of the stiffened plate is equal to the deflection of the equivalent unstiffened plate with flexural rigidity $\gls{sym-D-eq}$:
 \begin{equation}
-    D_{eq} = \frac{E~  t_{eq}^3}{12(1-\nu^2)}
+    \gls{sym-D-eq} = \frac{\gls{sym-E}~  \gls{sym-t-eq}^3}{12(1-\gls{sym-nu-poisson}^2)}
 \end{equation}
 
-The maximum stress $\sigma$ of the stiffened plate is then:
+The maximum stress $\gls{sym-sigma}$ of the stiffened plate is then:
 \begin{equation}\label{eq:plate-stress}
-    \sigma= 12M z_{\text{max}}/t_{eq}^3
+    \gls{sym-sigma}= 12\gls{sym-M} \gls{sym-z}_{\text{max}}/\gls{sym-t-eq}^3
 \end{equation}
-where $M$ is the maximum moment per unit length and $z_{\text{max}}$ is the maximum distance from the neutral axis of the stiffened section.
-This parallels the stress for an unstiffened plate of thickness $t$, which is $\sigma=6M/t^2 = 12 M(t/2)/t^3$.
+where $\gls{sym-M}$ is the maximum moment per unit length and $z_{\text{max}}$ is the maximum distance from the neutral axis of the stiffened section.
+This parallels the stress for an unstiffened plate of thickness $\gls{sym-t}$, which is $\gls{sym-sigma}=6\gls{sym-M}/\gls{sym-t}^2 = 12 \gls{sym-M}(\gls{sym-t}/2)/\gls{sym-t}^3$.
 
 Note that this equivalent-thickness method of accounting for stiffeners assumes that as a whole, the stiffener-plate system deflects like a single plate element, rather than as a set of multiple plate elements separated by stiffeners.
 This is a reasonable assumption when the stiffeners are small and densely spaced with respect to the plate, but breaks down if the stiffeners come to dominate the system.
-The so-called effective breadth ratio $\rho$ is used to quantify the validity of this assumption, where the equivalent-thickness method requires $\rho=1$:
+The so-called effective breadth ratio $\gls{sym-rho}$ is used to quantify the validity of this assumption, where the equivalent-thickness method requires $\gls{sym-rho}=1$:
 \begin{equation}
-   \rho = \rho_\lambda \rho_\psi
-\quad 
-\rho_\lambda = \begin{cases}
-        1, & \lambda\leq 0.673 \\
-        \frac{1-0.22/\lambda}{\lambda}, & \lambda > 0.673
+   \gls{sym-rho} = \gls{sym-rho-lambda} \gls{sym-rho-psi}
+\quad
+\gls{sym-rho-lambda} = \begin{cases}
+        1, & \gls{sym-lambda}\leq 0.673 \\
+        \frac{1-0.22/\gls{sym-lambda}}{\gls{sym-lambda}}, & \gls{sym-lambda} > 0.673
     \end{cases} \quad
-    \rho_\psi = \begin{cases}
-        1, & \psi> -0.236 \\
-        \frac{1}{2}+\frac{1}{3-\psi}, & \psi \leq -0.236
-    \end{cases} 
+    \gls{sym-rho-psi} = \begin{cases}
+        1, & \gls{sym-psi}> -0.236 \\
+        \frac{1}{2}+\frac{1}{3-\gls{sym-psi}}, & \gls{sym-psi} \leq -0.236
+    \end{cases}
 \end{equation}
-The effective breadth ratio depends on the slenderness factor $\lambda$ and load distribution factor $\psi$, found as follows:
+The effective breadth ratio depends on the slenderness factor $\gls{sym-lambda}$ and load distribution factor $\gls{sym-psi}$, found as follows:
 \begin{equation}
 \begin{aligned}
-    \lambda &= \frac{1.052}{\sqrt{k_{\text{buckle}}}} \frac{w}{t} \sqrt{\frac{f_1}{E}} \\
-    \psi&=\frac{f_2}{f_1}
+    \gls{sym-lambda} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-thick}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
+    \gls{sym-psi}&=\frac{\gls{sym-f-2}}{\gls{sym-f-1}}
     \end{aligned}
 \end{equation}
-with $t$ referring to the plate unstiffened thickness, $w$ as the distance between stiffeners, $f_1$ as the maximum compression stress along the width, and $f_2$ as the maximum tension stress along the width (or minimum compression stress, if there is no tension).
-By convention, compression stress is positive and tension is negative, so $\psi$ ranges from $-\infty$ to $+1$.
-The plate buckling coefficient $k_{\text{buckle}}$ is expressed as:
+with $\gls{sym-t}$ referring to the plate unstiffened thickness, $\gls{sym-w}$ as the distance between stiffeners, $\gls{sym-f-1}$ as the maximum compression stress along the width, and $\gls{sym-f-2}$ as the maximum tension stress along the width (or minimum compression stress, if there is no tension).
+By convention, compression stress is positive and tension is negative, so $\gls{sym-psi}$ ranges from $-\infty$ to $+1$.
+The plate buckling coefficient $\gls{sym-k-buckle}$ is expressed as:
 \begin{equation}\label{eq:k-buckle}
-  k_{\text{buckle}} = 4+2\left(1-\psi\right)^3+2\left(1-\psi\right)
+  \gls{sym-k-buckle} = 4+2\left(1-\gls{sym-psi}\right)^3+2\left(1-\gls{sym-psi}\right)
 \end{equation}
 This effective breadth procedure follows the American Iron and Steel Institute design manual \citep{american_iron_and_steel_institute_cold-formed_1991}.
-Rather than enforcing $\lambda<0.673$, corresponding with $\rho_\lambda=1$, MDOcean more flexibly requires $\lambda<0.809$, corresponding to $\rho_\lambda=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
-MDOcean also uses $k_{\text{buckle}}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\lambda$.
+Rather than enforcing $\gls{sym-lambda}<0.673$, corresponding with $\gls{sym-rho-lambda}=1$, MDOcean more flexibly requires $\gls{sym-lambda}<0.809$, corresponding to $\gls{sym-rho-lambda}=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
+MDOcean also uses $\gls{sym-k-buckle}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\gls{sym-lambda}$.
 
 Broadening the design space to allow for more dominant stiffeners with higher slenderness factors would require modeling the stiffener-plate system not as a plate with the stiffeners absorbed into an equivalent thickness, but as individual stiffeners with the plate absorbed into the effective breadth.
 That model has other complexities such as the shear lag phenomenon so is left to future extensions \citep{wierzbicki_lecture_2013,american_iron_and_steel_institute_cold-formed_1991}.
@@ -430,13 +449,23 @@ All edges are welded.
 Rather than model the deflections of each edge and apply compatibility, for simplicity the edges of each plate are conservatively modeled as fixed.
 The top and bottom plates are the only ones with external heave loads, arising from the float-spar tubular connection and the hydrodynamic pressure respectively.
 
-The trapezoidal plates are isosceles trapezoids with smaller base $b_1 = \pi D_{f,in}/12$, larger base $b_2=\pi D_f/12$, and perpendicular height $h_0=(D_f-D_{f,in})/2$ (see \Cref{fig:trapezoid}).
+The trapezoidal plates are isosceles trapezoids with smaller base $\gls{sym-b-1} = \gls{sym-pi} \gls{sym-D-f-in}/12$,
+larger base $\gls{sym-b-2}=\gls{sym-pi} \gls{sym-D-f}/12$,
+and perpendicular height $\gls{sym-h-0}=(\gls{sym-D-f}-\gls{sym-D-f-in})/2$ (see \Cref{fig:trapezoid}).
 The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
 For example, \citet{young_roarks_2001} compile models for rectangular plates under perpendicular loading.
-They show that the maximum bending stress $\sigma$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
-This makes sense because for fixed-edge plates with distributed loads, it is the square of the minimum distance from an edge to the point of highest deflection, $(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\sigma\sim x_{\text{min}}^2$.
-For trapezoids, one then expects approximate rectangles ($b_2/b_1\approx1$) to have $x_{\text{min}}=\min(b_1,h_0)$, short trapezoids ($h_0<b_1)$ to have $x_{\text{min}}=h_0$, tall trapezoids ($h_0\gg b_2$) to have $x_{\text{min}}=b_1$, and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
-The nominal RM3 design falls into this intermediate case, with $b_1\approx1.7$~m, $b_2\approx5.2$~m, and $h_0\approx6.8$~m.
+They show that the maximum bending stress $\gls{sym-sigma}$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
+This makes sense because for fixed-edge plates with distributed loads,
+it is the square of the minimum distance from an edge to the point of highest deflection,
+$(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\gls{sym-sigma}\sim x_{\text{min}}^2$.
+For trapezoids, one then expects approximate rectangles ($\gls{sym-b-2}/\gls{sym-b-1}\approx1$) to have $x_{\text{min}}=\min(\gls{sym-b-1},\gls{sym-h-0})$,
+short trapezoids ($\gls{sym-h-0}<\gls{sym-b-1})$ to have $x_{\text{min}}=\gls{sym-h-0}$,
+tall trapezoids ($\gls{sym-h-0}\gg \gls{sym-b-2}$) to have $x_{\text{min}}=\gls{sym-b-1}$,
+and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
+The nominal \gls{acr-rm3} design falls into this intermediate case,
+with $\gls{sym-b-1}\approx1.7$~\gls{sym-m},
+$\gls{sym-b-2}\approx5.2$~\gls{sym-m},
+and $\gls{sym-h-0}\approx6.8$~\gls{sym-m}.
 These dimensions are shown in \Cref{fig:trapezoid}.
 
 \begin{figure}[htbp]
@@ -446,66 +475,76 @@ These dimensions are shown in \Cref{fig:trapezoid}.
     \label{fig:trapezoid}
 \end{figure}
 
-To approximately capture the dimensions of a trapezoid, which effectively set the deflection curvature and therefore stress, $x_{\text{min}}$ is set to the diameter of the largest circle that can be inscribed in the trapezoid tangent to the shorter base $b_1$.
+To approximately capture the dimensions of a trapezoid, which effectively set the deflection curvature and therefore stress, $x_{\text{min}}$ is set to the diameter of the largest circle that can be inscribed in the trapezoid tangent to the shorter base $\gls{sym-b-1}$.
 This inscribed circle scheme satisfies all limit cases mentioned above and can be calculated as
 \begin{equation}
-    x_{\text{min}} = \begin{cases}b_1 \left( m + \sqrt{1+m^2}\right), & h_0 \geq \sqrt{b_1b_2} \\ h_0, & h_0 < \sqrt{b_1b_2}\end{cases}
+    \gls{sym-x-min} =
+    \begin{cases}
+        \gls{sym-b-1} \left( \gls{sym-m} + \sqrt{1+\gls{sym-m}^2}\right), & \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+        \\
+        \gls{sym-h-0}, & \gls{sym-h-0} < \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+    \end{cases}
 \end{equation}
-where $m=(b_2-b_1)/(2h_0)$ is the slope of the trapezoid.
-The expression is continuous at $h_0=\sqrt{b_1b_2}$, the point where the inscribed circle becomes tangent to base $b_2$ in addition to $b_1$.
+where $\gls{sym-m}=(\gls{sym-b-2}-\gls{sym-b-1})/(2\gls{sym-h-0})$ is the slope of the trapezoid.
+The expression is continuous at $\gls{sym-h-0}=\sqrt{\gls{sym-b-1}\gls{sym-b-2}}$, the point where the inscribed circle becomes tangent to base $\gls{sym-b-2}$ in addition to $\gls{sym-b-1}$.
 Continuity of the model across the design space avoids problems in the gradient-based optimization due to undefined gradients.
-The inscribed circle model gives $x_{\text{min}}\approx2.2$~m for the nominal float design.
-In addition to the shorter side length $x_{\text{min}}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $x_{\text{max}}$, which for the trapezoid is taken as
+The inscribed circle model gives $\gls{sym-x-min}\approx2.2$~\gls{sym-m} for the nominal float design.
+In addition to the shorter side length $\gls{sym-x-min}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $\gls{sym-x-max}$, which for the trapezoid is taken as
 \begin{equation}
-    x_{\text{max}} = \begin{cases} h_0,& h_0 \geq \sqrt{b_1b_2} \\ \frac{b_1+b_2}{2} + h(1-\sqrt{1+m^2}), & h_0 < \sqrt{b_1 b_2}\end{cases}
+    \gls{sym-x-max} =
+    \begin{cases}
+        \gls{sym-h-0},& \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+        \\
+        \frac{\gls{sym-b-1}+\gls{sym-b-2}}{2} + \gls{sym-h}(1-\sqrt{1+\gls{sym-m}^2}), & \gls{sym-h-0} < \sqrt{\gls{sym-b-1} \gls{sym-b-2}}
+    \end{cases}
 \end{equation}
 using a similar inscribed circle scheme to maintain continuity.
 
 \subsubsection{Float Bottom Plate}
-Under a distributed pressure $q$, the bottom plate maximum moment per unit length is then:
+Under a distributed pressure $\gls{sym-q}$, the bottom plate maximum moment per unit length is then:
 \begin{equation}\label{eq:bottom-plate-moment}
-M_{bot}=\beta q x_{\text{min}}^2
+\gls{sym-M-bot}=\gls{sym-beta-plate-0} \gls{sym-q} \gls{sym-x-min}^2
 \end{equation}
-for $\beta$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
-While the simulation utilizes the real $\beta$, constant $\beta$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\beta$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
+for $\gls{sym-beta-plate-0}$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+While the simulation utilizes the real $\gls{sym-beta-plate-0}$, constant $\gls{sym-beta-plate-0}$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\gls{sym-beta-plate-0}$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
 
 \subsubsection{Float Top Plate}
 The top float plate has equivalent thickness $t_{f,\text{top},eq}$ and the same dimensions and edge fixity as the bottom plate.
-Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $r_0$, where $r_0$ is assumed to be at least half the thickness.
-Under these conditions, either the stress at the center $\sigma_{\text{cent}}$ or along the longer edge $\sigma_{\text{edge}}$ may dominate:
+Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $\gls{sym-r-0}$, where $\gls{sym-r-0}$ is assumed to be at least half the thickness.
+Under these conditions, either the stress at the center $\gls{sym-sigma-cent}$ or along the longer edge $\gls{sym-sigma-edge}$ may dominate:
 \begin{equation}\label{eq:top-plate-stress}
     \begin{aligned}
-    \sigma_{\text{edge}}&= \frac{3W}{2\pi t_{f,\text{top},eq}^2}\left( (1+\nu)\ln\frac{2x_{\text{min}}}{\pi r_0}+\beta_1\right)\\
-        \sigma_{\text{cent}}&=-\beta_2 W/t_{f,\text{top},eq}^2
+    \gls{sym-sigma-edge}&= \frac{3\gls{sym-W}}{2\gls{sym-pi} \gls{sym-t-f-top-eq}^2}\left( (1+\gls{sym-nu-poisson})\ln\frac{2x_{\text{min}}}{\gls{sym-pi} \gls{sym-r-0}}+\gls{sym-beta-plate-1}\right)\\
+        \gls{sym-sigma-cent}&=-\gls{sym-beta-plate-2} \gls{sym-W}/\gls{sym-t-f-top-eq}^2
     \end{aligned}
 \end{equation}
-using $\beta_1$ and $\beta_2$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
+using $\gls{sym-beta-plate-1}$ and $\gls{sym-beta-plate-2}$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
 The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
-However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal RM3 design \citep{RM3,previsic_reference_2011}.
+However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal \gls{acr-rm3} design \citep{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \Cref{tab:struct-calc-vs-scale}.
 
 \subsubsection{Other Float Plates}
-The other float plates besides the top and bottom ones experience only the edge reaction moments that the top and bottom plates apply at their interface, with no additional external loads in heave. 
-Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal RM3 design.
+The other float plates besides the top and bottom ones experience only the edge reaction moments that the top and bottom plates apply at their interface, with no additional external loads in heave.
+Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal \gls{acr-rm3} design.
 This prevents the need for a separate structural analysis of the side plates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damping Plate}
-For an annular plate with free outer radius $a$ and fixed inner radius $b$, the nondimensional plate deflection $\overline{\delta}_{\text{plate}}$ and bending moment $\overline{M}_r$ can be calculated as a function of plate aspect ratio $b/a$ for various load cases.
+For an annular plate with free outer radius $\gls{sym-a}$ and fixed inner radius $\gls{sym-b}$, the nondimensional plate deflection $\overline{\gls{sym-delta}}_{\text{plate}}$ and bending moment $\overline{\gls{sym-M}}_{\gls{sym-r}}$ can be calculated as a function of plate aspect ratio $\gls{sym-b}/\gls{sym-a}$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
 Formulas for the concentrated loading are given by \citet{boedo_corrected_1998}, and formulas for distributed loading are given by \citet[case 2L, table 11.2]{young_roarks_2001}.
-The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $D_{eq}$ and equivalent section modulus $S_{eq}$.
+The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $\gls{sym-D-eq}$ and equivalent section modulus $\gls{sym-S-eq}$.
 The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $K_{\text{tube}}$.
-This results in the following expression for the radial plate bending stress $\sigma_r$:
+This results in the following expression for the radial plate bending stress $\gls{sym-sigma-r}$:
 \begin{equation}
-    \sigma_r =  \frac{F_{\text{heave}}}{S_{eq}} \left( 
-    \overline{M}_{r,dis} + \overline{M}_{r,con} \frac{\overline{\delta}_{\text{plate},dis}}{\frac{D_{eq}}{a^2K_{\text{tube}}} - \overline{\delta}_{\text{plate},con}}
+    \gls{sym-sigma-r} =  \frac{\gls{sym-F}_{\text{heave}}}{\gls{sym-S-eq}} \left(
+    \overline{\gls{sym-M}}_{\gls{sym-r},dis} + \overline{\gls{sym-M}}_{\gls{sym-r},con} \frac{\overline{\gls{sym-delta}}_{\text{plate},dis}}{\frac{\gls{sym-D-eq}}{\gls{sym-a}^2K_{\text{tube}}} - \overline{\gls{sym-delta}}_{\text{plate},con}}
     \right)
 \end{equation}
 
 The critical buckling stress $\sigma_{\text{buckle}}$ is found with the \citet{american_bureau_of_shipping_requirements_2022} methodology.
-The ultimate stress is then $\sqrt{\sigma_Y \sigma_{\text{buckle}}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
+The ultimate stress is then $\sqrt{\gls{sym-sigma-Y} \sigma_{\text{buckle}}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
 The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
 The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
 \begin{figure}[htbp]
@@ -531,7 +570,7 @@ The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
         \caption{Damping plate deflection}
         \label{fig:damping-plate-deflection}
     \end{subfigure}
-    \caption{Damping plate structural analysis: radial bending moment (a) and deflection (b) over the plate radius.}
+    \caption{Damping plate structural analysis: radial bending moment (\gls{sym-a}) and deflection (\gls{sym-b}) over the plate radius.}
     \label{fig:damping-plate-struct}
 \end{figure}
 In \Cref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
@@ -541,32 +580,73 @@ In \Cref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a fu
 As stated in \Cref{sec:structures}, the column's small slenderness ratio means that both axial compression and global Euler buckling must be taken into account.
 Meanwhile, the hydrostatic pressure at the bottom creates a substantial compressive hoop stress.
 
-The Euler critical buckling force $F_{\text{crit}}$ is:
+The Euler critical buckling force $\gls{sym-F-crit}$ is:
 \begin{equation}
-    F_{\text{crit}} = \frac{\pi^2 E I}{(K_{end} L)^2}
+    \gls{sym-F-crit} = \frac{\gls{sym-pi}^2 \gls{sym-E} \gls{sym-I}}{(\gls{sym-K-end} \gls{sym-L})^2}
 \end{equation}
-where $E$ is the Young's modulus, $I$ is the second moment of area, $K_{end}=2$ is the end condition (fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface), and $L$ is the beam length, set to $h_s$ the full spar height.
+where $\gls{sym-E}$ is the Young's modulus, $\gls{sym-I}$ is the second moment of area, $\gls{sym-K-end}=2$ is the end condition
+(fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface),
+and $\gls{sym-L}$ is the beam length, set to $\gls{sym-h-s}$ the full spar height.
 The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
 \begin{equation}
-    FOS = \frac{\sigma_{s,\text{max}}}{\sigma_s} = \frac{\sigma_Y \frac{\zeta + \sqrt{\zeta^2+4\omega}}{2}}{\frac{F}{A} + q}
+    FOS = \frac{\gls{sym-sigma}_{\gls{sym-s},\text{max}}}{\gls{sym-sigma-s}}
+    = \frac{
+                \gls{sym-sigma-Y} \frac{
+                                        \gls{sym-zeta-s} + \sqrt{
+                                                                \gls{sym-zeta-s}^2
+                                                                + 4\gls{sym-omega-s}
+                                                                }
+                                        }
+                                        {2}
+            }
+            {
+                \frac{\gls{sym-F}}{\gls{sym-A}} + \gls{sym-q}
+            }
 \end{equation}
-where $\zeta$ and $\omega$ are defined as follows:
+where $\gls{sym-zeta-s}$ and $\gls{sym-omega-s}$ are defined as follows:
 \begin{equation}
 \begin{aligned}
-     \zeta &= 1 - P_r(1 - P_r)~\frac{\sigma_Y}{F_{\text{crit}}/A} - \frac{\sigma_\theta}{\sigma_Y}, \qquad
-    \omega = \frac{\sigma_\theta}{2\sigma_Y}  \left(1 - \frac{\sigma_\theta}{2\sigma_Y}\right)
+     \gls{sym-zeta-s} &= 1 - \gls{sym-P-r}(1 - \gls{sym-P-r})
+                    ~\frac{
+                            \gls{sym-sigma-Y}
+                          }
+                          {
+                            \gls{sym-F-crit}/\gls{sym-A}
+                          }
+                    - \frac{
+                            \gls{sym-sigma-theta}
+                            }
+                            {
+                            \gls{sym-sigma-Y}
+                            },
+     \qquad
+    \gls{sym-omega-s} = \frac{\gls{sym-sigma-theta}}{2\gls{sym-sigma-Y}} 
+                        \left(
+                            1 - \frac{
+                                        \gls{sym-sigma-theta}
+                                    }
+                                    {
+                                        2\gls{sym-sigma-Y}
+                                    }
+                        \right)
 \end{aligned}
 \end{equation}
-and the hoop stress $\sigma_\theta$ is 
+and the hoop stress $\gls{sym-sigma-theta}$ is
 \begin{equation}
-     \sigma_\theta = \frac{qD_s}{2~t_{s,r}}
+     \gls{sym-sigma-theta} = \frac{
+                                    \gls{sym-q}\gls{sym-D-s}
+                                  }
+                                  {
+                                    2~\gls{sym-t-s-r}
+                                  }
 \end{equation}
-$P_r$ is a constant and $q$ is the distributed hydrostatic pressure at the bottom of the spar.
-These equations assume that the spar is compact, meaning that local buckling of the tube as a plate element is not a concern \citep{american_bureau_of_shipping_requirements_2022}.
-%These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}. 
+$\gls{sym-P-r}$ is a constant and $\gls{sym-q}$ is the distributed hydrostatic pressure at the bottom of the spar.
+These equations assume that the spar is compact,
+meaning that local buckling of the tube as a plate element is not a concern \citep{american_bureau_of_shipping_requirements_2022}.
+%These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}.
 % \begin{equation}
 % \begin{split}
-%     \sigma_{vm}^2 = \frac{1}{2} \left( (\sigma_{11} - \sigma_{22})^2 + (\sigma_{22} - \sigma_{33})^2 + (\sigma_{33} - \sigma_{11})^2 \right) \\ + 3 (\sigma_{12}^2 + \sigma_{23}^2 + \sigma_{31}^2)
+%     \gls{sym-sigma}_{vm}^2 = \frac{1}{2} \left( (\gls{sym-sigma}_{11} - \gls{sym-sigma}_{22})^2 + (\gls{sym-sigma}_{22} - \gls{sym-sigma}_{33})^2 + (\gls{sym-sigma}_{33} - \gls{sym-sigma}_{11})^2 \right) \\ + 3 (\gls{sym-sigma}_{12}^2 + \gls{sym-sigma}_{23}^2 + \gls{sym-sigma}_{31}^2)
 %     \label{von}
 % \end{split}
 % \end{equation}
@@ -574,9 +654,9 @@ These equations assume that the spar is compact, meaning that local buckling of 
 % Three yield factors of safety $FOS_y$ (for the float, vertical column, and damping plate) and one buckling factor of safety $FOS_b$ (for the vertical column) are computed for each of two forces (the powertrain force $F_p$ and the hydrodynamic excitation force $F_h$). This gives a total of eight FOS:
 % \begin{equation}
 % \begin{aligned}
-%     FOS_{y~{i,j}} = \frac{\sigma_y}{\sigma_{vm,ij}} ~~&~~
-%     FOS_{b,j} = \frac{F_{\text{crit}}}{F_j} \\
-%     i = 1..3, ~& j = 1..2
+%     FOS_{\gls{sym-y}~{i,\gls{sym-j}}} = \frac{\gls{sym-sigma-Y}}{\gls{sym-sigma}_{vm,ij}} ~~&~~
+%     FOS_{\gls{sym-b},\gls{sym-j}} = \frac{\gls{sym-F-crit}}{\gls{sym-F}_{\gls{sym-j}}}} \\
+%     i = 1..3, ~& \gls{sym-j} = 1..2
 % \end{aligned}
 % \end{equation}
 
@@ -596,18 +676,18 @@ These equations assume that the spar is compact, meaning that local buckling of 
 
 \begin{tabular}{cP{0.35\linewidth}P{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
-$\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\ 
-$g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
-$h$& Water depth & 100 & m  \\ 
-JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$\gls{sym-m}^3$  \\ 
+$\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$\gls{sym-s}^2$  \\ 
+$\gls{sym-h}$& Water depth & 100 & m  \\ 
+\gls{acr-jpd}& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
+$\gls{sym-H-s}$ & Significant wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
 $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$\gls{sym-T-e}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
 $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
-$\sigma_y$ & Material yield strength& 248 & MPa  \\ 
-$\rho_m$ & Material density& 7850 & kg/$m^3$  \\ 
-$E$& Material Young's modulus& 200 & GPa  \\ 
-$\text{cost}_m$ & Material cost& 1.89 & \$/kg \\ 
+$\gls{sym-sigma-Y}$ & Material yield strength& 248 & MPa  \\ 
+$\gls{sym-rho-M}$ & Material density& 7850 & kg/$\gls{sym-m}^3$  \\ 
+$\gls{sym-E}$& Material Young's modulus& 200 & GPa  \\ 
+$\text{cost}_{\gls{sym-M}}$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
 %$t_{fr}$ & \begin{tabular}[c]{@{}c@{}}Float Radial Wall\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.011 & m  \\ 
 %$t_{fc}$ & \begin{tabular}[c]{@{}c@{}} Float Circumferential\vspace{-1.5 mm} \\ Gusset Thickness\end{tabular} & 0.011 & m  \\ 
@@ -617,11 +697,11 @@ $\text{cost}_m$ & Material cost& 1.89 & \$/kg \\
 $FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
 $D_{d_{\text{min}}}$ & Minimum damping plate diameter & 30 & m  \\ 
 $FCR$ & Fixed charge rate& 10.8 & \%  \\ 
-$N_{WEC}$ & Number of WECs in array& 100 & -  \\ 
-$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
-$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
-$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
-$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
+$\gls{sym-N-WEC}$ & Number of \glspl{acr-wec} in array& 100 & -  \\ 
+$\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\ 
+$\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 
+$\gls{sym-h-d}/{\gls{sym-D-s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
+$\gls{sym-T-f-2}/{\gls{sym-h-f}}$ & Float submergence ratio & 0.615 & -  \\ 
 $F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
 }

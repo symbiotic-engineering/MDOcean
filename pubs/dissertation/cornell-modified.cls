@@ -414,8 +414,14 @@
   \prelim@contents{\listfigurename}
   \listoffigures
   \normalspacing
-  \clearpage
 }
+
+\newcommand{\acrnlist}{%
+  \listspacing{acrn}
+  \prelim@contents{List of Acronyms}
+  \chapter*{List of Acronyms}
+}
+
 \newcommand{\abbrlist}{%
   \listspacing{abbr}
   \prelim@contents{List of Abbreviations}
