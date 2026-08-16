@@ -26,11 +26,11 @@ By plotting the data for a variety of geometries on a single plot and scaling th
 we empirically arrive at the following form for the excitation coefficient magnitude:
 \begin{equation}\label{eq:scale-wamit}
 |\gls{sym-gamma-s}| = \gls{sym-rho-w} \gls{sym-g} \gls{sym-pi} \gls{sym-D-s}^2/4 |\gls{sym-mathrm-H-0-1}(\gls{sym-k-wavenumber}\gls{sym-R-x})| \exp(-\gls{sym-k-wavenumber} \gls{sym-e-1}) \gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-alpha} \max(1,\gls{sym-alpha})
-\sqrt{\frac{\gls{sym-Upsilon}\left(\frac{\gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-R-x} \gls{sym-alpha}^3}{\gls{sym-beta} \gls{sym-R-p}}\right)}
-           {\gls{sym-beta}\left(1+\frac{\gls{sym-beta}}{\gls{sym-alpha}}\right)}}
+\sqrt{\frac{\gls{sym-Upsilon}\left(\frac{\gls{sym-k-wavenumber}\gls{sym-h} \gls{sym-R-x} \gls{sym-alpha}^3}{\gls{sym-beta-olaya} \gls{sym-R-p}}\right)}
+           {\gls{sym-beta-olaya}\left(1+\frac{\gls{sym-beta-olaya}}{\gls{sym-alpha}}\right)}}
 \end{equation}
-where $\gls{sym-Upsilon}(\cdot)$ indicates a nonlinear relationship to be interpolated from data, and $\gls{sym-alpha}$, $\gls{sym-beta}$,  $\gls{sym-e-1}$, $\gls{sym-R-p}$, and $\gls{sym-R-x}$ are dimensions and nondimensional ratios defined in \citet{olaya_hydrodynamic_2015}.
-\Cref{fig:olaya-hydro-data} shows this nonlinear relationship, which has collapsed remarkably well for the variety of $\gls{sym-alpha}$ and $\gls{sym-beta}$ values.
+where $\gls{sym-Upsilon}(\cdot)$ indicates a nonlinear relationship to be interpolated from data, and $\gls{sym-alpha}$, $\gls{sym-beta-olaya}$,  $\gls{sym-e-1}$, $\gls{sym-R-p}$, and $\gls{sym-R-x}$ are dimensions and nondimensional ratios defined in \citet{olaya_hydrodynamic_2015}.
+\Cref{fig:olaya-hydro-data} shows this nonlinear relationship, which has collapsed remarkably well for the variety of $\gls{sym-alpha}$ and $\gls{sym-beta-olaya}$ values.
 Case numbers in the legend refer to the numerical parameters used by \citet[Section~V.]{olaya_hydrodynamic_2015}
 \begin{figure}[htbp]
 \centering
@@ -311,13 +311,13 @@ The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
 each decrease with the number of devices $\gls{sym-N-WEC}$ according to
 \begin{equation}\label{eq:cost-power-law}
     \gls{sym-C} = \gls{sym-C-infty}+ (\gls{sym-C-1} - \gls{sym-C-infty})
-                    \cdot (\gls{sym-N-WEC})^{-\gls{sym-beta}},
+                    \cdot (\gls{sym-N-WEC})^{-\gls{sym-beta-expo}},
 \end{equation}
 where $\gls{sym-C-infty}$ is the asymptotic large-scale unit cost,
 $\gls{sym-C-1}$ is the single-unit cost,
-and $\gls{sym-beta}$ is the rate of decrease.
+and $\gls{sym-beta-expo}$ is the rate of decrease.
 
-The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta}$ for each \gls{acr-cbs} category
+The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta-expo}$ for each \gls{acr-cbs} category
 were obtained by curve-fitting \Cref{eq:cost-power-law} to the \gls{acr-cbs} estimates
 for $\gls{sym-N-WEC} \in \{1, 10, 50, 100\}$ \citep{neary_reference_2014},
 and are tabulated in \Cref{tab:econ-model-values}.
@@ -329,7 +329,7 @@ and are tabulated in \Cref{tab:econ-model-values}.
     \expanded{
         \noexpand\tabular{\TableColumnSpecs{aor:econ-model-values}}
     }
-         \gls{acr-cbs} Category& Expo. $\gls{sym-beta}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
+         \gls{acr-cbs} Category& Expo. $\gls{sym-beta-expo}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
          \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. \gls{acr-capex}& 0.741& 1.24 \$M &13.92 \$M\\
          \textbf{1.4} - Structural \gls{acr-capex} & 0.481& 2.387 \$/kg&4.294 \$/kg\\
          \textbf{1.5} - \gls{acr-pwr} Take Off \gls{acr-capex}& 0.206& Constant: 92.59 \$k \gls{acr-pwr}: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k \gls{acr-pwr}: 1.355 \$/W Force: 0.0204 \$/N\\
@@ -503,10 +503,10 @@ using a similar inscribed circle scheme to maintain continuity.
 \subsubsection{Float Bottom Plate}
 Under a distributed pressure $\gls{sym-q}$, the bottom plate maximum moment per unit length is then:
 \begin{equation}\label{eq:bottom-plate-moment}
-\gls{sym-M-bot}=\gls{sym-beta} \gls{sym-q} \gls{sym-x-min}^2
+\gls{sym-M-bot}=\gls{sym-beta-plate-0} \gls{sym-q} \gls{sym-x-min}^2
 \end{equation}
-for $\gls{sym-beta}$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
-While the simulation utilizes the real $\gls{sym-beta}$, constant $\gls{sym-beta}$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\gls{sym-beta}$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
+for $\gls{sym-beta-plate-0}$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+While the simulation utilizes the real $\gls{sym-beta-plate-0}$, constant $\gls{sym-beta-plate-0}$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\gls{sym-beta-plate-0}$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
 
 \subsubsection{Float Top Plate}
 The top float plate has equivalent thickness $t_{f,\text{top},eq}$ and the same dimensions and edge fixity as the bottom plate.
