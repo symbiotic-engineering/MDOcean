@@ -45,7 +45,7 @@
 %%   Right brace   \}     Tilde         \~}
 %%
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\ProvidesClass{cornell}
+\ProvidesClass{cornell-modified}
 [2008/4/17 v2.9
   Cornell University thesis class]
 \newif\ifphd
