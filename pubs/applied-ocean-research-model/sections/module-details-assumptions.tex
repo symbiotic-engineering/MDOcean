@@ -1,21 +1,53 @@
 
 Dynamics
 
-
-A4) A2 implies linear dynamics, so efforts and flows can be related with linear coefficient matrices, so power metrics are quadratic
-
 A5) you only care about sinusoidal steady state dynamics, no transients
-
-A6) control is linear
-
 
 Control assumptions
 
-A7) all constraints can be written in terms of the fundamental
+Concept:
+We introduce QLPS as method for optimal control of quasi-linearized systems subject to time-domain constraints.
 
-A8) regular waves
+We show that the QLPS for standard wave energy objectives and constraints is a QCQP.
 
-A9) all constraints can be written with quadratic matrices
+We show that under additional conditions (narrow-band wave input and a singular PTO DOF), the QCQP reduces to order 1 and can be solved semi-ananlytically using geometry.
+
+Assumptions:
+QLPS requires assumptions A5 and A6:
+\begin{itemize}
+    \item A5)
+    \textbf{Dynamics can be represented in linear form.}
+    Assumption A2 quasi-linearizes the system, so this assumption is easily satisfied for MDOcean's dynamics.
+    Rather than a linear state-space form, we choose a linear multiport form in which the state variables are ``efforts'' and ``flows'' which can be related with linear coefficient matrices because it is well suited for expressing power flow.
+
+    \item A6)
+    \textbf{All constraints can be written in terms of the fundamental of state variables}, in this case efforts and flows.
+\end{itemize}
+When additional assumptions A7 and A8 are satisfied, the QLPS problem can be represented as a QCQP:
+
+\begin{itemize}
+    \item A7)
+    All constraints can be written with quadratic matrices.
+    Examples of constraints that fit this restriction include effort amplitude, flow amplitude, average power, reactive power, and linear combinations thereof.
+
+    \item A8)
+    The objective function can be written as a quadratic metric.
+    Average power is a quadratic metric.
+\end{itemize}
+
+When the additional assumptions A9 and A10 are satisfied, the QCQP can be solved semi-analytically:
+\begin{itemize}
+A9) \textbf{There is no coupling between dynamics at different frequencies.}
+This is satisfied as a result of assumption A3, which states the wave excitation is narrow-band, and A2, which states that the WEC dynamics are low-pass.
+A10) \textbf{There is no coupling between dynamics of different DOFs}, as viewed from the port where power is being maximized.
+This is satisfied because the RM3 PTO contains only a single DOF.
+Coupling between body DOFs is allowed, because they get collapsed into a single DOF at the PTO port.
+\end{itemize}
+Under these conditions, the QCQP for all frequencies and DOFs can be separated into a set of single-order QCQPs, one for each frequency and DOF, which can be solved semi-analytically using the geometric properties of circles.
+
+
+
+
 
 
 Loadcase assumptions
