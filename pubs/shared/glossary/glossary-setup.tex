@@ -384,6 +384,12 @@
 % ============================================================
 
 \newcommand{\newsym}[3]{%
+  \ifglsentryexists{sym-#1}{%
+    \PackageError{glossary-setup}{Duplicate symbol key `#1' (label `sym-#1') in \string\newsym}{%
+      Remove or rename one of the duplicate \string\newsym definitions.\MessageBreak
+      The symbol label `sym-#1' has already been defined.
+    }%
+  }{}%
   \edef\newsym@sortkey{\mysortkey{#1}}%
   % \glsxtrnewsymbol[
   %   description={#3},
@@ -392,7 +398,6 @@
   % ]{sym-#1}{\ensuremath{#2}}%
   \newglossaryentry{sym-#1}{name={\ensuremath{#2}},category={symbol},sort={\newsym@sortkey}, type={sym-\mysymgroup{#1}},description={#3}}
 }
-
 \makeatother
 
 \input{glossary/glossary-acronyms.tex}
@@ -402,4 +407,5 @@
 \input{glossary/glossary-symbols-optim.tex}
 \input{glossary/glossary-symbols-misc.tex}
 \input{glossary/glossary-symbols-jfm.tex}
+\input{glossary/glossary-symbols-shared.tex}
 \makeglossaries
