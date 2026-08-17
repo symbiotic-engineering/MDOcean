@@ -1,9 +1,63 @@
-\emph{The people you love will change you.
-The things you have learned will guide you. 
-And nothing on earth can silence the quiet voice still inside you.} 
+% \emph{The people you love will change you.
+% The things you have learned will guide you. 
+% And nothing on earth can silence the quiet voice still inside you.} 
 
-- Moana
+% - Moana
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Land Acknowledgement}
+Cornell University is located on the traditional homelands of the \cayuga (the Cayuga Nation).
+The \cayuga are members of the Haudenosaunee Confederacy, an alliance of six sovereign Nations with a historic and contemporary presence on this land.
+The Confederacy precedes the establishment of Cornell University, New York state, and the United States of America.
+We acknowledge the painful history of \cayuga dispossession,
+and honor the ongoing connection of \cayuga people, past and present, to these lands and waters.
+
+This land acknowledgment has been reviewed and approved by the traditional \cayuga leadership.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Artificial Intelligence Acknowledgement}
+
+To prepare this dissertation and the manuscripts on which it is based, the author and her collaborators used the following generative AI tools:
+Anthropic Claude (accessed May 2026);
+OpenAI ChatGPT (GPT-5.5, GPT-5.3, GPT-5.3-mini, and GPT-5-mini: accessed June 2025--August 2026);
+GitHub Copilot Cloud Agent (GPT-5.3 Codex: accessed March 2026--August 2026);
+GitHub Copilot Chat Extension for Visual Studio Code (Claude Sonnet 4, Claude Sonnet 4.5, GPT-4.1, GPT-5.4 mini, and GPT-5 mini: accessed February 2024--August 2026); and
+Google Search AI Overview (Gemini 1.0, Gemini 1.5, Gemini 2.0, Gemini 2.5, Gemini 3, Gemini 3.5: accessed May 2024--August 2026).
+AI tools were mainly used to generate and debug code not core to the work's technical contributions.
+This includes changelogs, code reviews, continuous integration, merges, dependency management, refactoring, syntax reference, error and warning resolution, and formatting.
+AI was used editorially to improve clarity, grammar, and readability of the text, mathematical notation, and conceptual diagrams.
+
+The following exceptions describe all AI tool usage related to the core technical contributions:
+\begin{itemize}[leftmargin=*]
+\item Based on author-provided descriptions of the desired content and formatting,
+      GitHub Copilot Cloud Agent generated initial source code for
+      \Cref{fig:fig:meem-sweep-pareto,fig:wecsim-thd,fig:force-power-limit-sweep,fig:olaya-hydro-data}.
+\item After the author developed and debugged the optimal control code for generic quadratic constraints and implemented the force constraint,
+      GitHub Copilot Cloud Agent integrated the amplitude and power constraints using the same pattern.
+\item ChatGPT was used to identify literature on control techniques for \Cref{fig:venn-diagram},
+      convex optimization sensitivity analysis,
+      and optimization algorithms for systems with structured coupling.
+\item With the intent of balancing technical accuracy and broadly-approachable terminology,
+      the author prompted Github Copilot Cloud Agent to generate the two sentences that conceptually introduce convexity in \Cref{sec:appendix-qp-convexity}
+      \ifdefined\DISSERTATION
+          and ChatGPT for the nonlinear pressure description in \Cref{sec:appendix-drag}.
+      \else
+          .
+      \fi
+\item ChatGPT was used to manipulate, simplify, or typeset some equations in 
+      \Cref{sec:appendix-drag,sec:appendix-qp-solution,sec:appendix-constraint-sensitivity,sec:appendix-qp-convexity,sec:appendix-slam}.
+      All equations were verified by hand and/or with symbolic math software.
+\item ChatGPT assisted with the application of the following technical concepts, which were then verified via code implementation:
+      the passivity, stability, and cardinality of underactuated multiport systems in \Cref{sec:appendix-pto-dynamics},
+      and curve fit structures that maintain desired spar excitation limiting properties in \Cref{sec:appendix-additional-hydro}.
+\end{itemize}
+After using these tools, the author reviewed and edited the content as needed and takes full responsibility for the content of the published dissertation.
+Author-generated continuous-integration tests and validation cases were used to verify the correctness of simulation code, both AI- and human-generated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Personal Acknowledgements}
 The PhD was hard in a way that undergrad wasn't.
 The technical challenges were simple compared to the emotional, mental, and institutional challenges.
 I learned a lot about myself and what I need to be successful,
@@ -12,68 +66,91 @@ and how to both enact and know the limits of grassroots systemic change.
 I got a lot of experience building, overhauling, 
 and refining the processes and systems that help me navigate these challenges.
 I am grateful to everyone who supported me through the process,
-as well as for those in my early life who helped me get to a PhD to begin with.
+as well as for those in my early life who helped me gain the qualifications necessary to start a PhD program to begin with.
 
 First, I thank my academic and professional mentors and supporters, including:
 \begin{itemize}
-  \item Maha for taking me on as a student and ultimately persisting with me through the PhD process
-  \item my committee members, Jacob Mays, Pat Reed, and Ryan Coe, for their technical insight and feedback
-  \item Sam Benson and Dmitry Savransky, for stepping in to provide additional departmental advising support when I needed it 
-  \item NREL for my undergraduate internship which exposed me to marine energy, including my mentor Scott Jenne
-  \item Andras Kiss, my mentor at my internship at Infinite Cooling, 
-  for showing me what someone with a PhD can do in industry and for being my role model
-  \item Racecar (the MIT Formula SAE Team) for raising me as an engineer and giving me the technical skills 
-  in multidisciplinary modeling and practical design and teamwork experience
+  \item My advisor Maha Haji for taking me on as a student and ultimately persisting with me through the PhD process.
+  \item My committee members, Jacob Mays, Pat Reed, and Ryan Coe, for their technical insight and feedback.
+  \item Sam Benson and Dmitry Savransky, for stepping in to provide additional departmental advising support when I needed it.
+  \item The water power team at the National Renewable Energy Laboratory (NREL) where I interned as an undergraduate,
+  which first exposed me to marine energy. My mentor there, Scott Jenne,
+  showed me that the scrappy fail-fast engineering spirit that I so cherish still has a place in rigorous research,
+  and in fact is essential.
+  This experience tipped the scale for me to pursue a PhD over immediately entering industry.
+  \item Andras Kiss, my mentor at my graduate internship at Infinite Cooling, 
+  for being a role model of what someone with a PhD can do in industry and the kind of engineer I want to be.
+  \item Individuals who provided technical support for my use of open-source software tools:
+  Pete Bachant, developer of \texttt{Calkit}; Greg Schivley, developer of \texttt{PowerGenome};
+  and Kaleb Smith, user of \texttt{GenX}.
+  I especially thank Pete for exchanging over 130 GitHub issues with me;
+  my code and results would not be nearly as reproducible and transparent without your help.
+  \item Racecar (the MIT Formula SAE Team) for raising me as an engineer, giving me strong fundamental technical skills 
+  in multidisciplinary modeling, and providing practical experience on a design team that will continue to serve me well throughout my career.
+  \item Laila Nashid, tutor through the Cornell Graduate Writing Service, for practical advice on strengthening my written argument.
   \item My physical and mental healthcare support and advising system, 
-  including Rachel Clark, Dawn Plue, Erin Forquer, Ila Rose, and Matt Jarman.
+  including Rachel Clark and Dawn Plue at Cornell Health; Erin Forquer, psychologist; Ila Rose at Finger Lakes Independence Center; and Matt Jarman at Productive for Good. You all cared when others didn't.
 \end{itemize}
 
 Next, I thank my academic and extracurricular peers at Cornell:
 \begin{itemize}
-  \item SEA Lab for being a fun and supportive research group: 
-  Can Jam on the fifth floor of Upson, PhD meetings, running, the hot tub
+  \item The other students in the SEA Lab for being a lively and supportive research group: 
+  Can Jam on the fifth floor of Upson, the bouncy-ball game at PhD meetings, morning runs around Beebe, the UMERC hot tub, and associated antics made the lab fun. One day we'll build a nuclear outer-space WEC.
   \item Olivia V. for being my best friend in the lab, conference buddy, 
-  and for being there for each other when our PhDs were hard
-  \item Nate, Matt, and Kapil, for making the lab fun with their antics. 
-  One day we'll build a nuclear outer-space WEC.
-  \item other MAE PhD students, including Colby, Charlotte, Diane, Jared. 
-  The DnD campaign where Onaam Timunuo got to meet his grandfather, who talks to rocks.
-  \item Everyone who was willing to body double with me, including 
-  Colby, Arthur, Joe, Demola, Stefan, Matt, Olivia V., Olivia G., Shariwa, Sam, Hana, and Jared.
-  \item all the undergrads I've had the pleasure of mentoring, 
+  prototyping buddy, and for being there for each other when our PhDs were hard. I'm so glad you got to test in the big wave tank, and sorry that I couldn't be there to see it.
+  \item Matt, for his legendary icebreakers and for soldiering through the final spring and summer together as the last SEA Lab members left standing in the original office. I swear we'll both make it out of here soon.
+  \item Nate, for being the best person to talk through a high-level research approach with to make sure it actually makes practical sense,
+  for the grounded lighthearted energy and stability you brought to the lab,
+  and for putting on \textit{Hitchhiker's Guide to the Galaxy} during the long drive to the IFAC conference.
+  \item Kapil, for being the lab's best nerd-sniper and the best person to talk through research implementation details and mathematics with.
+  I can't imagine working through the poorly-documented old MEEM papers trying to develop a first understanding of the model with anyone else.
+  All those hours trying to figure out the logic of the mathematically-heinous formulation were worth it.
+  \item Collin, for the attention to detail and admirable thoroughness and thoughtfulness in research. Your careful systematic approach to notation and derivations definitely made the MEEM paper better in a way that I couldn't have achieved without you.
+  \item Other MAE PhD students, including Colby, Charlotte, Diane, Jared and Arnav. 
+  The DnD campaign where Onaam Timunuo got to meet his grandfather, who talks to rocks, was a highlight for sure.
+  \item Everyone who was willing to body double with me while writing this dissertation, including 
+  Colby, Diane, Arthur, Joe, Demola, Stephan, Matt, Olivia V., Olivia G., Shariwa, Sam, Hana, Jared, and Yuxin.
+  \item All the undergrads I've had the pleasure of mentoring, 
   including Madison who has worked with me for 4 years and has grown so much, 
+  Bimali who went above and beyond on the MEEM project,
   and En, Andrea, and Moho, who turned Wait Terrace into a SEA Lab house.
   Teamwork is really important to me, and working with you all has been a highlight of my PhD.
-  \item Flor for being a devoted SNAC advisor, and SNAC members 
-  including Matthew, Anthony, Jessa, Will, Ethan, Sierra, and Aishat
-  \item the engineering leadership program, including professor Rob and Erica, 
-  the geckos cohort, and the GAIA co-founders Mark and Moe.
-  \item other GAIA members, including AJ, Nicholas, Sofia, Erick
+  \item Flor Ardon for being a devoted SNAC advisor, and SNAC members 
+  including Matthew, Anthony, Jessa, Will, Ethan, Sierra, and Aishat.
+  \item The engineering leadership program, including professors Rob Parker and Erica Dawson, 
+  the Geckos cohort, and the GAIA co-founders Mark Tarazi and Mohamed Aden.
+  \item Other GAIA members, including AJ, Nicholas, Sofia, and Erick.
 \end{itemize}
 
-Next, I thank my friends and housemates outside of the academic environment, including:
+Next, I thank my friends outside of the academic environment, including:
 \begin{itemize}
-  \item the CGSU graduate union for their energy to stand up to injustices 
-  that are startlingly common in academia and beyond,
-  and willingness to fight for me and my fellow graduate students
   \item Meghana for being the best friend I could ask for and always being a phone call away 
   for life debriefs, support, and even the times where 
   we just exist together mutually distracted on the phone.
-  You have been my sounding board since the very beginning deciding where to go to grad school 
-  and an invaluable friend throughout the process.
+  You have been my sounding board and an invaluable friend for
+  every part of the grad school experience,
+  from deciding what university to attend to finishing my dissertation.
   Thanks for calling me out on my perfectionism, 
   helping me reflect on what I've learned about myself and what I want, 
   and for just getting me.
   You sometimes know me better than I know myself, 
   and I would be a different person without you.
-  \item the wonderful housemates of Wait Terrace cooperative 
-  for late night wagon rides, floor time, squirrels in the walls, fridge quotes, karaoke
+  \item Meghana, Alex, Sandy, and Nathan, for letting me crash at their apartments
+  during my frequent visits to Boston; driving all the way to Ithaca to see my defense;
+  and providing moral support, virtual body doubling, and more during the final stretch.
+  \item The CGSU graduate union for their energy to stand up to injustices 
+  that are startlingly common in academia and beyond,
+  and willingness to fight for me and my fellow graduate students.
+  \item The wonderful housemates of Wait Terrace cooperative 
+  for late night wagon rides, floor time, squirrels in the walls, fridge quotes, and karaoke.
   \item Marina, Karen, and Marc, for cultivating a thriving house culture 
   full of Bob the Builder cakes, eight-foot inflatable gnomes, and British accents.
   \item Ilana, Olivia G., and Firdavs, for being great co-house managers 
-  and spending lovely midnights together on the Beebee Lake bridge. 
+  and spending lovely midnights together on the Beebe Lake bridge. 
   I leave the house in your capable hands.
-  \item Other roommates during my PhD, including Andrea, Alexa, and Helena
+  \item Andrea, my former roommate, for the spontaneous runs, deep reflections, casual speculative physics, and meaningful conversations about impact.
+  \item Olivia G., another housemate who has been there for me through the end,
+  and whose knack for research and writing helped me see my project in a new light.
   \item Ilana, my beloved roommate for the last 1.5 years, 
   who has been there for both the uncontrollable giggles and the uncontrollable tears.
   Yes, you can still be my roommate even if you turn into Kafka's beetle, 
@@ -81,22 +158,25 @@ Next, I thank my friends and housemates outside of the academic environment, inc
   Thanks for encouraging me to write Sun articles, 
   inviting me on that barefoot 4 a.m.\ walk to Goldwin Smith, 
   and helping me cement my identity.
-  One day you'll be a PhD too, and maybe we'll start that questionable cult together (kidding).
   You're like a little sister to me, and I can't wait to see what's ahead for you.
 \end{itemize}
 
 Finally, I thank my family, including:
 \begin{itemize}
   \item Brielle, who really is a little sister to me, 
-  and sends me encouragement, hometown updates, handmade craft gifts, 
-  and hidden little notes that always make me smile.
+  for sending me encouragement, hometown updates, handmade craft gifts, 
+  and hidden little notes that always make me smile;
+  and for creating the beautiful wave image used in this dissertation.
   \item My parents, for raising me to love learning enough to start a PhD 
   and to have the persistence to finish it.
   You keep a watchful eye on the Cornell red-tailed hawk cam, 
   and the annual excitement of the fledging of the hawks has marked the milestones of my PhD journey.
-  I hope that with this thesis, I have likewise taken flight.
+  I hope that with this dissertation, I have likewise taken flight.
+  My mom braved \LaTeX\ as a complete beginner to help proofread my dissertation materials,
+  and my dad helped keep me motivated in the final semester with captivating photos of the National Parks.
 \end{itemize}
 
 
 To everyone who has supported and encouraged me throughout this journey, thank you.
 I love you all.
+

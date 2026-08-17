@@ -1,10 +1,32 @@
 \section{Model Structure}
 \label{sec:model-structure}
 
+\ifdefined\DISSERTATION
+    The overall scope of WEC design includes the selection of discrete architecture choices, such the type of device and PTO (top row of \Cref{fig:design-scope});
+    continuous design variables in the physical domain, such as dimensions (second row of \Cref{fig:design-scope});
+    static analysis to evaluate the properties of these physical designs (blue boxes in third row of \Cref{fig:design-scope});
+    dynamic analysis to quantify the effect of these static properties on coupled dynamic properties like power production (blue dotted outline of \Cref{fig:design-scope});
+    and performance analysis to evaluate the viability of the design based on its static and dynamic properties (far right of \Cref{fig:design-scope}).
+    MDOcean performs static analysis for a single type of floating body (an RM3-like two-body point absorber)
+    as well as dynamic analysis and optimal control for the full coupled system,
+    assuming that the static properties for other components (e.g. drivetrain, generator) are known or swept inputs.
+
+    \begin{foldoutpage}
+        \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth]{figs/two_port_dimension_coeff_chain.pdf}
+        \caption{Flowchart showing the full WEC design space and the scope of MDOcean's static, dynamic, and optimal control analyses.
+        For visual clarity, some dependencies are omitted, such as that of the constraint limits on static analyses.
+        These dependencies are included in the XDSM diagram in \Cref{fig:n2}.}
+        \label{fig:design-scope}
+        \end{figure}
+    \end{foldoutpage}
+\fi
+
 The simulation is composed of five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics.
 The geometry module computes derived properties such as areas, volumes, masses, centers of gravity, hydrostatics, and stability margins from bulk dimensions and structural thicknesses.
 The hydrodynamics module evaluates frequency-domain hydrodynamic coefficients using a semi-analytical formulation based on the device geometry.
-The dynamics and control module combines hydrodynamic coefficients, mass properties, and generator ratings to compute system response, loads, and power production using a quasi-linear frequency-domain model with nonlinear corrections for drag and powertrain saturation.
+The dynamics and control module combines hydrodynamic coefficients, mass properties, and generator ratings to compute system response, loads, and power production using a quasi-linear frequency-domain model with approximate drag and saturation nonlinearities.
 Both operational and extreme (storm) conditions are considered.
 The structures module evaluates stress and factor-of-safety constraints under yield, ultimate, buckling, and fatigue criteria.
 Finally, the economics module estimates capital cost (PTO and structure) and levelized cost of energy using power production and material usage.
@@ -16,12 +38,14 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
 
 \begin{figure*}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figs/from-matlab/xdsm.pdf}
-\caption{Simplified XDSM diagram}\label{fig:n2}
+\includegraphics[\FigureOptions{aor:figs/from-matlab/xdsm.pdf}]{figs/from-matlab/xdsm.pdf}
+\caption{Simplified XDSM diagram}
+\label{fig:n2}
 \end{figure*}
+%
 \begin{figure*}[b!]
 \centering
-\includegraphics[width=1\linewidth]{figs/from-matlab/control_analysis_flowcharts.pdf}
+\includegraphics[\FigureOptions{aor:figs/from-matlab/control_analysis_flowcharts.pdf}]{figs/from-matlab/control_analysis_flowcharts.pdf}
 \caption{Optimization architectures organized by analysis method (MDF and SAND) and control method (explicit, implicit, simultaneous, and nested).}
 \label{fig:control-arch}
 \end{figure*}
@@ -110,7 +134,7 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
     The implicit formulation is preferred over explicit alternatives due to the structure of the derived optimal control conditions (\Cref{sec:mod-freq-domain}).
     It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
-    Detailed architecture rationale, coupling analysis, and the relation to MDO literature are provided in \cite{mccabe_dissertation_2026}.
+    \citep{mccabe_dissertation_2026} provides detailed architecture rationale, coupling analysis, and the relation to MDO literature.
     
     \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-MDF formulation used in this study highlighted.
 \fi
