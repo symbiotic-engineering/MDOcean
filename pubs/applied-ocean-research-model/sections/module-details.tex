@@ -209,6 +209,44 @@ Any violations are corrected by adjusting the coupling terms $A_c$ and $B_c$.
 \subsection{Dynamics and Control}\label{sec:dynamics}
 This subsection introduces the dynamics and control modeling assumptions before detailing the frequency-domain methods and control formulations.
 
+\subsubsection{Describing Functions}
+\paragraph{Concept}
+Describing functions assume a certain time-domain nonlinear signal shape and then calculate the fundamental amplitude of that signal for use in a typical frequency-domain simulation.
+Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
+MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
+While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
+MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabling efficient simulation while retaining model fidelity.
+
+\paragraph{Assumptions}
+Describing functions make the following assumptions:
+\begin{itemize}
+    \item A1)
+    \textbf{Any nonlinearities can be written as the sum of a linear transformation and harmonic generation}.
+    This allows us to work in the spectral domain.
+
+    \item A2)
+    \textbf{The system is low-pass with a cutoff frequency below the third harmonic}.
+    This assumption makes the spectral domain become the frequency domain, and is called quasi-linearization.
+    \ifdefined\DISSERTATION
+        The two nonlinearities that are quasi-linearized are both force signals.
+        For a force signal, the fundamental amplitude is the most relevant harmonic because not only is it typically the largest amplitude, but it also undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
+    \else
+        The fundamental is the most relevant harmonic for power because typically, its force is the largest and its position undergoes the least filtering by the low-pass plant.
+    \fi
+
+    \item A3)
+    \textbf{The input wave excitation is narrow-band}.
+    This makes quasi-linearization become sinusoidal-input describing functions.
+
+    \item A4)
+    \textbf{The functional form, and therefore signal shape, of the nonlinear waveform is known.}
+    We assume a quadratic absolute-value nonlinearity for drag and a saturated sinusoid nonlinearity for control force.
+\end{itemize}
+
+\paragraph{Implementation}
+The drag describing function formula is encoded directly into the simulation (see derivation in \Cref{sec:drag}),
+while the control force describing function is implemented indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
+
 %%%%%%%%%%%%%%%
 \subsubsection{Modified frequency-domain methods}
 \label{sec:mod-freq-domain}
@@ -401,30 +439,7 @@ The describing function for control force is prioritized due to its simpler impl
     \end{tabular}
     \end{table}
 
-Describing functions assume a certain time-domain nonlinear signal shape and then calculate the fundamental amplitude of that signal for use in a typical frequency-domain simulation.
-\ifdefined\DISSERTATION
-    The two signals where describing functions are used are both force signals.
-    For a force signal, the fundamental amplitude is the most relevant harmonic because not only is it typically the largest amplitude, but it also undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
-\else
-    The fundamental is the most relevant harmonic for power because typically, its force is the largest and its position undergoes the least filtering by the low-pass plant.
-\fi
-Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
-MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
-The former encodes the describing function formula directly into the simulation (see derivation in \Cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
 
-\ifdefined\DISSERTATION
-    This is possible because the describing function quasi-linearized pseudo-spectral method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \Cref{fig:mod-freq-domain-synthesis} is fed into the top left of \Cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
-    Unless intentionally made different to study robustness, the linearized plant model is identical for the synthesis and evaluation steps.
-    In this case, two workflows essentially become one, with no further computation required after the optimal control step.
-    Reconstruction of the nonlinear controller is not necessary for the evaluation of the power corresponding to that controller.
-    The power can be calculated directly from the frequency-domain response and the describing function of the nonlinear controller.
-    The time-domain representation of the nonlinear controller is only necessary for hardware implementation, or if the synthesized controller is to be evaluated with a different method such as time-stepping.
-\else
-    Because the same describing function is applied in both synthesis and evaluation, the inverse and forward describing functions cancel; the time-domain nonlinear controller need not be reconstructed for power evaluation, only for hardware implementation.
-\fi
-While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
-\citet{hall_open-source_2022} documents the RAFT open-source Python package for offshore wind turbines, which uses the drag describing function with iteration but does not include describing functions for saturation.
-MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabling efficient simulation while retaining model fidelity.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Equation of Motion}\label{sec:eom}
@@ -464,10 +479,7 @@ where, in the time domain under monochromatic forcing,
 \end{aligned}
 \end{equation}
 for both operational and storm conditions, where $\vec{\xi}(t)$ (body position) and $\zeta(t)$ (wave elevation) were defined in \Cref{sec:hydro}.
-The mass matrix is:
-\begin{equation}
-\mathbf{M_{op}}=\begin{bmatrix}m_f & 0 \\ 0 & m_s\end{bmatrix}, \quad  \mathbf{M_{storm}}=\begin{bmatrix}m_f + m_s \end{bmatrix}
-\end{equation}
+Exact forms of the mass matrix are given in \Cref{sec:appendix-dynamics}.
 
 \ifdefined\DISSERTATION
     For each force component, a linear or quasi-linear model is adopted, with coefficients $\vec{\gamma}$, $\mathbf{A_h}$, $\mathbf{B_h}$, $\mathbf{K_h}$ from the hydrodynamics module and $\mathbf{B_d}$, $\vec{\gamma}_d$, $\mathbf{B_p}$, and $\mathbf{K_p}$ to be derived in the following sections.
