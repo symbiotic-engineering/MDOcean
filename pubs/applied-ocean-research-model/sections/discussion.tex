@@ -8,14 +8,14 @@
 This subsection summarizes insights from variable-sweep analyses before presenting specific trend breakdowns.
 
 %%%%%%%%%%%%%%%%%%%
-\subsubsection{Effect of Bulk Dimensions on Hydrodynamic \gls{acr-eff}}
+\subsubsection{Effect of Bulk Dimensions on Hydrodynamic Efficiency}
 \ifdefined\DISSERTATION
     A brute-force sweep of nondimensionalized bulk geometry variables and the nondimensional wavenumber $\gls{sym-m-0}\gls{sym-h}$ allows for the identification of design trends.
     MDOcean performs a six-dimensional sweep with \resultsAOR[meemSweepSize] combinations in only \resultsAOR[meemSweepTime], an average of 16~ms per combination.
     Using only the hydrodynamics and dynamics modules for the present, we examine nondimensional outputs including radiation efficiency, capture width ratio, and nondimensionalized surface area.
     These serve respectively as rough proxies for power, power per unit cost, and cost, allowing for the visualization of tradeoffs between power and cost across the design space.
     Radiation efficiency was defined in \Cref{eq:power-matrix-decomposition} as the ratio of the capture width to the maximum radiation-limited capture width, and represents how well the device's geometry allows it to absorb power at a given frequency.
-    \gls{acr-cw} ratio is the ratio of capture width to a characteristic length scale, often taken as the device diameter but taken here as the square root of the wetted surface area to better serve as a proxy for cost.
+    Capture width ratio is the ratio of capture width to a characteristic length scale, often taken as the device diameter but taken here as the square root of the wetted surface area to better serve as a proxy for cost.
     (The cube root of submerged volume was also considered as a characteristic length scale; results were qualitatively similar to the square root of surface area and are not shown here.
     If wavelength were used as the characteristic length scale, the resulting capture width ratio would be a constant multiple of the radiation efficiency).
     For the final output, to nondimensionalize the wetted surface area, we divide it by the wavelength squared.
@@ -50,7 +50,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
     \hfill
     \begin{subfigure}[t]{0.48\linewidth}
         \includegraphics[\FigureOptions{aor:figs/from-matlab/sweep_geoms_line_cwr_sa.pdf}]{figs/from-matlab/sweep_geoms_line_cwr_sa.pdf}
-        \caption{\gls{acr-cw} ratio}
+        \caption{Capture width ratio}
         \label{fig:meem-sweep-cwr}
     \end{subfigure}
     \caption{Effect of wave environment and hydrodynamic design variables on (a) radiation efficiency and (b) capture width ratio}
@@ -74,7 +74,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
     High $\gls{sym-m-0}\gls{sym-h}$ favors qualitatively different geometries.
 \fi
 
-\paragraph{Design Cost-\gls{acr-pwr} Tradeoffs}
+\paragraph{Design Cost-Power Tradeoffs}
 \Cref{fig:meem-sweep-pareto} shows a Pareto front for the tradeoff of radiation efficiency (power proxy) and normalized surface area (cost proxy) across the six geometric design variables.
 \ifdefined\DISSERTATION
     The normalized surface area does not depend on the seventh input variable $\gls{sym-m-0}\gls{sym-h}$,
@@ -108,7 +108,7 @@ The dashed lines indicate the nominal design point at $\gls{sym-b}/\gls{sym-a} =
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%
-\subsubsection{Effect of \gls{acr-pto} Force and \gls{acr-pwr} Limits}
+\subsubsection{Effect of \gls{acr-pto} Force and Power Limits}
 \ifdefined\DISSERTATION
     Previous work has shown that capping the \gls{acr-pto} force can substantially reduce \gls{acr-pto} size and cost with minimal decrease in power.
     \citet{devin_high-dimensional_2024} finds that impedance matching at resonance has a large effect on power and \gls{acr-pto} sizing has little effect.
@@ -127,7 +127,7 @@ Using MDOcean, we investigate the effect of \gls{acr-pto} force limit on average
 \begin{figure}[htbp]
 \centering
 \includegraphics[\FigureOptions{aor:figs/from-matlab/power_force_sensitivity.pdf}]{figs/from-matlab/power_force_sensitivity.pdf}
-\caption{Effect of Force Limit on Annual Average \gls{acr-pwr} and Peak Structural Load}
+\caption{Effect of Force Limit on Annual Average Power and Peak Structural Load}
 \label{fig:force-limit}
 \end{figure}
 
@@ -154,7 +154,7 @@ We next move to a simultaneous sweep of both the force limit and the power limit
 \begin{figure*}[htbp]
 \centering
 \includegraphics[\FigureOptions{aor:figs/manual/pto_sweep_3.pdf}]{figs/manual/pto_sweep_3.pdf}
-\caption{Effect of Generator Force Limit and \gls{acr-pwr} Limit on Annual Average \gls{acr-pwr} and \gls{acr-lcoe}}
+\caption{Effect of Generator Force Limit and Power Limit on Annual Average Power and \gls{acr-lcoe}}
 \label{fig:force-power-limit-sweep}
 \end{figure*}
 Notably, the minimum \gls{acr-lcoe} point occurs at a force limit far below the unsaturated solution because the cost savings from a smaller \gls{acr-pto} outweigh the loss in power.
@@ -167,7 +167,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
     The theoretical analysis in \Cref{sec:appendix-constraint-sensitivity} derives mathematical conditions for when this is the case.
     Convexity suggests that local optimization methods should be effective for finding the optimal \gls{acr-pto} design.
 \else
-    \gls{acr-pwr} and \gls{acr-lcoe} both appear to be convex with respect to the force and power limits across the feasible region, a structural property that future optimizations can exploit.
+    Power and \gls{acr-lcoe} both appear to be convex with respect to the force and power limits across the feasible region, a structural property that future optimizations can exploit.
 \fi
 
 %%%%%%%%%%%%%%%%%%%
@@ -207,7 +207,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
 \label{sec:discussion-multidisciplinary}
 This section leverages the analytical multidisciplinary nature of the model to draw intuitive insights on limit cases and tradeoffs, and observe nondimensional relationships and scaling laws that would not be readily apparent in a purely numerical or single-discipline model.
 
-\paragraph{\gls{acr-pwr} Matrix Drivers}
+\paragraph{Power Matrix Drivers}
 Similar to \Cref{fig:JPD-multiply} showing the multiplication of the power matrix by the \gls{acr-jpd} to obtain average power,
 \Cref{fig:power-matrix-decomposition} further decomposes the power matrix into component matrices
 showing the impact of shape, drag, maximum force, and \gls{acr-pto} losses, with the following breakdown:
@@ -266,7 +266,7 @@ $\gls{sym-boldsymbol-eta-H-T-elec}$  & $\checkmark$ & $\checkmark$ & $\checkmark
 \begin{figure*}[htbp]
 \centering
 \includegraphics[\FigureOptions{aor:figs/from-matlab/nominal_power_matrix.pdf}]{figs/from-matlab/nominal_power_matrix.pdf}
-\caption{\gls{acr-pwr} matrix decomposition}
+\caption{Power matrix decomposition}
 \label{fig:power-matrix-decomposition}
 \end{figure*}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
@@ -292,7 +292,7 @@ From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
 \end{aligned}
 \end{equation}
 
-\gls{acr-pwr} is maximized when $|\gls{sym-Gamma-beta-opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
+Power is maximized when $|\gls{sym-Gamma-beta-opt}|=0$ in every sea state, which corresponds to unconstrained impedance-matched control.
 When constraints are active, the optimal $|\gls{sym-Gamma-beta-opt}|>0$ represents the impedance mismatch required to satisfy them, and power decreases quadratically with $|\gls{sym-Gamma-beta-opt}|$.
 
 \Cref{sec:appendix-constraint-sensitivity} uses this relationship to derive a closed-form scaling law for the optimal annual average power $\gls{sym-overline-P-elec}$ as a function of the constraint coefficients $\gls{sym-b-mu}$ (which are affine or square functions of the constraint limits $\gls{sym-tau-max}$, $\gls{sym-P-tau-Omega-max}$, $\gls{sym-xi-f-max}$, $\gls{sym-xi-s-max}$, and $\gls{sym-X-PTO-max}$ defined in \Cref{tab:qp-constraints}).
@@ -359,9 +359,9 @@ The fact that decreasing a constraint limit causes the numerator of the \gls{acr
 \newcommand{\modelTrustBuilders}{
     \begin{enumerate}[leftmargin=*]
         \item Surge force and mooring cost
-        \item \gls{acr-nl} storm wave forces
-        \item \gls{acr-irr}
-        \item \gls{acr-str}: thinner plates, better validation
+        \item Nonlinear storm wave forces
+        \item Irregular waves
+        \item Structure: thinner plates, better validation
         \item Additional \gls{acr-pto} nonlinearities
     \end{enumerate}
 }
@@ -389,7 +389,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     \end{table}
 
 \ifdefined\DISSERTATION
-    \paragraph{Neglect of Surge Force and \gls{acr-moor} Cost}
+    \paragraph{Neglect of Surge Force and Mooring Cost}
     \Cref{sec:design-load-cases} establishes that although the dynamics model estimates the surge force, the structures model uses only the heave force to calculate the factors of safety.
     The neglect of surge force means that geometries with significant lateral areas that would experience high surge force appear to perform better than they should.
     This is not only because of the impact on the structures module, but also because the surge force drives mooring cost, an effect which is not modeled in this study.
@@ -398,7 +398,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     Incorporating surge force into the structures module and adding a mooring cost module are recommended for future work.
     If these effects are implemented and confirmed to be important, then it may also be desired to obtain a more accurate estimate of the surge force across frequencies by utilizing the surge hydrodynamic coefficients instead of the long-wavelength approximation in \Cref{eq:surge-force}. 
     
-    \paragraph{\gls{acr-nl} \gls{acr-sto} \gls{acr-lo}}
+    \paragraph{Nonlinear Storm Loads}
     As \Cref{sec:irregular-waves} describes, MDOcean uses standard linear wave theory with equivalent regular waves, even for the storm condition.
     However, storm waves are nonlinear, and it is generally recommended to utilize higher order potential flow, \gls{acr-cfd} simulations, or wave tank tests to obtain storm loads \citep{coe_survey_2018}.
     Additionally, even when storm wave analysis uses linear or quasi-linear hydrodynamics, other design procedures typically utilize a time-domain ``design wave elevation'' signal to capture transient peaks.
@@ -417,7 +417,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     To more fully capture nonlinearities in irregular waves, the describing function mentioned earlier (which quantifies the fundamental amplitude of the response to a deterministic sinusoidal input) could be replaced with its probabilistic counterpart, stochastic linearization (which quantifies the expected value of the fundamental over the spectral input).
     This technique has been explored in several \gls{acr-wec} papers \citep{da_silva_statistical_2020,da_silva_stochastic_2023,kluger_synergistic_2017,folley_spectral-domain_2016,spanos_efficient_2016}, including one that performs multi-objective design optimization \citep{neshat_enhancing_2024}.
     
-    \paragraph{Probabilistic \gls{acr-var} in Load, Amplitude, and \gls{acr-pwr}}
+    \paragraph{Probabilistic Variation in Load, Amplitude, and Power}
     Once implemented, an irregular wave formulation would allow for the quantification of the short-term variability in power, load, and response amplitude within a sea state.
     Specifically, the Wiener-Khinchin theorem describes the spectrum of the output of a linear system in terms of the input spectrum and the transfer function.
     This opens the door for investigations in other disciplines, including the development of a spectral fatigue model, insight into broadband impedance matching and dynamic constraints, and analysis of grid integration.
@@ -477,7 +477,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     The most consequential current limitations are:
 \begin{itemize}[leftmargin=*]
     \item \textbf{Neglect of surge force in the structures module and absence of a mooring cost model.} Surge forces on the nominal \gls{acr-rm3} are \resultsAOR[surgeForceFloatNominal] (float) and \resultsAOR[surgeForceSparNominal] (spar), and mooring/foundation accounts for 12\% of \gls{acr-capex} (\Cref{tab:CBS}); incorporating these would likely affect optimal designs.
-    \item \textbf{Regular-wave assumption in storm load cases.} \gls{acr-sto} waves are nonlinear, and the regular-wave equivalent cannot capture transient peaks; second-order \gls{acr-meem} \citep{cong_novel_2020,mavrakos_second-order_2009} or the slender-body approximation in \gls{acr-raft} \citep{carmo_slender-body_2025} are candidate extensions.
+    \item \textbf{Regular-wave assumption in storm load cases.} Storm waves are nonlinear, and the regular-wave equivalent cannot capture transient peaks; second-order \gls{acr-meem} \citep{cong_novel_2020,mavrakos_second-order_2009} or the slender-body approximation in \gls{acr-raft} \citep{carmo_slender-body_2025} are candidate extensions.
     \item \textbf{Regular-wave assumption in operational loads.} Stochastic linearization \citep{da_silva_statistical_2020,da_silva_stochastic_2023,kluger_synergistic_2017,folley_spectral-domain_2016,spanos_efficient_2016,neshat_enhancing_2024} could replace the describing function to handle spectral inputs and enable spectral fatigue, grid-integration, and storage-sizing analyses \citep{mccabe_wec_2025}.
     \item \textbf{Single \gls{acr-wec} archetype.} Extending \gls{acr-meem} to handle the damping plate or 3+ concentric cylinders \citep{best_openflash_2026,bimali_matrix_2026} would broaden applicability, as would generalizing the framework to non-point-absorber archetypes.
 \end{itemize}

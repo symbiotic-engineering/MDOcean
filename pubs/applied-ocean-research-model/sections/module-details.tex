@@ -18,7 +18,7 @@
 \fi
 %TC:break Geometry
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\gls{acr-geo}}\label{sec:geom}
+\subsection{Geometry}\label{sec:geom}
 The geometry module computes submerged volume $\gls{sym-V-sub}$, structural volume $\gls{sym-V-struct}$, and associated hydrostatic properties from bulk dimensions.
 \Cref{fig:dims} defines the principal geometric variables, where $\gls{sym-T-draft}$ denotes drafts, $\gls{sym-h}$ heights, and $\gls{sym-D}$ diameters.
 Subscripts $\gls{sym-f}$, $\gls{sym-s}$, and $d$ refer to the float, spar, and damping plate, respectively.
@@ -206,7 +206,7 @@ Any violations are corrected by adjusting the coupling terms $\gls{sym-A-c}$ and
 
 %TC:break Dynamics and Control
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\gls{acr-dyn} and \gls{acr-ctl}}\label{sec:dynamics}
+\subsection{Dynamics and Control}\label{sec:dynamics}
 This subsection introduces the dynamics and control modeling assumptions before detailing the frequency-domain methods and control formulations.
 
 %%%%%%%%%%%%%%%
@@ -223,17 +223,17 @@ This subsection introduces the dynamics and control modeling assumptions before 
     Even with linearized intrinsic dynamics, maintaining optimality subject to dynamic constraints also requires a nonlinear controller.
     Dynamic constraints on amplitude, force, and peak power significantly influence the trade-off of power and cost, and amplitude limits are required to obtain a physically meaningful result.
     Besides nonlinearities, MDOcean also requires a low computation cost, since the dynamics will be evaluated many thousands of times during optimization.
-    Of the methods mentioned, Pontryagin's maximum principle (\gls{acr-pmp}) and quasi-linearized pseudo-spectral techniques meet these requirements.
+    Of the methods mentioned, \gls{acr-pmp} and \gls{acr-qlps} techniques meet these requirements.
     \gls{acr-pmp} requires an analytically difficult derivation unique to the specific nonlinearities in question because wave energy dynamics have a particular form requiring so-called singular control \citep{zou_optimal_2017}.
-    On the other hand, quasi-linearized pseudo-spectral techniques are simple and intuitive.
-    Therefore, MDOcean pursues a semi-analytical quasi-linearized pseudo-spectral method.
+    On the other hand, \gls{acr-qlps} techniques are simple and intuitive.
+    Therefore, MDOcean pursues a semi-analytical \gls{acr-qlps}.
 \else
     Standard linear frequency-domain \gls{acr-wec} analysis assumes unconstrained linear dynamics, enabling closed-form impedance-matched optimal control.
     However, real \glspl{acr-wec} are subject to (i) dynamic constraints (e.g., generator force, power, and stroke limits) and (ii) nonlinear forces, particularly viscous drag.
     Time-domain simulation handles both naturally but is computationally expensive, especially in an optimization loop.
     Pseudo-spectral methods are nonlinear and handle constraints by collocating the dynamics at specific time-steps, but require an outer numerical optimizer for both simulation and control synthesis.
 \fi
-MDOcean adopts a quasi-linearized pseudo-spectral (\gls{acr-qlps}) approach that retains the speed of frequency-domain analysis while handling both temporal constraints and drag nonlinearities.
+MDOcean adopts a \gls{acr-qlps} approach that retains the speed of frequency-domain analysis while handling both temporal constraints and drag nonlinearities.
 This formulation seeks to preserve the computational advantages and simplicity of classical linear analysis while extending its applicability to practical \gls{acr-wec} operating regimes that include saturation, drag, and dynamic constraints.
 \gls{acr-qlps} combines two techniques: (a) describing functions, which quasi-linearize a nonlinear waveform by retaining only its fundamental harmonic,
 and (b) constrained spectral optimal control, which solves the optimal control problem as a quadratically-constrained quadratic program (\gls{acr-qcqp}) assuming linear dynamics and spectral-domain constraints.
@@ -257,19 +257,19 @@ Avoiding iterative numerical optimization substantially reduces computational co
     Typical frequency domain methods for control design, such as loop shaping, \gls{acr-pid} tuning, and $H_\infty$/$H_2$ control for general applications, along with complex-conjugate impedance matching for power-maximizing applications such as wave energy, cannot take into account constraints and nonlinearities.
     Meanwhile, typical methods for nonlinear control design, such as feedback linearization, sliding mode control, backstepping, and Lyapunov-based control, are performed in the time domain and do not incorporate constraints.
     Latching and declutching control are wave-energy-specific passive nonlinear bang-bang control methods that utilize the frequency-domain concept of phase-matching the fundamental harmonic of the response to the wave excitation, but they are still primarily time-domain methods and do not incorporate constraints \citep{hals_comparison_2011}.
-    Methods for constrained optimal control, meanwhile, such as model predictive control (\gls{acr-mpc}), constrained linear-quadratic regulation (\gls{acr-lqr}), and trajectory optimization are likewise time-domain and were originally derived for linear control problems, although nonlinear extensions exist including nonlinear \gls{acr-mpc} (\gls{acr-nmpc}), constrained iterative \gls{acr-lqr} (iLQR), and differential dynamic programming (\gls{acr-dp}).
+    Methods for constrained optimal control, meanwhile, such as \gls{acr-mpc}, constrained \gls{acr-lqr}, and trajectory optimization are likewise time-domain and were originally derived for linear control problems, although nonlinear extensions exist including \gls{acr-nmpc}, constrained iterative \gls{acr-lqr} (iLQR), and differential \gls{acr-dp}.
     Other methods for nonlinear constrained optimal control in the time domain include the already-discussed \gls{acr-pmp} and the control barrier function method.
-    Methods to incorporate nonlinearities in the frequency domain include harmonic balance synthesis, which retains full nonlinearity in a sinusoidal-steady state analysis so technically falls in the spectral domain rather than the frequency domain; its linearized counterpart, describing function (\gls{acr-df})-based synthesis \citep{atherton_nonlinear_1982,gelb_multiple-input_1968}; and the extension of the latter to broadband inputs, spectral linearization (also called stochastic linearization, Gaussian closure, and quasi-linear control) \citep{roberts_random_2003,ching_quasilinear_2010}.
+    Methods to incorporate nonlinearities in the frequency domain include harmonic balance synthesis, which retains full nonlinearity in a sinusoidal-steady state analysis so technically falls in the spectral domain rather than the frequency domain; its linearized counterpart, \gls{acr-df}-based synthesis \citep{atherton_nonlinear_1982,gelb_multiple-input_1968}; and the extension of the latter to broadband inputs, spectral linearization (also called stochastic linearization, Gaussian closure, and quasi-linear control) \citep{roberts_random_2003,ching_quasilinear_2010}.
     These methods are not optimal control methods and do not incorporate constraints, although it is possible to sub-optimally enforce constraints by applying a saturation nonlinearity to the constrained quantity.
-    Finally, methods which combine frequency domain synthesis with constrained optimal control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral optimal control (\gls{acr-oc}), which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained impedance matching (\gls{acr-im}), the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using linear matrix inequalities (\glspl{acr-lmi}), typically in the context of robust control \citep{vanantwerp_tutorial_2000}.
+    Finally, methods which combine frequency domain synthesis with constrained optimal control include constrained loop shaping (often enforcing performance constraints while minimizing the distance to an optimal loop shape, in this case the complex-conjugate impedance); linear spectral \glsfull{acr-oc}, which poses a trajectory optimization problem for a linear system represented with global basis functions in the spectral domain; constrained \acrfull{acr-im}, the narrow-band, frequency-domain equivalent of spectral optimal control; and convex control formulated using \glspl{acr-lmi}, typically in the context of robust control \citep{vanantwerp_tutorial_2000}.
 
-    At the intersection of all three categories lies nonlinear spectral \gls{acr-oc}, pseudo-spectral \gls{acr-oc}, and the method used in MDOcean, which we call ``quasi-linearized pseudo-spectral \gls{acr-oc}.''
+    At the intersection of all three categories lies nonlinear spectral \gls{acr-oc}, pseudo-spectral \gls{acr-oc}, and the method used in MDOcean, which we call ``\acrlong{acr-qlps} \gls{acr-oc}.''
     The pseudospectral method uses the same global basis function representation as spectral \gls{acr-oc}, but instead of enforcing the dynamics at all points in the trajectory, it does so only at specific collocation points, which enables the representation of time-domain constraints and nonlinearities as opposed to harmonic constraints and nonlinearities \citep{elnagar_pseudospectral_1995}.
     Pseudo-spectral methods often employ Legendre or Chebyshev polynomial bases, although in wave energy Fourier bases are more typical.
     In this case, the method is equivalent to a nonlinear trajectory optimization problem that enforces both spectral-domain harmonic balance and time-domain constraints.
-    The quasi-linearized pseudo-spectral method used in MDOcean borrows the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain, but retains only the fundamental harmonic to collapse to the frequency domain.
+    The \gls{acr-qlps} method used in MDOcean borrows the pseudo-spectral concept of incorporating time-domain constraints in the spectral domain, but retains only the fundamental harmonic to collapse to the frequency domain.
     This is exactly analogous to the way that describing functions linearize the harmonic balance method.
-    It can also be thought of as the combination of describing functions with constrained impedance matching.
+    It can also be thought of as the combination of \glspl{acr-df} with constrained \gls{acr-im}.
 \fi
 
 \Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation,fig:mod-freq-domain-combined} distinguish three application workflows for the \gls{acr-qlps} method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the quasi-linearized system), evaluation (simulation of an arbitrary controller's power performance, where the controller, plant, or both are nonlinear), and both.
@@ -282,16 +282,16 @@ This differs from linearization approaches such as stochastic linearization, whi
 
 \begin{figure*}[htbp]
 \centering
-\caption{Flowchart depicting the \gls{acr-qlps} method (M1). The describing functions (\glspl{acr-df}) for response/constraint, controller, and plant are shown in yellow, pink, and blue respectively.}
+\caption{Flowchart depicting the \gls{acr-qlps} method (M1). The \acrlong{acr-df}s for response/constraint, controller, and plant are shown in yellow, pink, and blue respectively.}
 \begin{subfigure}[t]{.9\linewidth}
     \includegraphics[\FigureOptions{aor:figs/from-matlab/mod_freq_domain_ctrl_synthesis.pdf}]{figs/from-matlab/mod_freq_domain_ctrl_synthesis.pdf}
-    \caption{\gls{acr-ctl} synthesis - applies to (M1.2) only.}
+    \caption{Control synthesis - applies to (M1.2) only.}
     \label{fig:mod-freq-domain-synthesis}
 \end{subfigure}
 \vfill
 \begin{subfigure}[t]{.9\linewidth}
     \includegraphics[\FigureOptions{aor:figs/from-matlab/mod_freq_domain_ctrl_evaluation.pdf}]{figs/from-matlab/mod_freq_domain_ctrl_evaluation.pdf}
-    \caption{\gls{acr-ctl} evaluation - applies to both (M1.1) and (M1.2).}
+    \caption{Control evaluation - applies to both (M1.1) and (M1.2).}
     \label{fig:mod-freq-domain-evaluation}
 \end{subfigure}
 \vfill
@@ -317,7 +317,7 @@ However, in the special case where the only time-domain constraint is on the con
 \label{tab:constraint-approaches}
 \begin{tabular}{M{.03\linewidth} >{\raggedright\arraybackslash}m{0.45\linewidth}l l}
 &\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \toprule
-M1 & \gls{acr-nl} optimal (M1.1) or near-optimal (M1.2) controller, quasi-linearized via describing functions& \Stars{3} &\Stars{3} \\ \hline
+M1 & Nonlinear optimal (M1.1) or near-optimal (M1.2) controller, quasi-linearized via describing functions& \Stars{3} &\Stars{3} \\ \hline
 M2 & Linear optimal controller& \Stars{3} & \Stars{2} \\ \hline
 M3 & Saturate or zero the times with constraint violations, neglecting the effect on other signals& \Stars{2} & \Stars{1}\\ \hline
 M4 & Saturate or zero entire sea state& \Stars{1} & \Stars{0.5} \\ \hline
@@ -329,7 +329,7 @@ M5 &Mark design as infeasible& N/A& \Stars{0} \\
 \paragraph{M1: \gls{acr-qlps} with nonlinear control}
 The modified frequency-domain approach with the highest accuracy and optimality (M1) is to synthesize a new nonlinear optimal (or near-optimal) time-domain controller that obeys the constraint, taking into account the linearized effect of that nonlinear controller on the frequency domain response.
 This synthesis can occur in a number of ways.
-If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_2024,lin_fast_2025} develop via the \gls{acr-pmp}) is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of \gls{acr-qlps} in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
+If a time-domain optimal control law (e.g. those that \citet{abdulkadir_optimal_2024,lin_fast_2025} develop via \gls{acr-pmp}) is available for the constraint under consideration (M1.1), it can be used as the nonlinear optimal controller directly, essentially bypassing the use of \gls{acr-qlps} in the control synthesis step (\Cref{fig:mod-freq-domain-synthesis}) and using it only for evaluation (\Cref{fig:mod-freq-domain-evaluation}).
 \ifdefined\DISSERTATION
     This differs from the standard \gls{acr-pmp} method in that the evaluation of the response and power corresponding to the time-domain \gls{acr-pmp} controller is determined in the frequency domain, rather than via numerical time-integration (as in the method of \citet{zou_optimal_2017}) or analytical time-integration (as in the method of \citet{lin_fast_2025}).
     This is advantageous if the computational cost or mathematical labor of the numerical or analytical \gls{acr-pmp} evaluation methods, respectively, are of concern.
@@ -396,8 +396,8 @@ The describing function for control force is prioritized due to its simpler impl
          Drag& Describing function (M1.2) for $\sin(\gls{sym-omega} \gls{sym-t})|\sin(\gls{sym-omega} \gls{sym-t})|$ with iteration to find effect on response and optimal controller\\
          Force limit& Describing function (M1.2) for $\text{sat}(\sin(\gls{sym-omega} \gls{sym-t}))$ with iteration to find effect on response and optimal controller\\
         Operational amplitude limit& Optimal linear controller (M2)\\
-         \gls{acr-pwr} limit& Average value of $\text{sat}(\sin(\gls{sym-omega} \gls{sym-t})+\gls{sym-a})$, neglecting any effect on response and optimal controller (M3)\\
-        \gls{acr-sto} amplitude limit&Optimizer considers limit violations as infeasible designs (M5)\\
+         Power limit& Average value of $\text{sat}(\sin(\gls{sym-omega} \gls{sym-t})+\gls{sym-a})$, neglecting any effect on response and optimal controller (M3)\\
+        Storm amplitude limit&Optimizer considers limit violations as infeasible designs (M5)\\
     \end{tabular}
     \end{table}
 
@@ -517,7 +517,7 @@ The Thévenin equivalent circuit method is used to find the effective intrinsic 
 Details and circuit diagrams are provided in \Cref{sec:appendix-pto-dynamics}.
 
 %%%%%%%%%%%%%%%
-\subsubsection{\gls{acr-pwr} Production}\label{sec:power}
+\subsubsection{Power Production}\label{sec:power}
 The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $\gls{sym-p}(\gls{sym-t}) = \gls{sym-e-t}~\gls{sym-q-t}$.
 \ifdefined\DISSERTATION
     Substituting $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-F-p},\gls{sym-dot-xi}\}$ yields the floating body mechanical power,
@@ -571,7 +571,7 @@ The full expansion of $\gls{sym-p}_{\text{avg},\text{elec}}$ and $\gls{sym-p}_{p
 %The time-domain mechanical power is $\gls{sym-P}_{\text{mech}}(\gls{sym-t}) = \gls{sym-tau}(\gls{sym-t}) \gls{sym-Omega}(\gls{sym-t}) = (\gls{sym-B-u} \gls{sym-Omega}(\gls{sym-t}) + \gls{sym-K-u} \gls{sym-theta}(\gls{sym-t}) ) \gls{sym-Omega}(\gls{sym-t}) $, where $\gls{sym-theta}(\gls{sym-t})$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
 
 %%%%%%%%%%%%%%%
-\subsubsection{\gls{acr-oc}}\label{sec:optimal-control}
+\subsubsection{Optimal Control}\label{sec:optimal-control}
 This subsection presents the unconstrained and constrained optimal-control solutions used in the model.
 \paragraph{Unconstrained}
 In the absence of constraints, maximizing power at a given port requires impedance matching at that port due to the maximum power transfer theorem.
@@ -592,7 +592,7 @@ The power-maximizing \gls{acr-pto} damping $\gls{sym-B-l-damp}$ is then:
 
     Both of these controllers frequently result in excessively large forces and thus structural and powertrain requirements, especially in energetic sea states or in reactive control when $\gls{sym-K-l}$ is far from zero.
     $\gls{sym-K-l-reac}$ is often a large negative number because cost minimization favors a low mass, and the negative \gls{acr-pto} stiffness reduces the natural frequency to better match the ocean wave frequency with a smaller device mass.
-    \gls{acr-ctl} laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
+    Control laws \eqref{eq:matched-load} and \eqref{eq:damping-control} provide no mechanism to reduce this torque, so below we formulate a control law with the ability to obey constraints.
 \else
     Both controllers frequently produce excessively large forces in energetic sea states or under reactive control, and provide no mechanism to obey limits.
     We therefore formulate a control law that handles constraints below.
@@ -719,12 +719,12 @@ $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (
     While the nested architecture solves the quadratic program \Cref{eq:opt-problem}, the simultaneous architecture integrates the \gls{acr-qcqp} into the nonlinear design optimization, which does not take advantage of the efficiency available with the \gls{acr-qcqp} formulation.
     It is unknown whether the numerical direct approach to solving the \gls{acr-qcqp} would be more efficient than the numerical indirect approach, but both are expected to be significantly less efficient than the analytical approach, so the analytical approach is used for all results and benchmarks presented here.
 \else
-    Both analytical and numerical-indirect solutions for $\gls{sym-Gamma}_{\text{opt}}$ are implemented in MDOcean.
-    This study focuses on the superior analytical approach described in \Cref{sec:appendix-qp-solution}, which has a geometric interpretation as a minimum-distance problem on the complex plane of $\gls{sym-Gamma}_{\text{opt}}$ and is used for all results presented here.
+    Both analytical and numerical-indirect solutions for $\gls{sym-Gamma-opt}$ are implemented in MDOcean.
+    This study focuses on the superior analytical approach described in \Cref{sec:appendix-qp-solution}, which has a geometric interpretation as a minimum-distance problem on the complex plane of $\gls{sym-Gamma-opt}$ and is used for all results presented here.
     \citet[Appendix A.3.3]{mccabe_dissertation_2026} describes the numerical-indirect approach.
 \fi
 
-\paragraph{\gls{acr-nl} controller}
+\paragraph{Nonlinear controller}
 \ifdefined\DISSERTATION
     For the nonlinear controller, the maximum generator torque constraint is considered separately from the others.
     This constraint changes the optimal torque signal from a pure sinusoid to a saturated waveform, approaching a square wave for sufficiently low torque limit.
@@ -749,7 +749,7 @@ $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (
     \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_desc_fcn.pdf}]{figs/from-matlab/drag_desc_fcn.pdf}
     \caption{Quadratic drag}\label{fig:drag-df}
 \end{subfigure}
-\caption{Conceptual demonstration of describing function approximations. Plots show force versus time. \gls{acr-nl} signals in red; fundamental amplitudes in blue.}\label{fig:desc-fcns}
+\caption{Conceptual demonstration of describing function approximations. Plots show force versus time. Nonlinear signals in red; fundamental amplitudes in blue.}\label{fig:desc-fcns}
 \end{figure}
 Details of the calculation are provided in \Cref{sec:appendix-force-sat}.
 The result is updated effective values for control gains $\gls{sym-B-l}$ and $\gls{sym-K-l}$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \Cref{eq:constrained-qp-solution}.
@@ -841,7 +841,7 @@ The \gls{acr-jpd} used in this analysis represents wave conditions in Humboldt B
 \begin{figure}[b!]
 \centering
 \includegraphics[\FigureOptions{aor:figs/manual/jpd_mult.pdf}]{figs/manual/jpd_mult.pdf}
-\caption{\gls{acr-pwr} matrix multiplication}
+\caption{Power matrix multiplication}
 \label{fig:JPD-multiply}
 \end{figure}
 
@@ -920,7 +920,7 @@ This approximation can either under- or overestimate the true peak depending on 
 \label{tab:DLCs}
 \begin{tabular}{P{0.28\linewidth}P{0.3\linewidth}P{0.33\linewidth}}
     & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
-    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: \gls{acr-sto}}\\ \hline
+    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Peak powertrain force, $\max_{\gls{sym-t}} |\gls{sym-F-p}(\gls{sym-t})|$ \vspace{8pt} }
         & \parbox[m]{\linewidth}{\centering
@@ -1091,7 +1091,7 @@ If the ultimate design instead utilizes a simple PI controller, the assumption s
 
 %TC:break Structures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\gls{acr-str}}\label{sec:structures}
+\subsection{Structures}\label{sec:structures}
 The MDOcean structures module uses forces from the dynamics module as well as area and volume outputs from the geometry module to calculate the factors of safety for various structural failure modes.
 The factors of safety represent the multiplicative increase in force before stress would surpass peak limits for storm loads and the endurance limit under operational loads.
 
@@ -1179,7 +1179,7 @@ For illustrative purposes only, assuming a fixed maximum stress and considering 
 
 %TC:break Economics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\gls{acr-econ}}\label{sec:econ}
+\subsection{Economics}\label{sec:econ}
 The common economic metric $LCOE$ is calculated as the ratio of annualized expenditures to the annual energy production $AEP$:
 \begin{equation}\label{eq:lcoe}
     LCOE = \frac{CAPEX\cdot  FCR + OPEX}{AEP}

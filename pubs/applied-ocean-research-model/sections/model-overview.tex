@@ -54,7 +54,7 @@ Inputs and outputs are organized according to standard \gls{acr-mdo} conventions
     \paragraph{Absence of Feedback Coupling}
     The lack of variables in the lower left portion of the diagram indicates that there is no feedback coupling between modules, so an external solver to enforce consistency is not necessary.
     This helps decrease the simulation computation time and is appealing for optimization.
-    \paragraph{Presence of \gls{acr-dv} and Feed-Forward Coupling}
+    \paragraph{Presence of Design Variable and Feed-Forward Coupling}
     The fact that the same design variable group is an input to multiple modules indicates the presence of design variable coupling.
     Most heavily coupled are the bulk dimensions, which are input to the geometry, hydrodynamics, and structural modules.
     Thicknesses and generator ratings are each input to two modules, with thicknesses coupling geometry and structures and generator ratings coupling dynamics and economics.
@@ -87,7 +87,7 @@ Inputs and outputs are organized according to standard \gls{acr-mdo} conventions
     For this reason, \gls{acr-sand} would likely increase the runtime of the full optimization, motivating MDOcean's selection of \gls{acr-mdf} as the more suitable architecture.
     Another advantage of \gls{acr-mdf} over \gls{acr-sand} is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
     
-    \paragraph{\gls{acr-ctl} Optimization Architecture}
+    \paragraph{Control Optimization Architecture}
     In control co-design, the nested and simultaneous architectures are often contrasted \citep{sundarrajan_towards_2021,herber_nested_2018}.
     The nested architecture, known as ``asymmetric subspace optimization'' in \gls{acr-mdo} literature \citep{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
     This takes advantage of the fact that the inner optimization is often convex and can be solved quickly.
@@ -126,7 +126,7 @@ Inputs and outputs are organized according to standard \gls{acr-mdo} conventions
     For this reason, \gls{acr-mdf} is adopted.
     
     \paragraph{\gls{acr-ccd} Architecture}
-    \gls{acr-ctl} co-design problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
+    \gls{acr-ccd} problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
     In the nested approach, control is optimized in an inner loop, while in the simultaneous approach control and design variables are optimized together.
     In addition, optimal control-based formulations may determine control either explicitly or implicitly via optimality conditions. 
     

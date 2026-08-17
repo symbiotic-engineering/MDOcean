@@ -4,31 +4,31 @@
 \label{sec:validation-benchmarking}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Dynamic Validation Using \gls{acr-wec}-Sim}\label{sec:dynamic-validation}
-The popular time-domain hydrodynamic simulation software \gls{acr-wec}-Sim \citep{ruehl_wec-simwec-sim_2024} is used to validate the dynamics module.
-The \gls{acr-wec}-Sim \gls{acr-rm3} example is run with regular waves and with the device constrained to oscillate only in heave.
+\subsection{Dynamic Validation Using WEC-Sim}\label{sec:dynamic-validation}
+The popular time-domain hydrodynamic simulation software WEC-Sim \citep{ruehl_wec-simwec-sim_2024} is used to validate the dynamics module.
+The WEC-Sim \gls{acr-rm3} example is run with regular waves and with the device constrained to oscillate only in heave.
 \ifdefined\DISSERTATION
-    Notably, the \gls{acr-rm3} geometry provided in \gls{acr-wec}-Sim differs slightly from the published dimensions in the \gls{acr-rm3} report, so for validation the dimensions input to MDOcean are adjusted to match \gls{acr-wec}-Sim.
+    Notably, the \gls{acr-rm3} geometry provided in WEC-Sim differs slightly from the published dimensions in the \gls{acr-rm3} report, so for validation the dimensions input to MDOcean are adjusted to match WEC-Sim.
 \fi
 
 \ifdefined\DISSERTATION
-    \gls{acr-wec}-Sim runs utilize hydrodynamic coefficients obtained with the \gls{acr-wamit} \gls{acr-bem} for dynamics, and control coefficients calculated with MDOcean for consistency.
+    WEC-Sim runs utilize hydrodynamic coefficients obtained with the \gls{acr-wamit} \gls{acr-bem} for dynamics, and control coefficients calculated with MDOcean for consistency.
     MDOcean is run with \gls{acr-meem} as usual, and separately also run with the \gls{acr-wamit} coefficients to distinguish differences caused by disparate hydrodynamic coefficients from those caused by the underlying dynamics.
 \else
-    Two MDOcean configurations are compared against \gls{acr-wec}-Sim:
-    one using \gls{acr-meem} hydrodynamic coefficients (the default) and one using \gls{acr-wamit} \gls{acr-bem} coefficients matching \gls{acr-wec}-Sim's,
+    Two MDOcean configurations are compared against WEC-Sim:
+    one using \gls{acr-meem} hydrodynamic coefficients (the default) and one using \gls{acr-wamit} \gls{acr-bem} coefficients matching WEC-Sim's,
     to separate dynamics-model error from hydrodynamic-coefficient error.
 \fi
 
-The absolute error in average power compared to the \gls{acr-wec}-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
+The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
 with an error breakdown for all simulation scenarios and sea states shown in \Cref{fig:error-histogram}.
 \begin{figure*}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}]{figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
-    \caption{Error breakdown based on \gls{acr-wec}-Sim Verification Runs}
+    \caption{Error breakdown based on WEC-Sim Verification Runs}
     \label{fig:error-histogram}
 \end{figure*}
-Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as \gls{acr-wec}-Sim and with zero drag
+Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag
 (\resultsAOR[wecsimAvgPowerErrorBestCase] and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself,
 but in the way that the model amplifies errors in drag and hydrodynamic coefficient inputs.
 \Cref{sec:appendix-dynamic-validation} provides errors of additional outputs as a function of sea state.
@@ -56,7 +56,7 @@ It also matches \gls{acr-wamit} results well.
 
 The overall model is validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \citet{RM3}, as shown in \Cref{tab:validation}.
 \ifdefined\DISSERTATION
-    Volume and center of buoyancy results are also compared to the \gls{acr-wec}-Sim \gls{acr-rm3} tutorial geometry, which differs slightly from the nominal \gls{acr-rm3} geometry.
+    Volume and center of buoyancy results are also compared to the WEC-Sim \gls{acr-rm3} tutorial geometry, which differs slightly from the nominal \gls{acr-rm3} geometry.
     Structural calculations are additionally compared to \citet{previsic_reference_2011}, an unpublished report by an author of the reference model report providing more detail on the structural calculations.
 \fi
 The mass, power, and cost track well, but the structural force in storm waves has a significant discrepancy.
@@ -71,13 +71,13 @@ The mass, power, and cost track well, but the structural force in storm waves ha
 
 \ifdefined\DISSERTATION
     As with force, a tuned scale factor is also applied to the power when the geometry is set to the nominal \gls{acr-rm3} geometry to obtain an equal average power to the reference model report (86~kW).
-    Unlike the force, the power discrepancy is not attributed to a modeling error because the separate power validation against \gls{acr-wec}-Sim tracks extremely well as described in \Cref{sec:dynamic-validation}.
+    Unlike the force, the power discrepancy is not attributed to a modeling error because the separate power validation against WEC-Sim tracks extremely well as described in \Cref{sec:dynamic-validation}.
     Rather, the discrepancy is attributed to the fact that the reference model report uses a different dynamic model that is not described in detail, and does not document the hydrodynamic coefficients, water depth, drag coefficient, and other necessary input parameters that would be required to obtain a close match.
     A final tuned scale factor is applied to the structural mass to account for the fact that not all structural components are modeled, including spar stiffeners, damping plate circumferential stiffeners, and miscellaneous features like flanges, enclosures, and access mounts.
 \else
     A power scale factor is similarly applied to match the reference report's 86~kW average power;
     the discrepancy is attributed to the reference report's use of an undocumented dynamic model rather than to a modeling error in MDOcean
-    (the \gls{acr-wec}-Sim validation of \Cref{sec:dynamic-validation} tracks closely).
+    (the WEC-Sim validation of \Cref{sec:dynamic-validation} tracks closely).
     A structural-mass scale factor accounts for unmodeled subcomponents (spar stiffeners, damping plate circumferential stiffeners, flanges, enclosures, access mounts).
 \fi
 
@@ -160,7 +160,7 @@ The simulation is an order of magnitude faster than the Capytaine \gls{acr-bem} 
 \end{figure}
 
 The dynamics and controls module takes the next longest (\resultsAOR[pctRuntimeDynamics], enlarged in \Cref{fig:runtime-dynamics}), with contributions from force saturation, spar analysis, drag linearization, and evaluation of the motion transfer function.
-This represents a three-order-of-magnitude improvement over the equivalent regular-wave \gls{acr-wec}-Sim simulation run in parallel.
+This represents a three-order-of-magnitude improvement over the equivalent regular-wave WEC-Sim simulation run in parallel.
 \ifdefined\DISSERTATION
     Simplifying the dynamics to a single degree of freedom (\gls{acr-dof}) achieves another order of magnitude speedup, although the optimization and benchmarking results presented here utilize the 2-\gls{acr-dof} model.
 \fi
@@ -168,7 +168,7 @@ This represents a three-order-of-magnitude improvement over the equivalent regul
 \begin{figure}[t!]
 \centering
 \includegraphics[\FigureOptions{aor:figs/from-matlab/dynamics_runtime.pdf}]{figs/from-matlab/dynamics_runtime.pdf}
-\caption{Bar chart demonstrating the speed improvement of MDOcean's dynamics module over baseline solver \gls{acr-wec}-Sim}\label{fig:runtime-dynamics}
+\caption{Bar chart demonstrating the speed improvement of MDOcean's dynamics module over baseline solver WEC-Sim}\label{fig:runtime-dynamics}
 \end{figure}
 
 The structures, geometry, and economics modules are not computationally expensive and together compose the remaining \resultsAOR[pctRuntimeOther]~of the total runtime.

@@ -55,13 +55,13 @@ This intends to lower the likelihood of creating saturation behavior (where a di
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\gls{acr-dyn} and \gls{acr-ctl} Module Details}
+\section{Dynamics and Control Module Details}
 This section provides supplementary derivations and implementation details for the dynamics and control module.
 
 \subsection{Multiport Model Details}
 \input{sections/multiport-appendix}
 
-\subsection{\gls{acr-oc} Details}
+\subsection{Optimal Control Details}
 \input{sections/optimal-control-appendix}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,21 +91,21 @@ A future refinement could explicitly reconstruct the time-domain drag force from
 \subsection{Dynamic Validation}
 \label{sec:appendix-dynamic-validation}
 
-\subsubsection{\gls{acr-wec}-Sim}
+\subsubsection{WEC-Sim}
 The drag describing function and \gls{acr-meem} hydrodynamic coefficients have a minor effect assuming a 1-\gls{acr-dof} system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-\gls{acr-dof} system (38.2\% and 28.6\% respectively).
-Meanwhile, the error is extremely low in the 2-\gls{acr-dof} system enforcing the same hydrodynamic coefficients as \gls{acr-wec}-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
+Meanwhile, the error is extremely low in the 2-\gls{acr-dof} system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
 This indicates that the larger error in the 2-\gls{acr-dof}-drag-\gls{acr-meem} case is not an error in the 2-\gls{acr-dof} dynamic model itself, but in the way that a 2-\gls{acr-dof} model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each \gls{acr-dof}.
 The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
 
-A \gls{acr-wec}-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the \gls{acr-wec}-Sim \gls{acr-rm3} tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
-For consistency, MDOcean also uses this alternate geometry for \gls{acr-wec}-Sim comparisons only.}
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim \gls{acr-rm3} tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
 Each of the 210 sea states are simulated individually as the equivalent regular wave.
 Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
 %\Cref{tab:dynamic-validation} and
 \Cref{fig:dynamic-validation} compares the results.
 The $\gls{sym-C-d}=0$ simulation with identical hydrodynamic coefficients (top left of \Cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions.
 The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
-This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of \gls{acr-wec}-Sim's numerical integration and post-processing.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
 For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
 An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $\gls{sym-T-period}>12 \gls{sym-s}$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
 Turning on drag ($\gls{sym-C-d}=1$, top right of \Cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
@@ -114,7 +114,7 @@ While determining the exact source of the error requires further investigation, 
 Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's \gls{acr-meem} hydrodynamic coefficients on its dynamic power production.
 The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the \gls{acr-meem} hydro coefficients has minimal effect on the overall dynamic response.
 Finally, the bottom right corner of \Cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
-\gls{acr-pwr} is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
 This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \Cref{sec:dynamic-validation}.
 Meanwhile, MDOcean underpredicts the peak power by around 25\%.
 Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
@@ -176,7 +176,7 @@ While most signals show good agreement between the models, interestingly, large 
 \end{landscape}
 The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worse at mid-range frequencies.
 Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
-The \gls{acr-wec}-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
+The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
 Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
 
 We also validate the describing function approximation for the drag force.
@@ -192,27 +192,27 @@ The match is excellent in all four cases, confirming that the drag force is inde
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/position_THD_contour.pdf}]{figs/from-matlab/position_THD_contour.pdf}
-    \caption{Total Harmonic Distortion of Float Displacement in \gls{acr-wec}-Sim Simulations with Drag}
+    \caption{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
     \label{fig:wecsim-thd}
 \end{figure}
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_force_desc_fcn.pdf}]{figs/from-matlab/drag_force_desc_fcn.pdf}
-    \caption{Comparison of Assumed and Actual Drag Force Signal \gls{acr-shp}}
+    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
     \label{fig:wecsim-drag-waveform}
 \end{figure}
 
 \subsubsection{Reference Model Report}
 While the original reference model report \citep{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients,
 it does record the mechanical power for each sea state.
-\Cref{fig:report-power-validation} compares these values against those predicted by \gls{acr-wec}-Sim and MDOcean.
+\Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
     \caption{Comparison of mechanical power for \gls{acr-rm3} report \cite{RM3} and MDOcean}
     \label{fig:report-power-validation}
 \end{figure}
-Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided \gls{acr-wec}-Sim hydrodynamic coefficients,
+Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
 and that the power multiplier mentioned in \Cref{sec:dynamic-validation} has not been applied in the figure.
 We observe a rather poor match, with MDOcean underestimating power in the low-period sea states and overestimating in the high-period sea states.
 The discrepancy is of minimal concern for the reasons described in \Cref{sec:dynamic-validation}.
@@ -280,9 +280,9 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
          \gls{acr-cbs} Category&  Nominal \% for $\gls{sym-N-WEC}=1$& Nominal \% for $\gls{sym-N-WEC}=100$&Scales with design?\\\hline
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
-         1.3 - \gls{acr-moor}/Foundation&  3\%&  12\%&No\\
+         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
          1.4 - Structural&  17\%&  46\%&$\gls{sym-V}_{\text{struct}}$\\
-         1.5 - \gls{acr-pwr} Take Off&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
+         1.5 - \gls{acr-pto}&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
          1.7 - Installation&  34\%&  10\%&No\\
          1.8 - Decommissioning&  9\%&  9\%&No\\
@@ -299,7 +299,7 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
     \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\gls{acr-pwr}-Law Scaling with Number of Devices}
+\subsection{Power-Law Scaling with Number of Devices}
 \label{sec:appendix-econ-power-law}
 
 The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
@@ -332,7 +332,7 @@ and are tabulated in \Cref{tab:econ-model-values}.
          \gls{acr-cbs} Category& Expo. $\gls{sym-beta-expo}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
          \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. \gls{acr-capex}& 0.741& 1.24 \$M &13.92 \$M\\
          \textbf{1.4} - Structural \gls{acr-capex} & 0.481& 2.387 \$/kg&4.294 \$/kg\\
-         \textbf{1.5} - \gls{acr-pwr} Take Off \gls{acr-capex}& 0.206& Constant: 92.59 \$k \gls{acr-pwr}: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k \gls{acr-pwr}: 1.355 \$/W Force: 0.0204 \$/N\\
+         \textbf{1.5} - \gls{acr-pto} \gls{acr-capex}& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
  \textbf{2.1-2.6} - \gls{acr-opex}&0.557& 0&1.193 \$M\\
     \endtabular
     \end{table}
@@ -365,7 +365,7 @@ The \gls{acr-nrel} System Advisory Model assumes that hydraulic \gls{acr-pto} co
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\gls{acr-str} Module Details}
+\section{Structures Module Details}
 \label{sec:appendix-structures}
 Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
 It outputs a factor of safety for each limit case.
