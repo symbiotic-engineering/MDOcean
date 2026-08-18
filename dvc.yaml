@@ -8163,6 +8163,19 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-dissertation' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  get-aor-latexdiff-dvc-deps:
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c
+      "yq -r .stages.\\\"build-AOR-paper\\\".deps[] dvc.yaml | while read
+      -r dep; do git status --porcelain --ignored \"\$dep\"; done |
+      awk '\$1 == \"??\" || \$1 == \"!!\" {print \$2}' >
+      aor-latexdiff-dvc-deps.txt"
+    deps:
+      - .calkit/env-locks/pubs
+    outs:
+      - aor-latexdiff-dvc-deps.txt
+    desc: Automatically generated from the
+      'get-aor-latexdiff-dvc-deps' stage in calkit.yaml. Changes made
+      here will be overwritten.
   make-aor-latexdiff:
     cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c 
       "git latexdiff --no-view --tmpdirprefix . --main 
@@ -8185,6 +8198,7 @@ stages:
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
       - dev/latex/latexdiff-link-figs.sh
+      - aor-latexdiff-dvc-deps.txt
       - .calkit/env-locks/tex
     outs:
       - pubs/applied-ocean-research-model/main-diff.pdf

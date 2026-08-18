@@ -2,15 +2,17 @@
 set -e
 
 repo_root="$(git rev-parse --show-toplevel)"
-
+deps_file="$repo_root/aor-latexdiff-dvc-deps.txt"
 
 for tree in old new; do
-    for subfolder in from-matlab manual ; do
-        figs="$repo_root/pubs/applied-ocean-research-model/figs/$subfolder"
-        target="../$tree/pubs/applied-ocean-research-model/figs/$subfolder"
+    while IFS= read -r subfolder; do
+        subfolder="${subfolder%/}"
+        source="$repo_root/$subfolder"
+        target="../$tree/$subfolder"
 
         if [[ ! -e "$target" ]]; then
-            ln -s "$figs" "$target"
+            mkdir -p "$(dirname "$target")"
+            ln -s "$source" "$target"
         fi
-    done
+    done < "$deps_file"
 done

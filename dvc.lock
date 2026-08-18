@@ -31447,10 +31447,14 @@ stages:
       md5: bce75e09f8a3deb731513d66d450bb87.dir
       size: 1147
       nfiles: 1
+    - path: aor-latexdiff-dvc-deps.txt
+      hash: md5
+      md5: 542a8871790678ef79fb3ef5293355d3
+      size: 153
     - path: dev/latex/latexdiff-link-figs.sh
       hash: md5
-      md5: f7193b75ed504157248a27d326daf816
-      size: 395
+      md5: 75aee98d916c94a30d72595b5ebf182a
+      size: 456
       isexec: true
     - path: pubs/applied-ocean-research-model/cas-common.sty
       hash: md5
@@ -31516,5 +31520,21 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/main-diff.pdf
       hash: md5
-      md5: e38ad572db1821ad1d00cafe9c0e909f
-      size: 7714859
+      md5: d7b49cfae87799e64c5c87b28c201302
+      size: 7717735
+  get-aor-latexdiff-dvc-deps:
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "yq -r 
+      .stages.\\\"build-AOR-paper\\\".deps[] dvc.yaml | while read -r dep; do 
+      git status --porcelain --ignored \"\$dep\"; done | awk '\$1 == \"??\" || 
+      \$1 == \"!!\" {print \$2}' > aor-latexdiff-dvc-deps.txt"
+    deps:
+    - path: .calkit/env-locks/pubs
+      hash: md5
+      md5: e19d1a82ea9a53293d87ad6ad99ba34a.dir
+      size: 5500
+      nfiles: 2
+    outs:
+    - path: aor-latexdiff-dvc-deps.txt
+      hash: md5
+      md5: 542a8871790678ef79fb3ef5293355d3
+      size: 153

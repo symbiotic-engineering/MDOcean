@@ -5807,6 +5807,15 @@ pipeline:
         - path: pubs/dissertation/aux/
           storage: dvc
           delete_before_run: false
+    get-aor-latexdiff-dvc-deps:
+      kind: shell-command
+      environment: pubs
+      command: yq -r .stages.\\"build-AOR-paper\\".deps[] dvc.yaml |
+        while read -r dep; do
+        git status --porcelain --ignored "\$dep";
+        done | awk '\$1 == "??" || \$1 == "!!" {print \$2}' > aor-latexdiff-dvc-deps.txt
+      outputs:
+        - aor-latexdiff-dvc-deps.txt
     make-aor-latexdiff:
       kind: shell-command
       environment: tex
@@ -5830,6 +5839,7 @@ pipeline:
         - pubs/applied-ocean-research-model/cas-dc.cls
         - pubs/applied-ocean-research-model/cas-common.sty
         - dev/latex/latexdiff-link-figs.sh
+        - aor-latexdiff-dvc-deps.txt
       outputs:
         - pubs/applied-ocean-research-model/main-diff.pdf
     # all-writing:
