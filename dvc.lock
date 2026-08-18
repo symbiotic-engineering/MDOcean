@@ -11776,7 +11776,7 @@ stages:
       size: 28896
     - path: pubs/applied-ocean-research-model/figs/from-matlab/
       hash: md5
-      md5: de66d1ff63c78bc0e26c1a6b4a48fc80.dir
+      md5: e0a0b7062e7c6ad66bec1939950baff1.dir
       size: 7205871
       nfiles: 58
     - path: pubs/applied-ocean-research-model/figs/manual/
@@ -11816,8 +11816,8 @@ stages:
       size: 5615
     - path: pubs/applied-ocean-research-model/tables/
       hash: md5
-      md5: b6e0efc77eb330f15f637f9361f510bc.dir
-      size: 3109
+      md5: e69fd686d4c46b04d7d29066bf6b3fd0.dir
+      size: 3155
       nfiles: 4
     - path: pubs/applied-ocean-research-model/zotero-meem-refs.bib
       hash: md5
@@ -11826,13 +11826,13 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/aux/
       hash: md5
-      md5: 06cdf1f775cc4555f1de1783434391dc.dir
-      size: 375537
+      md5: 5fd957bb4ea0c077b8ea4bcf50dcd61d.dir
+      size: 375455
       nfiles: 10
     - path: pubs/applied-ocean-research-model/main.pdf
       hash: md5
-      md5: 5d18dd5f37be07a7510d29598e01699f
-      size: 7780339
+      md5: 35d7d1eac2ff73096c9a749b882dd3c9
+      size: 7780344
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
       pubs/renewable-energy-mdo/.latexmkrc pubs/renewable-energy-mdo/mdocean.tex
@@ -31435,3 +31435,86 @@ stages:
       hash: md5
       md5: 1e53e6f35f82313fc40df4b2e6ab6e04
       size: 16864408
+  make-aor-latexdiff:
+    cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c "git 
+      latexdiff --no-view --tmpdirprefix . --main 
+      pubs/applied-ocean-research-model/main.tex --whole-tree --filter 
+      'dev/latex/latexdiff-link-figs.sh' -o 
+      pubs/applied-ocean-research-model/main-diff.pdf ad55aca --"
+    deps:
+    - path: .calkit/env-locks/tex
+      hash: md5
+      md5: bce75e09f8a3deb731513d66d450bb87.dir
+      size: 1147
+      nfiles: 1
+    - path: dev/latex/latexdiff-link-figs.sh
+      hash: md5
+      md5: f7193b75ed504157248a27d326daf816
+      size: 395
+      isexec: true
+    - path: pubs/applied-ocean-research-model/cas-common.sty
+      hash: md5
+      md5: 33ec0c91fd7e02fb9b10c2abe8498293
+      size: 76688
+    - path: pubs/applied-ocean-research-model/cas-dc.cls
+      hash: md5
+      md5: 2f95646e7b80682c76fa46acab457365
+      size: 4428
+    - path: pubs/applied-ocean-research-model/commands-aor.tex
+      hash: md5
+      md5: 20254173dc97cb2028f7a7642b0e0680
+      size: 914
+    - path: pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      hash: md5
+      md5: b24eb82d1afd0a3fa7d82c6efbe1f559
+      size: 28896
+    - path: pubs/applied-ocean-research-model/figs/from-matlab/
+      hash: md5
+      md5: e0a0b7062e7c6ad66bec1939950baff1.dir
+      size: 7205871
+      nfiles: 58
+    - path: pubs/applied-ocean-research-model/figs/manual/
+      hash: md5
+      md5: f694732c6fc628d1af03704b3fb76756.dir
+      size: 365432
+      nfiles: 4
+    - path: pubs/applied-ocean-research-model/figs/tikz/
+      hash: md5
+      md5: 0b455113aed924840efbdb36b8a15844.dir
+      size: 91516
+      nfiles: 9
+    - path: pubs/applied-ocean-research-model/main.tex
+      hash: md5
+      md5: 4a2bfb09e7d9a55725f69bf3f691e437
+      size: 13029
+    - path: pubs/applied-ocean-research-model/numeric-results.tex
+      hash: md5
+      md5: 2b63f671bee8fb87f7cdb040242ab86e
+      size: 18296
+    - path: pubs/applied-ocean-research-model/references.bib
+      hash: md5
+      md5: 64b6330983ee628b4b8012622df5161c
+      size: 541316
+    - path: pubs/applied-ocean-research-model/sections/
+      hash: md5
+      md5: 388da204d96da27c66a41fc68dc82fd8.dir
+      size: 407592
+      nfiles: 12
+    - path: pubs/applied-ocean-research-model/shared-pkg.tex
+      hash: md5
+      md5: 3c58f0db6fb43912102268eb7307a6fe
+      size: 5615
+    - path: pubs/applied-ocean-research-model/tables/
+      hash: md5
+      md5: e69fd686d4c46b04d7d29066bf6b3fd0.dir
+      size: 3155
+      nfiles: 4
+    - path: pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      hash: md5
+      md5: 2b239e27c2b3fe0e1ff79c16314db608
+      size: 47709
+    outs:
+    - path: pubs/applied-ocean-research-model/main-diff.pdf
+      hash: md5
+      md5: e38ad572db1821ad1d00cafe9c0e909f
+      size: 7714859

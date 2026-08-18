@@ -8163,6 +8163,33 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-dissertation' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  make-aor-latexdiff:
+    cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c 
+      "git latexdiff --no-view --tmpdirprefix . --main 
+      pubs/applied-ocean-research-model/main.tex --whole-tree --filter
+      'dev/latex/latexdiff-link-figs.sh' -o 
+      pubs/applied-ocean-research-model/main-diff.pdf ad55aca --"
+    deps:
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/figs/from-matlab/
+      - pubs/applied-ocean-research-model/figs/manual/
+      - pubs/applied-ocean-research-model/figs/tikz/
+      - pubs/applied-ocean-research-model/tables/
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/numeric-results.tex
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
+      - dev/latex/latexdiff-link-figs.sh
+      - .calkit/env-locks/tex
+    outs:
+      - pubs/applied-ocean-research-model/main-diff.pdf
+    desc: Automatically generated from the 'make-aor-latexdiff' stage 
+      in calkit.yaml. Changes made here will be overwritten.
   view-aor-figs:
     cmd: calkit nb execute --environment pubs --no-check 
       "pubs/applied-ocean-research-model/view_figs.ipynb"
