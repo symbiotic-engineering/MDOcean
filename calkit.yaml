@@ -5819,9 +5819,10 @@ pipeline:
     make-aor-latexdiff:
       kind: shell-command
       environment: tex
-      command: git latexdiff --no-view --tmpdirprefix .
+      command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="$(pwd)" git latexdiff --no-view --tmpdirprefix .
         --main pubs/applied-ocean-research-model/main.tex
         --whole-tree --filter 'dev/latex/latexdiff-link-figs.sh'
+        --prepare 'conda run -n mdocean-pubs python ../new/dev/latex/latexdiff-prepare.py'
         -o pubs/applied-ocean-research-model/main-diff.pdf ad55aca --
       inputs:
         - pubs/applied-ocean-research-model/sections/
