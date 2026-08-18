@@ -31523,18 +31523,21 @@ stages:
       md5: d7b49cfae87799e64c5c87b28c201302
       size: 7717735
   get-aor-latexdiff-dvc-deps:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "yq -r 
-      .stages.\\\"build-AOR-paper\\\".deps[] dvc.yaml | while read -r dep; do 
-      git status --porcelain --ignored \"\$dep\"; done | awk '\$1 == \"??\" || 
-      \$1 == \"!!\" {print \$2}' > aor-latexdiff-dvc-deps.txt"
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "bash 
+      dev/latex/get-aor-latexdiff-dvc-deps.sh"
     deps:
     - path: .calkit/env-locks/pubs
       hash: md5
       md5: e19d1a82ea9a53293d87ad6ad99ba34a.dir
       size: 5500
       nfiles: 2
-    outs:
-    - path: aor-latexdiff-dvc-deps.txt
+    - path: dev/latex/get-aor-latexdiff-dvc-deps.sh
       hash: md5
-      md5: 542a8871790678ef79fb3ef5293355d3
-      size: 153
+      md5: d2ded54c23fe24be2ad8be3ba87c7db1
+      size: 857
+      isexec: true
+    outs:
+    - path: aor-latexdiff-dvc-deps.json
+      hash: md5
+      md5: b0cc6f1f78b488ea3c4bec325d32ae64
+      size: 291

@@ -5810,19 +5810,20 @@ pipeline:
     get-aor-latexdiff-dvc-deps:
       kind: shell-command
       environment: pubs
-      command: yq -r .stages.\\"build-AOR-paper\\".deps[] dvc.yaml |
-        while read -r dep; do
-        git status --porcelain --ignored "\$dep";
-        done | awk '\$1 == "??" || \$1 == "!!" {print \$2}' > aor-latexdiff-dvc-deps.txt
+      command: bash dev/latex/get-aor-latexdiff-dvc-deps.sh
+      inputs:
+        - dev/latex/get-aor-latexdiff-dvc-deps.sh
       outputs:
-        - aor-latexdiff-dvc-deps.txt
+        - path: aor-latexdiff-dvc-deps.json
+          storage: git
     make-aor-latexdiff:
       kind: shell-command
       environment: tex
-      command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="$(pwd)" git latexdiff --no-view --tmpdirprefix .
+      command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="$(pwd)" DVC_CACHE_DIR="$(pwd)/.dvc/cache"
+        DVC_DEPS_JSON="$(pwd)/aor-latexdiff-dvc-deps.json" git latexdiff --no-view --tmpdirprefix .
         --main pubs/applied-ocean-research-model/main.tex
         --whole-tree --filter 'dev/latex/latexdiff-link-figs.sh'
-        --prepare 'conda run -n mdocean-pubs python ../new/dev/latex/latexdiff-prepare.py'
+        --prepare 'python3 ../new/dev/latex/latexdiff-prepare.py'
         -o pubs/applied-ocean-research-model/main-diff.pdf ad55aca --
       inputs:
         - pubs/applied-ocean-research-model/sections/
@@ -5840,7 +5841,7 @@ pipeline:
         - pubs/applied-ocean-research-model/cas-dc.cls
         - pubs/applied-ocean-research-model/cas-common.sty
         - dev/latex/latexdiff-link-figs.sh
-        - aor-latexdiff-dvc-deps.txt
+        - aor-latexdiff-dvc-deps.json
       outputs:
         - pubs/applied-ocean-research-model/main-diff.pdf
     # all-writing:
