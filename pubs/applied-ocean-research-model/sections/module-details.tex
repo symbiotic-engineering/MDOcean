@@ -211,41 +211,99 @@ This subsection introduces the dynamics and control modeling assumptions before 
 
 \subsubsection{Describing Functions}
 \paragraph{Concept}
-Describing functions assume a certain time-domain nonlinear signal shape and then calculate the fundamental amplitude of that signal for use in a typical frequency-domain simulation.
+MDOcean's dynamics utilize the sinusoidal-input describing function method, which assumes a certain time-domain nonlinear signal shape and then calculates the fundamental amplitude of that signal for use in a typical frequency-domain simulation.
 Because the fundamental amplitude depends on the response, the frequency domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.
 MDOcean uses iteration to handle both the drag force and control force nonlinearities. % and an analytical solution for the force saturation nonlinearity.
 While the describing function method used here has been known for over half a century, MDOcean represents its first application in a wave energy optimization or open-source simulation, to the authors' knowledge.
 MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabling efficient simulation while retaining model fidelity.
 
 \paragraph{Assumptions}
+\newcounter{asmpnumber}
 Describing functions make the following assumptions:
 \begin{itemize}
-    \item A1)
-    \textbf{Any nonlinearities can be written as the sum of a linear transformation and harmonic generation}.
-    This allows us to work in the spectral domain.
+    \item \assumption{nonlinearities-are-harmonics}
+    \textbf{Any nonlinearities can be written as the sum of a quasi-linear transformation and harmonic generation}.
+    This allows a spectral-domain model, rather than time-domain, while preserving nonlinearities.
+    Using the nonlinearity classification structure of \citet{rijlaarsdam_comparative_2017,rijlaarsdam_frequency_2012},
+    \asmpref{nonlinearities-are-harmonics} permits gain compression/expansion, harmonic generation, and frequency-mixing,
+    including ``Volterra,'' ``special Weiner,'' or ``convergent'' system types.
+    Eligible nonlinearities include drag, saturation, and nonlinear potential flow effects.
+    \citet{folley_spectral-domain_2016,da_silva_stochastic_2023} discuss spectral-domain modeling for WECs.
 
-    \item A2)
-    \textbf{The system is low-pass with a cutoff frequency below the third harmonic}.
-    This assumption makes the spectral domain become the frequency domain, and is called quasi-linearization.
-    \ifdefined\DISSERTATION
-        The two nonlinearities that are quasi-linearized are both force signals.
-        For a force signal, the fundamental amplitude is the most relevant harmonic because not only is it typically the largest amplitude, but it also undergoes the least amount of filtering by the low-pass plant and therefore contributes the most to power production.
-    \else
-        The fundamental is the most relevant harmonic for power because typically, its force is the largest and its position undergoes the least filtering by the low-pass plant.
-    \fi
+    \item \assumption{system-low-pass}
+    \textbf{The system is low-pass}.
+    Most physical systems have low-pass behavior due to inertia, and WECs are no exception.
+    Since the nonlinearities of \asmpref{nonlinearities-are-harmonics} considered here generate only odd harmonics,
+    we define \asmpref{system-low-pass} as applicable when the third harmonic of an incident wave exceeds the system's cutoff frequency.
+    \citet{mccabe_force-limited_2024} discuss further and demonstrate the assumption graphically, and \citet[Figure 3]{mccabe_economic_2025} show that RM3's hydrodynamic response is low-pass for frequencies above 1.2 rad/s.
+    This gives a maximum wave period of 15.7~s,
+    so \asmpref{system-low-pass} applies for the vast majority of incident energy, even in an irregular sea state.
 
-    \item A3)
+    \item \assumption{quasi-linearized}
+    \textbf{The response to higher harmonics can be neglected, resulting in a linearized spectral-domain model.}
+    This is a direct consequence of \asmpref{nonlinearities-are-harmonics} and asmpref{system-low-pass}.
+    This assumption is called ``best linear approximation,'' ``quasi-linearization,'' ``statistical linearization,'' and ``Gaussian closure'' by \citet{rijlaarsdam_comparative_2017,ching_quasilinear_2010,roberts_random_2003,nie_optimal_2016} respectively.
+    \citet{nie_optimal_2016,da_silva_statistical_2020,spanos_efficient_2016,tan_computationally_2026} pursue this assumption for WECs.
+
+    \item \assumption{stationary-ergodic}
+    \textbf{The input phase does not affect the analysis.}
+    Our system meets this criteria since a linearized WEC is wide-sense stationary and the long-term average power is an ergodic output.
+    Under this assumption, using a deterministic spectrally-equivalent multisine instead of a random-phase stochastic input for the wave elevation does not change the power and other dynamic outputs, so the former can be used for simplicity.
+    This is implicitly assumed in most of the spectral linearization references above,
+    since stochastic-steady-state rather than transient outputs are of interest.
+
+    \item \assumption{waves-narrow-band}
     \textbf{The input wave excitation is narrow-band}.
-    This makes quasi-linearization become sinusoidal-input describing functions.
+    This implies that the deterministic multisine wave input can be replaced by a single sine wave;
+    in other words, it approximates an irregular wave spectrum as an equivalent regular wave.
+    The quasi-linearization method then collapses to the sinusoidal-input describing function method, where a nonlinearity is approximated simply as an amplitude-dependent gain and phase shift applied to a sinusoidal input.
 
-    \item A4)
-    \textbf{The functional form, and therefore signal shape, of the nonlinear waveform is known.}
+    \item \assumption{signal-shape-known}
+    \textbf{The signal shape of the nonlinear waveform is known.}
+    Calculating the SIDF gain and phase shift requires specifying a signal shape and computing its fundamental \cite{gelb_multiple-input_1968,atherton_nonlinear_1982}.
     We assume a quadratic absolute-value nonlinearity for drag and a saturated sinusoid nonlinearity for control force.
 \end{itemize}
 
 \paragraph{Implementation}
 The drag describing function formula is encoded directly into the simulation (see derivation in \Cref{sec:drag}),
 while the control force describing function is implemented indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
+
+\subsubsection{Quasi-Linear Pseudo-Spectral Optimal Control}
+\paragraph{Concept}
+This section introduces QLPS, which combines the dynamic analysis concept of quasi-linearization with the pseudo-spectral concept of collocation to yield a simple yet effective method for constrained nonlinear optimal control synthesis.
+
+\paragraph{Assumptions}
+The most general form of QLPS requires only a single assumption
+\assumption{constraints-fundamental}:
+\textbf{the optimization objective and constraints can be written as a (potentially nonlinear) invertible function of the fundamental amplitude of linear dynamic system state variables}.
+This follows directly from \asmpref{quasi-linearized} (linearized dynamics) and \asmpref{stationary-ergodic} (deterministic rather than stochastic analysis) when the states used to obtain the objective and constraints are the outputs of the dynamic analysis.
+This assumption means that the peak value or other time-domain characteristic of a nonlinear signal can be constrained as long as it can be written in terms of the fundamental.
+
+Here we formulate the QLPS problem for a linear multiport dynamic system in which the state variables are ``effort'' and ``flow'' phasors related by linear coefficient matrices.
+This form is well suited for expressing oscillatory power flow, although a more standard linear state-space representation yields equivalent mathematics.
+
+Despite the linearized dynamics, the potential nonlinear relationship between the state variables and the objectives and constraints
+makes the general QLPS problem a nonlinear optimization problem (NLP).
+This alone is not a significant computational benefit over the general pseudo-spectral method for nonlinear dynamic systems.
+
+The computational benefits come when we introduce assumptions \asmpref{quadratic-objective} and \asmpref{quadratic-constraints},
+which respectively state that \textbf{the objectives and constraints can be written as a quadratic function of the state variables}.
+This is an easy requirement for wave energy, since quadratic metrics of a linear multiport effort-flow model include many quantities of interest: effort magnitude, flow magnitude, average power, reactive power, and linear combinations thereof.
+Under this condition, the NLP becomes a QCQP (quadratically constrained quadratic program).
+The original WEC pseudo-spectral formulation by \citet{bacelli_numerical_2015} conforms to this assumption and shows that under the additional assumption \assumption{passive-dynamics-convex} of \textbf{passive dynamics}, the QCQP is convex.
+
+Even more computational benefits, and the novel aspect of the QLPS approach, appear when two more assumptions are enforced.
+\assumption{no-freq-coupling} and \assumption{no-dof-coupling} require that the system has \textbf{no dynamic coupling between different frequencies and different control DOFs} respectively.
+\asmpref{no-freq-coupling} is satisfied as a result of \asmpref{waves-narrow-band} (narrow-band waves),
+and \asmpref{no-dof-coupling} is satisfied because the RM3 contains only a single controlled DOF.
+\asmpref{no-dof-coupling} permits coupling between the body DOFs as long as there is a single controlled DOF as is present here,
+or it permits multiple controlled DOFs only if they are uncoupled when viewed from each control load port at which power is to be optimized
+(i.e. an array of non-interacting multi-DOF WECs for which off-diagonal terms of the intrinsic impedance matrix are negligible).
+
+Under \asmpref{no-freq-coupling} and \asmpref{no-dof-coupling}, the QCQP for all frequencies and DOFs can be separated into a set of single-order QCQPs, one for each frequency and DOF, which can be solved semi-analytically using the geometric properties of circles.
+
+\paragraph{Implementation}
+
 
 %%%%%%%%%%%%%%%
 \subsubsection{Modified frequency-domain methods}
