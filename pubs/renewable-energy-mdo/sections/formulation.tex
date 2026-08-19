@@ -16,13 +16,13 @@ Parameters $\gls{sym-vec-p}$ are constant inputs required to compute the objecti
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Objective Function}\label{remdo:sec:obj}
-For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by WEC developers to evaluate market viability \citep{trueworthy_wave_2020} and computed by the economics module \citep{mccabe_development_2026}.
+For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by \gls{acr-wec} developers to evaluate market viability \citep{trueworthy_wave_2020} and computed by the economics module \citep{mccabe_development_2026}.
 
 \ifdefined\DISSERTATION
     LCOE is adopted for its simplicity, although this choice brings three major limitations.
     First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule generated has equal value.
     On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \citep{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022},
-    so capturing nonuniform sources of WEC value such as consistency or complementarity would require modifications (e.g.\ those proposed by \citet{mccabe_system_2023}) outside the scope of the present model.
+    so capturing nonuniform sources of \gls{acr-wec} value such as consistency or complementarity would require modifications (e.g.\ those proposed by \citet{mccabe_system_2023}) outside the scope of the present model.
     Second, LCOE has high uncertainty for early-stage designs: the economic model assumes only structural and PTO costs scale with design \citep{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
     Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \citep{livecchi_powering_2019}.
     For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \citep{jenne_powering_2021}.
@@ -45,7 +45,7 @@ The objective function is expressed:
 [\gls{sym-C-design} (\gls{sym-vec-x}, \gls{sym-vec-p}),\ \gls{sym-overline-P-elec} (\gls{sym-vec-x}, \gls{sym-vec-p})]^\top, & \text{Multi-objective}
 \end{cases}
 \end{equation}
-%The objectives of this optimization problem are to minimize the LCOE and the power coefficient of variation of the RM3 WEC. LCOE, the cost per unit energy over the lifetime of the device, was chosen as an objective function because it is often the metric used to assess and compare energy production methods. A low LCOE indicates the project is competitive with conventional energy production processes and better able to generate affordable energy for consumers. The second objective, power coefficient of variation, is a measure of the fluctuation in power output. Minimizing power variation provides more consistent output and reduces the amount of energy storage required.
+%The objectives of this optimization problem are to minimize the LCOE and the power coefficient of variation of the RM3 \gls{acr-wec}. LCOE, the cost per unit energy over the lifetime of the device, was chosen as an objective function because it is often the metric used to assess and compare energy production methods. A low LCOE indicates the project is competitive with conventional energy production processes and better able to generate affordable energy for consumers. The second objective, power coefficient of variation, is a measure of the fluctuation in power output. Minimizing power variation provides more consistent output and reduces the amount of energy storage required.
 
 %The coefficient of variation of power $c_v$ normalizes the standard deviation of power across different sea states $\sigma$ by the average power across those sea states $\mu$:
 % \begin{equation}
@@ -178,7 +178,7 @@ The encoding of a physical design space into optimization design variables is no
 This logic repeats for the remaining design variables and requirements.
 After several formulation iterations, the design variable and parameter definitions in \Cref{remdo:tab:design-vars,remdo:tab:parameters} emerged as effective.
 The 12 design variables represent 5 bulk dimensions, 2 generator ratings, and 5 structural dimensions (3 thicknesses and 2 stiffener heights).
-Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive WEC optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
+Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive \gls{acr-wec} optimization in breadth of design-variable disciplines, and on the larger end, though not the largest, in number of design variables.
 
 \begin{table}[ht]
 \setlength\tabcolsep{1pt}
@@ -245,7 +245,7 @@ $\text{cost}_m$ & Material cost& 1.89 & \$/kg \\
 $FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
 $D_{d_{\text{min}}}$ & Minimum damping plate diameter & 30 & m  \\ 
 $FCR$ & Fixed charge rate& 10.8 & \%  \\ 
-$N_{WEC}$ & Number of WECs in array& 100 & -  \\ 
+$N_{WEC}$ & Number of \glspl{acr-wec} in array& 100 & -  \\ 
 $D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
 $T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
 $h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
@@ -260,7 +260,7 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 \ifdefined\DISSERTATION
     Notably, while the design variables include PTO sizing variables, PTO characteristics such as the generator and drivetrain impedances are kept as parameters.
     Rather than perform PTO co-design, which \citet{coe_useful_2023,gaebele_incorporating_2023} and studies discussed in \Cref{remdo:sec:lit}) have already proven is valuable, this study keeps the PTO design fixed at representative values.
-    While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of WEC co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
+    While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of \gls{acr-wec} co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
     Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
 \else
     While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed.
