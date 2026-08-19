@@ -95,7 +95,8 @@ pipeline:
     make-var-bounds:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); b = var_bounds(); save('./mdocean/inputs/var_bounds.mat','b');"
+      command: ./mymatlab "add_mdocean_path(); b = var_bounds(); 
+        save('./mdocean/inputs/var_bounds.mat','b');"
       inputs:
         - ./mdocean/inputs/var_bounds.m
         - ./mdocean/inputs/parameters.m
@@ -136,6 +137,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/analysis_fcn.m
@@ -199,6 +201,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-AllFigCompare
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
         - ./mdocean/analysis/@AllFigCompare/post_process_fcn.m
@@ -266,6 +269,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Comparison; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/analysis_fcn.m
@@ -339,6 +343,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Comparison
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Comparison/Comparison.m
         - ./mdocean/analysis/@Comparison/post_process_fcn.m
@@ -424,6 +429,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Constraints; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/analysis_fcn.m
@@ -487,6 +493,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Constraints
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Constraints/Constraints.m
         - ./mdocean/analysis/@Constraints/post_process_fcn.m
@@ -554,6 +561,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Cost; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/analysis_fcn.m
@@ -617,6 +625,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Cost
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Cost/Cost.m
         - ./mdocean/analysis/@Cost/post_process_fcn.m
@@ -684,6 +693,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); 
         obj=DampingPlateStructures; obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/analysis_fcn.m
@@ -752,6 +762,7 @@ pipeline:
         obj=DampingPlateStructures; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DampingPlateStructures
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DampingPlateStructures/DampingPlateStructures.m
         - ./mdocean/analysis/@DampingPlateStructures/post_process_fcn.m
@@ -823,6 +834,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=DescFcns; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/analysis_fcn.m
@@ -890,6 +902,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DescFcns
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DescFcns/DescFcns.m
         - ./mdocean/analysis/@DescFcns/post_process_fcn.m
@@ -961,6 +974,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); 
         obj=DesignSpaceExploration; obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/analysis_fcn.m
@@ -1027,6 +1041,7 @@ pipeline:
         obj=DesignSpaceExploration; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DesignSpaceExploration
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DesignSpaceExploration/DesignSpaceExploration.m
         - ./mdocean/analysis/@DesignSpaceExploration/post_process_fcn.m
@@ -1104,6 +1119,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=DesignVars; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/analysis_fcn.m
@@ -1167,6 +1183,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DesignVars
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DesignVars/DesignVars.m
         - ./mdocean/analysis/@DesignVars/post_process_fcn.m
@@ -1234,6 +1251,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=DragIntegral; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DragIntegral/DragIntegral.m
         - ./mdocean/analysis/@DragIntegral/analysis_fcn.m
@@ -1298,6 +1316,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DragIntegral
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@DragIntegral/DragIntegral.m
         - ./mdocean/analysis/@DragIntegral/post_process_fcn.m
@@ -1373,6 +1392,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=FitOlaya; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./dev/hydro_coeffs/damping_plate/3b_black.csv
         - ./dev/hydro_coeffs/damping_plate/3b_blue.csv
@@ -1454,6 +1474,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-FitOlaya
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@FitOlaya/FitOlaya.m
         - ./mdocean/analysis/@FitOlaya/post_process_fcn.m
@@ -1623,6 +1644,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); 
         obj=ForceSaturationFigFunc; obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/analysis_fcn.m
@@ -1697,6 +1719,7 @@ pipeline:
         obj=ForceSaturationFigFunc; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ForceSaturationFigFunc
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ForceSaturationFigFunc/ForceSaturationFigFunc.m
         - ./mdocean/analysis/@ForceSaturationFigFunc/post_process_fcn.m
@@ -1766,6 +1789,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/analysis_fcn.m
@@ -1838,6 +1862,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-GradientOptimFigFunc
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
         - ./mdocean/analysis/@GradientOptimFigFunc/post_process_fcn.m
@@ -1930,6 +1955,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/analysis_fcn.m
@@ -1995,6 +2021,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-HydroCoeffFigFunc
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@HydroCoeffFigFunc/HydroCoeffFigFunc.m
         - ./mdocean/analysis/@HydroCoeffFigFunc/post_process_fcn.m
@@ -2062,6 +2089,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/analysis_fcn.m
@@ -2143,6 +2171,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-LocationSensitivity
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
         - ./mdocean/analysis/@LocationSensitivity/post_process_fcn.m
@@ -2221,6 +2250,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Meem; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/analysis_fcn.m
@@ -2295,6 +2325,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Meem
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Meem/Meem.m
         - ./mdocean/analysis/@Meem/post_process_fcn.m
@@ -2372,6 +2403,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Multistart; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Multistart/Multistart.m
         - ./mdocean/analysis/@Multistart/analysis_fcn.m
@@ -2446,13 +2478,8 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Multistart
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
-        - ./mdocean/SAFE/PAWN/pawn_cdfs.m
-        - ./mdocean/SAFE/PAWN/pawn_exclude_NaN.m
-        - ./mdocean/SAFE/PAWN/pawn_indices_givendata.m
-        - ./mdocean/SAFE/PAWN/pawn_ks.m
-        - ./mdocean/SAFE/PAWN/pawn_split_sample.m
-        - ./mdocean/SAFE/util/empiricalcdf.m
         - ./mdocean/analysis/@Multistart/Multistart.m
         - ./mdocean/analysis/@Multistart/post_process_fcn.m
         - ./mdocean/analysis/GenericAnalysis.m
@@ -2528,6 +2555,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/analysis_fcn.m
@@ -2602,6 +2630,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParamSensitivities
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParamSensitivities/ParamSensitivities.m
         - ./mdocean/analysis/@ParamSensitivities/post_process_fcn.m
@@ -2718,6 +2747,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Parameters; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/analysis_fcn.m
@@ -2781,6 +2811,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Parameters
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Parameters/Parameters.m
         - ./mdocean/analysis/@Parameters/post_process_fcn.m
@@ -2848,6 +2879,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/analysis_fcn.m
@@ -2923,6 +2955,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParetoFigFunc
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
         - ./mdocean/analysis/@ParetoFigFunc/post_process_fcn.m
@@ -3004,6 +3037,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/analysis_fcn.m
@@ -3067,6 +3101,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParetoSweep
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
         - ./mdocean/analysis/@ParetoSweep/post_process_fcn.m
@@ -3134,6 +3169,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=PtoSweep; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@PtoSweep/PtoSweep.m
         - ./mdocean/analysis/@PtoSweep/analysis_fcn.m
@@ -3197,6 +3233,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-PtoSweep
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@PtoSweep/PtoSweep.m
         - ./mdocean/analysis/@PtoSweep/post_process_fcn.m
@@ -3266,6 +3303,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@ReadNonMatlabFigs/ReadNonMatlabFigs.m
         - ./mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m
@@ -3329,6 +3367,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ReadNonMatlabFigs
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - mdocean/plots/non_matlab_figs/img/
         - mdocean/plots/non_matlab_figs/pdf/
@@ -3420,6 +3459,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=QPCircles; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@QPCircles/QPCircles.m
         - ./mdocean/analysis/@QPCircles/analysis_fcn.m
@@ -3485,6 +3525,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-QPCircles
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@QPCircles/QPCircles.m
         - ./mdocean/analysis/@QPCircles/post_process_fcn.m
@@ -3552,6 +3593,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/analysis_fcn.m
@@ -3637,6 +3679,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-RunSingleFigFunc
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@RunSingleFigFunc/RunSingleFigFunc.m
         - ./mdocean/analysis/@RunSingleFigFunc/post_process_fcn.m
@@ -3723,6 +3766,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Runtime; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/analysis/@Runtime/analysis_fcn.m
@@ -3790,6 +3834,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Runtime
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Runtime/Runtime.m
         - ./mdocean/analysis/@Runtime/post_process_fcn.m
@@ -3864,6 +3909,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Slamming; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/analysis/@Slamming/analysis_fcn.m
@@ -3930,6 +3976,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Slamming
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Slamming/Slamming.m
         - ./mdocean/analysis/@Slamming/post_process_fcn.m
@@ -3997,6 +4044,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=SparHydro; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/analysis/@SparHydro/analysis_fcn.m
@@ -4062,6 +4110,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-SparHydro
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@SparHydro/SparHydro.m
         - ./mdocean/analysis/@SparHydro/post_process_fcn.m
@@ -4129,6 +4178,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
         - ./mdocean/analysis/@SweepGeoms/analysis_fcn.m
@@ -4202,6 +4252,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-SweepGeoms
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
         - ./mdocean/analysis/@SweepGeoms/post_process_fcn.m
@@ -4296,6 +4347,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Validation; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/analysis/@Validation/analysis_fcn.m
@@ -4365,6 +4417,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Validation
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Validation/Validation.m
         - ./mdocean/analysis/@Validation/post_process_fcn.m
@@ -4436,6 +4489,7 @@ pipeline:
       command: ./mymatlab "add_mdocean_path(); obj=Wecsim; 
         obj.run_analysis();"
       inputs:
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
           Resource _SAM CSV.csv
@@ -4518,6 +4572,7 @@ pipeline:
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Wecsim
+        - ./mip.lock
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/analysis/@Wecsim/post_process_fcn.m
@@ -5009,7 +5064,8 @@ pipeline:
     test-aor:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); addpath('tests'); run_tests('AOR')"
+      command: ./mymatlab "add_mdocean_path(); addpath('tests'); 
+        run_tests('AOR')"
       inputs:
         - ./mip.lock
         - from_stage_outputs: analysis-Comparison
@@ -5038,7 +5094,8 @@ pipeline:
     test-re:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); addpath('tests'); run_tests('RE')"
+      command: ./mymatlab "add_mdocean_path(); addpath('tests'); 
+        run_tests('RE')"
       inputs:
         - ./mip.lock
         - from_stage_outputs: analysis-AllFigCompare
@@ -5364,7 +5421,8 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      command: ./mymatlab "add_mdocean_path(); move_results_to_pubs('RE');"
+      command: ./mymatlab "add_mdocean_path(); 
+        move_results_to_pubs('RE');"
     move-aor-results:
       kind: shell-command
       environment: _system
@@ -5395,7 +5453,8 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: ./mymatlab "add_mdocean_path(); move_results_to_pubs('AOR');"
+      command: ./mymatlab "add_mdocean_path(); 
+        move_results_to_pubs('AOR');"
     aor-results-to-latex:
       kind: json-to-latex
       inputs:
