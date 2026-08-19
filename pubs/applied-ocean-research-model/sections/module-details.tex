@@ -214,9 +214,9 @@ This subsection introduces the dynamics and control modeling assumptions before 
 \label{sec:mod-freq-domain}
 
 \ifdefined\DISSERTATION
-    Methods for \gls{acr-wec} dynamics and control simulation in an optimization context were reviewed in \Cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), quasi-linearized pseudo-spectral techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
+    Methods for \gls{acr-wec} dynamics and control simulation in an optimization context were reviewed in \Cref{sec:lit} and include time-stepping (nonlinear, numerical, high computation cost), frequency domain (linear, analytical, low computation cost), pseudo-spectral (nonlinear, numerical, medium computation cost), \gls{acr-qlps} techniques (approximate nonlinear, semi-analytical, low computational cost), and Pontryagin's maximum principle (nonlinear, analytical, low computational cost).
     In wave energy, both spectral-domain numerical methods and analytical methods have generated recent research interest. \citet{bacelli_numerical_2015,coe_initial_2020,tan_computationally_2026,nie_optimal_2016,da_silva_stochastic_2023} study the former and \citet{abdulkadir_optimal_2024,lin_fast_2025} illustrate the latter.
-    This section describes both the technical concept and the practical rationale for the choice of a quasi-linearized pseudo-spectral method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
+    This section describes both the technical concept and the practical rationale for the choice of a \gls{acr-qlps} method, and contextualizes it with respect to other constrained optimal control methods in more detail than was possible in the literature review.
 
     MDOcean requires the ability to incorporate nonlinearities, at least approximately.
     Inherent nonlinearities such as drag significantly affect the amplitude and power production at resonance.
@@ -247,7 +247,7 @@ Avoiding iterative numerical optimization substantially reduces computational co
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/control_method_venn_diagram.pdf}]{figs/from-matlab/control_method_venn_diagram.pdf}
-    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's quasi-linearized pseudo-spectral approach at the intersection of frequency domain, nonlinear, and constrained optimal control.
+    \caption{Venn diagram comparing different methods for control synthesis, with MDOcean's \gls{acr-qlps} approach at the intersection of frequency domain, nonlinear, and constrained optimal control.
     See text for acronym descriptions.}
     \label{fig:venn-diagram}
 \end{figure}
@@ -362,10 +362,10 @@ If neither a numerical nor an analytical implementation is available to identify
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
     This simple approach does not require any derivations to implement.
-    It has been used in several previous \gls{acr-wec} optimization studies for various constraints \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common quasi-linearized pseudo-spectral method in the marine energy field.
+    It has been used in several previous \gls{acr-wec} optimization studies for various constraints \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013} and is evidently the most common \gls{acr-qlps} method in the marine energy field.
 \else
     This simple approach has been used in several previous \gls{acr-wec} optimization studies for various constraints in the studies \citep{garcia-teruel_design_2022,garcia-teruel_reliability-based_2021,cotten_multi-objective_2022,mccabe_constrained_2013}
-    and is the most common quasi-linearized pseudo-spectral method in the marine energy field.
+    and is the most common \gls{acr-qlps} method in the marine energy field.
 \fi
 It is utilized here for the power limit.
 
@@ -413,7 +413,7 @@ MDOcean uses iteration to handle both the drag force and control force nonlinear
 The former encodes the describing function formula directly into the simulation (see derivation in \Cref{sec:drag}), while the latter implements it indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
 
 \ifdefined\DISSERTATION
-    This is possible because the describing function quasi-linearized pseudo-spectral method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \Cref{fig:mod-freq-domain-synthesis} is fed into the top left of \Cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
+    This is possible because the describing function \gls{acr-qlps} method is used for both controller synthesis and evaluation, so the time-domain nonlinear optimal controller that is output from the right of \Cref{fig:mod-freq-domain-synthesis} is fed into the top left of \Cref{fig:mod-freq-domain-evaluation}, resulting in a chaining of the inverse control describing function with the forward control describing function, which cancel out.
     Unless intentionally made different to study robustness, the linearized plant model is identical for the synthesis and evaluation steps.
     In this case, two workflows essentially become one, with no further computation required after the optimal control step.
     Reconstruction of the nonlinear controller is not necessary for the evaluation of the power corresponding to that controller.
@@ -429,7 +429,7 @@ MDOcean therefore extends semi-analytical dynamics to wave energy systems, enabl
 %%%%%%%%%%%%%%%
 \subsubsection{Equation of Motion}\label{sec:eom}
 \ifdefined\DISSERTATION
-    Before applying the quasi-linearized pseudo-spectral method described above, we first present the equations of motion for a standard linear \gls{acr-wec} model, starting in the time domain and quickly moving to the frequency domain.
+    Before applying the \gls{acr-qlps} method described above, we first present the equations of motion for a standard linear \gls{acr-wec} model, starting in the time domain and quickly moving to the frequency domain.
     Specifically, we combine the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \else
     The MDOcean dynamic model combines the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to express the equations of motion for a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.

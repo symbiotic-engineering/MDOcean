@@ -132,7 +132,7 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     \citet{rosati_control_2023} optimizes an \gls{acr-owc} and is notable for its comparatively detailed cost modeling and its optimization of both economic and power variability metrics.
     \citet{mccabe_multidisciplinary_2022} also optimized power variation, although that study's use of regular waves makes the variation formulation less useful.
     Meanwhile, one point absorber \gls{acr-pto} optimization \citep{son_performance_2016} is additionally notable for its use of the \gls{acr-meem} method.
-    \citet{gaebele_tpl_2025} is relevant because it optimizes the dimensional scale and \gls{acr-pto} of the \gls{acr-rm3} \gls{acr-wec} directly using a control co-design approach.
+    \citet{gaebele_tpl_2025} is relevant because it optimizes the dimensional scale and \gls{acr-pto} of the \gls{acr-rm3} \gls{acr-wec} directly using a \gls{acr-ccd} approach.
     It also efficiently incorporates many time-domain constraints (maximum force, speed, average power, \gls{acr-rms} torque, and stroke) while maintaining frequency-domain hydrodynamics via the pseudo-spectral (\gls{acr-ps}) modeling method, which \citep{devin_high-dimensional_2024,grasberger_control_2024} also use.
 
     Other \gls{acr-ccd} papers optimize \gls{acr-wec} dimensions without modeling the \gls{acr-pto}.
@@ -144,8 +144,8 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     Across these studies, the most directly relevant work falls into three groups.
     First, several large-scale optimization studies \citep{gaudin_single_2021,khanal_multi-objective_2024,edwards_optimisation_2022,garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} address one to four disciplines but invariably exclude either structures or powertrain.
     Second, structural optimization of \glspl{acr-wec} is hampered by the cost of \gls{acr-fea} \citep{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022}; the few \gls{acr-wec} studies that perform structural optimization \citep{an_optimal_2024,ambuhl_reliability-based_2014} decouple it from power calculations.
-    Third, recent control co-design studies \citep{rosati_control_2023,son_performance_2016,gaebele_tpl_2025,devin_high-dimensional_2024,grasberger_control_2024,herber_dynamic_2014,lin_fast_2025,abdulkadir_optimal_2024} efficiently handle constraints via pseudo-spectral methods or analytical \gls{acr-pmp}, but none integrate structures or full economic costs.
-    The directly comparable \gls{acr-rm3} study \citep{gaebele_tpl_2025} optimizes dimensional scale and \gls{acr-pto} with control co-design but excludes structures.
+    Third, recent \gls{acr-ccd} studies \citep{rosati_control_2023,son_performance_2016,gaebele_tpl_2025,devin_high-dimensional_2024,grasberger_control_2024,herber_dynamic_2014,lin_fast_2025,abdulkadir_optimal_2024} efficiently handle constraints via pseudo-spectral methods or analytical \gls{acr-pmp}, but none integrate structures or full economic costs.
+    The directly comparable \gls{acr-rm3} study \citep{gaebele_tpl_2025} optimizes dimensional scale and \gls{acr-pto} with \gls{acr-ccd} but excludes structures.
 \fi
 
 \paragraph{Software tools and gaps}
@@ -153,7 +153,7 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     Beyond models used in individual studies, it is also helpful to analyze the capabilities and gaps of available simulation tools.
     The popular time-domain hydrodynamics tool WEC-Sim \citep{ruehl_wec-simwec-sim_2024} can become multidisciplinary through the use of integrations like \gls{acr-nemoh}/Capytaine (hydrodynamic coefficients), \gls{acr-pto}-Sim (electric and hydraulic components), WEC-Sim Applications (optimal control and other useful tools), and MoorDyn (mooring).
     However, as \citep{housner_numerical_2024} reveals, it is too slow to use for large-scale optimization.
-    Meanwhile, the newer pseudospectral tool WecOptTool \citep{coe_initial_2020} is faster and suitable for control co-design, but its disciplines are currently limited to hydrodynamics (via Capytaine) and control, with the ability to easily add custom dynamics like \gls{acr-pto} and mooring as needed, and it still can take considerable time for large optimizations.
+    Meanwhile, the newer pseudospectral tool WecOptTool \citep{coe_initial_2020} is faster and suitable for \gls{acr-ccd}, but its disciplines are currently limited to hydrodynamics (via Capytaine) and control, with the ability to easily add custom dynamics like \gls{acr-pto} and mooring as needed, and it still can take considerable time for large optimizations.
 
     A 2023 marine energy software assessment \citep{ruehl_next-generation_2023} identified that industry-wide needs broadly include using state-of-the-art computation; overcoming limitations of existing software; ensuring appropriate language, architecture, and license of new software; accessing data; and ensuring usability and accuracy of free open source software.
     Specifically, relevant gaps include tools for powertrain and controls modeling, co-design, and optimization; high-fidelity models with faster runtime and low/mid-fidelity models with higher accuracy; inter-operabilty of models across disciplines and fidelities; and data for verification and validation \citep{ruehl_next-generation_2023}.
@@ -161,7 +161,7 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
 \else
     The two leading open-source \gls{acr-wec} simulation tools illustrate the gap.
     WEC-Sim \citep{ruehl_wec-simwec-sim_2024} is a time-domain simulator extensible to multidisciplinary studies via integrations (\gls{acr-nemoh}/Capytaine for hydrodynamics, \gls{acr-pto}-Sim for powertrain, MoorDyn for mooring), but is too slow for large-scale optimization \citep{housner_numerical_2024}.
-    WecOptTool \citep{coe_initial_2020} is a faster pseudospectral tool suitable for control co-design but currently limited to hydrodynamics and control.
+    WecOptTool \citep{coe_initial_2020} is a faster pseudospectral tool suitable for \gls{acr-ccd} but currently limited to hydrodynamics and control.
     A 2023 marine energy software assessment \citep{ruehl_next-generation_2023} explicitly identifies the absence of a fast multidisciplinary optimization platform as an industry-wide gap, which explains why no study in \Cref{tab:lit} simultaneously optimizes geometry, structures, and powertrain. 
     
     Existing studies therefore tend to sacrifice either disciplinary breadth or computational tractability: high-fidelity multidisciplinary models are generally too expensive for large-scale optimization, while optimization-oriented models often omit structures, powertrain dynamics, or economic assessment.
@@ -305,7 +305,7 @@ For early-stage \gls{acr-wec} design optimization, where the model must be run m
     The work provides the following contributions:
     \begin{itemize}[leftmargin=*]
         \item \textbf{Integrates semi-analytical models} from hydrodynamics, dynamics, control, structures, and economics in a single framework suitable for optimization
-        \item Formulates an underactuated optimal control problem with coupled nonlinear multi-port dynamics, and introduces the \textbf{quasi-linearized pseudo-spectral (\gls{acr-qlps}) method} to approximate time-domain constraints and nonlinearities
+        \item Formulates an underactuated optimal control problem with coupled nonlinear multi-port dynamics, and introduces the \textbf{\acrfull{acr-qlps} method} to approximate time-domain constraints and nonlinearities
         \item \textbf{Analytically solves} the \gls{acr-qlps} optimal control problem as a univariate quadratically-constrained quadratic program (\gls{acr-qcqp}) with a geometric interpretation on the complex reflection coefficient plane
         \item \textbf{Validates} against WEC-Sim and the \gls{acr-rm3} reference design across power, structural, and economic outputs
         \item Demonstrates \textbf{computational performance} (\resultsAOR[simRuntime] simulation runtime) enabling optimization studies that are otherwise infeasible
