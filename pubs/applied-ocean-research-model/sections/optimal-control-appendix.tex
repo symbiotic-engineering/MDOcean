@@ -325,7 +325,7 @@ Similar graphical interpretations of constraints for wave energy converters are 
 To support the discussion in \Cref{sec:discussion}, this section derives the scaling of optimal average power with the constraint limits and demonstrates its conditions for convexity.
 
 The constraint limits are
-$\gls{sym-tau}_{\text{max}}$, $\gls{sym-P}_{\gls{sym-tau}\gls{sym-Omega},\text{max}}$, $\gls{sym-xi}_{\gls{sym-f},\text{max}}$, $\gls{sym-xi}_{\gls{sym-s},\text{max}}$, and $\gls{sym-X-PTO-max}$, which we collectively denote as $\gls{sym-L-mu}$.
+$\gls{sym-tau}_{\text{max}}$, $\gls{sym-P}_{\gls{sym-tau}\gls{sym-Omega},\text{max}}$, $\gls{sym-xi-f-max}$, $\gls{sym-xi-s-max}$, and $\gls{sym-X-PTO-max}$, which we collectively denote as $\gls{sym-L-mu}$.
 The dependence of power on the first two limits (\gls{acr-pto} sizing variables) is of more immediate relevance than the last three (amplitude limits) because the former can be independently manipulated through \gls{acr-pto} design, while the latter can only be manipulated by changing the bulk dimensions.
 The sensitivity of power to bulk dimensions is substantially more complex than the sensitivity to constraint limits for reasons discussed in \Cref{sec:appendix-dimension-sensitivity}, so we focus on the \gls{acr-pto} sizing sensitivities here.
 
@@ -455,8 +455,8 @@ Thus, using \textrm{aff}() and \textrm{quad}() to denote affine and quadratic fu
 \end{equation}
 Constraint activity indices $\gls{sym-mu}^*,\gls{sym-nu}^*$ depend on the constraint limits,
 and this dependence must be accounted for before the curvature of $|\gls{sym-Gamma-opt}|^2$ can be analyzed.
-From \Cref{eq:gamma-opt-quadratic}, we can define $\gls{sym-mu}^*$ and $\gls{sym-nu}^*$ more explicitly as functions of $\gls{sym-b-mu}$ by defining a penalty function $\gls{sym-f}(\gls{sym-Gamma})$ that returns $\gls{sym-Gamma}$ if $\gls{sym-Gamma}$ is feasible and $\infty$ \textrm{otherwise}.
-This function can be constructed as $\gls{sym-f}(\gls{sym-Gamma}) = \gls{sym-Gamma} + \sum_{\gls{sym-mu}} \gls{sym-mathbb-I-mu}(\gls{sym-Gamma})$,
+From \Cref{eq:gamma-opt-quadratic}, we can define $\gls{sym-mu}^*$ and $\gls{sym-nu}^*$ more explicitly as functions of $\gls{sym-b-mu}$ by defining a penalty function $\gls{sym-f-penalty}(\gls{sym-Gamma})$ that returns $\gls{sym-Gamma}$ if $\gls{sym-Gamma}$ is feasible and $\infty$ \textrm{otherwise}.
+This function can be constructed as $\gls{sym-f-penalty}(\gls{sym-Gamma}) = \gls{sym-Gamma} + \sum_{\gls{sym-mu}} \gls{sym-mathbb-I-mu}(\gls{sym-Gamma})$,
 where $\gls{sym-mathbb-I-mu}(\gls{sym-Gamma})$ is an indicator function that returns $0$ if $\gls{sym-Gamma}$ satisfies the $\gls{sym-mu}$th constraint and $\infty$ \textrm{otherwise}.
 The penalty function is convex in $\gls{sym-Gamma}$ if and only if all constraints are convex, i.e., if $\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
 Then, the optimal reflection coefficient of each candidate type can be written as the minimum of the candidate points passed through the penalty function.
@@ -464,11 +464,11 @@ Then, the optimal reflection coefficient of each candidate type can be written a
 \begin{aligned}
    |\gls{sym-Gamma-cl-mu-star}| &=
     \min_{\gls{sym-mu}} \left\{
-        | \gls{sym-f}\left(\gls{sym-Gamma-cl-mu} (\gls{sym-b-mu})\right) |
+        | \gls{sym-f-penalty}\left(\gls{sym-Gamma-cl-mu} (\gls{sym-b-mu})\right) |
     \right\}, \quad
     |\gls{sym-Gamma-int-mu-star-nu-star}| =
     \min_{\gls{sym-mu},\gls{sym-nu}} \left\{
-        | \gls{sym-f}\left(\gls{sym-Gamma-mu-nu}(\gls{sym-b-mu}, \gls{sym-b-nu})\right) |
+        | \gls{sym-f-penalty}\left(\gls{sym-Gamma-mu-nu}(\gls{sym-b-mu}, \gls{sym-b-nu})\right) |
     \right\}
 \end{aligned}
 \end{equation}
@@ -490,7 +490,7 @@ so $\sqrt{\textrm{aff}(\gls{sym-b-mu})}$ is concave.
 The sum of a concave function and an affine function is concave,
 so $|\gls{sym-Gamma-cl}|=\textrm{aff}(\gls{sym-b-mu}) + \sqrt{\textrm{aff}(\gls{sym-b-mu})}$ is concave.
 The penalty function is convex if and only if all constraints are convex,
-so $-|\gls{sym-f}(\gls{sym-Gamma-cl})|$
+so $-|\gls{sym-f-penalty}(\gls{sym-Gamma-cl})|$
 is concave if and only if
 $\gls{sym-S-mu}=1 ~\forall \gls{sym-mu}$.
 The minimum of a set of concave functions is a concave increasing function,

@@ -231,7 +231,7 @@ The wave power density $\gls{sym-mathbf-J-H-T-wave}$ and maximum capture width  
 The maximum capture width matrix represents the radiation limit determined by the \gls{acr-wec} mode of motion
 (heave in this case; for surge or pitch the value would be doubled due to the asymmetry of the outgoing wave field).
 
-The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$ (computed with $\gls{sym-C-d-f}=\gls{sym-C-d-s}=0$, ideal \gls{acr-pto}):
+The radiation and drag efficiencies are defined relative to a drag-free simulation $\mathbf{\gls{sym-P}}_{\gls{sym-F-PTO}\gls{sym-dot-X},\text{no drag}}$ (computed with $\gls{sym-C-d-f}=\gls{sym-C-d-s}=0$, ideal \gls{acr-pto}):
 \begin{equation}
 \gls{sym-boldsymbol-eta-H-T-rad} = \frac{\mathbf{P}_{F\dot{X},\text{no drag}}}{\mathbf{J}^{H,T}_{wave}\,\mathbf{CW}^{\gls{sym-H},\gls{sym-T-period}}_{max}}, \qquad
 \gls{sym-boldsymbol-eta-H-T-drag} = \frac{\mathbf{P}_{F\dot{X},\text{ideal}}}{\mathbf{P}_{F\dot{X},\text{no drag}}}.
@@ -239,7 +239,7 @@ The radiation and drag efficiencies are defined relative to a drag-free simulati
 $\gls{sym-boldsymbol-eta-H-T-drag}$ may exceed 1 at frequencies where the drag-free system is so undamped that
 the unconstrained controller from \Cref{eq:matched-load,eq:damping-control} would induce instability;
 in such cases a sub-optimal controller is substituted, which lowers
-$\mathbf{\gls{sym-P}}_{\gls{sym-F}\gls{sym-dot-X},\text{no drag}}$
+$\mathbf{\gls{sym-P}}_{\gls{sym-F-PTO}\gls{sym-dot-X},\text{no drag}}$
 (the denominator) rather than raising the numerator.
 In cases where the unconstrained controller is stable,
 $\gls{sym-boldsymbol-eta-H-T-drag} \leq 1$ is guaranteed.
@@ -281,8 +281,8 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
          1.3 - Mooring/Foundation&  3\%&  12\%&No\\
-         1.4 - Structural&  17\%&  46\%&$\gls{sym-V}_{\text{struct}}$\\
-         1.5 - \gls{acr-pto}&  4\%&  11\%&$\gls{sym-F}_{\text{max}}, \gls{sym-P}_{pk,\text{elec}}$\\
+         1.4 - Structural&  17\%&  46\%&$\gls{sym-V-struct}$\\
+         1.5 - \gls{acr-pto}&  4\%&  11\%&$\gls{sym-F-max}, \gls{sym-P-pk-elec}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
          1.7 - Installation&  34\%&  10\%&No\\
          1.8 - Decommissioning&  9\%&  9\%&No\\
@@ -305,9 +305,9 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
 The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
 ($\gls{sym-C}_{\text{fixed}}$,
  $\gls{sym-C}_{pto,\text{constant}}$, 
- $\gls{sym-p}_{\gls{sym-P}}$,
- $\gls{sym-p}_{\gls{sym-F}}$,
- $\gls{sym-p}_{\gls{sym-s}}$)
+ $\gls{sym-p-P}$,
+ $\gls{sym-p-F}$,
+ $\gls{sym-p-s}$)
 each decrease with the number of devices $\gls{sym-N-WEC}$ according to
 \begin{equation}\label{eq:cost-power-law}
     \gls{sym-C} = \gls{sym-C-infty}+ (\gls{sym-C-1} - \gls{sym-C-infty})
@@ -590,9 +590,9 @@ Meanwhile, the hydrostatic pressure at the bottom creates a substantial compress
 
 The Euler critical buckling force $\gls{sym-F-crit}$ is:
 \begin{equation}
-    \gls{sym-F-crit} = \frac{\gls{sym-pi}^2 \gls{sym-E} \gls{sym-I}}{(\gls{sym-K-end} \gls{sym-L})^2}
+    \gls{sym-F-crit} = \frac{\gls{sym-pi}^2 \gls{sym-E} \gls{sym-I-zz}}{(\gls{sym-K-end} \gls{sym-L})^2}
 \end{equation}
-where $\gls{sym-E}$ is the Young's modulus, $\gls{sym-I}$ is the second moment of area, $\gls{sym-K-end}=2$ is the end condition
+where $\gls{sym-E}$ is the Young's modulus, $\gls{sym-I-zz}$ is the second moment of area, $\gls{sym-K-end}=2$ is the end condition
 (fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface),
 and $\gls{sym-L}$ is the beam length, set to $\gls{sym-h-s}$ the full spar height.
 The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
@@ -608,7 +608,7 @@ The spar factor of safety $FOS$ to prevent yield and global buckling under the c
                                         {2}
             }
             {
-                \frac{\gls{sym-F}}{\gls{sym-A}} + \gls{sym-q}
+                \frac{\gls{sym-F-heave}}{\gls{sym-A}} + \gls{sym-q}
             }
 \end{equation}
 where $\gls{sym-zeta-s}$ and $\gls{sym-omega-s}$ are defined as follows:
