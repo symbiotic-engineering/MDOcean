@@ -531,15 +531,23 @@ This prevents the need for a separate structural analysis of the side plates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damping Plate}
-For an annular plate with free outer radius $\gls{sym-a}$ and fixed inner radius $\gls{sym-b}$, the nondimensional plate deflection $\overline{\gls{sym-delta}}_{\text{plate}}$ and bending moment $\overline{\gls{sym-M}}_{\gls{sym-r}}$ can be calculated as a function of plate aspect ratio $\gls{sym-b}/\gls{sym-a}$ for various load cases.
+For an annular plate with free outer radius $\gls{sym-a-outer-damping-plate}$ and fixed inner radius $\gls{sym-b-inner-damping-plate}$, the nondimensional plate deflection $\gls{sym-overline-delta-plate}$ and bending moment $\gls{sym-overline-M-r}$ can be calculated as a function of plate aspect ratio $\gls{sym-b-inner-damping-plate}/\gls{sym-a-outer-damping-plate}$ for various load cases.
 In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
 Formulas for the concentrated loading are given by \citet{boedo_corrected_1998}, and formulas for distributed loading are given by \citet[case 2L, table 11.2]{young_roarks_2001}.
 The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $\gls{sym-D-eq}$ and equivalent section modulus $\gls{sym-S-eq}$.
-The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $K_{\text{tube}}$.
+The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $\gls{sym-K-tube}$.
 This results in the following expression for the radial plate bending stress $\gls{sym-sigma-r}$:
 \begin{equation}
-    \gls{sym-sigma-r} =  \frac{\gls{sym-F}_{\text{heave}}}{\gls{sym-S-eq}} \left(
-    \overline{\gls{sym-M}}_{\gls{sym-r},dis} + \overline{\gls{sym-M}}_{\gls{sym-r},con} \frac{\overline{\gls{sym-delta}}_{\text{plate},dis}}{\frac{\gls{sym-D-eq}}{\gls{sym-a}^2K_{\text{tube}}} - \overline{\gls{sym-delta}}_{\text{plate},con}}
+    \gls{sym-sigma-r} =  \frac{\gls{sym-F-heave}}{\gls{sym-S-eq}}
+    \left(
+            \gls{sym-overline-M-r}_{,dis} + \gls{sym-overline-M-r}_{,con} \frac{
+                                                                                \gls{sym-overline-delta-plate}_{dis}
+                                                                                }
+                                                                                {
+                                                                                \frac{\gls{sym-D-eq}}
+                                                                                     {\gls{sym-a-outer-damping-plate}^2 \gls{sym-K-tube}}
+                                                                                - \gls{sym-overline-delta-plate}_{con}
+                                                                                }
     \right)
 \end{equation}
 
@@ -570,7 +578,7 @@ The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
         \caption{Damping plate deflection}
         \label{fig:damping-plate-deflection}
     \end{subfigure}
-    \caption{Damping plate structural analysis: radial bending moment (\gls{sym-a}) and deflection (\gls{sym-b}) over the plate radius.}
+    \caption{Damping plate structural analysis: radial bending moment \ref{fig:damping-plate-moment} and deflection \ref{fig:damping-plate-deflection} over the plate radius.}
     \label{fig:damping-plate-struct}
 \end{figure}
 In \Cref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
