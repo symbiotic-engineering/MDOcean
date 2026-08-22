@@ -531,13 +531,13 @@ The instantaneous time-domain power at any port is simply the product of the por
 In the frequency domain assuming sinusoidal waveforms, the active power $\gls{sym-P}$, reactive power $\gls{sym-Q}$, complex power $\gls{sym-S}$, and apparent power $|\gls{sym-S}|$ from electrical engineering \citep{saadat_power_1999} are
 \begin{equation}\label{eq:power-PQS}
 \begin{aligned}
-    \gls{sym-P} &= \tfrac{1}{2}\Re (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re (\gls{sym-Z})|\gls{sym-hat-q}|^2,\\
-    \gls{sym-Q} &= \tfrac{1}{2}\Im (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im (\gls{sym-Z})|\gls{sym-hat-q}|^2, \\
-    \gls{sym-S} &= \gls{sym-P} + iQ = \tfrac{1}{2}\hat{e}\gls{sym-hat-q}^* = \tfrac{1}{2}\gls{sym-Z}|\gls{sym-hat-q}|^2, \\
-    |\gls{sym-S}| &= \tfrac{1}{2}|\gls{sym-Z}||\gls{sym-hat-q}|^2,
+    \gls{sym-P} &= \tfrac{1}{2}\Re (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re (\gls{sym-Z-term})|\gls{sym-hat-q}|^2,\\
+    \gls{sym-Q} &= \tfrac{1}{2}\Im (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im (\gls{sym-Z-term})|\gls{sym-hat-q}|^2, \\
+    \gls{sym-S} &= \gls{sym-P} + iQ = \tfrac{1}{2}\hat{e}\gls{sym-hat-q}^* = \tfrac{1}{2}\gls{sym-Z-term}|\gls{sym-hat-q}|^2, \\
+    |\gls{sym-S}| &= \tfrac{1}{2}|\gls{sym-Z-term}||\gls{sym-hat-q}|^2,
 \end{aligned}
 \end{equation}
-where the port is terminated with complex impedance $\gls{sym-Z}$ and $(\,)^*$ denotes the conjugate transpose.
+where the port is terminated with complex impedance $\gls{sym-Z-term}$ and $(\,)^*$ denotes the conjugate transpose.
 
 The average and peak powers over a wave period, derived in \Cref{sec:appendix-power-time}, are
 \begin{equation}\label{eq:power-avg-peak}
@@ -555,11 +555,11 @@ Validation in \Cref{sec:validation-benchmarking} sets $\gls{sym-eta}=80\%$ to ma
 
 The full expansion of $\gls{sym-p}_{\text{avg},\text{elec}}$ and $\gls{sym-p}_{pk,\text{elec}}$ in terms of the optimal-control variables $\gls{sym-B-l}$, $\gls{sym-K-l}$, and the electrical-port current phasor $\gls{sym-hat-I}$ is given in \Cref{sec:appendix-power-elec}.
 
-% Additionally, the drivetrain mechanical cascade matrix $[\gls{sym-a}]_{\gls{sym-m}}$ is set to the identity matrix, which represents a static effective gear radius $\gls{sym-R}=1$:
+% Additionally, the drivetrain mechanical cascade matrix $[\gls{sym-a}]_{\gls{sym-m}}$ is set to the identity matrix, which represents a static effective gear radius $\gls{sym-R-gear}=1$:
 % \begin{equation}
 % [a]_m = \begin{bmatrix}
-% 1/R &~ 0 \\
-% 0 &~ R
+% 1/\gls{sym-R-gear} &~ 0 \\
+% 0 &~ \gls{sym-R-gear}
 % \end{bmatrix} = \begin{bmatrix}
 % 1 &~ 0 \\
 % 0 &~ 1
@@ -892,7 +892,7 @@ In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its 
 \fi
 \begin{equation}\label{eq:peak-pto-force}
 \max_{\gls{sym-t}} | \gls{sym-F-p-op} (\gls{sym-t}) |
-\approx \frac{1}{\gls{sym-R}}
+\approx \frac{1}{\gls{sym-R-gear}}
 \left(
 \left| \gls{sym-Z-shaft} \gls{sym-hat-Omega} \right|
                          + \gls{sym-tau-max} \right).
@@ -1221,14 +1221,14 @@ This yields:
 \begin{equation}\label{eq:unit-cost}
 \begin{aligned}
     \gls{sym-C-unit} &=  \gls{sym-C-pto} + C_{\text{struct}} + C_{\text{fixed}} \\
-    \gls{sym-C-pto} &= C_{pto,\text{constant}} + \gls{sym-p-P-2} P_{pk,\text{elec}} +\gls{sym-p-F-2} F_{\text{max}} \\
-    C_{\text{struct}} &= \gls{sym-p-s-2} V_{\text{struct}}
+    \gls{sym-C-pto} &= C_{pto,\text{constant}} + \gls{sym-p-P} P_{pk,\text{elec}} +\gls{sym-p-F} F_{\text{max}} \\
+    C_{\text{struct}} &= \gls{sym-p-s} V_{\text{struct}}
 \end{aligned}
 \end{equation}
 where $\gls{sym-p-P}$, $\gls{sym-p-F}$, and $\gls{sym-p-s}$ are the prices of power, force, and structural material in units of \$/kW, \$/N, and \$/m$^3$ respectively.
 See \Cref{sec:appendix-econ-power-law} for more details.
 
-The per-\gls{acr-wec} unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, $\gls{sym-p-P-2}$, $\gls{sym-p-F-2}$, and $\gls{sym-p-s-2}$ all decrease with the number of devices $\gls{sym-N-WEC}$ via a power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
+The per-\gls{acr-wec} unit costs and prices $C_{\text{fixed}}$, $C_{pto,\text{constant}}$, \gls{sym-p-P}, \gls{sym-p-F}, and \gls{sym-p-s} all decrease with the number of devices $\gls{sym-N-WEC}$ via a power law (\Cref{eq:cost-power-law} in \Cref{sec:appendix-econ}), with curve-fit parameters given in \Cref{tab:econ-model-values}.
 
 The total $CAPEX$ and $OPEX$ are found by multiplying the unit costs by the number of devices $\gls{sym-N-WEC}$.
 For consistency with prior references \citep{neary_reference_2014,RM3}, all costs are intentionally kept in units of 2012 \gls{acr-usd} without adjusting for inflation.
