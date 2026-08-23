@@ -77,35 +77,35 @@ Constraints are the most common but not the only enforcement mechanism.
     \begin{longtable}{cP{0.25\linewidth}P{0.27\linewidth}P{0.08\linewidth}L{0.28\linewidth}}
           \textbf{\#}&\textbf{Requirement}&  \textbf{Description}& \textbf{Priority}&\textbf{Enforcement}\\
          \hline
-  \requirement{float_spar_diam}&$D_s < D_{f,in}$&  Float spar diameter& 1&Parameter $D_{f,in}/D_s$\\
-  \requirement{float_in_out_diam}&$D_{f,in}<D_{f}$& Float outer/inner diameter& 1&Lin. ineq. constraint $g_{L,2}$\\
-  \requirement{float_spar_draft}&$T_{f,2}<T_s$&  Float spar draft& 1&Lin. ineq. constraint $g_{L,3}$\\
-  \requirement{float_seafloor_overflow}&$h-T_s>\Delta z_{s,\text{min}}$&  Float seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,5}$\\
-  \requirement{spar_seafloor_overflow}&$h-T_{f,2}>\Delta z_{f,\text{min}}$&  Spar seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,6}$\\
+  \requirement{float_spar_diam}&$\gls{sym-D-s} < D_{f,in}$&  Float spar diameter& 1&Parameter $D_{f,in}/\gls{sym-D-s}$\\
+  \requirement{float_in_out_diam}&$D_{f,in}<\gls{sym-D-f}$& Float outer/inner diameter& 1&Lin. ineq. constraint $g_{L,2}$\\
+  \requirement{float_spar_draft}&$\gls{sym-T-f-2}<\gls{sym-T-s}$&  Float spar draft& 1&Lin. ineq. constraint $g_{L,3}$\\
+  \requirement{float_seafloor_overflow}&$\gls{sym-h}-\gls{sym-T-s}>\gls{sym-Delta} z_{s,\text{min}}$&  Float seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,5}$\\
+  \requirement{spar_seafloor_overflow}&$\gls{sym-h}-\gls{sym-T-f-2}>\gls{sym-Delta} z_{f,\text{min}}$&  Spar seafloor + numerical overflow& 1&Lin. ineq. constraint $g_{L,6}$\\
   \hline 
-  \requirement{float_base_diameter}& $D_{f,in} <\gls{sym-D-f-b} < D_f$& Float base diameter& 2&Parameter $\gls{sym-D-f-b}/D_f$ \\
-  \requirement{float_draft}& $T_{f,1}<T_{f,2}$ & Float draft & 2 & Parameter $T_{f,1}/T_{f,2}$ \\
-  \requirement{float_submergence}& $T_{f,2} < h_f$& Float submergence& 2&Parameter $T_{f,2}/h_f$\\
-  \requirement{spar_damping_ratio}& $\zeta > \zeta_{\text{min}}$& Spar damping ratio& 2&Parameters $D_d/D_s$, $T_s/D_s$, $h_d/D_s$\\
-  \requirement{spar_similarity}&$\omega_n<\omega_{n,\text{max}}$& Spar similarity& 2&Lin. ineq. constraint $g_{L,1}$\\
+  \requirement{float_base_diameter}& $D_{f,in} <\gls{sym-D-f-b} < \gls{sym-D-f}$& Float base diameter& 2&Parameter $\gls{sym-D-f-b}/\gls{sym-D-f}$ \\
+  \requirement{float_draft}& $\gls{sym-T-f-1}<\gls{sym-T-f-2}$ & Float draft & 2 & Parameter $\gls{sym-T-f-1}/\gls{sym-T-f-2}$ \\
+  \requirement{float_submergence}& $\gls{sym-T-f-2} < \gls{sym-h-f}$& Float submergence& 2&Parameter $\gls{sym-T-f-2}/\gls{sym-h-f}$\\
+  \requirement{spar_damping_ratio}& $\zeta > \zeta_{\text{min}}$& Spar damping ratio& 2&Parameters $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, $\gls{sym-h-d}/\gls{sym-D-s}$\\
+  \requirement{spar_similarity}&$\gls{sym-omega-n}<\omega_{n,\text{max}}$& Spar similarity& 2&Lin. ineq. constraint $g_{L,1}$\\
   \requirement{positive_net_power}&$P_{\text{avg}}>0$& Positive net power& 2&Nonlin. ineq. constraint $g_{NL,14}$\\
   \hline
-  \requirement{clearance_static}& $h_{fs,\text{clear}}>0$& Float spar tube clearance (static)& 3&Design variable bound\\
+  \requirement{clearance_static}& $\gls{sym-h-fs-clear}>0$& Float spar tube clearance (static)& 3&Design variable bound\\
   \requirement{tops_static}&$h_{fs,\text{up}}>0$& Float spar tops (static)& 3&Lin. ineq. constraint $g_{L,4}$\\
   \requirement{base_static}& $h_{fs,\text{down}}>0$& Float spar base (static)& 3&Lin. ineq. constraint $g_{L,3}$\\
-  \requirement{damping_plate_thickness}& $t_d < h_d$& Maximum damping plate thickness & 3 & Lin. ineq. constraint $g_{L,7}$\\
-  \requirement{float_stiffener_height}& $h_{\text{stiff},f} < h_f / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
-  \requirement{tops_dynamic}&$h_{fs,\text{up}}>|\xi_f-\xi_s|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
-  \requirement{base_dynamic}& $h_{fs,\text{down}}>|\xi_f-\xi_s|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
-  \requirement{clearance_dynamic}& $h_{fs,\text{clear}}>|\xi_f-\xi_s|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
-  \requirement{linear_amplitude}& $\xi_{lin}>|\xi_f|$& Float amplitude (linearity)& 3&Nonlin. ineq. constraint $g_{NL,22}$\\
-  \requirement{slam_amplitude}& $\xi_{\text{slam}}>|\xi_f|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
+  \requirement{damping_plate_thickness}& $\gls{sym-t-d} < \gls{sym-h-d}$& Maximum damping plate thickness & 3 & Lin. ineq. constraint $g_{L,7}$\\
+  \requirement{float_stiffener_height}& $h_{\text{stiff},f} < \gls{sym-h-f} / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
+  \requirement{tops_dynamic}&$h_{fs,\text{up}}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
+  \requirement{base_dynamic}& $h_{fs,\text{down}}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
+  \requirement{clearance_dynamic}& $\gls{sym-h-fs-clear}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
+  \requirement{linear_amplitude}& $\gls{sym-xi-lin}>|\gls{sym-xi-f}|$& Float amplitude (linearity)& 3&Nonlin. ineq. constraint $g_{NL,22}$\\
+  \requirement{slam_amplitude}& $\xi_{\text{slam}}>|\gls{sym-xi-f}|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
   \requirement{float_hydrostatics}&$V_{f,\text{struct},\text{min}} < V_{f,\text{struct}} < V_{f,\text{struct},\text{max}}$& Float hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
   \requirement{spar_hydrostatics}&$V_{s,\text{struct},\text{min}} < V_{s,\text{struct}} < V_{s,\text{struct},\text{max}}$& Spar hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
   \requirement{FOS}&$FOS > FOS_{\text{min}}$& Structural factors of safety& 3&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
   \requirement{GM}&$GM > 0$& Metacentric height (pitch stability)& 3&Nonlin. ineq. constraint $g_{NL,5}$\\
-  \requirement{force_max}&$F_p = F_{\text{max}}$& Maximum powertrain force& 3&Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
-  \requirement{P_max}&$P_{pk,\text{elec}} = P_{\text{max}}$& Maximum powertrain power& 3&Nonlin. ineq. constraint $g_{NL,18}$\\
+  \requirement{force_max}&$\gls{sym-F-p} = F_{\text{max}}$& Maximum powertrain force& 3&Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
+  \requirement{P_max}&$\gls{sym-P-pk-elec} = P_{\text{max}}$& Maximum powertrain power& 3&Nonlin. ineq. constraint $g_{NL,18}$\\
   \requirement{LCOE}&$LCOE<LCOE_{\text{max}}$& Maximum LCOE& 3&Nonlin. ineq. constraint $g_{NL,15}$\\
 
     \caption{Requirements}
@@ -157,14 +157,14 @@ and will inform the optimization problem formulation.
 \subsubsection{Design Variables, Parameters, and Constraints}
 The encoding of a physical design space into optimization design variables is non-unique.
 \ifdefined\DISSERTATION
-    For example, the float spar and drafts could be encoded directly as dimensions $T_{f,2}$ and $T_s$, or nondimensionally as dimension $T_s$ and ratio $T_{f,2}/T_s$.
+    For example, the float spar and drafts could be encoded directly as dimensions $\gls{sym-T-f-2}$ and $\gls{sym-T-s}$, or nondimensionally as dimension $\gls{sym-T-s}$ and ratio $\gls{sym-T-f-2}/\gls{sym-T-s}$.
     An encoding may be chosen because it more directly controls the objective, makes the problem convex in the objective or constraints, or helps maintain feasibility and convergence during optimization.
     The last is pursued here.
     Depending on the encoding, each requirement can be enforced via parameters, design variable bounds, linear inequality or equality constraints, or nonlinear inequality or equality constraints, listed from least to most difficult for the optimizer.
     It is therefore desirable to use only parameters, bounds, and linear constraints (no nonlinear constraints) for the five priority 1 requirements, ensuring they hold even at intermediate points.
     
-    Continuing the draft example, two priority 1 requirements, \reqref{float_spar_draft} and \reqref{spar_seafloor_overflow}, contain $T_{f,2}$, while $T_s$ appears in \reqref{float_spar_draft} and \reqref{float_seafloor_overflow}.
-    Assuming the other variables involved (e.g.\ $T_{f,1}$, $h$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
+    Continuing the draft example, two priority 1 requirements, \reqref{float_spar_draft} and \reqref{spar_seafloor_overflow}, contain $\gls{sym-T-f-2}$, while $\gls{sym-T-s}$ appears in \reqref{float_spar_draft} and \reqref{float_seafloor_overflow}.
+    Assuming the other variables involved (e.g.\ $\gls{sym-T-f-1}$, $\gls{sym-h}$) are parameters or design variables, the dimensional encoding makes all three requirements achievable via linear constraint, while the nondimensional encoding makes \reqref{float_spar_draft} a bound (preferable) but forces \reqref{spar_seafloor_overflow} into a nonlinear constraint (undesired).
     Early results with nondimensional encodings \citep{mccabe_multidisciplinary_2022} showed the optimizer frequently violating nonlinear constraints and causing simulation failure, so the dimensional encoding is selected.
 \else
     For example, the float and spar drafts may be encoded directly as dimensions or as a dimension and a ratio.
@@ -188,18 +188,18 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive \gl
 \caption{Design Variables}\label{remdo:tab:design-vars}
 \begin{tabular}{c>{\centering\arraybackslash}m{0.12\linewidth}>{\centering\arraybackslash}m{0.25\linewidth}>{\centering\arraybackslash}m{0.12\linewidth}>{\centering\arraybackslash}m{0.12\linewidth}>{\centering\arraybackslash}m{0.12\linewidth}c}
  \textbf{\#}&\textbf{Design Var.}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
- $x_1$&$D_s$& Spar outer diameter& 0& 6& 30& m\\
- $x_2$&$D_{f}$ & Float outer diameter& 1& 20 & 50& m \\
- $x_3$&$T_{f,2}$ & Float draft& 0.5& Nominal RM3~\citep{mccabe_development_2026}&100& m\\
- $x_4$&$h_s$& Spar height  & 5& Nominal RM3~\citep{mccabe_development_2026}& 100& m\\
- $x_5$&$h_{fs,\text{clear}}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
+ $x_1$&$\gls{sym-D-s}$& Spar outer diameter& 0& 6& 30& m\\
+ $x_2$&$\gls{sym-D-f}$ & Float outer diameter& 1& 20 & 50& m \\
+ $x_3$&$\gls{sym-T-f-2}$ & Float draft& 0.5& Nominal RM3~\citep{mccabe_development_2026}&100& m\\
+ $x_4$&$\gls{sym-h-s}$& Spar height  & 5& Nominal RM3~\citep{mccabe_development_2026}& 100& m\\
+ $x_5$&$\gls{sym-h-fs-clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
  $x_6$& $F_{\text{max}}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
- $x_{7}$&$P_{pk,\text{elec}}$& Generator peak power rating & 50& 286& 1000& kW\\
- $x_{8}$&$t_{f,b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\
- $x_{9}$&$t_{s,r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\
- $x_{10}$&$t_{d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\
+ $x_{7}$&$\gls{sym-P-pk-elec}$& Generator peak power rating & 50& 286& 1000& kW\\
+ $x_{8}$&$\gls{sym-t-f-b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\
+ $x_{9}$&$\gls{sym-t-s-r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\
+ $x_{10}$&$\gls{sym-t-d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\
  $x_{11}$&$h_{\text{stiff},f}$& Float stiffener height& 0& 0.406& 2& m\\
- $x_{12}$& $h_{\text{stiff},d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
+ $x_{12}$& $\gls{sym-h-stiff-d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
 \end{tabular}%
 }
 \end{center}
@@ -207,12 +207,12 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive \gl
 
 The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \citep{RM3}.
 \ifdefined\DISSERTATION
-    Three parameters of note are the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
+    Three parameters of note are the geometric ratios $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, and $\gls{sym-h-d}/\gls{sym-D-s}$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
     Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citet{mccabe_development_2026}.
     In effect, the spar dimensional design space is restricted to comply with the model assumptions.
     This prevents determining the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \else
-    Three parameters of note, the geometric ratios $D_d/D_s$, $T_s/D_s$, and $h_d/D_s$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citet{mccabe_development_2026}.
+    Three parameters of note, the geometric ratios $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, and $\gls{sym-h-d}/\gls{sym-D-s}$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citet{mccabe_development_2026}.
     This restricts the spar design space to remain model-valid; it precludes finding the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \fi
 %\hl{Explain how this manifests as a minimum damping plate diameter.}
@@ -228,9 +228,9 @@ $\rho_w$ & Seawater density& 1000 & kg/$m^3$  \\
 $g$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
 $h$& Water depth & 100 & m  \\ 
 JPD& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
-$H_s$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
+$\gls{sym-H-s}$ & Wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
 $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 18.8, 24.2, 30.1, 24.2, 18.8, 13.4] & m  \\ 
-$T$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
+$\gls{sym-T-period}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
 $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\sigma_y$ & Material yield strength& 248 & MPa  \\ 
 $\rho_M$ & Material density& 7850 & kg/$m^3$  \\ 
@@ -243,13 +243,13 @@ $\text{cost}_m$ & Material cost& 1.89 & \$/kg \\
 %$t_{sr}$ & Vertical Column Thickness & 0.025 & m  \\ 
 %$B_{\text{min}}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
 $FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
-$D_{d_{\text{min}}}$ & Minimum damping plate diameter & 30 & m  \\ 
+$\gls{sym-D-d-min}$ & Minimum damping plate diameter & 30 & m  \\ 
 $FCR$ & Fixed charge rate& 10.8 & \%  \\ 
 $N_{WEC}$ & Number of \glspl{acr-wec} in array& 100 & -  \\ 
-$D_{d}/{D_{s}}$ & Normalized damping plate diameter & 5 & -  \\ 
-$T_{s}/{D_{s}}$ & Normalized spar draft& 5.83 & -  \\ 
-$h_{d}/{D_{s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
-$T_{f}/{h_{f}}$ & Float submergence ratio & 0.5 & -  \\ 
+$\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\ 
+$\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 
+$\gls{sym-h-d}/{\gls{sym-D-s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
+$T_{f}/{\gls{sym-h-f}}$ & Float submergence ratio & 0.5 & -  \\ 
 $F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
 \end{table}

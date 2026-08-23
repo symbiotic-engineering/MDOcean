@@ -97,7 +97,7 @@ The eight linear inequality constraints of the optimization formulation (\Cref{r
     \end{pmatrix}
 \end{equation}
 The $-0.01$ values on the right-hand side provide a small numerical buffer against the constraints to avoid model limits.
-The coefficient for $t_d$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
+The coefficient for $\gls{sym-t-d}$ in $g_{L,7}$ is $10^{-3}$ rather than $1$ to convert from millimeters to meters.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -123,16 +123,16 @@ For SQP, Hessian scaling further equalizes each variable's effect magnitude on t
 First the unscaled optimization is run for a small number (8) of iterations to obtain a realistic Hessian $H$.
 Then a scale vector $\vec{s}$ with elements $s_i$ is calculated from the diagonal Hessian entries, as \citet[section 8.3]{papalambros_principles_2017} recommend:
 \begin{equation}
-    s_i = \frac{1}{\sqrt{H_{ii}}}
+    s_i = \frac{1}{\sqrt{\gls{sym-H-ii}}}
 \end{equation}
-A new scaled optimization problem is solved using the scaled design variables $\vec{x}_s$:
+A new scaled optimization problem is solved using the scaled design variables $\gls{sym-vec-x-s}$:
 \begin{equation}
 \begin{aligned}
-    \text{min}~~& \gls{sym-J}(\vec{x}_s \odot \vec{s},~\gls{sym-vec-p}) \\
-    \text{by varying}~~&\vec{x}_s= \vec{x} \varoslash \vec{s}\\
-    \text{subject to}~~ &\vec{x}_{LB}\varoslash \vec{s} \leq \vec{x}_s \leq \vec{x}_{UB} \varoslash \vec{s}\\
-    &\vec{g}_{NL}(\vec{x}_s\odot\vec{s},~\gls{sym-vec-p}) \geq 0\\
-    & (\gls{sym-mathbf-A-ineq} \odot \vec{s}^{\top})\vec{x}_s \leq \gls{sym-vec-b-ineq}
+    \text{min}~~& \gls{sym-J}(\gls{sym-vec-x-s} \odot \vec{s},~\gls{sym-vec-p}) \\
+    \text{by varying}~~&\gls{sym-vec-x-s}= \gls{sym-vec-x} \varoslash \vec{s}\\
+    \text{subject to}~~ &\gls{sym-vec-x-LB}\varoslash \vec{s} \leq \gls{sym-vec-x-s} \leq \gls{sym-vec-x-UB} \varoslash \vec{s}\\
+    &\gls{sym-vec-g-NL}(\gls{sym-vec-x-s}\odot\vec{s},~\gls{sym-vec-p}) \geq 0\\
+    & (\gls{sym-mathbf-A-ineq} \odot \vec{s}^{\top})\gls{sym-vec-x-s} \leq \gls{sym-vec-b-ineq}
     \label{remdo:eq:scaled-standard}
 \end{aligned}
 \end{equation}
@@ -210,21 +210,21 @@ The optimization converges in \resultsRE[singleObjIters]~iterations, not includi
 \end{table*}
 
 \ifdefined\DISSERTATION
-    Additional optimization outputs are the objective gradient $\vec{\nabla} J=\partial J/\partial \vec{x}$
-    and the Hessian of the Lagrangian $\mathbf{H} = \partial^2 (J+\sum_i g_i)/\partial \vec{x}^2$,
+    Additional optimization outputs are the objective gradient $\vec{\nabla} \gls{sym-J}=\partial \gls{sym-J}/\partial \gls{sym-vec-x}$
+    and the Hessian of the Lagrangian $\gls{sym-mathbf-H} = \partial^2 (\gls{sym-J}+\sum_i \gls{sym-g-i})/\partial \gls{sym-vec-x}^2$,
     whose value lies in computing further local sensitivities such as the effect of perturbing a design variable or parameter from its optimum.
     Local parameter sensitivity is treated in \Cref{remdo:sec:appendix-sensitivities-local}; design-variable perturbation is examined here.
     \Cref{remdo:fig:delta-J} shows the relative change in objective for a 10\% perturbation of each design variable from its optimum,
-    $\gls{sym-Delta} J/J$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
+    $\gls{sym-Delta} \gls{sym-J}/\gls{sym-J}$, computed via \Cref{remdo:eq:delta-J} and compared against the ground-truth simulation re-evaluation.
 \else
-    The optimization also returns the objective gradient $\vec{\nabla} J$ and the Hessian of the Lagrangian, enabling further local sensitivities.
+    The optimization also returns the objective gradient $\vec{\nabla} \gls{sym-J}$ and the Hessian of the Lagrangian, enabling further local sensitivities.
     \Cref{remdo:fig:delta-J} shows the relative objective change for a 10\% perturbation of each design variable from its optimum via \Cref{remdo:eq:delta-J}, against ground-truth re-evaluation.
 \fi
 % change plot so it represents magnitude, accuracy, and curvature
 
 
 \begin{equation}\label{remdo:eq:delta-J}
-    \gls{sym-Delta} J \approx \vec{\nabla} J^{\top} \gls{sym-Delta} \vec{x}% + \frac{1}{2} \gls{sym-Delta} \vec{x}^{\top} H \gls{sym-Delta} \vec{x}
+    \gls{sym-Delta} \gls{sym-J} \approx \vec{\nabla} J^{\top} \gls{sym-Delta} \gls{sym-vec-x}% + \frac{1}{2} \gls{sym-Delta} \vec{x}^{\top} H \gls{sym-Delta} \vec{x}
 \end{equation}
 
 \begin{figure}[htbp]
@@ -234,15 +234,15 @@ The optimization converges in \resultsRE[singleObjIters]~iterations, not includi
 \end{figure}
 
 \ifdefined\DISSERTATION
-    The gradient $\vec{\nabla} J$, and hence the gradient estimate of $\gls{sym-Delta} J$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
+    The gradient $\vec{\nabla} \gls{sym-J}$, and hence the gradient estimate of $\gls{sym-Delta} \gls{sym-J}$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
     Here all values are nonzero, indicating that every design variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
-    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
+    The highest sensitivities are $\gls{sym-D-s}$, $\gls{sym-D-f}$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises LCOE by 7.9\%, 4.4\%, and 3.7\% respectively.
     The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
-    The gradient estimates are generally accurate except for the diameters $D_s$, $D_f$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
+    The gradient estimates are generally accurate except for the diameters $\gls{sym-D-s}$, $\gls{sym-D-f}$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for LCOE minimization, since increasing the diameters and power rating raises both power production and capital cost.
     More accurate perturbed-LCOE estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
 \else
-    The gradient estimate $\gls{sym-Delta} J$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
-    The highest sensitivities are $D_s$, $D_f$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
+    The gradient estimate $\gls{sym-Delta} \gls{sym-J}$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
+    The highest sensitivities are $\gls{sym-D-s}$, $\gls{sym-D-f}$, and $h_{\text{stiff},f}$ (a 10\% change raises LCOE by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
     Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
 \fi
 Inaccuracies here, due to the nonlinear curvature of the true objective,
@@ -298,7 +298,7 @@ Future multistart procedures could therefore fix deterministic starts for the un
 \Cref{remdo:fig:param-sens-local-global-J-star,remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the local sensitivities of the optimal objective and optimal design variables, respectively, to parameters.
 \begin{figure}[htbp]
 \includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_re_optim_objective_grid.pdf}]{figs/from-matlab/post_optim_re_optim_objective_grid.pdf}
-\caption{Local parameter sensitivity analysis to optimal objective $J^*$}
+\caption{Local parameter sensitivity analysis to optimal objective $\gls{sym-J}^*$}
 \label{remdo:fig:param-sens-local-global-J-star}
 \end{figure}
 
@@ -308,15 +308,15 @@ This partial derivative is found via finite difference around the optimal point 
 The second method, suggested by \citet{martins_engineering_2022}, uses a linear model to account for the change in $x^*$ due to parameter-dependent constraints.
 The change in $x^*$ is not calculated directly and is instead incorporated through the Lagrange multipliers $\gls{sym-vec-lambda}$:
 \begin{equation}
-\frac{dJ^*}{dp} \approx \frac{\partial J}{\partial \gls{sym-vec-p}} -  \gls{sym-vec-lambda}^{\top} \frac{\partial g}{\partial \gls{sym-vec-p}}
+\frac{dJ^*}{dp} \approx \frac{\partial \gls{sym-J}}{\partial \gls{sym-vec-p}} -  \gls{sym-vec-lambda}^{\top} \frac{\partial \gls{sym-g-constraint}}{\partial \gls{sym-vec-p}}
 \end{equation}
 The third method, proposed by \citet{sobieszczanski-sobieski_sensitivity_1982}, uses a quadratic model that not only takes into account the change of $x^*$ through the parameter-dependent constraints, but also the change of $x^*$ due to the second-order curvature of the objective.
 This method involves setting up a simple linear system for each parameter $p_i$ and solving it for the sensitivity vector $\vec{x}_{\text{sens}}$:
 \begin{equation}
-    \gls{sym-A-sens} \vec{x}_{sens}(p_i) = \gls{sym-vec-b-sens}(p_i)
+    \gls{sym-A-sens} \vec{x}_{sens}(\gls{sym-p-i}) = \gls{sym-vec-b-sens}(\gls{sym-p-i})
 \end{equation}
 The forms of the parameter-agnostic $A_{\text{sens}}$ matrix and the parameter-specific $b_{\text{sens}}$ vector are given by \citet{sobieszczanski-sobieski_sensitivity_1982} and not repeated here.
-They are computed from solver outputs like the Lagrange multipliers $\gls{sym-vec-lambda}$, Hessian $\mathbf{H}$, and gradient $\vec{\nabla} J$, as well as other derivatives %\hl{(specify which)}
+They are computed from solver outputs like the Lagrange multipliers $\gls{sym-vec-lambda}$, Hessian $\gls{sym-mathbf-H}$, and gradient $\vec{\nabla} \gls{sym-J}$, as well as other derivatives %\hl{(specify which)}
 obtained here via finite difference simulation evaluations % \hl{(specify how many)}
 without re-optimizing.
 The sensitivity vector $\vec{x}_{\text{sens}}$ is then used to solve for a number of quantities of interest including the objective parameter sensitivity $dJ^*/dp$ and the optimal design parameter sensitivity $\partial x^*/\partial p$: %, and the parameter change constraint activity threshold $\gls{sym-Delta} p_{ij}$ associated with constraint $g_j$:
@@ -345,11 +345,11 @@ This could indicate the presence of discontinuities, strong nonlinearities, or t
 On the bright side, for the majority %(\resultsRE[percentParamsRightSign])
 of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
 Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
-For example, this occurs for $h$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, \gls{sym-D-d-tu}, $FOS_{\text{mult},d}$, $D_d/D_s$, $T_s/D_s$, $T_{f,1}/T_{f,2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
+For example, this occurs for $\gls{sym-h}$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, \gls{sym-D-d-tu}, $FOS_{\text{mult},d}$, $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, $\gls{sym-T-f-1}/\gls{sym-T-f-2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance.
 
 \Cref{remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the normalized local parameter sensitivities of the optimal design.
-Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $t_{f,b}$ and $t_d$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
+Even more significant discrepancies are observed than in the objective sensitivities, although both methods agree that the two structural thicknesses $\gls{sym-t-f-b}$ and $\gls{sym-t-d}$ are insensitive to all parameter changes investigated, likely because they remain at their lower bound.
 This reinforces the decision to utilize the re-optimization based sensitivities to draw conclusions despite their higher computational cost.
 \begin{figure}[htbp]
 \includegraphics[\FigureOptions{re:figs/from-matlab/post_optim_design_grid.pdf}]{figs/from-matlab/post_optim_design_grid.pdf}
