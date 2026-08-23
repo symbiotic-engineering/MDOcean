@@ -3,7 +3,7 @@
 In this section, optimization and sensitivity analyses reveal
 economic inviability, application-dependent R\&D priorities,
 and mixed conclusions on global deployability and temporal consistency.
-We show that slamming, fatigue, and wave probability explain the larger hull, undersized PTO, and bimodal frequency response that characterize optimal designs across the cost-power tradeoff.
+We show that slamming, fatigue, and wave probability explain the larger hull, undersized \gls{acr-pto}, and bimodal frequency response that characterize optimal designs across the cost-power tradeoff.
 Structures are found to be particularly important, an observation that few other frameworks are capable of assessing,
 while gradient-based, multi-start, and epsilon-constraint methods are helpful yet not essential.
 We organize results by the type of insight they provide and discuss the study contributions, limitations, and future directions therein.
@@ -13,7 +13,7 @@ Raw results of each method are available in \cref{remdo:sec:appendix-supplementa
 \label{remdo:sec:results-single}
 
 \subsubsection{Larger Bulk Geometry}
-\Cref{remdo:fig:overlaid-geometry} compares the minimum-LCOE geometry to the nominal.
+\Cref{remdo:fig:overlaid-geometry} compares the minimum-\gls{acr-lcoe} geometry to the nominal.
 The optimized design is larger in all bulk dimensions.
 The float diameter $\gls{sym-D-f}$ increases from 20~m to \resultsRE[DfoptMinLCOE],
 which increases the radiation damping (see \Cref{remdo:fig:overlaid-hydro})
@@ -412,13 +412,13 @@ as fatigue-minimizing control should appeal more at higher ratios of operational
 \label{remdo:tab:location}
 \end{table*}
 
-\subsubsection{Calmer Hawaii favors large, light designs}
+\subsubsection{Calmer \acrlong{acr-hi} favors large, light designs}
 \ifdefined\DISSERTATION
     All optimized \gls{acr-lcoe} values undercut the \gls{acr-rm3} baseline.
     Pac-Wave South, OR, gives the lowest \gls{acr-lcoe}, \$\resultsRE[LCOEPacWaveNorth]/kWh, as expected from its highest incident wave energy flux, while \gls{acr-wets}, \gls{acr-hi}, gives the highest, \$\resultsRE[LCOEHawaii]/kWh, consistent with its low incident energy.
     The optimal designs are similar for the \gls{acr-ca} and Oregon sites but quite different for \gls{acr-hi}, which has a \resultsRE[HawaiiDesignCharacteristics].
     This is surprising: the simple scaling argument
-    $\omega_n = \sqrt{k/m}=\sqrt{\rho g A/(\rho A T_f C_m)}\sim T_f^{-1/2}$
+    $\gls{sym-omega-n} = \sqrt{k/m}=\sqrt{\gls{sym-rho-w} \gls{sym-g} \gls{sym-wave-amplitude}/(\gls{sym-rho-w} \gls{sym-wave-amplitude} \gls{sym-T-f-2} \gls{sym-C-m})}\sim \gls{sym-T-f-2}^{-1/2}$
     implies a \gls{acr-wec}'s uncontrolled natural frequency scales with draft to the $-1/2$ power,
     so a smaller draft would be expected at higher-frequency sites like \gls{acr-hi}.
     One hypothesis for the reversal is that \gls{acr-hi}'s lower incident energy and excitation force requires higher oscillation amplitude for comparable power, in turn requiring higher draft to avoid slamming.
@@ -470,7 +470,7 @@ This subsection quantifies how parameter and model-assumption changes affect the
 
 \Cref{remdo:fig:param-sens-J-star-tornado,remdo:fig:param-sens-x-star-tornado,remdo:fig:param-sens-x-star-tornado-2}
 show tornado charts of the highest normalized sensitivities for the objective and design respectively,
-normalized so that a value of 1 means a given percent increase in the parameter causes the same percent increase in $J^*$ or $x^*$.
+normalized so that a value of 1 means a given percent increase in the parameter causes the same percent increase in $\gls{sym-J}^*$ or $\gls{sym-x-dv}^*$.
 \begin{figure*}[htbp]
     \centering
     \includegraphics[\FigureOptions{re:figs/from-matlab/re_optim_objective_tornado.pdf}]{figs/from-matlab/re_optim_objective_tornado.pdf}
@@ -513,7 +513,7 @@ The ultimate contribution to annual energy is also bimodal, with a dominant peak
 \begin{figure*}[htbp]
     \centering
     \includegraphics[\FigureOptions{re:figs/from-matlab/single_obj_opt_power_matrix.pdf}]{figs/from-matlab/single_obj_opt_power_matrix.pdf}
-    \caption{Power matrix multiplicative breakdown for minimum LCOE design}
+    \caption{Power matrix multiplicative breakdown for minimum \gls{acr-lcoe} design}
     \label{remdo:fig:power-matrix-opt}
 \end{figure*}
 
@@ -549,9 +549,9 @@ Thus, the importance of balancing cost, power, and probability at the grid scale
     a comparison worth quantifying in future work.
     
     The price of power $\$/W$ also has a high sensitivity ($-2.1$), though the price of force $\$/N$ is too low to appear.
-    Site parameters ($h$, $-1.8$; $H_s$, $-1.6$; $T_{\text{struct}}$, $+1.4$; $H_{s,\text{struct}}$, $+1.1$) are also influential;
-    notably the sign of $T_{\text{struct}}$ flips relative to the minimum-LCOE point, so a larger structural period decreases minimum LCOE but increases minimum design cost.
-    Per the $N_{WEC}$ sensitivity, adding a \gls{acr-wec} to the 100-unit array decreases per-\gls{acr-wec} design cost by 1.1\% through the economic model's economies of scale, an effect absent from the LCOE minimization.
+    Site parameters ($\gls{sym-h}$, $-1.8$; $\gls{sym-H-s}$, $-1.6$; \gls{sym-T-struct}, $+1.4$; \gls{sym-H-s-struct}, $+1.1$) are also influential;
+    notably the sign of \gls{sym-T-struct} flips relative to the minimum-\gls{acr-lcoe} point, so a larger structural period decreases minimum \gls{acr-lcoe} but increases minimum design cost.
+    Per the \gls{sym-N-WEC} sensitivity, adding a \gls{acr-wec} to the 100-unit array decreases per-\gls{acr-wec} design cost by 1.1\% through the economic model's economies of scale, an effect absent from the \gls{acr-lcoe} minimization.
     Unintuitively, the sensitivity to material yield strength is positive ($+1.0$):
     a stronger material yields a more expensive design, because with several thicknesses already at their lower bound,
     the added strength is leveraged into larger, higher-load bulk dimensions rather than reduced structural cost.
@@ -741,9 +741,9 @@ This subsection evaluates how realistic the optimization formulation choices are
     
     For controllable choices held fixed for simplicity, such as many geometric parameters, high values indicate the value should become a design variable in future studies.
     
-    The LCOE-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) also sensitive to structural (yellow) parameters.
+    The \gls{acr-lcoe}-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) also sensitive to structural (yellow) parameters.
     In \Cref{remdo:fig:param-sens-x-star-tornado-2}, the cost-minimizing design variables add sensitivity to economic parameters.
-    Dynamic parameters (blue), including the float and spar drag coefficients and PTO efficiency, do not significantly affect the optimal design in either case; the low drag-coefficient sensitivity in particular means it is likely unnecessary to model the variation of drag coefficient with hull shape, frequency, or surface roughness.
+    Dynamic parameters (blue), including the float and spar drag coefficients and \gls{acr-pto} efficiency, do not significantly affect the optimal design in either case; the low drag-coefficient sensitivity in particular means it is likely unnecessary to model the variation of drag coefficient with hull shape, frequency, or surface roughness.
     Some structural thicknesses ($t_{fb}$ and $\gls{sym-t-d}$ in both, $t_{sr}$ in cost minimization) are insensitive to all parameters because the optimum sits consistently at the lower bound, reinforcing the need to improve the structures model for thin-skinned stiffened shells.
     
     The following geometric relationships highlight which parameters should be promoted to design variables in future work.
@@ -794,9 +794,9 @@ This subsection evaluates how realistic the optimization formulation choices are
 
 \ifdefined\DISSERTATION
     Because non-convex optimization can become trapped in local minima, 1000 random initial guesses are tested, of which 974 are linearly infeasible and discarded.
-    Of the 26 linearly feasible starting points, none converge while satisfying the Karush-Kuhn-Tucker (KKT) first-order optimality conditions.
-    For LCOE minimization, 17 optimizations converge via small design steps and 9 fail to converge; for design-cost minimization the split reverses, at 9 and 17.
-    Among the converged runs, 5 (LCOE) and 4 (cost) reach the same minimum
+    Of the 26 linearly feasible starting points, none converge while satisfying the \gls{acr-kkt} first-order optimality conditions.
+    For \gls{acr-lcoe} minimization, 17 optimizations converge via small design steps and 9 fail to converge; for design-cost minimization the split reverses, at 9 and 17.
+    Among the converged runs, 5 (\gls{acr-lcoe}) and 4 (cost) reach the same minimum
     (termed the global minimum here as the lowest objective found across all starts, though global optimality is never guaranteed)
     while more (12 and 5 respectively) reach a less optimal local minimum.
     Of the non-converged runs, only one reaches the global minimum in each case.
@@ -927,7 +927,7 @@ The damping control front is a bit more non-convex, with cusps at around 85, 90,
 	1) Multibody: would enable explicit optimization of spar dimensions, which is important because the minimum damping plate diameter constraint is frequently active.
 
 	2) Irregular waves: would enable more realistic fatigue estimation (i.e.\ Miner's rule) and power-variability assessment (i.e.\ with energy storage), allowing comparison of variability reduction from design changes versus added batteries.
-This would also provide more complete results for PTO impedance-matching bandwidth, including whether some PTO types or \gls{acr-wec} shapes yield better $Z(\omega)$ matching with each other or with the sea state.
+This would also provide more complete results for \gls{acr-pto} impedance-matching bandwidth, including whether some \gls{acr-pto} types or \gls{acr-wec} shapes yield better $Z(\gls{sym-omega})$ matching with each other or with the sea state.
 
 	3) model different \gls{acr-wec} archetypes: would allow consistent comparison of \gls{acr-wec} archetypes in early concept design and start to address the design convergence problem.
 Would require not only \gls{acr-meem} for the different \gls{acr-wec} types, but also semi-analytical structural models for each one, or the decision to integrate a lightweight \gls{acr-fea} with plate/shell element capabilities (ie pynite).

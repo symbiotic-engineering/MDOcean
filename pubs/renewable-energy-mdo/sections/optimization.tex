@@ -9,12 +9,12 @@ The optimization solution and post-optimality analysis process is shown in \Cref
 \end{figure}
 
 \ifdefined\DISSERTATION
-    First, design space exploration is performed using a one-at-a-time (OAT) sweep, in which each design variable is individually varied while the others remain at their nominal values.
+    First, design space exploration is performed using a \gls{acr-oat} sweep, in which each design variable is individually varied while the others remain at their nominal values.
     This provides an initial understanding of the problem behavior, can reveal objective multimodality, and shows whether the objective and constraints are locally monotonic in each variable.
-    OAT does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \citep{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
+    \gls{acr-oat} does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \citep{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
 \else
-    First, design space exploration uses a one-at-a-time (OAT) sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality.
-    OAT does not capture inter-variable coupling \citep{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
+    First, design space exploration uses a \gls{acr-oat} sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality.
+    \gls{acr-oat} does not capture inter-variable coupling \citep{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,7 +37,7 @@ The single-objective algorithm is selected by characterizing the problem followi
     \end{tabular}
     \end{table}
 
-This motivates sequential quadratic programming (SQP) with multistart.
+This motivates \gls{acr-sqp} with multistart.
 \ifdefined\DISSERTATION
     \gls{acr-sqp} is a gradient-based method that builds successive quadratic approximations of the objective and linear approximations of the constraints, solving each subproblem as an efficient quadratic program and updating the approximations every iteration to track the true nonlinear functions.
     The MATLAB \gls{acr-sqp} implementation also guarantees that every intermediate design query obeys its bounds, which helps remain within the zone of model validity defined by the priority 1 requirements of \Cref{remdo:sec:requirements}.
