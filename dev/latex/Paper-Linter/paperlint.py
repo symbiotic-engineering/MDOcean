@@ -13,6 +13,10 @@ import options_settings as opts
 import tex_structure as ts
 
 SHARED_GLOSSARY_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs", "shared", "glossary"))
+GLOSSARY_USAGE_ROOTS = [
+    os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs")),
+    os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "mdocean", "simulation", "modules", "OpenFLASH", "pubs", "JFM")),
+]
 
 output_handle = sys.stdout
 use_color = True
@@ -40,6 +44,7 @@ def main():
     )
 
     checks.GLOSSARY_DIR = SHARED_GLOSSARY_DIR
+    checks.GLOSSARY_USAGE_ROOTS = GLOSSARY_USAGE_ROOTS
     checks.ACRONYM_GLOSSARY_FILE = options["acronym_glossary_seed_file"]
     checks.PREFIX_CHECK_CONFIGS = options["check_params"]
     if options["replace_glossary_refs"]:
@@ -112,6 +117,10 @@ def main():
                     elif state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
                         if c[2] == "glossary-refs":
                             c[3](file, SHARED_GLOSSARY_DIR, options["acronym_glossary_seed_file"])
+                        elif c[2] == "glossary-unused":
+                            c[3](SHARED_GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
+                        elif c[2] == "glossary-symbol-duplicate":
+                            c[3](SHARED_GLOSSARY_DIR)
                         elif c[2] == "prefix":
                             c[3](config.get("path"), config.get("prefix"), recursive=config.get("recursive", False), source_prefix=config.get("source_prefix"))
                         else:

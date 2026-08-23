@@ -17,8 +17,12 @@ SENTENCE_END_RE = ts.SENTENCE_END_RE
 math_text_mix_strings = set()
 current_file_equation_symbols = set()
 GLOSSARY_DIR = None
+GLOSSARY_USAGE_ROOTS = []
 ACRONYM_GLOSSARY_FILE = None
 PREFIX_CHECK_CONFIGS = {}
+unused_glossary_entries = []
+missing_description_entries = []
+duplicate_symbol_groups = []
 
 def split_sentences(text):
     sentences = []
@@ -185,6 +189,40 @@ def check_glossary_refs():
         if count > 0:
             warns.append((i, "Glossary terms should use glossary references where available", (0, len(line))))
             break
+    return warns
+
+
+def check_glossary_unused():
+    global unused_glossary_entries
+    warns = []
+    if GLOSSARY_DIR is None:
+        return warns
+    unused_glossary_entries = gs.find_unused_glossary_entries(GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
+    for path, key, symbol in unused_glossary_entries:
+        warns.append((-1, "Glossary symbol '%s' (%s) in %s is never referenced with \\gls{...}" % (key, symbol, path)))
+    return warns
+
+
+def check_glossary_missing_description():
+    global missing_description_entries
+    warns = []
+    if GLOSSARY_DIR is None:
+        return warns
+    missing_description_entries = gs.find_missing_description_entries(GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
+    for path, key, symbol in missing_description_entries:
+        warns.append((-1, "Glossary symbol '%s' (%s) in %s is used but has a blank description" % (key, symbol, path)))
+    return warns
+
+
+def check_glossary_symbol_duplicate():
+    global duplicate_symbol_groups
+    warns = []
+    if GLOSSARY_DIR is None:
+        return warns
+    duplicate_symbol_groups = gs.find_duplicate_symbol_groups(GLOSSARY_DIR)
+    for symbol, entries in duplicate_symbol_groups:
+        keys = ", ".join("'%s' (%s)" % (key, path) for path, _, key in entries)
+        warns.append((-1, "Symbol %s is defined by more than one \\newsym key: %s" % (symbol, keys)))
     return warns
 
 
@@ -1174,6 +1212,9 @@ checks = [
     (check_prefix,                      CATEGORY_REFERENCE,  "prefix", actions.fix_prefix),
     (check_mathmode_subscripts,         CATEGORY_TYPOGRAPHY, "mathmode-subscripts", actions.fix_mathmode_subscripts_in_file),
     (check_glossary_refs,               CATEGORY_REFERENCE,  "glossary-refs", actions.fix_glossary_refs_in_file),
+    (check_glossary_unused,             CATEGORY_REFERENCE,  "glossary-unused", actions.fix_glossary_unused),
+    (check_glossary_missing_description, CATEGORY_REFERENCE, "glossary-missing-description"),
+    (check_glossary_symbol_duplicate,   CATEGORY_REFERENCE,  "glossary-symbol-duplicate", actions.fix_glossary_symbol_duplicate),
     (check_space_before_cite,           CATEGORY_TYPOGRAPHY, "cite-space", actions.fix_space_before_cite_in_file),
     (check_math_text_mix,               CATEGORY_TYPOGRAPHY, "math-text-mix"),
     (check_units,                       CATEGORY_TYPOGRAPHY, "units"),

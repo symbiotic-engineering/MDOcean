@@ -508,3 +508,124 @@ def write_symbol_glossary(path, symbols, glossary_dir=None, used_labels=None):
         for line in lines:
             handle.write(line + "\n")
 
+
+def parse_newsym_entries_with_lines(path):
+    """Like parse_newsym_entries, but also returns the 0-based line index of each entry."""
+    entries = []
+    if not os.path.exists(path):
+        return entries
+    try:
+        with open(path) as handle:
+            lines = handle.readlines()
+    except Exception:
+        return entries
+    for i, line in enumerate(lines):
+        parsed = _parse_newsym_line(line)
+        if parsed is None:
+            continue
+        key, symbol, description = parsed
+        entries.append((i, key, symbol, description))
+    return entries
+
+
+def collect_tex_files_under(roots):
+    files = []
+    for root in roots:
+        root_path = pathlib.Path(root)
+        if root_path.is_dir():
+            files.extend(sorted(root_path.rglob("*.tex")))
+    return files
+
+
+def find_unused_glossary_entries(glossary_dir, usage_roots):
+    """Return (path, key, symbol) for \\newsym entries never referenced via \\gls{sym-<key>}."""
+    entries = []
+    if not glossary_dir or not os.path.isdir(glossary_dir):
+        return entries
+    used_labels = collect_glossary_labels_from_files(collect_tex_files_under(usage_roots))
+    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        for key, symbol, _ in parse_newsym_entries(path):
+            if ("sym-%s" % key) not in used_labels:
+                entries.append((path, key, symbol))
+    return entries
+
+
+def delete_unused_glossary_entries(glossary_dir, usage_roots):
+    unused_entries = find_unused_glossary_entries(glossary_dir, usage_roots)
+    if not unused_entries:
+        return 0
+    keys_by_path = {}
+    for path, key, _ in unused_entries:
+        keys_by_path.setdefault(path, set()).add(key)
+    for path, keys in keys_by_path.items():
+        with open(path) as handle:
+            lines = handle.readlines()
+        new_lines = []
+        for line in lines:
+            parsed = _parse_newsym_line(line)
+            if parsed is not None and parsed[0] in keys:
+                continue
+            new_lines.append(line)
+        with open(path, "w") as handle:
+            handle.writelines(new_lines)
+    return len(unused_entries)
+
+
+def find_missing_description_entries(glossary_dir, usage_roots):
+    """Return (path, key, symbol) for used \\newsym entries whose description is blank."""
+    entries = []
+    if not glossary_dir or not os.path.isdir(glossary_dir):
+        return entries
+    used_labels = collect_glossary_labels_from_files(collect_tex_files_under(usage_roots))
+    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        for key, symbol, description in parse_newsym_entries(path):
+            if not description.strip() and ("sym-%s" % key) in used_labels:
+                entries.append((path, key, symbol))
+    return entries
+
+
+def find_duplicate_symbol_groups(glossary_dir):
+    """Return (symbol, [(path, line_index, key), ...]) for symbols defined by more than one key."""
+    groups = {}
+    if not glossary_dir or not os.path.isdir(glossary_dir):
+        return []
+    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        for line_no, key, symbol, _ in parse_newsym_entries_with_lines(path):
+            groups.setdefault(symbol.strip(), []).append((path, line_no, key))
+    return [(symbol, entries) for symbol, entries in groups.items() if len(entries) > 1]
+
+
+def dedupe_glossary_symbols(glossary_dir):
+    """Append a numeric subscript to all but the first entry in each duplicate-symbol group."""
+    duplicate_groups = find_duplicate_symbol_groups(glossary_dir)
+    if not duplicate_groups:
+        return 0
+
+    all_symbols = set()
+    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        for _, _, symbol, _ in parse_newsym_entries_with_lines(path):
+            all_symbols.add(symbol.strip())
+
+    renames_by_path = {}
+    fixed = 0
+    for symbol, entries in duplicate_groups:
+        for path, line_no, key in entries[1:]:
+            suffix = 2
+            new_symbol = "%s_%d" % (symbol, suffix)
+            while new_symbol in all_symbols:
+                suffix += 1
+                new_symbol = "%s_%d" % (symbol, suffix)
+            all_symbols.add(new_symbol)
+            renames_by_path.setdefault(path, {})[line_no] = new_symbol
+            fixed += 1
+
+    for path, line_renames in renames_by_path.items():
+        with open(path) as handle:
+            lines = handle.readlines()
+        for line_no, new_symbol in line_renames.items():
+            key, _, description = _parse_newsym_line(lines[line_no])
+            lines[line_no] = "\\newsym{%s}{%s}{%s}\n" % (key, new_symbol, description)
+        with open(path, "w") as handle:
+            handle.writelines(lines)
+    return fixed
+

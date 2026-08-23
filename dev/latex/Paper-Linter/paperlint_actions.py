@@ -468,6 +468,14 @@ def fix_glossary_refs_in_file(path, glossary_dir, acronym_glossary_file=None):
     return gs.replace_glossary_refs_in_file(str(path), replacements, acronym_replacements=acronym_replacements)
 
 
+def fix_glossary_unused(glossary_dir, usage_roots):
+    return gs.delete_unused_glossary_entries(glossary_dir, usage_roots)
+
+
+def fix_glossary_symbol_duplicate(glossary_dir):
+    return gs.dedupe_glossary_symbols(glossary_dir)
+
+
 def _iter_tex_files(root):
     root = Path(root)
     for path in root.rglob('*.tex'):

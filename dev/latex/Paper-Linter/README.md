@@ -346,6 +346,18 @@ This category includes warnings for everything related to (cross-)references (sw
 * **Description**: Warns if math symbols should be replaced with glossary references where available
 * **Switch**: `glossary-refs`
 
+#### Unused Glossary Symbols
+* **Description**: Warns if a `\newsym` entry in `pubs/shared/glossary/` is never referenced with `\gls{...}` in `pubs/` or `mdocean/simulation/modules/OpenFLASH/pubs/JFM/`. Fix (`2`) deletes the unused `\newsym` entries.
+* **Switch**: `glossary-unused`
+
+#### Glossary Symbols Missing a Description
+* **Description**: Warns if a `\newsym` entry is used with `\gls{...}` somewhere but has a blank description argument. Fix (`2`) is not implemented.
+* **Switch**: `glossary-missing-description`
+
+#### Duplicate Glossary Symbols
+* **Description**: Warns if two or more `\newsym` entries in `pubs/shared/glossary/` share the same symbol (second argument) under different keys. Fix (`2`) appends a `_2`, `_3`, etc. subscript to all but the first entry's symbol to make them unique.
+* **Switch**: `glossary-symbol-duplicate`
+
 #### Math Glossary Reference Coverage
 * **Description**: Warns if an equation has fewer than two `\gls{...}` references or an inline/display math span has none
 * **Switch**: `math-gls-coverage`
