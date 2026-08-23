@@ -408,21 +408,21 @@ Note that this equivalent-thickness method of accounting for stiffeners assumes 
 This is a reasonable assumption when the stiffeners are small and densely spaced with respect to the plate, but breaks down if the stiffeners come to dominate the system.
 The so-called effective breadth ratio $\gls{sym-rho}$ is used to quantify the validity of this assumption, where the equivalent-thickness method requires $\gls{sym-rho}=1$:
 \begin{equation}
-   \gls{sym-rho} = \gls{sym-rho-lambda} \gls{sym-rho-psi}
+   \gls{sym-rho} = \gls{sym-rho-epsilon} \gls{sym-rho-psi}
 \quad
-\gls{sym-rho-lambda} = \begin{cases}
-        1, & \gls{sym-lambda-slenderness}\leq 0.673 \\
-        \frac{1-0.22/\gls{sym-lambda-slenderness}}{\gls{sym-lambda-slenderness}}, & \gls{sym-lambda-slenderness} > 0.673
+\gls{sym-rho-epsilon} = \begin{cases}
+        1, & \gls{sym-epsilon-slenderness}\leq 0.673 \\
+        \frac{1-0.22/\gls{sym-epsilon-slenderness}}{\gls{sym-epsilon-slenderness}}, & \gls{sym-epsilon-slenderness} > 0.673
     \end{cases} \quad
     \gls{sym-rho-psi} = \begin{cases}
         1, & \gls{sym-psi}> -0.236 \\
         \frac{1}{2}+\frac{1}{3-\gls{sym-psi}}, & \gls{sym-psi} \leq -0.236
     \end{cases}
 \end{equation}
-The effective breadth ratio depends on the slenderness factor $\gls{sym-lambda-slenderness}$ and load distribution factor $\gls{sym-psi}$, found as follows:
+The effective breadth ratio depends on the slenderness factor $\gls{sym-epsilon-slenderness}$ and load distribution factor $\gls{sym-psi}$, found as follows:
 \begin{equation}
 \begin{aligned}
-    \gls{sym-lambda-slenderness} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-thick}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
+    \gls{sym-epsilon-slenderness} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-thick}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
     \gls{sym-psi}&=\frac{\gls{sym-f-2}}{\gls{sym-f-1}}
     \end{aligned}
 \end{equation}
@@ -433,8 +433,8 @@ The plate buckling coefficient $\gls{sym-k-buckle}$ is expressed as:
   \gls{sym-k-buckle} = 4+2\left(1-\gls{sym-psi}\right)^3+2\left(1-\gls{sym-psi}\right)
 \end{equation}
 This effective breadth procedure follows the American Iron and Steel Institute design manual \citep{american_iron_and_steel_institute_cold-formed_1991}.
-Rather than enforcing $\gls{sym-lambda-slenderness}<0.673$, corresponding with $\gls{sym-rho-lambda}=1$, MDOcean more flexibly requires $\gls{sym-lambda-slenderness}<0.809$, corresponding to $\gls{sym-rho-lambda}=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
-MDOcean also uses $\gls{sym-k-buckle}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\gls{sym-lambda-slenderness}$.
+Rather than enforcing $\gls{sym-epsilon-slenderness}<0.673$, corresponding with $\gls{sym-rho-epsilon}=1$, MDOcean more flexibly requires $\gls{sym-epsilon-slenderness}<0.809$, corresponding to $\gls{sym-rho-epsilon}=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
+MDOcean also uses $\gls{sym-k-buckle}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\gls{sym-epsilon-slenderness}$.
 
 Broadening the design space to allow for more dominant stiffeners with higher slenderness factors would require modeling the stiffener-plate system not as a plate with the stiffeners absorbed into an equivalent thickness, but as individual stiffeners with the plate absorbed into the effective breadth.
 That model has other complexities such as the shear lag phenomenon so is left to future extensions \citep{wierzbicki_lecture_2013,american_iron_and_steel_institute_cold-formed_1991}.
