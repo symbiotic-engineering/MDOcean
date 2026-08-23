@@ -40,33 +40,33 @@ The quadratic coefficients $\{\gls{sym-mathbf-Q-mu}, \gls{sym-vec-a-mu}, \gls{sy
     $|\gls{sym-hat-xi-f}| \leq \gls{sym-xi-f-max}$ &
         $\frac{1}{\gls{sym-omega}^2}
         [\gls{sym-mathbf-a-F-p-dot-xi-f-leftarrow-VI}]^*
-        \gls{sym-mathbf-A-hat-q-2}
+        \gls{sym-mathbf-Q-hat-q-2}
         [\gls{sym-mathbf-a-F-p-dot-xi-f-leftarrow-VI}]$ &
         $[0,~ \gls{sym-hat-xi-f-0}]^\top$ & $\gls{sym-xi-f-max} - |\gls{sym-hat-xi-f-0}|$ \\
     $|\gls{sym-hat-xi-s}| \leq \gls{sym-xi-s-max}$ &
         $\frac{1}{\gls{sym-omega}^2}
         [\gls{sym-mathbf-a-F-p-dot-xi-s-leftarrow-VI}]^*
-        \gls{sym-mathbf-A-hat-q-2}
+        \gls{sym-mathbf-Q-hat-q-2}
         [\gls{sym-mathbf-a-F-p-dot-xi-s-leftarrow-VI}]$ &
         $[0,~ \gls{sym-hat-xi-s-0}]^\top$ & $\gls{sym-xi-s-max} - |\gls{sym-hat-xi-s-0}|$ \\
     $|\gls{sym-hat-X-PTO}| \leq \gls{sym-X-PTO-max}$ &
         $\frac{1}{\gls{sym-omega}^2}
         [\gls{sym-mathbf-a-F-dot-X-leftarrow-VI}]^*
-        \gls{sym-mathbf-A-hat-q-2}
+        \gls{sym-mathbf-Q-hat-q-2}
         [\gls{sym-mathbf-a-F-dot-X-leftarrow-VI}]$ &
         $\gls{sym-vec-zero}$ & $\gls{sym-X-PTO-max}^2$ \\
     $|\gls{sym-hat-tau}| \leq \gls{sym-tau-max}$ &
         $[\gls{sym-mathbf-a-tau-Omega-leftarrow-VI}]^*
-        \gls{sym-mathbf-A-hat-e-2}
+        \gls{sym-mathbf-Q-hat-e-2}
         [\gls{sym-mathbf-a-tau-Omega-leftarrow-VI}]$ &
         $\gls{sym-vec-zero}$ & $\gls{sym-tau-max}^2$ \\
     $\gls{sym-P-tau-Omega} \leq \gls{sym-P-tau-Omega-max}$ &
         $[\gls{sym-mathbf-a-tau-Omega-leftarrow-VI}]^*
-        \gls{sym-mathbf-A-P}
+        \gls{sym-mathbf-Q-P}
         [\gls{sym-mathbf-a-tau-Omega-leftarrow-VI}]$ &
         $\gls{sym-vec-zero}$ & $\gls{sym-P-tau-Omega-max}$ \\
     $\gls{sym-P-VI} \geq 0$ &
-        $-\gls{sym-mathbf-A-P}$ &
+        $-\gls{sym-mathbf-Q-P}$ &
         $\gls{sym-vec-zero}$ & $0$ \\
 \end{tabular}
 \end{table}
@@ -90,7 +90,7 @@ Specifically, the equality constraint requires that the solution be a particular
 where $\gls{sym-Gamma}$ is a nondimensional complex scalar representing the remaining degree of freedom in the optimization after enforcing the equality constraint.
 For the particular solution, we have chosen to use the optimal solution in the absence of inequality constraints, which is identical to the solution implied by the impedance-matching condition \Cref{eq:matched-load} and can be derived from the quadratic program as follows:
 \begin{equation}\label{eq:x-p}
-    \gls{sym-vec-x-p} = \frac{d \gls{sym-mathbf-A-P}\gls{sym-vec-c}}{\gls{sym-vec-c}^{\,*}\gls{sym-mathbf-A-P}\gls{sym-vec-c}}
+    \gls{sym-vec-x-p} = \frac{d \gls{sym-mathbf-Q-P}\gls{sym-vec-c}}{\gls{sym-vec-c}^{\,*}\gls{sym-mathbf-Q-P}\gls{sym-vec-c}}
 \end{equation}
 This selection for $\gls{sym-vec-x-p}$ means that the degree of freedom $\gls{sym-Gamma}$ represents the deviation of the solution from the impedance-matched solution.
 Using $\gls{sym-hat-I-p}$ for brevity to denote the current in the particular solution, \Cref{eq:x-p-plus-nullspace} can be rewritten as:
@@ -293,7 +293,7 @@ A convex optimization problem is one in which both the feasible set and the obje
 The key practical implication is that any locally optimal solution is also globally optimal, so gradient-based solvers converge to the true optimum without exhaustive search, and solution time scales polynomially with the number of decision variables rather than exponentially.
 
 After reducing to the $\gls{sym-Gamma}$ parameterization, the power objective $|\gls{sym-Gamma}|^2$ is a sum of squares and therefore convex.
-Even though the original power matrix $\gls{sym-mathbf-A-P}$ (see \Cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \citet{bacelli_numerical_2015} show that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\gls{sym-Gamma}$ in \Cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.
+Even though the original power matrix $\gls{sym-mathbf-Q-P}$ (see \Cref{tab:power-metrics}) has eigenvalues $\{-1,1\}$ and is indefinite, \citet{bacelli_numerical_2015} show that substituting the linear dynamics equality constraint into the objective---which is exactly what the reduction to $\gls{sym-Gamma}$ in \Cref{eq:obj-gamma} accomplishes---renders the objective convex for both regular and irregular wave forcing.
 Nonlinear dynamics can reintroduce non-convexity and should be checked on a case-by-case basis.
 
 The inequality constraints are more problematic.
@@ -302,7 +302,7 @@ In the $\gls{sym-Gamma}$ plane, a convex constraint corresponds to a circle whos
 Constraints on the effort and flow magnitude (e.g., force limits $|\gls{sym-hat-F-PTO} |\leq \gls{sym-F-max}$) can be convex or non-convex, depending on the complex angle of the Th\'{e}venin equivalent of the relevant source impedance and on the ratio of the constraint limit to its unconstrained value.
 \citet{mccabe_force-limited_2024} visualize the feasible regions for families of such constraints on the complex $\gls{sym-Gamma}$ plane.
 They show that the constraints are always convex for purely real impedances; that for reactive plants, nonconvexities occur when the value of the constraint limit exceeds some threshold; and that this threshold lowers as the reactivity increases.
-The quadratic matrices $\gls{sym-mathbf-Q-mu}$ in \Cref{tab:qp-constraints} confirm this: $\gls{sym-mathbf-A-hat-q-2}$ and $\gls{sym-mathbf-A-hat-e-2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
+The quadratic matrices $\gls{sym-mathbf-Q-mu}$ in \Cref{tab:qp-constraints} confirm this: $\gls{sym-mathbf-Q-hat-q-2}$ and $\gls{sym-mathbf-Q-hat-e-2}$ are only positive \emph{semi}definite, indicating constraints that define half-spaces rather than bounded ellipsoids.
 For the 2D problem studied here, non-convexity is handled by the exhaustive enumeration of candidate points in \Cref{eq:gamma-opt-quadratic}, which is efficient in two dimensions but does not scale to higher dimensions.
 Future work should investigate semidefinite relaxations of these non-convex constraints using the S-procedure \citep{vanantwerp_tutorial_2000}, which replaces each non-convex constraint with a conservative but convex outer approximation.
 It is expected that the optimal design will have low reactivity because reactivity increases signal peak-to-average ratios, implying that a semi-definite relaxation would likely improve in accuracy as it approaches the optimal.

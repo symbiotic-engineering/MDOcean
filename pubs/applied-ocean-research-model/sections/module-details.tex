@@ -602,15 +602,15 @@ The power-maximizing \gls{acr-pto} damping $\gls{sym-B-l-damp}$ is then:
 We first compile expressions for all metrics $\gls{sym-M}$ which must be constrained.
 \ifdefined\DISSERTATION
     For the time being, we keep these expressions generic so they apply to any port.
-    To facilitate the calculations in transmission form, we write the metrics as the quadratic product of the port variable vector with a suitable matrix $\gls{sym-mathbf-A-M}$:
+    To facilitate the calculations in transmission form, we write the metrics as the quadratic product of the port variable vector with a suitable matrix $\gls{sym-mathbf-Q-M}$:
 \else
-    Each metric is written as a quadratic product of the port variable vector with a matrix $\gls{sym-mathbf-A-M}$:
+    Each metric is written as a quadratic product of the port variable vector with a matrix $\gls{sym-mathbf-Q-M}$:
 \fi
 \begin{equation}\label{eq:metrics}
     \gls{sym-M} = \frac{1}{4} \begin{bmatrix}
     \hat{e} \\ \gls{sym-hat-q}
     \end{bmatrix}^*
-    \gls{sym-mathbf-A-M}
+    \gls{sym-mathbf-Q-M}
     \begin{bmatrix}
     \hat{e} \\ \gls{sym-hat-q}
     \end{bmatrix}
@@ -622,7 +622,7 @@ The matrices for various metrics are given in \Cref{tab:power-metrics}.
 \label{tab:power-metrics}
 \begin{tabular}{L{0.1\linewidth}|ccccc}
     Metric $\gls{sym-M}$ & $\gls{sym-p}_{\text{avg}}=\gls{sym-P}$ & $\gls{sym-Q}$ & $\gls{sym-S}$ & $|\gls{sym-hat-e}|^2$ & $|\gls{sym-hat-q}|^2$ \\ \hline
-    Matrix $\gls{sym-mathbf-A-M}$ &
+    Matrix $\gls{sym-mathbf-Q-M}$ &
     $\begin{bmatrix}
         0 & 1 \\
         1 & 0
@@ -653,12 +653,14 @@ The matrices for various metrics are given in \Cref{tab:power-metrics}.
 
 Note that the apparent power $|\gls{sym-S}|$, and therefore the peak power from \Cref{eq:power-avg-peak}, cannot be written in the quadratic form of \Cref{eq:metrics} and is instead fourth-order:
 \begin{equation}
-    |\gls{sym-S}|^2 = \gls{sym-S} \gls{sym-S}^* = \frac{1}{16} \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}^*
-    \gls{sym-mathbf-A-S}
-    \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}
-    \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}^*
-    \gls{sym-mathbf-A-S}^{\top}
-    \begin{bmatrix} \hat{e} \\ \hat{q} \end{bmatrix}
+    |\gls{sym-S}|^2 = \gls{sym-S} \gls{sym-S}^* 
+    = \frac{1}{16}
+    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}^*
+    \gls{sym-mathbf-Q-S}
+    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}
+    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}^*
+    \gls{sym-mathbf-Q-S}^{\top}
+    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}
 \end{equation}
 Peak power constraints use a more complicated approach discussed in \Cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
 
@@ -669,7 +671,7 @@ For the linear impedance mismatch, the average electrical power from \Cref{eq:po
 This is a quadratically-constrained quadratic program (\gls{acr-qcqp}):
 \begin{equation}\label{eq:opt-problem}
 \begin{aligned}
-& \max_{\gls{sym-vec-x} \in \gls{sym-mathbb-C}^2} & \gls{sym-p-avg-VI} &= \frac{1}{4}\gls{sym-vec-x}^{\,*} \gls{sym-mathbf-A-P} \gls{sym-vec-x} \\[3pt]
+& \max_{\gls{sym-vec-x} \in \gls{sym-mathbb-C}^2} & \gls{sym-p-avg-VI} &= \frac{1}{4}\gls{sym-vec-x}^{\,*} \gls{sym-mathbf-Q-P} \gls{sym-vec-x} \\[3pt]
 & \text{\gls{sym-s}.\gls{sym-t}.}
 & \gls{sym-vec-x}^{\,*}\gls{sym-mathbf-Q-mu}\gls{sym-vec-x}
     + 2\Re\!\left\{\gls{sym-vec-a-mu}^{\,*}\gls{sym-vec-x}\right\}
