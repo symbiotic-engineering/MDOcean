@@ -16,7 +16,7 @@ SENTENCE_END_RE = ts.SENTENCE_END_RE
 
 math_text_mix_strings = set()
 current_file_equation_symbols = set()
-GLOSSARY_FILE = None
+GLOSSARY_DIR = None
 ACRONYM_GLOSSARY_FILE = None
 PREFIX_CHECK_CONFIGS = {}
 
@@ -166,10 +166,12 @@ def check_mathmode_subscripts():
 
 
 def check_glossary_refs():
+    global current_file_equation_symbols
     warns = []
-    if GLOSSARY_FILE is None and ACRONYM_GLOSSARY_FILE is None:
+    current_file_equation_symbols = set(collect_equation_symbol_first_use().keys())
+    if GLOSSARY_DIR is None and ACRONYM_GLOSSARY_FILE is None:
         return warns
-    replacements = gs.read_glossary_replacements(GLOSSARY_FILE) if GLOSSARY_FILE else {}
+    replacements = gs.read_glossary_replacements(GLOSSARY_DIR) if GLOSSARY_DIR else {}
     acronym_replacements = gs.read_acronym_replacements(ACRONYM_GLOSSARY_FILE)
     if not replacements and not acronym_replacements:
         return warns

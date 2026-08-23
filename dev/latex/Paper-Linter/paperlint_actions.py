@@ -459,9 +459,9 @@ def fix_missing_word_style_in_file(path):
     return _rewrite_lines(path, lambda line: missing_word_style_line(line, prose_style_for_word, styled_word_pattern)[0])
 
 
-def fix_glossary_refs_in_file(path, glossary_file, acronym_glossary_file=None):
+def fix_glossary_refs_in_file(path, glossary_dir, acronym_glossary_file=None):
     path = Path(path)
-    replacements = gs.read_glossary_replacements(glossary_file)
+    replacements = gs.read_glossary_replacements(glossary_dir)
     acronym_replacements = gs.read_acronym_replacements(acronym_glossary_file)
     if not replacements and not acronym_replacements:
         return 0

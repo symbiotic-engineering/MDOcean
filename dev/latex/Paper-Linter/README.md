@@ -4,7 +4,7 @@ This script checks for common mistakes in LaTeX source files of scientific paper
 
 ## Usage
 
-    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--params <params-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--replace-glossary-refs] [--error]
+    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--params <params-file>] [--output <output-file>] [--symbol-glossary-paper <paper-name>] [--replace-glossary-refs] [--error]
 
 Provide either a single .tex file to check or a path to recursively check all .tex files in that directory.
 By default, all rules are used for checking the document.
@@ -14,10 +14,10 @@ For example, `-i typography` only activates the typography rules, whereas `-i al
 
 If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1|2 <switch>` (`2` enables a check and runs its fix action when available).
 If `--params` is provided, paper-specific parameters are loaded from a parameter file as `key=value` pairs.
-Supported params include `symbol_glossary_seed`, `symbol_glossary_output`, and `acronym_glossary_seed` for glossary-based rewrite workflows.
+Supported params include `symbol_glossary_paper` and `acronym_glossary_seed` for glossary-based rewrite workflows.
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
-If `--symbol-glossary-output` is provided, extracted equation symbols are written as `\glsxtrnewsymbol` entries for glossary package workflows. If the file already exists, matching symbols keep their existing `description={...}` values and only new symbols receive a blank description.
+If `--symbol-glossary-paper <paper-name>` is provided, equation symbols extracted from the document are compared against every `\newsym{key}{symbol}{description}` entry already defined in `pubs/shared/glossary/`, and any symbols not yet documented there are written as new `\newsym{key}{symbol}{}` entries to `pubs/shared/glossary/glossary-symbols-<paper-name>-generated.tex`. Symbols that get documented elsewhere in `pubs/shared/glossary/` afterwards are dropped from the generated file on the next run, and manually-added descriptions in the generated file are preserved until then.
 If `--replace-glossary-refs` is provided, the linter rewrites matched math-mode symbol bodies to `\gls{...}` references in place using `pubs/shared/symbol-glossary-shared.tex` as the source of glossary labels, and can also rewrite acronym short/long forms when `acronym_glossary_seed` is configured.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 

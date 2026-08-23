@@ -15,7 +15,6 @@ from math_symbol_parser import (
     canonicalize_symbol as shared_canonicalize_symbol,
     extract_math_symbols as shared_extract_math_symbols,
     find_math_symbol_matches as shared_find_math_symbol_matches,
-    parse_glossary_entries,
     symbol_key as shared_symbol_key,
 )
 
@@ -89,12 +88,14 @@ def _prefer_glossary_symbol(existing_symbol, candidate_symbol):
     return existing_symbol
 
 
-def read_glossary_replacements(path):
+def read_glossary_replacements(glossary_dir):
     replacements = {}
-    if not os.path.exists(path):
+    if not glossary_dir or not os.path.isdir(glossary_dir):
         return replacements
-    for label, symbol, _ in parse_glossary_entries(pathlib.Path(path)):
-        replacements[shared_symbol_key(shared_canonicalize_symbol(symbol))] = label
+    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        for key, symbol, _ in parse_newsym_entries(path):
+            label = "sym-%s" % key
+            replacements[shared_symbol_key(shared_canonicalize_symbol(symbol))] = label
     return replacements
 
 
@@ -342,109 +343,35 @@ def symbol_to_glossary_label(symbol):
     return "sym-%s" % safe
 
 
-def _split_top_level_options(options):
-    parts = []
-    current = ""
-    depth = 0
-    for ch in options:
-        if ch == "{":
-            depth += 1
-        elif ch == "}":
-            if depth > 0:
-                depth -= 1
-        if ch == "," and depth == 0:
-            if current.strip():
-                parts.append(current.strip())
-            current = ""
-            continue
-        current += ch
-    if current.strip():
-        parts.append(current.strip())
-    return parts
-
-
-def _extract_option_value(options, wanted_key):
-    for option in _split_top_level_options(options):
-        if "=" not in option:
-            continue
-        key, value = option.split("=", 1)
-        if key.strip() != wanted_key:
-            continue
-        value = value.strip()
-        group, end_idx = _read_braced_group(value, 0)
-        if group is not None and end_idx == len(value):
-            return _unwrap_braces(group)
-        return value
-    return None
-
-
-def _extract_description_option(options):
-    return _extract_option_value(options, "description")
-
-
-def _extract_sort_option(options):
-    return _extract_option_value(options, "sort")
-
-
-def _parse_glsxtrnewsymbol_line(line):
+def _parse_newsym_line(line):
+    """Parse a \\newsym{key}{symbol}{description} definition line, if present."""
     stripped = line.strip()
     comment_idx = re.search(r"(?<!\\)%", stripped)
     if comment_idx:
         stripped = stripped[:comment_idx.start()].rstrip()
-    if not stripped.startswith(r"\glsxtrnewsymbol"):
-        return None, None
+    if not stripped.startswith(r"\newsym"):
+        return None
 
-    idx = len(r"\glsxtrnewsymbol")
+    idx = len(r"\newsym")
     idx = _skip_ws(stripped, idx)
-    options = ""
-    if idx < len(stripped) and stripped[idx] == "[":
-        end_idx = idx + 1
-        brace_depth = 0
-        while end_idx < len(stripped):
-            char = stripped[end_idx]
-            if char == "{":
-                brace_depth += 1
-            elif char == "}":
-                if brace_depth > 0:
-                    brace_depth -= 1
-            elif char == "]" and brace_depth == 0:
-                break
-            end_idx += 1
-        if end_idx >= len(stripped) or stripped[end_idx] != "]":
-            return None, None
-        options = stripped[idx + 1:end_idx]
-        idx = end_idx + 1
-
+    key_group, idx = _read_braced_group(stripped, idx)
+    if key_group is None:
+        return None
     idx = _skip_ws(stripped, idx)
-    label_group, idx = _read_braced_group(stripped, idx)
-    if label_group is None:
-        return None, None
-    idx = _skip_ws(stripped, idx)
-    ensuremath_group, idx = _read_braced_group(stripped, idx)
-    if ensuremath_group is None:
-        return None, None
-    if _skip_ws(stripped, idx) != len(stripped):
-        return None, None
-
-    ensuremath_content = _unwrap_braces(ensuremath_group).strip()
-    if not ensuremath_content.startswith(r"\ensuremath"):
-        return None, None
-    symbol_idx = _skip_ws(ensuremath_content, len(r"\ensuremath"))
-    symbol_group, symbol_end = _read_braced_group(ensuremath_content, symbol_idx)
+    symbol_group, idx = _read_braced_group(stripped, idx)
     if symbol_group is None:
-        return None, None
-    if _skip_ws(ensuremath_content, symbol_end) != len(ensuremath_content):
-        return None, None
+        return None
+    idx = _skip_ws(stripped, idx)
+    description_group, idx = _read_braced_group(stripped, idx)
+    if description_group is None:
+        return None
+    if _skip_ws(stripped, idx) != len(stripped):
+        return None
 
+    key = _unwrap_braces(key_group).strip()
     symbol = _unwrap_braces(symbol_group)
-    description = _extract_description_option(options)
-    sort = _extract_sort_option(options)
-    metadata = {}
-    if description is not None:
-        metadata["description"] = description
-    if sort is not None:
-        metadata["sort"] = sort
-    return symbol, metadata
+    description = _unwrap_braces(description_group).strip()
+    return key, symbol, description
 
 
 def _strip_wrapped_commands(text, commands):
@@ -473,43 +400,35 @@ def _normalize_glossary_sort_symbol(symbol):
     return _normalize_symbol(stripped)
 
 
-def read_existing_symbol_metadata(path):
-    metadata_by_symbol = {}
+def parse_newsym_entries(path):
+    """Read all \\newsym{key}{symbol}{description} entries from a single file."""
+    entries = []
     if not os.path.exists(path):
-        return metadata_by_symbol
-
+        return entries
     try:
         with open(path) as handle:
             lines = handle.readlines()
     except Exception:
-        return metadata_by_symbol
-
+        return entries
     for line in lines:
-        symbol, metadata = _parse_glsxtrnewsymbol_line(line)
-        if symbol is None or not metadata:
+        parsed = _parse_newsym_line(line)
+        if parsed is None:
             continue
-        symbol = _canonicalize_symbol(symbol.strip())
-        existing = metadata_by_symbol.setdefault(_symbol_key(_normalize_glossary_equivalence_symbol(symbol)), {})
-        for key, value in metadata.items():
-            if value or key not in existing:
-                existing[key] = value
-    return metadata_by_symbol
+        entries.append(parsed)
+    return entries
 
 
-def read_existing_symbols(path):
+def read_newsym_symbols_from_dir(glossary_dir, exclude_path=None):
+    """Collect the normalized symbols already defined by \\newsym in a glossary folder."""
     symbols = set()
-    if not os.path.exists(path):
+    exclude_resolved = pathlib.Path(exclude_path).resolve() if exclude_path else None
+    if not os.path.isdir(glossary_dir):
         return symbols
-    try:
-        with open(path) as handle:
-            lines = handle.readlines()
-    except Exception:
-        return symbols
-    for line in lines:
-        symbol, _ = _parse_glsxtrnewsymbol_line(line)
-        if symbol is None:
+    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        if exclude_resolved is not None and path.resolve() == exclude_resolved:
             continue
-        symbols.add(_normalize_glossary_equivalence_symbol(_canonicalize_symbol(symbol.strip())))
+        for _, symbol, _ in parse_newsym_entries(path):
+            symbols.add(_normalize_glossary_equivalence_symbol(_canonicalize_symbol(symbol.strip())))
     return symbols
 
 
@@ -528,60 +447,64 @@ def collect_glossary_labels_from_files(paths):
     return labels
 
 
-def build_symbol_glossary_lines(symbols, metadata_by_symbol):
+def symbol_to_newsym_key(symbol):
+    label = symbol_to_glossary_label(symbol)
+    return label[len("sym-"):] if label.startswith("sym-") else label
+
+
+def build_newsym_lines(symbols, metadata_by_symbol, used_labels=None):
     lines = []
-    used_labels = set()
+    used_labels = set(used_labels or [])
     filtered_symbols = [symbol for symbol in symbols if _symbol_key(_normalize_glossary_equivalence_symbol(symbol)) not in GLOSSARY_IGNORED_SYMBOLS]
     for symbol in sorted(filtered_symbols, key=lambda item: (
-        metadata_by_symbol.get(_symbol_key(_normalize_glossary_equivalence_symbol(item)), {}).get("sort", symbol_to_glossary_label(_normalize_glossary_sort_symbol(item))).lower(),
-        symbol_to_glossary_label(_normalize_glossary_label_symbol(item)),
+        symbol_to_newsym_key(_normalize_glossary_sort_symbol(item)).lower(),
+        symbol_to_newsym_key(_normalize_glossary_label_symbol(item)),
         item,
     )):
-        label_base = symbol_to_glossary_label(_normalize_glossary_label_symbol(symbol))
+        key_base = symbol_to_newsym_key(_normalize_glossary_label_symbol(symbol))
         lookup_key = _symbol_key(_normalize_glossary_equivalence_symbol(symbol))
-        sort_value = metadata_by_symbol.get(lookup_key, {}).get("sort")
-        if sort_value is None:
-            sort_value = symbol_to_glossary_label(_normalize_glossary_sort_symbol(symbol))
-        label = label_base
+        key = key_base
         suffix = 2
-        while label in used_labels:
-            label = "%s-%d" % (label_base, suffix)
+        while ("sym-%s" % key) in used_labels:
+            key = "%s-%d" % (key_base, suffix)
             suffix += 1
-        used_labels.add(label)
-        metadata = metadata_by_symbol.get(lookup_key, {})
-        description = metadata.get("description", "")
-        sort_option = ""
-        if metadata.get("sort") or sort_value != label_base:
-            sort_option = f",sort={sort_value}"
-        lines.append(f"\\glsxtrnewsymbol[description={{{description}}}{sort_option}]{{{label}}}{{\\ensuremath{{{symbol}}}}}")
+        used_labels.add("sym-%s" % key)
+        description = metadata_by_symbol.get(lookup_key, {}).get("description", "")
+        lines.append(f"\\newsym{{{key}}}{{{symbol}}}{{{description}}}")
     return lines
 
 
-def write_symbol_glossary(path, symbols, seed_path=None, used_labels=None):
-    source_path = seed_path if seed_path else path
+def write_symbol_glossary(path, symbols, glossary_dir=None, used_labels=None):
+    """Write newly discovered symbols not already documented in glossary_dir to path.
+
+    Entries already present in path from a previous run are carried over (with
+    their description) unless a symbol has since been documented elsewhere in
+    glossary_dir, in which case it is dropped from the generated file.
+    """
+    known_symbols = read_newsym_symbols_from_dir(glossary_dir, exclude_path=path) if glossary_dir else set()
+
     grouped_symbols = {}
+    metadata_by_symbol = {}
+    for key, symbol, description in parse_newsym_entries(path):
+        normalized_key = _symbol_key(_normalize_glossary_equivalence_symbol(symbol))
+        if normalized_key in known_symbols:
+            continue
+        grouped_symbols[normalized_key] = symbol
+        metadata_by_symbol[normalized_key] = {"description": description}
+
     for symbol in set(symbols):
         normalized_key = _symbol_key(_normalize_glossary_equivalence_symbol(symbol))
+        if normalized_key in known_symbols:
+            continue
         existing_symbol = grouped_symbols.get(normalized_key)
         if existing_symbol is None:
             grouped_symbols[normalized_key] = symbol
         else:
             grouped_symbols[normalized_key] = _prefer_glossary_symbol(existing_symbol, symbol)
 
-    used_labels = set(used_labels or [])
-    if os.path.exists(source_path):
-        for label, symbol, _ in parse_glossary_entries(pathlib.Path(source_path)):
-            canonical_symbol = _canonicalize_symbol(symbol)
-            normalized_key = _symbol_key(_normalize_glossary_equivalence_symbol(canonical_symbol))
-            if canonical_symbol in grouped_symbols.values() or label in used_labels:
-                existing_symbol = grouped_symbols.get(normalized_key)
-                if existing_symbol is None:
-                    grouped_symbols[normalized_key] = canonical_symbol
-                else:
-                    grouped_symbols[normalized_key] = _prefer_glossary_symbol(existing_symbol, canonical_symbol)
-    metadata_by_symbol = read_existing_symbol_metadata(source_path)
-    lines = build_symbol_glossary_lines(set(grouped_symbols.values()), metadata_by_symbol)
+    lines = build_newsym_lines(set(grouped_symbols.values()), metadata_by_symbol, used_labels=used_labels)
 
     with open(path, "w") as handle:
         for line in lines:
             handle.write(line + "\n")
+

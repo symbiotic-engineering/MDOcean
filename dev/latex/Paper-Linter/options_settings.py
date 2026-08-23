@@ -6,7 +6,7 @@ import tex_structure as ts
 
 
 def usage(program_name):
-    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--params <params-file>] [--output <output-file>] [--symbol-glossary-output <output-file>] [--symbol-glossary-seed <seed-file>] [--replace-glossary-refs] [-i/x <switch n, evaluated in order of specification>] [--error]" % program_name)
+    print("%s <file.tex/path> [-x <excluded-switch1>] [-i <included-switch1>] [--ignore <file-or-name>] [--settings <settings-file>] [--params <params-file>] [--output <output-file>] [--symbol-glossary-paper <paper-name>] [--replace-glossary-refs] [-i/x <switch n, evaluated in order of specification>] [--error]" % program_name)
     sys.exit(1)
 
 
@@ -91,12 +91,10 @@ def apply_params_file(params_file, options):
             prefix_params[key] = resolve_path(value) if key == "path" else value
         elif key in ["ignore", "ignored_file"]:
             options["ignored_files"].append(resolve_path(value))
-        elif key in ["symbol_glossary_seed_file", "symbol_glossary_seed"]:
-            options["symbol_glossary_seed_file"] = resolve_path(value)
+        elif key in ["symbol_glossary_paper", "symbol_glossary_paper_name"]:
+            options["symbol_glossary_paper_name"] = value
         elif key in ["acronym_glossary_seed_file", "acronym_glossary_seed"]:
             options["acronym_glossary_seed_file"] = resolve_path(value)
-        elif key in ["symbol_glossary_file", "symbol_glossary_output"]:
-            options["symbol_glossary_file"] = resolve_path(value)
         elif key in ["output_file", "output"]:
             options["output_file"] = resolve_path(value)
         else:
@@ -111,8 +109,7 @@ def parse_cli_args(argv, switch_exists, add_categories, remove_categories):
     options = {
         "ignored_files": [],
         "output_file": None,
-        "symbol_glossary_file": None,
-        "symbol_glossary_seed_file": None,
+        "symbol_glossary_paper_name": None,
         "acronym_glossary_seed_file": None,
         "replace_glossary_refs": False,
         "exit_code": False,
@@ -196,20 +193,12 @@ def parse_cli_args(argv, switch_exists, add_categories, remove_categories):
                 print("Missing file after --output")
                 usage(argv[0])
 
-        if arg == "--symbol-glossary-output":
+        if arg == "--symbol-glossary-paper":
             if idx + 1 < len(argv):
-                options["symbol_glossary_file"] = argv[idx + 1]
+                options["symbol_glossary_paper_name"] = argv[idx + 1]
                 idx += 1
             else:
-                print("Missing file after --symbol-glossary-output")
-                usage(argv[0])
-
-        if arg == "--symbol-glossary-seed":
-            if idx + 1 < len(argv):
-                options["symbol_glossary_seed_file"] = argv[idx + 1]
-                idx += 1
-            else:
-                print("Missing file after --symbol-glossary-seed")
+                print("Missing paper name after --symbol-glossary-paper")
                 usage(argv[0])
 
         if arg == "--replace-glossary-refs":

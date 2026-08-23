@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import pathlib
 import sys
 
 LATEX_DEV_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
@@ -11,7 +12,7 @@ import glossary_symbols as gs
 import options_settings as opts
 import tex_structure as ts
 
-GLOSSARY_FILE = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs", "shared", "symbol-glossary-shared.tex"))
+SHARED_GLOSSARY_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs", "shared", "glossary"))
 
 output_handle = sys.stdout
 use_color = True
@@ -38,18 +39,22 @@ def main():
         checks.remove_categories,
     )
 
-    checks.GLOSSARY_FILE = GLOSSARY_FILE
+    checks.GLOSSARY_DIR = SHARED_GLOSSARY_DIR
     checks.ACRONYM_GLOSSARY_FILE = options["acronym_glossary_seed_file"]
     checks.PREFIX_CHECK_CONFIGS = options["check_params"]
     if options["replace_glossary_refs"]:
         options["check_states"]["glossary-refs"] = 2
 
-    if options["symbol_glossary_seed_file"] is not None:
+    if os.path.isdir(SHARED_GLOSSARY_DIR):
         try:
-            with open(options["symbol_glossary_seed_file"]) as handle:
-                checks.actions.WORD_STYLE_REFERENCE_TEXT = handle.read()
+            reference_text_parts = [
+                p.read_text() for p in sorted(pathlib.Path(SHARED_GLOSSARY_DIR).glob("*.tex"))
+            ]
+            checks.actions.WORD_STYLE_REFERENCE_TEXT = "\n".join(reference_text_parts)
         except Exception:
             checks.actions.WORD_STYLE_REFERENCE_TEXT = ""
+    else:
+        checks.actions.WORD_STYLE_REFERENCE_TEXT = ""
 
     if options["output_file"] is not None:
         output_handle = open(options["output_file"], "w")
@@ -106,7 +111,7 @@ def main():
                         pass
                     elif state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
                         if c[2] == "glossary-refs":
-                            c[3](file, GLOSSARY_FILE, options["acronym_glossary_seed_file"])
+                            c[3](file, SHARED_GLOSSARY_DIR, options["acronym_glossary_seed_file"])
                         elif c[2] == "prefix":
                             c[3](config.get("path"), config.get("prefix"), recursive=config.get("recursive", False), source_prefix=config.get("source_prefix"))
                         else:
@@ -126,7 +131,7 @@ def main():
                             if c[2] not in autofix_files:
                                 autofix_files[c[2]] = set()
                             autofix_files[c[2]].add(file)
-                if c[2] == "symbol-mention":
+                if c[2] == "glossary-refs":
                     all_equation_symbols.update(checks.current_file_equation_symbols)
                 if state > 0:
                     warnings += [(x, c[2]) for x in add_warn]
@@ -148,15 +153,19 @@ def main():
             write_output("Unique text strings in math environments [math-text-mix]:")
             for text_string in sorted(checks.math_text_mix_strings):
                 write_output("- %s" % text_string)
-        if options["symbol_glossary_file"] is not None:
+        if options["symbol_glossary_paper_name"] is not None:
             used_glossary_labels = gs.collect_glossary_labels_from_files(tex_files)
+            output_path = os.path.join(
+                SHARED_GLOSSARY_DIR,
+                "glossary-symbols-%s-generated.tex" % options["symbol_glossary_paper_name"],
+            )
             gs.write_symbol_glossary(
-                options["symbol_glossary_file"],
+                output_path,
                 all_equation_symbols,
-                options["symbol_glossary_seed_file"],
+                SHARED_GLOSSARY_DIR,
                 used_labels=used_glossary_labels,
             )
-            write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), options["symbol_glossary_file"]))
+            write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), output_path))
     finally:
         if output_handle is not sys.stdout:
             output_handle.close()
