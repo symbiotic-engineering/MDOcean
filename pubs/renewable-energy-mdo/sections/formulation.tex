@@ -19,21 +19,21 @@ Parameters $\gls{sym-vec-p}$ are constant inputs required to compute the objecti
 For the single-objective formulation, the optimization minimizes the levelized cost of energy ($LCOE$), the metric most commonly used by \gls{acr-wec} developers to evaluate market viability \citep{trueworthy_wave_2020} and computed by the economics module \citep{mccabe_development_2026}.
 
 \ifdefined\DISSERTATION
-    LCOE is adopted for its simplicity, although this choice brings three major limitations.
-    First, because LCOE balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule generated has equal value.
+    \gls{acr-lcoe} is adopted for its simplicity, although this choice brings three major limitations.
+    First, because \gls{acr-lcoe} balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule generated has equal value.
     On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \citep{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022},
     so capturing nonuniform sources of \gls{acr-wec} value such as consistency or complementarity would require modifications (e.g.\ those proposed by \citet{mccabe_system_2023}) outside the scope of the present model.
-    Second, LCOE has high uncertainty for early-stage designs: the economic model assumes only structural and PTO costs scale with design \citep{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
-    Third, LCOE has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the DOE's ``Powering the Blue Economy'' initiative \citep{livecchi_powering_2019}.
+    Second, \gls{acr-lcoe} has high uncertainty for early-stage designs: the economic model assumes only structural and \gls{acr-pto} costs scale with design \citep{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
+    Third, \gls{acr-lcoe} has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the \gls{acr-doe}'s ``\gls{acr-pbe}'' initiative \citep{livecchi_powering_2019}.
     For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \citep{jenne_powering_2021}.
     
     In the multi-objective formulation, instead of $LCOE$, the two objectives are average electrical power $\gls{sym-overline-P-elec}$ and design-dependent capital cost $\gls{sym-C-design}$.
-    This directly addresses the second and third LCOE limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
+    This directly addresses the second and third \gls{acr-lcoe} limitations: the fixed charge rate and inaccurately-scaled cost components can no longer influence the optimum, and the minimum-capital design for a given power requirement is easily identified.
 \else
-    LCOE is adopted for its simplicity, though it carries three limitations:
+    \gls{acr-lcoe} is adopted for its simplicity, though it carries three limitations:
     it values every Joule equally, ignoring the temporal and spatial variation of electricity value on real grids \citep{akdemir_opportunities_2023,mccabe_system_2023};
-    it has high early-stage uncertainty, since costs other than structural and PTO costs are difficult to predict early on and thus modeled as fixed with respect to design \citep{mccabe_development_2026};
-    and it is less relevant for the off-grid \emph{Powering the Blue Economy} applications \citep{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
+    it has high early-stage uncertainty, since costs other than structural and \gls{acr-pto} costs are difficult to predict early on and thus modeled as fixed with respect to design \citep{mccabe_development_2026};
+    and it is less relevant for the off-grid \emph{\gls{acr-pbe}} applications \citep{livecchi_powering_2019,jenne_powering_2021} where power requirements are fixed or projects are unfinanced.
     The multi-objective formulation addresses the latter two limitations by replacing $LCOE$ with average electrical power $\gls{sym-overline-P-elec}$ and design-dependent capital cost $\gls{sym-C-design}$.
     This removes the influence of the fixed charge rate and inaccurately-scaled costs and exposes the minimum-capital design for a given power requirement.
 \fi
@@ -62,9 +62,9 @@ Constraints are the most common but not the only enforcement mechanism.
     Explicitly outlining the requirements and resulting formulation logic serves three purposes:
     (1) to ground the optimization within the engineering design process, where requirements drive decisions;
     (2) to clarify a part of the optimization process that is critical to result quality yet often omitted;
-    and (3) to illustrate how the MDO mindset systematically yields a ``clever'' formulation that overcomes common difficulties in large-scale optimization.
+    and (3) to illustrate how the \gls{acr-mdo} mindset systematically yields a ``clever'' formulation that overcomes common difficulties in large-scale optimization.
 \else
-    Outlining the requirements and the resulting formulation logic grounds the optimization within the engineering design process, clarifies a step that is often omitted despite its necessity, and illustrates how the MDO mindset yields a formulation that overcomes common large-scale optimization difficulties.
+    Outlining the requirements and the resulting formulation logic grounds the optimization within the engineering design process, clarifies a step that is often omitted despite its necessity, and illustrates how the \gls{acr-mdo} mindset yields a formulation that overcomes common large-scale optimization difficulties.
 \fi
 
 \Cref{remdo:tab:requirements} lists each requirement with its priority and enforcement mechanism.
@@ -190,8 +190,8 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive \gl
  \textbf{\#}&\textbf{Design Var.}& \textbf{Description} & \textbf{Lower Bound}& \textbf{Nominal Value} & \textbf{Upper Bound} & \textbf{Units} \\ \hline
  $x_1$&$\gls{sym-D-s}$& Spar outer diameter& 0& 6& 30& m\\
  $x_2$&$\gls{sym-D-f}$ & Float outer diameter& 1& 20 & 50& m \\
- $x_3$&$\gls{sym-T-f-2}$ & Float draft& 0.5& Nominal RM3~\citep{mccabe_development_2026}&100& m\\
- $x_4$&$\gls{sym-h-s}$& Spar height  & 5& Nominal RM3~\citep{mccabe_development_2026}& 100& m\\
+ $x_3$&$\gls{sym-T-f-2}$ & Float draft& 0.5& Nominal \gls{acr-rm3}~\citep{mccabe_development_2026}&100& m\\
+ $x_4$&$\gls{sym-h-s}$& Spar height  & 5& Nominal \gls{acr-rm3}~\citep{mccabe_development_2026}& 100& m\\
  $x_5$&$\gls{sym-h-fs-clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
  $x_6$& $F_{\text{max}}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
  $x_{7}$&$\gls{sym-P-pk-elec}$& Generator peak power rating & 50& 286& 1000& kW\\
@@ -205,14 +205,14 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive \gl
 \end{center}
 \end{table}
 
-The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, CA, A-36 structural steel, and nominal RM3 values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \citep{RM3}.
+The parameters in \Cref{remdo:tab:parameters} assume operation in the seas of Humboldt Bay, \gls{acr-ca}, A-36 structural steel, and nominal \gls{acr-rm3} values for the design factor of safety, fixed charge rate, number of devices, and float submergence ratio \citep{RM3}.
 \ifdefined\DISSERTATION
     Three parameters of note are the geometric ratios $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, and $\gls{sym-h-d}/\gls{sym-D-s}$, which hold the spar proportions constant to maintain a sufficiently large damping ratio (\reqref{spar_damping_ratio}).
-    Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citet{mccabe_development_2026}.
+    Together with \reqref{spar_similarity}, which enforces geometric similarity on the damping plate, this fixes the spar dynamics to those of the nominal \gls{acr-rm3}, preserving the modeling assumptions of \citet{mccabe_development_2026}.
     In effect, the spar dimensional design space is restricted to comply with the model assumptions.
     This prevents determining the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \else
-    Three parameters of note, the geometric ratios $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, and $\gls{sym-h-d}/\gls{sym-D-s}$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal RM3, preserving the modeling assumptions of \citet{mccabe_development_2026}.
+    Three parameters of note, the geometric ratios $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, and $\gls{sym-h-d}/\gls{sym-D-s}$, hold the spar proportions constant to maintain the damping ratio (\reqref{spar_damping_ratio}) and, with \reqref{spar_similarity}, fix the spar dynamics to those of the nominal \gls{acr-rm3}, preserving the modeling assumptions of \citet{mccabe_development_2026}.
     This restricts the spar design space to remain model-valid; it precludes finding the true optimal spar dimensions under multibody dynamics but suffices for an initial study emphasizing float design.
 \fi
 %\hl{Explain how this manifests as a minimum damping plate diameter.}
@@ -258,15 +258,15 @@ Returning to \Cref{remdo:tab:requirements}, the enforcement column shows that th
 A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstraints]~nonlinear inequality constraints exist, with no equality constraints; the eight linear inequality constraints are given in matrix form in \Cref{remdo:sec:appendix-linear-constraints}.
 
 \ifdefined\DISSERTATION
-    Notably, while the design variables include PTO sizing variables, PTO characteristics such as the generator and drivetrain impedances are kept as parameters.
-    Rather than perform PTO co-design, which \citet{coe_useful_2023,gaebele_incorporating_2023} and studies discussed in \Cref{remdo:sec:lit}) have already proven is valuable, this study keeps the PTO design fixed at representative values.
-    While impedance matching can and should be used to design the actual PTO hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-PTO (e.g.\ structural) aspects of \gls{acr-wec} co-design introduced here while still capturing the effect of PTO rating on system performance and maintaining the generality to incorporate PTO optimization later.
-    Developing a more detailed PTO cost model that scales with these characteristics would be a necessary next step toward PTO co-design.
+    Notably, while the design variables include \gls{acr-pto} sizing variables, \gls{acr-pto} characteristics such as the generator and drivetrain impedances are kept as parameters.
+    Rather than perform \gls{acr-pto} co-design, which \citet{coe_useful_2023,gaebele_incorporating_2023} and studies discussed in \Cref{remdo:sec:lit}) have already proven is valuable, this study keeps the \gls{acr-pto} design fixed at representative values.
+    While impedance matching can and should be used to design the actual \gls{acr-pto} hardware, this choice adds simplicity and illustrative value at the system level: it highlights the novel non-\gls{acr-pto} (e.g.\ structural) aspects of \gls{acr-wec} co-design introduced here while still capturing the effect of \gls{acr-pto} rating on system performance and maintaining the generality to incorporate \gls{acr-pto} optimization later.
+    Developing a more detailed \gls{acr-pto} cost model that scales with these characteristics would be a necessary next step toward \gls{acr-pto} co-design.
 \else
-    While the design variables include PTO sizing (force and power ratings), other PTO characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed.
-    This choice adds simplicity and isolates the novel non-PTO (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of PTO rating on system performance. 
-    Recent papers have demonstrated the value of full PTO co-design \citep{coe_useful_2023,gaebele_incorporating_2023};
-    pursuing it here would require a more detailed PTO cost model scaling with impedance, a necessary next step for future work.
+    While the design variables include \gls{acr-pto} sizing (force and power ratings), other \gls{acr-pto} characteristics such as generator and drivetrain impedances are kept as parameters rather than co-designed.
+    This choice adds simplicity and isolates the novel non-\gls{acr-pto} (e.g.\ structural) aspects of co-design introduced here, while still capturing the effect of \gls{acr-pto} rating on system performance. 
+    Recent papers have demonstrated the value of full \gls{acr-pto} co-design \citep{coe_useful_2023,gaebele_incorporating_2023};
+    pursuing it here would require a more detailed \gls{acr-pto} cost model scaling with impedance, a necessary next step for future work.
 \fi
 
 %\subsubsection{Model Checking}
@@ -275,7 +275,7 @@ A total of \resultsRE[numLinConstraints]~linear and \resultsRE[numNonlinConstrai
 
 \subsection{Interpretation}
 Translating raw optimization outputs into meaningful engineering insights is nontrivial and rarely made explicit.
-Consistent with MDO as part of the design process, this section outlines the methodology for interpreting optimation and sensitivity results for wave energy, focusing on which design questions can and cannot be addressed by which results.
+Consistent with \gls{acr-mdo} as part of the design process, this section outlines the methodology for interpreting optimation and sensitivity results for wave energy, focusing on which design questions can and cannot be addressed by which results.
 % maybe instroduce this distinction when discussing choice of DVs vs parameters originally? think of PTO size, structures, and h_fs_clear as dynamic limit setters. maybe cite Pat's book on how parameter sensitivities can be used for factor screening and other things.
 We separate parameters by the amount of control the designer has over them and the degree to which their values may vary due to both flexibility and uncertainty.
 ``States of the world,'' such as location and use case, have low control and high variation, whereas physical constants, such as gravitational acceleration and water density, have low control and low variation.
