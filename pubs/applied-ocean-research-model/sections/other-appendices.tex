@@ -518,8 +518,8 @@ Under these conditions, either the stress at the center $\gls{sym-sigma-cent}$ o
         \gls{sym-sigma-cent}&=-\gls{sym-beta-plate-2} \gls{sym-W}/\gls{sym-t-f-top-eq}^2
     \end{aligned}
 \end{equation}
-using $\gls{sym-beta-plate-1}$ and $\gls{sym-beta-plate-2}$ tabulated as a function of $x_{\text{max}}/x_{\text{min}}$ by \citet{young_roarks_2001}.
-The bending moment per unit length is then found as $M_{\text{top}}=\sigma_{\text{edge}}t_{f,\text{top},eq}^2/6$.
+using $\gls{sym-beta-plate-1}$ and $\gls{sym-beta-plate-2}$ tabulated as a function of $\gls{sym-x-max}/\gls{sym-x-min}$ by \citet{young_roarks_2001}.
+The bending moment per unit length is then found as $\gls{sym-M-top}=\gls{sym-sigma-edge} \gls{sym-t-f-top-eq}^2/6$.
 However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal \gls{acr-rm3} design \citep{RM3,previsic_reference_2011}.
 It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
 In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \Cref{tab:struct-calc-vs-scale}.
@@ -532,10 +532,10 @@ This prevents the need for a separate structural analysis of the side plates.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damping Plate}
 For an annular plate with free outer radius $\gls{sym-a-outer-damping-plate}$ and fixed inner radius $\gls{sym-b-inner-damping-plate}$, the nondimensional plate deflection $\gls{sym-overline-delta-plate}$ and bending moment $\gls{sym-overline-M-r}$ can be calculated as a function of plate aspect ratio $\gls{sym-b-inner-damping-plate}/\gls{sym-a-outer-damping-plate}$ for various load cases.
-In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force $F_{\text{tube}}$.
+In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force \gls{sym-F-tube}.
 Formulas for the concentrated loading are given by \citet{boedo_corrected_1998}, and formulas for distributed loading are given by \citet[case 2L, table 11.2]{young_roarks_2001}.
 The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $\gls{sym-D-eq}$ and equivalent section modulus $\gls{sym-S-eq}$.
-The tube force $F_{\text{tube}}$ is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $\gls{sym-K-tube}$.
+The tube force \gls{sym-F-tube} is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $\gls{sym-K-tube}$.
 This results in the following expression for the radial plate bending stress $\gls{sym-sigma-r}$:
 \begin{equation}
     \gls{sym-sigma-r} =  \frac{\gls{sym-F-heave}}{\gls{sym-S-eq}}
@@ -551,8 +551,8 @@ This results in the following expression for the radial plate bending stress $\g
     \right)
 \end{equation}
 
-The critical buckling stress $\sigma_{\text{buckle}}$ is found with the \citet{american_bureau_of_shipping_requirements_2022} methodology.
-The ultimate stress is then $\sqrt{\gls{sym-sigma-Y} \sigma_{\text{buckle}}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
+The critical buckling stress $\gls{sym-sigma-buckle}$ is found with the \citet{american_bureau_of_shipping_requirements_2022} methodology.
+The ultimate stress is then $\sqrt{\gls{sym-sigma-Y} \gls{sym-sigma-buckle}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
 The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
 The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
 \begin{figure}[htbp]
