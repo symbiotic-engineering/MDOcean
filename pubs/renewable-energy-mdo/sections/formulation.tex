@@ -94,7 +94,7 @@ Constraints are the most common but not the only enforcement mechanism.
   \requirement{tops_static}&$h_{fs,\text{up}}>0$& Float spar tops (static)& 3&Lin. ineq. constraint $g_{L,4}$\\
   \requirement{base_static}& $h_{fs,\text{down}}>0$& Float spar base (static)& 3&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{damping_plate_thickness}& $\gls{sym-t-d} < \gls{sym-h-d}$& Maximum damping plate thickness & 3 & Lin. ineq. constraint $g_{L,7}$\\
-  \requirement{float_stiffener_height}& $h_{\text{stiff},f} < \gls{sym-h-f} / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
+  \requirement{float_stiffener_height}& $\gls{sym-h-stiff-f} < \gls{sym-h-f} / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
   \requirement{tops_dynamic}&$h_{fs,\text{up}}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
   \requirement{base_dynamic}& $h_{fs,\text{down}}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
   \requirement{clearance_dynamic}& $\gls{sym-h-fs-clear}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
@@ -104,8 +104,8 @@ Constraints are the most common but not the only enforcement mechanism.
   \requirement{spar_hydrostatics}&$V_{s,\text{struct},\text{min}} < V_{s,\text{struct}} < V_{s,\text{struct},\text{max}}$& Spar hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
   \requirement{FOS}&$FOS > FOS_{\text{min}}$& Structural factors of safety& 3&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
   \requirement{GM}&$GM > 0$& Metacentric height (pitch stability)& 3&Nonlin. ineq. constraint $g_{NL,5}$\\
-  \requirement{force_max}&$\gls{sym-F-p} = F_{\text{max}}$& Maximum powertrain force& 3&Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
-  \requirement{P_max}&$\gls{sym-P-pk-elec} = P_{\text{max}}$& Maximum powertrain power& 3&Nonlin. ineq. constraint $g_{NL,18}$\\
+  \requirement{force_max}&$\gls{sym-F-p} = \gls{sym-F-max}$& Maximum powertrain force& 3&Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
+  \requirement{P_max}&$\gls{sym-p-pk-VI} = \gls{sym-P-max}$& Maximum powertrain power& 3&Nonlin. ineq. constraint $g_{NL,18}$\\
   \requirement{LCOE}&$LCOE<LCOE_{\text{max}}$& Maximum LCOE& 3&Nonlin. ineq. constraint $g_{NL,15}$\\
 
     \caption{Requirements}
@@ -193,12 +193,12 @@ Referring back to \Cref{remdo:tab:lit}, this study is the most comprehensive \gl
  $x_3$&$\gls{sym-T-f-2}$ & Float draft& 0.5& Nominal \gls{acr-rm3}~\citep{mccabe_development_2026}&100& m\\
  $x_4$&$\gls{sym-h-s}$& Spar height  & 5& Nominal \gls{acr-rm3}~\citep{mccabe_development_2026}& 100& m\\
  $x_5$&$\gls{sym-h-fs-clear}$& Vertical float tube to spar clearance at rest& 0.01& 4& 10& m\\
- $x_6$& $F_{\text{max}}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
- $x_{7}$&$\gls{sym-P-pk-elec}$& Generator peak power rating & 50& 286& 1000& kW\\
+ $x_6$& $\gls{sym-F-max}$& Generator peak force rating & 0.01& 6.773 & 100& MN\\
+ $x_{7}$&$\gls{sym-P-max}$& Generator peak power rating & 50& 286& 1000& kW\\
  $x_{8}$&$\gls{sym-t-f-b}$& Float bottom plate thickness & 2.5& 14.2& 25.4& mm\\
  $x_{9}$&$\gls{sym-t-s-r}$& Spar radial column thickness & 5& 25.4& 50.8& mm\\
  $x_{10}$&$\gls{sym-t-d}$& Damping plate thickness& 5& 25.4& 50.8& mm\\
- $x_{11}$&$h_{\text{stiff},f}$& Float stiffener height& 0& 0.406& 2& m\\
+ $x_{11}$&$\gls{sym-h-stiff-f}$& Float stiffener height& 0& 0.406& 2& m\\
  $x_{12}$& $\gls{sym-h-stiff-d}$& Damping plate stiffener height& 0& 0.559& 2&m\\
 \end{tabular}%
 }
@@ -250,7 +250,7 @@ $\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\
 $\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 
 $\gls{sym-h-d}/{\gls{sym-D-s}}$ & Normalized damping plate thickness & 0.004 & -  \\ 
 $T_{f}/{\gls{sym-h-f}}$ & Float submergence ratio & 0.5 & -  \\ 
-$F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\ 
+$\gls{sym-F-heave-mult}$ & Heave force multiplier & 1.65 & - \\ 
 \end{tabular}
 \end{table}
 

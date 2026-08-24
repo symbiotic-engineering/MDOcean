@@ -286,7 +286,7 @@ From \Cref{eq:constrained-qp-solution,eq:power-elec}, the average electrical pow
     \\ \text{\gls{sym-s}.\gls{sym-t}.}
 \quad
     |\gls{sym-hat-F-p-beta}| &\leq \gls{sym-F-max},\quad
-    |\gls{sym-p-pk-elec-beta}| \leq \gls{sym-P-max-elec},\\
+    |\gls{sym-p-pk-V-I-beta}| \leq \gls{sym-P-max},\\
     |\gls{sym-hat-xi-f-beta}| &\leq \gls{sym-xi-f-max},\quad
     |\gls{sym-hat-xi-s-beta}| \leq \gls{sym-xi-s-max}\\
 \end{aligned}
@@ -326,14 +326,14 @@ This illustrates the importance of a multidisciplinary optimization considering 
 To better see the dependence of \gls{acr-lcoe} on design for a fixed $\gls{sym-N-WEC}$ and $FCR$, one can divide out the constant factors from \Cref{eq:lcoe}, leaving normalized price constants $\gls{sym-p-prime-star}$:
 \begin{equation}\label{eq:LCOE-scale}
   LCOE = \frac{
-    \gls{sym-p-prime-F} \gls{sym-F-max} + \gls{sym-p-prime-P}\gls{sym-P-max-elec} + \gls{sym-p-prime-s} \gls{sym-V-struct} + \gls{sym-p-prime-0}
+    \gls{sym-p-prime-F} \gls{sym-F-max} + \gls{sym-p-prime-P}\gls{sym-P-max} + \gls{sym-p-prime-s} \gls{sym-V-struct} + \gls{sym-p-prime-0}
     }{\gls{sym-overline-P-elec}}
 \end{equation}
-The numerator is affine in the design inputs $\gls{sym-F-max}$ and $\gls{sym-P-max-elec}$, while $\gls{sym-V-struct}$ is the product of structural thicknesses with their corresponding areas, which depend quadratically on the bulk dimensions.
+The numerator is affine in the design inputs $\gls{sym-F-max}$ and $\gls{sym-P-max}$, while $\gls{sym-V-struct}$ is the product of structural thicknesses with their corresponding areas, which depend quadratically on the bulk dimensions.
 The fact that decreasing a constraint limit causes the numerator of the \gls{acr-lcoe} to monotonically increase and the denominator to monotonically decrease implies that at system optimality, each constraint will be active in at least one sea state.
 
 \ifdefined\DISSERTATION
-    The \gls{acr-lcoe} minimization with design variables of $\gls{sym-F-max}$, $\gls{sym-P-max-elec}$, and thicknesses is a fractional quadratic program, a structure common in resource allocation problems.
+    The \gls{acr-lcoe} minimization with design variables of $\gls{sym-F-max}$, $\gls{sym-P-max}$, and thicknesses is a fractional quadratic program, a structure common in resource allocation problems.
     When the denominator is convex with respect to the \gls{acr-pto} limits, this means that \gls{acr-lcoe} is ``quasi-convex'' in the \gls{acr-pto} limits for fixed geometry \citep{agrawal_disciplined_2020}.
     This quasi-convexity can be leveraged by using a subgradient method or by solving a small sequence of convex problems, which simplifies the optimization process significantly compared to a general nonlinear solver.
     This motivates a three-level nested optimization strategy:

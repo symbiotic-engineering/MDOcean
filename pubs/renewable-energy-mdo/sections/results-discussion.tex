@@ -164,7 +164,7 @@ Future studies could quantify the lowest marginal \gls{acr-pto} force price (\$/
 \subsubsection{Pareto Front}
 \ifdefined\DISSERTATION
     In the multi-objective optimization, the design-dependent capital cost $C_{\text{design}}$ and average electrical power $P_{\text{avg},\text{elec}}$ are optimized simultaneously to expose the trade-off between them.
-    As described in \Cref{remdo:sec:multi-obj-process}, this gives insight for cases where \gls{acr-lcoe} may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $\gls{sym-p-0}$.
+    As described in \Cref{remdo:sec:multi-obj-process}, this gives insight for cases where \gls{acr-lcoe} may not apply or is uncertain due to cost variables modeled as constant, including $OPEX$, $FCR$, and $\gls{sym-p-prime-0}$.
     The Pareto front is shown in \Cref{remdo:fig:pareto-lcoe}, with the utopia point marked by a green star, simulated designs by squares, and superimposed constant-$LCOE$ contours. %, and the actual nominal performance reported in the RM3 reference \citep{RM3} by a diamond.
     All Pareto-optimal designs cost significantly less than the nominal \gls{acr-rm3}, spanning powers both below and above it.
     %\Cref{remdo:fig:pareto-lcoe} provides a zoomed view 
@@ -172,7 +172,7 @@ Future studies could quantify the lowest marginal \gls{acr-pto} force price (\$/
     %\hl{analyze more: how are the max power and min LCOE designs different?... multiple apparent points of tangency...}  % TODO (scrutineering)
 \else
     The multi-objective optimization simultaneously trades off design-dependent capital cost $C_{\text{design}}$ against average electrical power $P_{\text{avg},\text{elec}}$ (\Cref{remdo:sec:multi-obj-process}),
-    giving insight where \gls{acr-lcoe} is inapplicable or uncertain in its constant-modeled cost terms ($OPEX$, $FCR$, $\gls{sym-p-0}$).
+    giving insight where \gls{acr-lcoe} is inapplicable or uncertain in its constant-modeled cost terms ($OPEX$, $FCR$, $\gls{sym-p-prime-0}$).
     The Pareto front (\Cref{remdo:fig:pareto-lcoe}) shows all designs costing significantly less than the nominal \gls{acr-rm3} \citep{RM3} across a range of powers;
     the zoomed view with constant-$LCOE$ contours (\Cref{remdo:fig:pareto-lcoe}) places the minimum-\gls{acr-lcoe} design at the front's tangency with the contours, nearly coincident with the maximum-power design.
 \fi
@@ -206,7 +206,7 @@ Similar trends are quantified in \Cref{remdo:fig:design-heuristics}, which provi
 
 \ifdefined\DISSERTATION
     Examining the direction of change, with increasing cost and power (left to right) most design variables tend to increase, though not necessarily monotonically.
-    Two structural variables, $h_{\text{stiff},f}$ and $\gls{sym-t-f-b}$ stay essentially constant, likely due to active lower bounds.
+    Two structural variables, $\gls{sym-h-stiff-f}$ and $\gls{sym-t-f-b}$ stay essentially constant, likely due to active lower bounds.
     Two other structural variables, $\gls{sym-t-s-r}$ and $h_{\text{stiff,d}}$, increase with cost and power, while the remaining structural variable $\gls{sym-t-d}$ is slightly elevated at lower power and constant for the remainder of the curve.
     
     Examining the magnitude of change, the powertrain ratings vary most dramatically across the front while geometric and structural variables need only moderate adjustment.
@@ -305,7 +305,7 @@ If the \gls{acr-wec} is infeasible, the gap determines the reduction to the base
 % 404-409
 \ifdefined\DISSERTATION
     \Cref{remdo:fig:constraint-activity} shows which constraints are active along the front.
-    Three structural design variables ($\gls{sym-t-d}$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) reach their lower bound and none their upper bound.
+    Three structural design variables ($\gls{sym-t-d}$, $\gls{sym-h-stiff-f}$, $\gls{sym-h-1-stiff-d}$) reach their lower bound and none their upper bound.
     %The only active linear constraint is the spar natural frequency constraint;
     %since it is priority 2 (required for modeling accuracy under the assumptions),
     %its activity is significant and discussed further in \Cref{remdo:sec:discussion}.
@@ -535,13 +535,13 @@ Thus, the importance of balancing cost, power, and probability at the grid scale
 \ifdefined\DISSERTATION
     Returning to \Cref{remdo:fig:param-sens-J-star-tornado}, the right side shows the sensitivities of the minimum design cost, which are higher overall:
     minimum \gls{acr-lcoe} has 5 parameters with normalized magnitude above 0.5, whereas minimum design cost has sixteen.
-    The minimum design cost is most sensitive ($+2.1$) to the nondimensional damping plate stiffener height $\gls{sym-h-stiff-d}/h_{1,\text{stiff},d}$,
+    The minimum design cost is most sensitive ($+2.1$) to the nondimensional damping plate stiffener height $\gls{sym-h-stiff-d}/\gls{sym-h-1-stiff-d}$,
     suggesting it be added as a design variable.
     Other high sensitivities such as
     $\gls{sym-D-d}/\gls{sym-D-s}$ ($+1.7$),
     \gls{sym-D-d-tu} ($-1.6$),
     $D_{d,\text{min}}$ ($-1.1$),
-    $w_{\text{stiff},d}/h_{1,\text{stiff},d}$ ($-1.0$),
+    $w_{\text{stiff},d}/\gls{sym-h-1-stiff-d}$ ($-1.0$),
     also relate to the damping plate, while no float or spar geometric parameter is highly sensitive,
     indicating the damping plate drives the minimum achievable cost.
     This raises the question whether the damping plate is worth having at all,
@@ -563,7 +563,7 @@ Thus, the importance of balancing cost, power, and probability at the grid scale
     sixteen parameters exceed magnitude 0.5 versus five for \gls{acr-lcoe},
     and is dominated by damping plate geometry (the nondimensional stiffener height at $+2.1$, $\gls{sym-D-d}/\gls{sym-D-s}$ at $+1.7$, and related terms),
     with no float or spar geometric parameter influential, indicating the damping plate sets the minimum achievable cost.
-    Two counterintuitive findings stand out: the sign of the structural-period sensitivity $T_{\text{struct}}$ flips between the two objectives,
+    Two counterintuitive findings stand out: the sign of the structural-period sensitivity $\gls{sym-T-struct}$ flips between the two objectives,
     and the material yield strength has a \emph{positive} cost sensitivity ($+1.0$).
     Specifically, a stronger material yields a costlier design
     because--with thicknesses already at their lower bounds--the added strength is spent on larger, higher-load dimensions rather than reduced structural cost.
@@ -741,16 +741,16 @@ This subsection evaluates how realistic the optimization formulation choices are
     
     For controllable choices held fixed for simplicity, such as many geometric parameters, high values indicate the value should become a design variable in future studies.
     
-    The \gls{acr-lcoe}-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $h_{\text{stiff},f}$, $h_{1,\text{stiff},d}$) also sensitive to structural (yellow) parameters.
+    The \gls{acr-lcoe}-minimizing design variables are most sensitive to site (black) and geometric (red) parameters, with a subset of structural variables ($t_{sr}$, $\gls{sym-h-stiff-f}$, $\gls{sym-h-1-stiff-d}$) also sensitive to structural (yellow) parameters.
     In \Cref{remdo:fig:param-sens-x-star-tornado-2}, the cost-minimizing design variables add sensitivity to economic parameters.
     Dynamic parameters (blue), including the float and spar drag coefficients and \gls{acr-pto} efficiency, do not significantly affect the optimal design in either case; the low drag-coefficient sensitivity in particular means it is likely unnecessary to model the variation of drag coefficient with hull shape, frequency, or surface roughness.
     Some structural thicknesses ($t_{fb}$ and $\gls{sym-t-d}$ in both, $t_{sr}$ in cost minimization) are insensitive to all parameters because the optimum sits consistently at the lower bound, reinforcing the need to improve the structures model for thin-skinned stiffened shells.
     
     The following geometric relationships highlight which parameters should be promoted to design variables in future work.
-    $\gls{sym-D-d}/\gls{sym-D-s}$ strongly affects four design variables ($\gls{sym-D-s}$, $t_{sr}$, $\gls{sym-h-s}$, $h_{\text{stiff},f}$), indicating $\gls{sym-D-d}$ should be a design variable;
+    $\gls{sym-D-d}/\gls{sym-D-s}$ strongly affects four design variables ($\gls{sym-D-s}$, $t_{sr}$, $\gls{sym-h-s}$, $\gls{sym-h-stiff-f}$), indicating $\gls{sym-D-d}$ should be a design variable;
     $\gls{sym-T-f-1}/\gls{sym-T-f-2}$ strongly affects the overall draft $\gls{sym-T-f-2}$, indicating $\gls{sym-T-f-1}$ should be one too;
     $\gls{sym-T-s}/\gls{sym-D-s}$ affects $\gls{sym-h-s}$ and $\gls{sym-h-fs-clear}$, indicating $\gls{sym-T-s}$ should be added alongside $\gls{sym-h-s}$;
-    and $D_{f,in}/\gls{sym-D-s}$ strongly affects $h_{\text{stiff},f}$, suggesting $D_{f,in}$,
+    and $D_{f,in}/\gls{sym-D-s}$ strongly affects $\gls{sym-h-stiff-f}$, suggesting $D_{f,in}$,
     though a larger float-spar gap would introduce unmodeled moonpool resonance effects, making this addition less straightforward.
     %\hl{Any other params that could have been design variables...}  % TODO (scrutineering)
     In summary, the parameters that should become design variables in future optimizations are $\gls{sym-D-d}$, $\gls{sym-T-f-1}$, $\gls{sym-T-s}$, and possibly $D_{f,in}$.

@@ -236,13 +236,13 @@ The optimization converges in \resultsRE[singleObjIters]~iterations, not includi
 \ifdefined\DISSERTATION
     The gradient $\vec{\nabla} \gls{sym-J}$, and hence the gradient estimate of $\gls{sym-Delta} \gls{sym-J}$, is zero for any design variable not involved in an active constraint, provided the optimization has converged.
     Here all values are nonzero, indicating that every design variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}; each value conveys how much the objective would improve if that variable could change, though doing so would violate the active constraint it participates in.
-    The highest sensitivities are $\gls{sym-D-s}$, $\gls{sym-D-f}$, and $h_{\text{stiff},f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises \gls{acr-lcoe} by 7.9\%, 4.4\%, and 3.7\% respectively.
+    The highest sensitivities are $\gls{sym-D-s}$, $\gls{sym-D-f}$, and $\gls{sym-h-stiff-f}$: a 10\% decrease in the diameters or 10\% increase in the stiffener height raises \gls{acr-lcoe} by 7.9\%, 4.4\%, and 3.7\% respectively.
     The remaining design variables can be perturbed 10\% in either direction while changing the objective by only 1--2\% (though they may affect constraints).
     The gradient estimates are generally accurate except for the diameters $\gls{sym-D-s}$, $\gls{sym-D-f}$ and the peak power $P_{\text{max}}$, where curvature in the objective indicates a tradeoff producing an optimum even absent active constraints, which are expected for \gls{acr-lcoe} minimization, since increasing the diameters and power rating raises both power production and capital cost.
     More accurate perturbed-\gls{acr-lcoe} estimates would require the objective Hessian via manual finite differences, since the solver returns only the Hessian of the Lagrangian.
 \else
     The gradient estimate $\gls{sym-Delta} \gls{sym-J}$ is zero for any design variable not in an active constraint at convergence; here all values are nonzero, showing every variable affects the active constraints of \Cref{remdo:fig:lagrange-multiplier}.
-    The highest sensitivities are $\gls{sym-D-s}$, $\gls{sym-D-f}$, and $h_{\text{stiff},f}$ (a 10\% change raises \gls{acr-lcoe} by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
+    The highest sensitivities are $\gls{sym-D-s}$, $\gls{sym-D-f}$, and $\gls{sym-h-stiff-f}$ (a 10\% change raises \gls{acr-lcoe} by 7.9\%, 4.4\%, and 3.7\%); the rest shift the objective only 1--2\% under 10\% perturbation.
     Estimates are accurate except for the diameters and peak power, where objective curvature reflects the power-versus-cost tradeoff that would produce an optimum even without active constraints.
 \fi
 Inaccuracies here, due to the nonlinear curvature of the true objective,
@@ -345,7 +345,7 @@ This could indicate the presence of discontinuities, strong nonlinearities, or t
 On the bright side, for the majority %(\resultsRE[percentParamsRightSign])
 of parameters, the quadratic sensitivity at least correctly predicts the sign and is only inaccurate in the sensitivity magnitude.
 Likewise, the quadratic sensitivity typically outperforms the partial and linear sensitivities in more closely matching the re-optimization-based sensitivity, as would be expected.
-For example, this occurs for $\gls{sym-h}$, $H_{s,\text{struct}}$, $FOS_{\text{min}}$, \gls{sym-D-d-tu}, $FOS_{\text{mult},d}$, $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, $\gls{sym-T-f-1}/\gls{sym-T-f-2}$, and $F_{\text{heave},\text{mult}}$, but not for $T_{\text{struct}}$ or $\eta_{pto}$.
+For example, this occurs for $\gls{sym-h}$, $\gls{sym-H-s-struct}$, $FOS_{\text{min}}$, \gls{sym-D-d-tu}, $FOS_{\text{mult},d}$, $\gls{sym-D-d}/\gls{sym-D-s}$, $\gls{sym-T-s}/\gls{sym-D-s}$, $\gls{sym-T-f-1}/\gls{sym-T-f-2}$, and $\gls{sym-F-heave-mult}$, but not for $\gls{sym-T-struct}$ or $\eta_{pto}$.
 All in all, the quadratic post-optimality sensitivities are useful for rapidly evaluating directional effects without the need to re-optimize, but lack the accuracy required to predict effect magnitudes, which is necessary to screen for parameters with significant effects and appropriately prioritize parameters in order of importance.
 
 \Cref{remdo:fig:param-sens-local-x-star,remdo:fig:param-sens-global-x-star} depict the normalized local parameter sensitivities of the optimal design.
