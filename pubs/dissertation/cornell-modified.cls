@@ -366,7 +366,7 @@
   \typeout{Vita}
   \pagestyle{plain}
   \pagenumbering{roman}
-  \setcounter{page}{8}
+  \setcounter{page}{6}
   \prelim@contents{Biographical Sketch}
   \chapter*{Biographical Sketch}
 }{%

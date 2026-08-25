@@ -558,7 +558,7 @@ To capture non-dynamic power losses such as those in an electrical drive, a cons
 \fi
 Validation in \Cref{sec:validation-benchmarking} sets $\gls{sym-eta}=80\%$ to match the \gls{acr-rm3} design assumption of \citet{RM3}.
 
-The full expansion of $\gls{sym-p}_{\text{avg},\text{elec}}$ and $\gls{sym-p}_{pk,\text{elec}}$ in terms of the optimal-control variables $\gls{sym-B-l}$, $\gls{sym-K-l}$, and the electrical-port current phasor $\gls{sym-hat-I}$ is given in \Cref{sec:appendix-power-elec}.
+The full expansion of $\gls{sym-p-avg-elec}$ and $\gls{sym-p-pk-elec}$ in terms of the optimal-control variables $\gls{sym-B-l}$, $\gls{sym-K-l}$, and the electrical-port current phasor $\gls{sym-hat-I}$ is given in \Cref{sec:appendix-power-elec}.
 
 % Additionally, the drivetrain mechanical cascade matrix $[\gls{sym-a}]_{\gls{sym-m}}$ is set to the identity matrix, which represents a static effective gear radius $\gls{sym-R-gear}=1$:
 % \begin{equation}
@@ -604,7 +604,7 @@ The power-maximizing \gls{acr-pto} damping $\gls{sym-B-l-damp}$ is then:
 \fi
 
 \paragraph{Constrained}
-We first compile expressions for all metrics $\gls{sym-M}$ which must be constrained.
+We first compile expressions for all metrics $\gls{sym-underline-M}$ which must be constrained.
 \ifdefined\DISSERTATION
     For the time being, we keep these expressions generic so they apply to any port.
     To facilitate the calculations in transmission form, we write the metrics as the quadratic product of the port variable vector with a suitable matrix $\gls{sym-mathbf-Q-M}$:
@@ -612,7 +612,7 @@ We first compile expressions for all metrics $\gls{sym-M}$ which must be constra
     Each metric is written as a quadratic product of the port variable vector with a matrix $\gls{sym-mathbf-Q-M}$:
 \fi
 \begin{equation}\label{eq:metrics}
-    \gls{sym-M} = \frac{1}{4} \begin{bmatrix}
+    \gls{sym-underline-M} = \frac{1}{4} \begin{bmatrix}
     \hat{e} \\ \gls{sym-hat-q}
     \end{bmatrix}^*
     \gls{sym-mathbf-Q-M}
@@ -626,7 +626,7 @@ The matrices for various metrics are given in \Cref{tab:power-metrics}.
 \caption{Matrices for calculating various metrics at a port via \Cref{eq:metrics}}
 \label{tab:power-metrics}
 \begin{tabular}{L{0.1\linewidth}|ccccc}
-    Metric $\gls{sym-M}$ & $\gls{sym-p}_{\text{avg}}=\gls{sym-P}$ & $\gls{sym-Q}$ & $\gls{sym-S}$ & $|\gls{sym-hat-e}|^2$ & $|\gls{sym-hat-q}|^2$ \\ \hline
+    Metric $\gls{sym-underline-M}$ & $\gls{sym-p}_{\text{avg}}=\gls{sym-P}$ & $\gls{sym-Q}$ & $\gls{sym-S}$ & $|\gls{sym-hat-e}|^2$ & $|\gls{sym-hat-q}|^2$ \\ \hline
     Matrix $\gls{sym-mathbf-Q-M}$ &
     $\begin{bmatrix}
         0 & 1 \\
@@ -712,7 +712,7 @@ The linear equality constraint $\gls{sym-vec-c}^{\,*}\gls{sym-vec-x} = d$ enforc
     \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re (\gls{sym-Z-s-th})}~ (1 - |\Gamma_{\text{opt}}|^2)
 \end{aligned}
 \end{equation}
-where $\gls{sym-Gamma}_{\text{opt}}$ is a complex scalar with magnitude between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
+where $\gls{sym-Gamma}_{\text{opt}}$ is a complex scalar with magnitude typically between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
 The reflection coefficient represents the degree to which the constraints introduce an impedance mismatch.
 $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (no active inequality constraints).
 
@@ -798,7 +798,6 @@ The pressure along the bottom surface of each body due to drag $\gls{sym-vec-p-d
     &\approx~|\gls{sym-vec-hat-V-rel} (\gls{sym-y})|^2\frac{8}{3\gls{sym-pi}} \cos (\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-vec-hat-V-rel} (\gls{sym-y}))
 \end{aligned}
 \end{equation}
-where the last line of \cref{eq:drag-pressure} applies the describing function approximation.
 The relative velocity uses the standard linear-wave velocity phasor evaluated at body draft; the explicit expression is in \Cref{sec:appendix-drag} (\Cref{eq:wave-velocity-phasor}).
 
 The time-domain nonlinear waveform and describing function approximation for the drag pressure/force are compared in \Cref{fig:desc-fcns}(b).
@@ -807,14 +806,14 @@ The amplitude of the sinusoidal approximation equals $\frac{8}{3\gls{sym-pi}}\ap
 Integrating the drag pressure over the wetted surface via strip theory (\Cref{sec:appendix-drag}) yields a quasi-linearized drag force consisting of a damping term in phase with the body motion and an excitation term potentially out of phase:
 \begin{equation}\label{eq:drag-damping-excitation}
     \gls{sym-vec-hat-F-d} = -\gls{sym-mathbf-B-d} \gls{sym-vec-hat-dot-xi}
-    + \gls{sym-vec-gamma}_{d} \gls{sym-hat-zeta}
+    + \gls{sym-vec-gamma-d} \gls{sym-hat-zeta}
 \end{equation}
 The excitation term arises from the use of the relative velocity rather than direct \gls{acr-wec} velocity, which is often overlooked in \gls{acr-wec} models and has important implications for the phase of the drag force.
 The damping-excitation grouping of the drag terms, as well as the dependence of the relative velocity on the direction of wave propagation $\gls{sym-y}$, improves on the approach of \citet{quartier_influence_2021} and is discussed more in \Cref{sec:appendix-drag}.
 Explicit expressions for $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$ in terms of nondimensional strip-theory integrals over body geometry are given in \Cref{sec:appendix-drag} (\Cref{eq:drag-coeffs}).
 
 These numerical integrals are precomputed and stored as a lookup table to support fast optimization.
-The resulting magnitude and phase of \gls{acr-wec} motion are obtained by numerically converging the state-dependent coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma}_{d}$.
+The resulting magnitude and phase of \gls{acr-wec} motion are obtained by numerically converging the state-dependent coefficients $\gls{sym-mathbf-B-d}$ and $\gls{sym-vec-gamma-d}$.
 \Cref{sec:appendix-drag} discusses details and control implications.
 
 %\subsubsection{Power Saturation}
@@ -830,18 +829,18 @@ We now combine the results across sea states to find the long-term energy statis
     While matrices in \Cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\gls{sym-vec-hat-xi}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\gls{sym-hat-xi-f}$) or the sum across all degrees of freedom (i.e.\ power in systems with multiple actuated degrees of freedom).
     These scalars are assembled into ``matrices'' (i.e.\ $\gls{sym-boldsymbol-hat-xi-H-T-f}$) indexed by sea state rather than by degree of freedom, indicated by the $\gls{sym-H},\gls{sym-T-period}$ superscript.
     Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
-    To distinguish from the average and maximum signal values over a wave period denoted with $\text{avg}$ and $pk$ subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $\text{max}$.
+    To distinguish from the average and maximum signal values over a wave period denoted with avg and pk subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $\text{max}$.
     This intentionally matches the $\text{max}$ subscript used in \Cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.
     An exception is the slamming and submergence constraints, which will be discussed separately in \Cref{sec:design-load-cases}.
 \else
-    Quantities indexed by sea state are written as ``power matrices'' $(\cdot)^{\gls{sym-H},\gls{sym-T-period}}$ (e.g.\ $\mathbf{\gls{sym-P}}_{\text{elec}}^{\gls{sym-H},\gls{sym-T-period}}$),
+    Quantities indexed by sea state are written as ``power matrices'' $(\cdot)^{\gls{sym-H},\gls{sym-T-period}}$ (e.g.\ \gls{sym-mathbf-P-H-T-elec}),
     with operations interpreted elementwise across sea states rather than as matrix multiplication.
     Long-term averages across sea states are denoted with an overbar $\overline{(\cdot)}$ and long-term maxima with subscript $\text{max}$,
-    distinguishing them from the within-period averages and peaks ($\text{avg}$, $pk$) introduced in \Cref{sec:power}.
+    distinguishing them from the within-period averages and peaks (avg, pk) introduced in \Cref{sec:power}.
     A separate quadratic amplitude limit for slamming and submergence, which varies across sea states, is treated in \Cref{sec:design-load-cases}.
 \fi
 
-To find the long-term average power production $\overline{\gls{sym-P}}_{\text{elec}}$ in a location with a given distribution of sea states, the power matrix $\mathbf{\gls{sym-P}}^{\gls{sym-H},\gls{sym-T-period}}_{\text{elec}}$ for each sea state is weighted by that sea state's probability using a Joint Probability Density (\gls{acr-jpd}) matrix and then summed.
+To find the long-term average power production \gls{sym-overline-P-elec} in a location with a given distribution of sea states, the power matrix \gls{sym-mathbf-P-H-T-elec} for each sea state is weighted by that sea state's probability using a \gls{acr-jpd} matrix and then summed.
 This method is illustrated in \Cref{fig:JPD-multiply}.
 The \gls{acr-jpd} used in this analysis represents wave conditions in Humboldt Bay, \gls{acr-ca} and is taken from the study by \citet{janzou_system_2020}.
 
@@ -852,9 +851,9 @@ The \gls{acr-jpd} used in this analysis represents wave conditions in Humboldt B
 \label{fig:JPD-multiply}
 \end{figure}
 
-The annual energy production $AEP$ in kWh/year for a farm of multiple devices is the product of the number of devices, the average power per device, an efficiency $\gls{sym-eta}_{\text{array}}$ representing transmission losses and array downtime, and an appropriate unit conversion:
+The annual energy production $\gls{acr-aep}$ in kWh/year for a farm of multiple devices is the product of the number of devices, the average power per device, an efficiency $\gls{sym-eta-array}$ representing transmission losses and array downtime, and an appropriate unit conversion:
 \begin{equation}\label{eq:AEP}
-    AEP = \gls{sym-N-WEC} ~ \overline{\gls{sym-P}}_{elec} ~\gls{sym-eta-array} \frac{8766}{1000}.
+    \gls{acr-aep} = \gls{sym-N-WEC} ~ \gls{sym-overline-P-elec} ~\gls{sym-eta-array} \frac{8766}{1000}.
 \end{equation}
 
 %Finally, the standard deviation $\gls{sym-sigma}$ of power across all sea states $\gls{sym-P}(\gls{sym-omega})$ is computed, and normalized by the average power $\gls{sym-mu}$ to get the coefficient of variation (see equation \eqref{cv}).
@@ -891,10 +890,10 @@ In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator
 In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-\gls{acr-dof} equation of motion for the force necessary to enforce zero relative motion between the float and spar.
 \ifdefined\DISSERTATION
     Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
-    The peak of $\gls{sym-tau}(\gls{sym-t})$ is lower than its fundamental amplitude due to generator force saturation at $\gls{sym-tau}_{\text{max}}$, so using $\gls{sym-tau}_{\text{max}}$ rather than $|\gls{sym-hat-tau}|$ is both less conservative and more realistic.
+    The peak of $\gls{sym-tau}(\gls{sym-t})$ is lower than its fundamental amplitude due to generator force saturation at \gls{sym-tau-max}, so using \gls{sym-tau-max} rather than $|\gls{sym-hat-tau}|$ is both less conservative and more realistic.
     Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
 \else
-    Saturation caps the operational generator torque at $\gls{sym-tau}_{\text{max}}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\gls{sym-hat-tau}|$.
+    Saturation caps the operational generator torque at $\gls{sym-tau-max}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\gls{sym-hat-tau}|$.
     Assuming constructive interference with the shaft torque,
 \fi
 \begin{equation}\label{eq:peak-pto-force}
@@ -993,7 +992,8 @@ Additionally, a limit of $\gls{sym-h-fs-clear}$ (see definition in \Cref{fig:dim
 The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \Cref{sec:hydro}.
 This maximum amplitude $\gls{sym-xi-lin}$ for the float and spar respectively is
 \begin{equation}
-    \xi_{f,\text{linear}} = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-f-2}), \quad \xi_{s,\text{linear}}  = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-s})
+    \gls{sym-xi-f-lin} = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-f-2}), \quad
+    \gls{sym-xi-s-lin}  = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-s})
 \end{equation}
 \ifdefined\DISSERTATION
     which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in \gls{acr-meem}) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
@@ -1071,7 +1071,7 @@ are given in \Cref{sec:appendix-slam}.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Irregular Waves}\label{sec:irregular-waves}
-MDOcean uses a \gls{acr-jpd} (joint probability density matrix) to capture the long-term variation in wave conditions and accurately estimate annual average power and fatigue load.
+MDOcean uses a \gls{acr-jpd} matrix to capture the long-term variation in wave conditions and accurately estimate annual average power and fatigue load.
 Additionally, it represents each irregular wave condition within the \gls{acr-jpd} as an equivalent sinusoidal regular wave.
 Regular wave height $\gls{sym-H}$ and period $\gls{sym-T-period}$ are selected to provide equal energy as the irregular sea state:
 \begin{equation}\label{eq:regular-wave-equiv}
@@ -1104,7 +1104,7 @@ The factors of safety represent the multiplicative increase in force before stre
 
 \ifdefined\DISSERTATION
     Again aligning with the modeling philosophy of investing the up-front development time to create a simulation that runs extremely quickly with moderate accuracy, MDOcean integrates a combination of explicit algebraic and tabulated semi-analytical structural models that are well-established in the structures community yet rarely utilized for \gls{acr-wec} design.
-    The structures module therefore runs significantly faster than traditional finite element method (\gls{acr-fem}) simulations, though it lacks the ability to easily generalize to other geometries, boundary conditions, and load cases as a \gls{acr-fem} model could.
+    The structures module therefore runs significantly faster than traditional \gls{acr-fem} simulations, though it lacks the ability to easily generalize to other geometries, boundary conditions, and load cases as a \gls{acr-fem} model could.
 
     More specifically, the peak limits analyzed include yield, global buckling, local buckling, and ultimate where appropriate, while the endurance limit assesses high-cycle fatigue.
     The latter is potentially conservative, and future work could implement Miner's law to better represent infrequent operational loads (low-cycle fatigue) \citep{ove_arup__partners_ltd_structural_2016}.
@@ -1155,7 +1155,7 @@ Each of the twelve float sections is modeled as a stiffened shell subject to dis
 \fi
 
 The cylindrical shell of the spar is modeled as a short column under compression and hydrostatic hoop stress.
-The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original reference model design did not account for \citep{previsic_reference_2011}.
+The column's short length requires an intermediate solution between pure compression and Euler buckling, a consideration that the original \gls{acr-rm3} design did not account for \citep{previsic_reference_2011}.
 
 The damping plate is a thin stiffened annular plate subject to a vertical distributed force on its bottom surface, reacted by the welded connection to the column along the column's circumference and by four welded tubular supports.
 \ifdefined\DISSERTATION
@@ -1187,9 +1187,9 @@ For illustrative purposes only, assuming a fixed maximum stress and considering 
 %TC:break Economics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Economics}\label{sec:econ}
-The common economic metric $LCOE$ is calculated as the ratio of annualized expenditures to the annual energy production $AEP$:
+The common economic metric $LCOE$ is calculated as the ratio of annualized expenditures to the annual energy production $\gls{acr-aep}$:
 \begin{equation}\label{eq:lcoe}
-    LCOE = \frac{CAPEX\cdot  \gls{acr-fcr} + OPEX}{AEP}
+    LCOE = \frac{CAPEX \cdot \acrshort{acr-fcr} + OPEX}{\gls{acr-aep}}
 \end{equation}
 where the numerator consists of the up-front capital expenditure $CAPEX$, annualized via a fixed charge rate $\gls{acr-fcr}$, plus an annual operational expenditure $OPEX$.
 \ifdefined\DISSERTATION
