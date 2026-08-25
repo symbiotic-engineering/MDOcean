@@ -451,15 +451,15 @@ Forces include wave excitation $\gls{sym-vec-F-e}$, hydrodynamic radiation $\gls
 % todo: this is time domain so gamma is not allowed to be complex
 \begin{equation}\label{eq:eom}
     \gls{sym-mathbf-M}\ddot{\vec\xi} (\gls{sym-t})
-    = \gls{sym-vec-F-e} (\gls{sym-t}) + \gls{sym-vec-F-rad} (\gls{sym-t}) + \gls{sym-vec-F-res} (\gls{sym-t}) + \gls{sym-vec-F-d} (\gls{sym-t}) + \gls{sym-vec-F-p} (\gls{sym-t})
+    = \gls{sym-vec-F-e} + \gls{sym-vec-F-rad} + \gls{sym-vec-F-res} + \gls{sym-vec-F-d} + \gls{sym-vec-F-p} (\gls{sym-t})
 \end{equation}
 where, in the frequency domain under monochromatic forcing,
 \begin{equation}\label{eq:eom-forces}
 \begin{aligned}
-    \gls{sym-vec-F-e} (\gls{sym-t})   &= \Re\!\left(\gls{sym-vec-gamma}\,\gls{sym-tilde-zeta} (\gls{sym-t})\right),
-    & \gls{sym-vec-F-rad} (\gls{sym-t}) &= -\gls{sym-mathbf-A-h}\gls{sym-ddot-vec-xi} (\gls{sym-t}) - \gls{sym-mathbf-B-h}\gls{sym-dot-vec-xi} (\gls{sym-t}), \\
-    \gls{sym-vec-F-res} (\gls{sym-t}) &= -\gls{sym-mathbf-K-h}\gls{sym-vec-xi} (\gls{sym-t}),
-    & \gls{sym-vec-F-d} (\gls{sym-t})   &= -\gls{sym-mathbf-B-d}\gls{sym-dot-vec-xi} (\gls{sym-t}) + \Re\!\left(\gls{sym-vec-gamma-d}\,\gls{sym-tilde-zeta} (\gls{sym-t})\right), \\
+    \gls{sym-vec-F-e}   &= \Re\!\left(\gls{sym-vec-gamma}\,\gls{sym-tilde-zeta} (\gls{sym-t})\right),
+    & \gls{sym-vec-F-rad} &= -\gls{sym-mathbf-A-h}\gls{sym-ddot-vec-xi} (\gls{sym-t}) - \gls{sym-mathbf-B-h}\gls{sym-dot-vec-xi} (\gls{sym-t}), \\
+    \gls{sym-vec-F-res} &= -\gls{sym-mathbf-K-h}\gls{sym-vec-xi} (\gls{sym-t}),
+    & \gls{sym-vec-F-d}   &= -\gls{sym-mathbf-B-d}\gls{sym-dot-vec-xi} (\gls{sym-t}) + \Re\!\left(\gls{sym-vec-gamma-d}\,\gls{sym-tilde-zeta} (\gls{sym-t})\right), \\
     \gls{sym-vec-F-p} (\gls{sym-t})   &= -\gls{sym-mathbf-B-p}\gls{sym-dot-vec-xi} (\gls{sym-t}) - \gls{sym-mathbf-K-p}\gls{sym-vec-xi} (\gls{sym-t}).
 \end{aligned}
 \end{equation}
@@ -774,9 +774,9 @@ The result is updated effective values for control gains $\gls{sym-B-l}$ and $\g
 Drag force $\gls{sym-vec-F-d}$ is proportional to the product of the relative velocity of the \gls{acr-wec} and incident wave, $\gls{sym-vec-v-rel}(\gls{sym-y},\gls{sym-t})=\gls{sym-vec-dot-xi}(\gls{sym-t})-\gls{sym-vec-v-wave}(\gls{sym-y},\gls{sym-t})$, with its absolute value.
 The resulting quadratic form $|\gls{sym-vec-F-d}|\sim|\gls{sym-vec-v-rel}|^2$ implies a nonlinear input-output response that would normally require time-domain simulation.
 To improve computational efficiency and allow solution in the frequency domain, the nonlinearity is quasi-linearized with a describing function, following \citet{quartier_influence_2021}.
-The pressure along the bottom surface of each body due to drag $\gls{sym-vec-p-d}(\gls{sym-y},\gls{sym-t})$ is modeled with empirical drag coefficient vector $\gls{sym-vec-C-d}$:
+The pressure along the bottom surface of each body due to drag $\gls{sym-vec-p-d}$ is modeled with empirical drag coefficient vector $\gls{sym-vec-C-d}$:
 \begin{equation}\label{eq:drag-pressure}
-    \gls{sym-vec-p-d} (\gls{sym-y},\gls{sym-t}) = \frac{1}{2}\gls{sym-rho-w} \gls{sym-vec-C-d} ~\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t}) |\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t})|
+    \gls{sym-vec-p-d} = \frac{1}{2}\gls{sym-rho-w} \gls{sym-vec-C-d} ~\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t}) |\gls{sym-vec-v-rel} (\gls{sym-y},\gls{sym-t})|
 \end{equation}
 \Cref{eq:drag-pressure-approx} expands the velocity term then applies the describing function approximation:
 \begin{equation}\label{eq:drag-pressure-approx}
@@ -1006,13 +1006,13 @@ These limits depend on the phase of the response, not just the magnitude, so the
                     \exp (i\gls{sym-k-wavenumber}\gls{sym-y})
                     \gls{sym-hat-xi}
                     )
-    < \gls{sym-Delta-z-slam}^2
+    < \gls{sym-dDelta-z-slam}^2
     -\left(
             \frac{\gls{sym-H}}{2}
     \right)^2
 \end{equation}
-for relevant vertical body dimension $\gls{sym-Delta-z-slam}$ and horizontal coordinate $\gls{sym-y}$.
-The values of $\gls{sym-Delta-z-slam}$ used for float and spar in operational and storm cases and the rationale
+for relevant vertical body dimension $\gls{sym-dDelta-z-slam}$ and horizontal coordinate $\gls{sym-y}$.
+The values of $\gls{sym-dDelta-z-slam}$ used for float and spar in operational and storm cases and the rationale
 (avoiding slanted-surface slamming, damping plate surfacing, and related effects)
 are given in \Cref{sec:appendix-slam}.
 
@@ -1184,9 +1184,9 @@ For illustrative purposes only, assuming a fixed maximum stress and considering 
 \subsection{Economics}\label{sec:econ}
 The common economic metric $LCOE$ is calculated as the ratio of annualized expenditures to the annual energy production $AEP$:
 \begin{equation}\label{eq:lcoe}
-    LCOE = \frac{CAPEX\cdot  FCR + OPEX}{AEP}
+    LCOE = \frac{CAPEX\cdot  \gls{acr-fcr} + OPEX}{AEP}
 \end{equation}
-where the numerator consists of the up-front capital expenditure $CAPEX$, annualized via a fixed charge rate $FCR$, plus an annual operational expenditure $OPEX$.
+where the numerator consists of the up-front capital expenditure $CAPEX$, annualized via a fixed charge rate $\gls{acr-fcr}$, plus an annual operational expenditure $OPEX$.
 \ifdefined\DISSERTATION
     The fixed charge rate incorporates the effect of device lifetime as well as a variety of financial values affecting the time-value of money such as tax rate, interest rate, depreciation, and how much of the project is financed with debt (loans) compared to equity (investors).
 \fi

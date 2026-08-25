@@ -177,13 +177,13 @@ With the describing function approximation, the nonlinear time-domain drag equat
 The solution for states $|\gls{sym-vec-hat-dot-xi}|$ and $\angle \gls{sym-vec-hat-dot-xi}$ for a given controller can be obtained either through numerical iteration or analytical solution of the nonlinear equation \eqref{eq:eom}.
 Iteration is chosen here, the same approach used for a frequency-domain drag simulation of floating offshore wind turbines \citep{hall_open-source_2022}.
 MDOcean provides users with two options: to employ a typical nonlinear root-finding algorithm, or to simply use the equation of motion \eqref{eq:eom} to obtain subsequent iterates.
-The latter is a form of fixed point iteration where $\gls{sym-vec-hat-dot-xi}_{\gls{sym-k-generic-index}} = \gls{sym-g}(\gls{sym-vec-hat-dot-xi}_{\gls{sym-k-generic-index}-1})$, where $\gls{sym-g}(\gls{sym-vec-hat-dot-xi})$ is the equation of motion \Cref{eq:eom-freq-domain} and $\gls{sym-k-generic-index}$ is the iteration index.
+The latter is a form of fixed point iteration where $\gls{sym-vec-hat-dot-xi}_{\gls{sym-k-generic-index}} = \gls{sym-f}(\gls{sym-vec-hat-dot-xi}_{\gls{sym-k-generic-index}-1})$, where $\gls{sym-f}(\gls{sym-vec-hat-dot-xi})$ is the equation of motion \Cref{eq:eom-freq-domain} and $\gls{sym-k-generic-index}$ is the iteration index.
 It is therefore guaranteed to converge as long as the dynamics are contracting at the solution, which \citet{chicone_contraction_2006} shows has the following criteria:
 \begin{equation}
  \left|
     \frac{\partial}
     {\partial \gls{sym-vec-hat-dot-xi}}~\left[
-    \gls{sym-g}\left(
+    \gls{sym-f}\left(
         \gls{sym-vec-hat-dot-xi}~
     \right)\right]
 \right| < 1

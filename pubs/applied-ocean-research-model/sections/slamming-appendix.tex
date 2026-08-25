@@ -1,16 +1,16 @@
-In regular waves of height $\gls{sym-H}$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the \gls{acr-wec}, $\gls{sym-xi-t}-\gls{sym-Delta-z-slam}$, with the wave elevation $\gls{sym-zeta-y-t}$, which depends on the horizontal position coordinate $\gls{sym-y}$.
+In regular waves of height $\gls{sym-H}$, the conditions for slamming can be derived by comparing the vertical position of the bottom of the \gls{acr-wec}, $\gls{sym-xi-t}-\gls{sym-dDelta-z-slam}$, with the wave elevation $\gls{sym-zeta-y-t}$, which depends on the horizontal position coordinate $\gls{sym-y}$.
 To prevent slamming, the criteria
 \begin{equation}\label{eq:slamming-time-domain}
 \begin{aligned}
-    \gls{sym-xi-t} - \gls{sym-Delta-z-slam} &< \gls{sym-zeta-y-t} \\
-    |\gls{sym-hat-xi}|\cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-hat-xi}) - \gls{sym-Delta-z-slam} &< \frac{\gls{sym-H}}{2}\cos(\gls{sym-omega} \gls{sym-t} - \gls{sym-k-wavenumber}\gls{sym-y})
+    \gls{sym-xi-t} - \gls{sym-dDelta-z-slam} &< \gls{sym-zeta-y-t} \\
+    |\gls{sym-hat-xi}|\cos(\gls{sym-omega} \gls{sym-t}+\angle \gls{sym-hat-xi}) - \gls{sym-dDelta-z-slam} &< \frac{\gls{sym-H}}{2}\cos(\gls{sym-omega} \gls{sym-t} - \gls{sym-k-wavenumber}\gls{sym-y})
 \end{aligned}
 \end{equation}
 must be true at all times and over all positions where the body could exit the waves, $-\gls{sym-D}/2<\gls{sym-y}<\gls{sym-D}/2$.
 Note that this expression assumes a sinusoidal waveshape but still applies for irregular waves if a wave-by-wave approach \citep{lin_fast_2025} is utilized.
 Manipulating \Cref{eq:slamming-time-domain} to ensure the inequality is satisfied for all $\gls{sym-t}$ yields the criterion:
 \begin{equation}
-|\gls{sym-hat-xi}|^2 - \gls{sym-H}\cos(\gls{sym-k-wavenumber}\gls{sym-y})|\gls{sym-hat-xi}|\cos\angle\gls{sym-hat-xi} + \gls{sym-H}\sin(\gls{sym-k-wavenumber}\gls{sym-y})|\gls{sym-hat-xi}|\sin\angle\gls{sym-hat-xi} < \gls{sym-Delta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\right)^2
+|\gls{sym-hat-xi}|^2 - \gls{sym-H}\cos(\gls{sym-k-wavenumber}\gls{sym-y})|\gls{sym-hat-xi}|\cos\angle\gls{sym-hat-xi} + \gls{sym-H}\sin(\gls{sym-k-wavenumber}\gls{sym-y})|\gls{sym-hat-xi}|\sin\angle\gls{sym-hat-xi} < \gls{sym-dDelta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\right)^2
 \end{equation}
 which is quadratic in $\gls{sym-hat-xi}$ and therefore already in a form suitable for the constrained optimal control procedure described in \Cref{sec:optimal-control,sec:appendix-qp-solution}, once the appropriate worst-case $\gls{sym-y}$ is substituted.
 The remainder of this section develops an explicit expression for the allowable amplitudes under various scenarios and the corresponding worst-case $\gls{sym-y}$.
@@ -20,7 +20,7 @@ Completing the square results in:
         |\gls{sym-hat-xi}|- \frac{\gls{sym-H}}{2}\cos(\angle\gls{sym-hat-xi} + \gls{sym-k-wavenumber}\gls{sym-y})
     \right]^2
     <
-    \gls{sym-Delta-z-slam}^2 - (\gls{sym-H}/2)^2 \sin^2(
+    \gls{sym-dDelta-z-slam}^2 - (\gls{sym-H}/2)^2 \sin^2(
                                                         \angle\gls{sym-hat-xi} + \gls{sym-k-wavenumber}\gls{sym-y}
                                                         )
 \end{equation}
@@ -28,8 +28,8 @@ In general, after taking the square root of \Cref{eq:slamming-squared}, both the
 This yields a maximum and minimum amplitude criteria to prevent slamming, $\gls{sym-xi}_{\text{min},\text{slam}}<|\gls{sym-hat-xi}|<\gls{sym-xi}_{\text{max},\text{slam}}$, with the following values:
 \begin{equation}\label{eq:slamming-min-max}
 \begin{aligned}
-    \gls{sym-xi-max-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta-surf} + \sqrt{\gls{sym-Delta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta-surf}\right)^2 } \\
-    \gls{sym-xi-min-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta-surf} - \sqrt{\gls{sym-Delta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta-surf}\right)^2 }
+    \gls{sym-xi-max-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta-surf} + \sqrt{\gls{sym-dDelta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta-surf}\right)^2 } \\
+    \gls{sym-xi-min-slam} &= \frac{\gls{sym-H}}{2} \cos\gls{sym-theta-surf} - \sqrt{\gls{sym-dDelta-z-slam}^2-\left(\frac{\gls{sym-H}}{2}\sin\gls{sym-theta-surf}\right)^2 }
 \end{aligned}
 \end{equation}
 where $\gls{sym-theta-surf}=\angle\gls{sym-hat-xi} + \gls{sym-k-wavenumber}\gls{sym-y}$ must be evaluated with the value of $\gls{sym-y}$ that creates the minimum value of $\gls{sym-xi}_{\text{max},\text{slam}}$ and the maximum value of $\gls{sym-xi}_{\text{min},\text{slam}}$ to ensure lack of slamming across the entire \gls{acr-wec} surface.
@@ -37,7 +37,7 @@ The relevant value of $\gls{sym-theta-surf}$ differs depending on the wave ampli
 
 %%%%%%%%%%%%%%%
 \subsubsection{Case 1: Small Wave Amplitudes}
-For the case of $\gls{sym-Delta-z-slam} >\gls{sym-H}/2$ (wave amplitudes smaller than the draft), \Cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\gls{sym-hat-xi}|<\gls{sym-xi}_{\text{max},\text{slam}}$ because $\gls{sym-xi}_{\text{min},\text{slam}}<0$.
+For the case of $\gls{sym-dDelta-z-slam} >\gls{sym-H}/2$ (wave amplitudes smaller than the draft), \Cref{eq:slamming-min-max} reduces to only a maximum amplitude criteria $|\gls{sym-hat-xi}|<\gls{sym-xi}_{\text{max},\text{slam}}$ because $\gls{sym-xi}_{\text{min},\text{slam}}<0$.
 This aligns with the intuition that a body fixed at the still water line would not exit the water when the wave amplitude is less than the draft.
 The value of $\gls{sym-theta-surf}$ that minimizes $\gls{sym-xi-max-slam}$ over the relevant range is
 \begin{equation}\label{eq:slamming-limit-small-waves}
@@ -49,9 +49,9 @@ The value of $\gls{sym-theta-surf}$ that minimizes $\gls{sym-xi-max-slam}$ over 
 \end{equation}
 where the symmetry of \Cref{eq:slamming-min-max} has been used to collapse possible values onto $[0,\gls{sym-pi}]$.
 
-This expression reduces to the simple limits $\gls{sym-Delta-z-slam} -\gls{sym-H}/2$ and $\gls{sym-Delta-z-slam} +\gls{sym-H}/2$
+This expression reduces to the simple limits $\gls{sym-dDelta-z-slam} -\gls{sym-H}/2$ and $\gls{sym-dDelta-z-slam} +\gls{sym-H}/2$
 for short wavelengths $(\gls{sym-theta-surf}=\gls{sym-pi})$ and long wavelengths $(\gls{sym-theta-surf}=0)$ respectively.
-These limits are also the minimum and maximum values of $\gls{sym-xi-max-slam}$ for any diameter and wave condition where $\gls{sym-Delta-z-slam} >\gls{sym-H}/2$.
+These limits are also the minimum and maximum values of $\gls{sym-xi-max-slam}$ for any diameter and wave condition where $\gls{sym-dDelta-z-slam} >\gls{sym-H}/2$.
 For intermediate wavelengths, the variable $\gls{sym-theta-surf}$ accurately accounts for the effect of body diameter and the phase offset of body motion from the waves.
 Intuitively, $\gls{sym-theta-surf}$ represents how high up the free surface the bottom of the \gls{acr-wec} is allowed to get before the edge exits the water,
 with $\gls{sym-theta-surf}=0$ allowing the body to get all the way to the wave crest (top)
@@ -59,7 +59,7 @@ and $\gls{sym-theta-surf}=\gls{sym-pi}$ requiring the float to remain fully belo
 
 %%%%%%%%%%%%%%%
 \subsubsection{Case 2: Large Wave Amplitudes}
-In sufficiently large waves ($\gls{sym-H}/2>\gls{sym-Delta-z-slam}$), \Cref{eq:slamming-limit-small-waves} does not apply.
+In sufficiently large waves ($\gls{sym-H}/2>\gls{sym-dDelta-z-slam}$), \Cref{eq:slamming-limit-small-waves} does not apply.
 Intuitively, when the wave amplitude exceeds the draft, a minimum amplitude of motion in-phase with the incident wave is required to prevent the wave trough from going below the body surface.
 The minimum amplitude arises mathematically when $\gls{sym-xi}_{\text{min},\text{slam}}>0$, which occurs exactly for waves meeting the amplitude criterion.
 The ``in-phase'' motion requirement is consistent with the observation that in this wave regime, the maximum amplitude in \Cref{eq:slamming-min-max} becomes unsatisfiable ($\gls{sym-xi}_{\text{max},\text{slam}}<0$) for \gls{acr-wec} phases that are more than 90 degrees out of phase with the incident wave ($\gls{sym-theta-surf} \\text{in} [\gls{sym-pi}/2,3\gls{sym-pi}/2]$).
@@ -77,7 +77,7 @@ The following requirement on $\gls{sym-D}$ ensures that there exist some values 
     \gls{sym-k-wavenumber}\gls{sym-D}
     <
     2\arcsin\left(
-                    \frac{\gls{sym-Delta-z-slam}}{\gls{sym-H}/2}
+                    \frac{\gls{sym-dDelta-z-slam}}{\gls{sym-H}/2}
             \right)
 \end{equation}
 which has upper bound $\gls{sym-k-wavenumber}\gls{sym-D}<\gls{sym-pi}$.
@@ -88,7 +88,7 @@ Once \Cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\gls{sym-ha
                                     0,
                                     ~~
                                     \arcsin\left(
-                                                \frac{\gls{sym-Delta-z-slam}}
+                                                \frac{\gls{sym-dDelta-z-slam}}
                                                      {\gls{sym-H}/2}
                                            \right)
                                     -\frac{
@@ -98,7 +98,7 @@ Once \Cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\gls{sym-ha
                                \right]
     \cup \left[
                 2\gls{sym-pi}-\arcsin\left(
-                                            \frac{\gls{sym-Delta-z-slam}}
+                                            \frac{\gls{sym-dDelta-z-slam}}
                                                  {\gls{sym-H}/2}
                                      \right)
                 +\frac{
@@ -112,7 +112,7 @@ Once \Cref{eq:D-slamming} is satisfied, the set of acceptable $\angle\gls{sym-ha
 At the edge-case $\angle\gls{sym-hat-xi}$ on the inner boundaries of this interval,
 only a single amplitude is permitted because the values for
 $\gls{sym-xi}_{\text{max},\text{slam}}$ and $\gls{sym-xi}_{\text{min},\text{slam}}$
-coincide at $\sqrt{(\gls{sym-H}/2)^2-\gls{sym-Delta-z-slam} ^2}$.
+coincide at $\sqrt{(\gls{sym-H}/2)^2-\gls{sym-dDelta-z-slam} ^2}$.
 At any lower amplitude, the \gls{acr-wec} would exit the water at the wave trough,
 and any higher, the \gls{acr-wec} would raise out of the water at the wave crest.
 The permissible amplitude range can be widened by decreasing $\gls{sym-D}$
@@ -122,17 +122,17 @@ The widest permissible amplitude range occurs when the \gls{acr-wec} is perfectl
 and is small with respect to the wavelength
 ($\gls{sym-k-wavenumber}\gls{sym-D}\approx0$),
 which yields the limits
-$\gls{sym-H}/2-\gls{sym-Delta-z-slam} < |\gls{sym-hat-xi}| < \gls{sym-H}/2+\gls{sym-Delta-z-slam}$.
+$\gls{sym-H}/2-\gls{sym-dDelta-z-slam} < |\gls{sym-hat-xi}| < \gls{sym-H}/2+\gls{sym-dDelta-z-slam}$.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Implementation}
 \Cref{fig:slam} visualizes the nondimensional maximum and minimum slamming amplitudes
 $\gls{sym-xi-max-slam}/(\gls{sym-H}/2)$ and $\gls{sym-xi-min-slam}/(\gls{sym-H}/2)$
 as a function of the worst-case phase angle $\gls{sym-theta-surf}$
-and the draft to wave amplitude ratio $\gls{sym-Delta-z-slam} /(\gls{sym-H}/2)$.
+and the draft to wave amplitude ratio $\gls{sym-dDelta-z-slam} /(\gls{sym-H}/2)$.
 This reveals that besides increasing the draft, decreasing $\gls{sym-theta-surf}$ can prevent slamming,
 for example by decreasing the diameter or adjusting $\angle \gls{sym-xi}$ via control.
-If $\gls{sym-Delta-z-slam} <\gls{sym-H}/2|\sin\gls{sym-theta-surf}|$,
+If $\gls{sym-dDelta-z-slam} <\gls{sym-H}/2|\sin\gls{sym-theta-surf}|$,
 the design is unviable and the slamming limits are undefined,
 consistent with the negative right hand side of \Cref{eq:slamming-squared} discussed above.
 \begin{figure}[htbp]
@@ -147,24 +147,24 @@ While preventing slamming requires that the bottom of the \gls{acr-wec} remains 
 preventing submersion requires that the top of the \gls{acr-wec} remains above the free surface.
 Analogous to \eqref{eq:slamming-time-domain}, we obtain:
 \begin{equation}\label{eq:submersion}
-    \gls{sym-xi-t} + \gls{sym-Delta-z-sub} > \gls{sym-zeta-y-t}
+    \gls{sym-xi-t} + \gls{sym-dDelta-z-sub} > \gls{sym-zeta-y-t}
 \end{equation}
 
 Conceptually, both the slamming requirement \eqref{eq:slamming-time-domain} and the submersion requirement \eqref{eq:submersion} must be applied to both the float and the spar for a total of 4 free surface constraints for each sea state.
 However, the limit on $|\gls{sym-hat-xi-f}-\gls{sym-hat-xi-s}|$ described in \Cref{tab:DLCs} already ensures that the top of the spar remains above the top of the float across all dynamic conditions.
 Coupled with the fact that the float diameter always exceeds the spar diameter, this means that satisfaction of the float submersion requirement implies automatic satisfaction of the spar submersion requirement.
 While this logic works for submersion, it does not apply for slamming because the damping plate diameter may exceed the float diameter.
-The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\gls{sym-Delta-z-surf}=\\text{min}(\gls{sym-Delta-z-sub}, \gls{sym-Delta-z-slam} )$, where the values for $\gls{sym-Delta-z-sub} $ and $\gls{sym-Delta-z-slam}$ were given in \Cref{sec:dynamics}.
+The remaining three free surface constraints are aggregated into a single constraint for each sea state, using the minimum z-dimension for each body $\gls{sym-dDelta-z-surf}=\\text{min}(\gls{sym-dDelta-z-sub}, \gls{sym-dDelta-z-slam} )$, where the values for $\gls{sym-dDelta-z-sub} $ and $\gls{sym-dDelta-z-slam}$ were given in \Cref{sec:dynamics}.
 This reduces the number of free surface constraints per sea state from four to one.
 
-For operational waves, the vertical dimension $\gls{sym-Delta-z-surf}$ in \Cref{eq:slam-constraint-quadratic} is set as follows.
-For float slamming, $\gls{sym-Delta-z-surf} = \gls{sym-T-f-1}$ (rather than $\gls{sym-T-f-2}$):
+For operational waves, the vertical dimension $\gls{sym-dDelta-z-surf}$ in \Cref{eq:slam-constraint-quadratic} is set as follows.
+For float slamming, $\gls{sym-dDelta-z-surf} = \gls{sym-T-f-1}$ (rather than $\gls{sym-T-f-2}$):
 this prevents slamming on the slanted underside of the float and additionally maintains constant waterplane area,
 avoiding unmodeled nonlinearities in the hydrostatic stiffness and Froude-Krylov excitation force.
-For spar slamming, $\gls{sym-Delta-z-surf} = \gls{sym-T-s} - \gls{sym-h-d}$
+For spar slamming, $\gls{sym-dDelta-z-surf} = \gls{sym-T-s} - \gls{sym-h-d}$
 prevents both slamming on the bottom of the spar and surfacing of the damping plate.
 For float and spar submersion,
-$\gls{sym-Delta-z-surf}$
+$\gls{sym-dDelta-z-surf}$
 is set to the above-water heights
 $\gls{sym-h-f} - \gls{sym-T-f-2}$
 and
@@ -173,7 +173,7 @@ respectively.
 
 The storm case slamming constraint is not currently applied.
 A future extension should set
-$\gls{sym-Delta-z-surf} = \gls{sym-T-f-2}$
+$\gls{sym-dDelta-z-surf} = \gls{sym-T-f-2}$
 in the storm case to prevent slamming on the (now-merged) bottom surface of the float-spar system.
 
 The amplitude limits

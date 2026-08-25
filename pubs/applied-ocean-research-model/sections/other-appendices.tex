@@ -6,10 +6,10 @@
 As \Cref{sec:hydro-other} introduces, because of the importance of the damping plate, the spar hydrodynamic coefficients do utilize other methods besides \gls{acr-meem}.
 We approximate the spar added mass coefficient $\gls{sym-A-s}$ as a frequency-independent quantity using a formula that \citet{philip_damping_2012} proposes based on the displaced water volume in the spherical projection of the damping plate:
 \begin{equation}\label{eq:As}
- \gls{sym-A-s} =\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3\left(1 - \frac{3}{4}\gls{sym-r}^2\sqrt{1-\gls{sym-r}^2} - \frac{1}{4}(1-\sqrt{1-\gls{sym-r}^2})^2(2+\sqrt{1-\gls{sym-r}^2})\right),
+ \gls{sym-A-s} =\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3\left(1 - \frac{3}{4}\gls{sym-sigma-ratio}^2\sqrt{1-\gls{sym-sigma-ratio}^2} - \frac{1}{4}(1-\sqrt{1-\gls{sym-sigma-ratio}^2})^2(2+\sqrt{1-\gls{sym-sigma-ratio}^2})\right),
 \end{equation}
-where $\gls{sym-r} = \gls{sym-D-s}/\gls{sym-D-d}$.
-This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3$ at $\gls{sym-r}=0$) to a pure column limit ($\frac{1}{6}\gls{sym-rho-w} \gls{sym-D-d}^3$ at $\gls{sym-r}=1$).
+where $\gls{sym-sigma-ratio} = \gls{sym-D-s}/\gls{sym-D-d}$.
+This expression smoothly transitions from a pure plate limit ($\frac{1}{3}\gls{sym-rho-w} \gls{sym-D-d}^3$ at $\gls{sym-sigma-ratio}=0$) to a pure column limit ($\frac{1}{6}\gls{sym-rho-w} \gls{sym-D-d}^3$ at $\gls{sym-sigma-ratio}=1$).
 \ifdefined\DISSERTATION
     The trend is shown in \figureautorefname~\ref{fig:spar_added_mass}.
     \begin{figure}
@@ -75,7 +75,7 @@ This section provides supplementary derivations and implementation details for t
 \input{sections/slamming-appendix}
 
 %%%%%%%%%%%%%%%
-\subsection{Conservatism of the Fundamental-Amplitude Approximation for Fluid Forces}
+\subsection{Conservatism of the Fundamental-Amplitude Approximation}
 \label{sec:appendix-peak-fluid-force}
 
 \Cref{eq:peak-fluid-force} approximates the peak fluid force by the magnitude of its fundamental harmonic phasor.
@@ -400,7 +400,7 @@ To analyze these compound sections, equivalent properties can be established tha
     \label{fig:stiffened-plate}
 \end{figure}
 
-Specifically, the equivalent thickness of the plate $\gls{sym-t-eq}$ is derived by equating the stiffened section'\gls{sym-s} second moment of area per unit width with that of a uniform section:
+Specifically, the equivalent thickness of the plate $\gls{sym-t-eq}$ is derived by equating the stiffened section's second moment of area per unit width with that of a uniform section:
 \begin{equation}
     \int \gls{sym-z}^2dz = \frac{\gls{sym-t-eq}^3}{12}
 \end{equation}
@@ -475,9 +475,9 @@ short trapezoids ($\gls{sym-h-0}<\gls{sym-b-1})$ to have $x_{\text{min}}=\gls{sy
 tall trapezoids ($\gls{sym-h-0}\gg \gls{sym-b-2}$) to have $x_{\text{min}}=\gls{sym-b-1}$,
 and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
 The nominal \gls{acr-rm3} design falls into this intermediate case,
-with $\gls{sym-b-1}\approx1.7$~\gls{sym-m},
-$\gls{sym-b-2}\approx5.2$~\gls{sym-m},
-and $\gls{sym-h-0}\approx6.8$~\gls{sym-m}.
+with $\gls{sym-b-1}\approx1.7$~m,
+$\gls{sym-b-2}\approx5.2$~m,
+and $\gls{sym-h-0}\approx6.8$~m.
 These dimensions are shown in \Cref{fig:trapezoid}.
 
 \begin{figure}[htbp]
@@ -492,30 +492,30 @@ This inscribed circle scheme satisfies all limit cases mentioned above and can b
 \begin{equation}
     \gls{sym-x-min} =
     \begin{cases}
-        \gls{sym-b-1} \left( \gls{sym-m} + \sqrt{1+\gls{sym-m}^2}\right), & \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+        \gls{sym-b-1} \left( \gls{sym-m-trap} + \sqrt{1+\gls{sym-m-trap}^2}\right), & \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
         \\
         \gls{sym-h-0}, & \gls{sym-h-0} < \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
     \end{cases}
 \end{equation}
-where $\gls{sym-m}=(\gls{sym-b-2}-\gls{sym-b-1})/(2\gls{sym-h-0})$ is the slope of the trapezoid.
+where $\gls{sym-m-trap}=(\gls{sym-b-2}-\gls{sym-b-1})/(2\gls{sym-h-0})$ is the slope of the trapezoid.
 The expression is continuous at $\gls{sym-h-0}=\sqrt{\gls{sym-b-1}\gls{sym-b-2}}$, the point where the inscribed circle becomes tangent to base $\gls{sym-b-2}$ in addition to $\gls{sym-b-1}$.
 Continuity of the model across the design space avoids problems in the gradient-based optimization due to undefined gradients.
-The inscribed circle model gives $\gls{sym-x-min}\approx2.2$~\gls{sym-m} for the nominal float design.
+The inscribed circle model gives $\gls{sym-x-min}\approx2.2$~m for the nominal float design.
 In addition to the shorter side length $\gls{sym-x-min}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $\gls{sym-x-max}$, which for the trapezoid is taken as
 \begin{equation}
     \gls{sym-x-max} =
     \begin{cases}
         \gls{sym-h-0},& \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
         \\
-        \frac{\gls{sym-b-1}+\gls{sym-b-2}}{2} + \gls{sym-h}(1-\sqrt{1+\gls{sym-m}^2}), & \gls{sym-h-0} < \sqrt{\gls{sym-b-1} \gls{sym-b-2}}
+        \frac{\gls{sym-b-1}+\gls{sym-b-2}}{2} + \gls{sym-h}(1-\sqrt{1+\gls{sym-m-trap}^2}), & \gls{sym-h-0} < \sqrt{\gls{sym-b-1} \gls{sym-b-2}}
     \end{cases}
 \end{equation}
 using a similar inscribed circle scheme to maintain continuity.
 
 \subsubsection{Float Bottom Plate}
-Under a distributed pressure $\gls{sym-q}$, the bottom plate maximum moment per unit length is then:
+Under a distributed pressure $\gls{sym-q-pressure}$, the bottom plate maximum moment per unit length is then:
 \begin{equation}\label{eq:bottom-plate-moment}
-\gls{sym-M-bot}=\gls{sym-beta-plate-0} \gls{sym-q} \gls{sym-x-min}^2
+\gls{sym-M-bot}=\gls{sym-beta-plate-0} \gls{sym-q-pressure} \gls{sym-x-min}^2
 \end{equation}
 for $\gls{sym-beta-plate-0}$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
 While the simulation utilizes the real $\gls{sym-beta-plate-0}$, constant $\gls{sym-beta-plate-0}$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\gls{sym-beta-plate-0}$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
@@ -620,7 +620,7 @@ The spar factor of safety $FOS$ to prevent yield and global buckling under the c
                                         {2}
             }
             {
-                \frac{\gls{sym-F-heave}}{\gls{sym-A}} + \gls{sym-q}
+                \frac{\gls{sym-F-heave}}{\gls{sym-A}} + \gls{sym-q-pressure}
             }
 \end{equation}
 where $\gls{sym-zeta-s}$ and $\gls{sym-omega-s}$ are defined as follows:
@@ -654,13 +654,13 @@ where $\gls{sym-zeta-s}$ and $\gls{sym-omega-s}$ are defined as follows:
 and the hoop stress $\gls{sym-sigma-theta}$ is
 \begin{equation}
      \gls{sym-sigma-theta} = \frac{
-                                    \gls{sym-q}\gls{sym-D-s}
+                                    \gls{sym-q-pressure}\gls{sym-D-s}
                                   }
                                   {
                                     2~\gls{sym-t-s-r}
                                   }
 \end{equation}
-$\gls{sym-P-r}$ is a constant and $\gls{sym-q}$ is the distributed hydrostatic pressure at the bottom of the spar.
+$\gls{sym-P-r}$ is a constant and $\gls{sym-q-pressure}$ is the distributed hydrostatic pressure at the bottom of the spar.
 These equations assume that the spar is compact,
 meaning that local buckling of the tube as a plate element is not a concern \citep{american_bureau_of_shipping_requirements_2022}.
 %These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}.
@@ -696,8 +696,8 @@ meaning that local buckling of the tube as a plate element is not a concern \cit
 
 \begin{tabular}{cP{0.35\linewidth}P{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
-$\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$\gls{sym-m}^3$  \\ 
-$\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$\gls{sym-s}^2$  \\ 
+$\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$m^3$  \\ 
+$\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
 $\gls{sym-h}$& Water depth & 100 & m  \\ 
 \gls{acr-jpd}& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
 $\gls{sym-H-s}$ & Significant wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
@@ -705,7 +705,7 @@ $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 1
 $\gls{sym-T-e}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
 $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\gls{sym-sigma-Y}$ & Material yield strength& 248 & MPa  \\ 
-$\gls{sym-rho-M}$ & Material density& 7850 & kg/$\gls{sym-m}^3$  \\ 
+$\gls{sym-rho-M}$ & Material density& 7850 & kg/$m^3$  \\ 
 $\gls{sym-E}$& Material Young's modulus& 200 & GPa  \\ 
 $\text{cost}_{\gls{sym-M}}$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 
@@ -716,7 +716,7 @@ $\text{cost}_{\gls{sym-M}}$ & Material cost& 1.89 & \$/kg \\
 %$B_{\text{min}}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
 $FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
 $D_{d_{\text{min}}}$ & Minimum damping plate diameter & 30 & m  \\ 
-$FCR$ & Fixed charge rate& 10.8 & \%  \\ 
+$\gls{acr-fcr}$ & Fixed charge rate& 10.8 & \%  \\ 
 $\gls{sym-N-WEC}$ & Number of \glspl{acr-wec} in array& 100 & -  \\ 
 $\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\ 
 $\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 

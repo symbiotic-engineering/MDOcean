@@ -597,7 +597,7 @@ $ \\ \hline
 \int_{-\gls{sym-h}}^{-\gls{sym-d-2}} \gls{sym-phi-p}^{i2} \gls{sym-vec-Z-m-i2}^{~\top} dz
 $\\ \hline
          M& $\displaystyle
-\int_{-\gls{sym-h}}^{-\gls{sym-d-1}} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-p}^{i1}\gls{sym-vec-Z-m-i2}^{i2~\top} dz - \int_{-\gls{sym-h}}^{-\gls{sym-d-2}}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-p}^{i2}\gls{sym-vec-Z-m-i2}^{~\top} dz
+\int_{-\gls{sym-h}}^{-\gls{sym-d-1}} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-p}^{i1}\gls{sym-vec-Z-m-i2}^{~\top} dz - \int_{-\gls{sym-h}}^{-\gls{sym-d-2}}\frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-p}^{i2}\gls{sym-vec-Z-m-i2}^{~\top} dz
 $\\ \hline
          K& $\displaystyle
 \int_{-\gls{sym-h}}^{-\gls{sym-d-2}} \frac{\partial}{\partial \gls{sym-r}}\gls{sym-phi-p}^{i2} \vec{\gls{sym-Z}}_{\gls{sym-k-index}}^{e~\top} dz
@@ -769,10 +769,10 @@ There, damping converges well at low frequencies but requires more harmonics at 
 
 \subsection{Numerical Notes}\label{sec:appendix-meem-numerics}
 Note that radial eigenfunctions $\gls{sym-R-1n-i1}(\gls{sym-r})$ and $\gls{sym-R-1m-i2}(\gls{sym-r})$ contain the modified Bessel function of the first kind $\gls{sym-mathrm-I-0}(\gls{sym-chi-bessel})$, which diverges for $\gls{sym-chi-bessel}\rightarrow \infty$, resulting in numeric overflow.
-To prevent overflow, each fluid region must exceed a minimum height $\gls{sym-Delta-z-min}$ that is proportional to the region diameter $\gls{sym-D}$ for both the spar ($\gls{sym-Delta-z-s}, \gls{sym-D-s}$) and the float ($\gls{sym-Delta-z-f}, \gls{sym-D-f}$), with variables shown in \Cref{fig:meem-geom}.
-The constant of proportionality between $\gls{sym-Delta-z-min}$ and $\gls{sym-D}$ is a function of the number of harmonics $\gls{sym-N-harmonics}$ used in that region ($\gls{sym-N}$ for spar, $\gls{sym-M}$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\gls{sym-chi-max}$:
+To prevent overflow, each fluid region must exceed a minimum height $\gls{sym-dDelta-z-min}$ that is proportional to the region diameter $\gls{sym-D}$ for both the spar ($\gls{sym-dDelta-z-s}, \gls{sym-D-s}$) and the float ($\gls{sym-dDelta-z-f}, \gls{sym-D-f}$), with variables shown in \Cref{fig:meem-geom}.
+The constant of proportionality between $\gls{sym-dDelta-z-min}$ and $\gls{sym-D}$ is a function of the number of harmonics $\gls{sym-N-harmonics}$ used in that region ($\gls{sym-N}$ for spar, $\gls{sym-M}$ for float), as well as the maximum argument to the \texttt{besseli} function in MATLAB before overflow, $\gls{sym-chi-max}$:
 \begin{equation}\label{eq:delta-z-min}
-    \frac{\gls{sym-Delta-z-min}}{\gls{sym-D}} = \frac{\gls{sym-pi}\gls{sym-N-harmonics}}{2\gls{sym-chi-max}} \approx \frac{\gls{sym-N-harmonics}}{446}.
+    \frac{\gls{sym-dDelta-z-min}}{\gls{sym-D}} = \frac{\gls{sym-pi}\gls{sym-N-harmonics}}{2\gls{sym-chi-max}} \approx \frac{\gls{sym-N-harmonics}}{446}.
 \end{equation}
 By trial, $\gls{sym-chi-max}$ is found to be $\approx 700.5$, close to the theoretical value of \texttt{log (realmax)} $\approx 709.8$ for exponential scaling.
 Since $\gls{sym-N-harmonics}=10$ gives adequate convergence for most geometries, this condition is trivially satisfied for nearly all floating bodies of practical relevance, but must still be added as a constraint to prevent the optimizer from exploiting the numerical divergence.

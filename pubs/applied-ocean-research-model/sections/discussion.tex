@@ -192,7 +192,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
 
 \ifdefined\DISSERTATION
     Besides $\gls{sym-D-f}$, the other design variable displaying a non-monotonic relationship with $LCOE$ is the force limit $F_{\text{max}}$, with an optimal at around half the nominal force limit.
-    Together, these insights inform the selection of the starting design for optimization, $\gls{sym-vec-x-o}$.
+    Together, these insights inform the selection of the starting design for optimization, $\gls{sym-vec-x-0}$.
     The \gls{acr-oat} sweep also does not reveal any multimodality in the objectives, a promising sign that only a limited number of multi-starts may be necessary, although objective multimodality could still exist in other parts of the design space.
     Finally, the \gls{acr-oat} design sweep shows the highly constrained nature of the problem, with large regions of the design space infeasible.
     In particular, the feasible region $1.3<\gls{sym-D-f}/\gls{sym-D-f-nom}<2.1$ is an ``island'' in the feasible design space, separated from the other feasible points at $\gls{sym-D-f}/\gls{sym-D-f-nom}<1 $ by the damping plate fatigue constraint.
@@ -300,20 +300,20 @@ When constraints are active, the optimal $|\gls{sym-Gamma-beta-opt}|>0$ represen
 The result is:
 \begin{equation}\label{eq:power-double-sum-main}
 \begin{aligned}
-    \overline{\gls{sym-overline-P-elec}}_{elec} =~&\overline{\gls{sym-overline-P-elec}}_{elec,0}
+    \gls{sym-overline-P-elec} =~& \gls{sym-overline-P-elec}_{,0}
     - \gls{sym-eta} \sum_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}
     \left[ 
-        \sqrt{\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(b_{\mu})}
+        \sqrt{\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu})}
         ~+ \right. \\
-        & \left. \textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(b_{\mu}, b_{\nu})
+        & \left. \textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu}, \gls{sym-b-nu})
     \right.+
      \\
     &\left.
-        \left(\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(b_{\mu}) + \textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(b_{\nu})\right)
-        \sqrt{\textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(b_{\mu}, b_{\nu})}~
+        \left(\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu}) + \textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-nu})\right)
+        \sqrt{\textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}(\gls{sym-b-mu}, \gls{sym-b-nu})}~
     \right]
 \end{aligned}\end{equation}
-where $\overline{\gls{sym-overline-P-elec}}_{\text{elec},0}$ is the unconstrained power and $\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}$, $\textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}$ are affine and quadratic functions of $\gls{sym-b-mu}$ and $\gls{sym-b-nu}$, respectively.
+where $\gls{sym-overline-P-elec}_{,0}$ is the unconstrained power and $\textrm{aff}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}$, $\textrm{quad}_{\gls{sym-mu}\gls{sym-nu}\gls{sym-beta}}$ are affine and quadratic functions of $\gls{sym-b-mu}$ and $\gls{sym-b-nu}$, respectively.
 $\gls{sym-mu}$ and $\gls{sym-nu}$ are constraint indices, expanded in \Cref{sec:appendix-constraint-sensitivity}.
 
 Under conditions derived in \Cref{sec:appendix-constraint-sensitivity}, this scaling law is convex in the constraint coefficients $\gls{sym-b-mu}$.
@@ -323,9 +323,9 @@ The scaling law also displays coupling in the constraint variables: the effect o
 This illustrates the importance of a multidisciplinary optimization considering all interactions, rather than a sequential optimization that optimizes one subsystem at a time holding the others fixed.
 
 \paragraph{\gls{acr-lcoe} Drivers}
-To better see the dependence of \gls{acr-lcoe} on design for a fixed $\gls{sym-N-WEC}$ and $FCR$, one can divide out the constant factors from \Cref{eq:lcoe}, leaving normalized price constants $\gls{sym-p-prime-star}$:
+To better see the dependence of \gls{acr-lcoe} on design for a fixed $\gls{sym-N-WEC}$ and $\gls{acr-fcr}$, one can divide out the constant factors from \Cref{eq:lcoe}, leaving normalized price constants $\gls{sym-p-prime-star}$:
 \begin{equation}\label{eq:LCOE-scale}
-  LCOE = \frac{
+  \gls{acr-lcoe} = \frac{
     \gls{sym-p-prime-F} \gls{sym-F-max} + \gls{sym-p-prime-P}\gls{sym-P-max} + \gls{sym-p-prime-s} \gls{sym-V-struct} + \gls{sym-p-prime-0}
     }{\gls{sym-overline-P-elec}}
 \end{equation}

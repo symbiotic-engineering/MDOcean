@@ -23,7 +23,7 @@ For the single-objective formulation, the optimization minimizes the levelized c
     First, because \gls{acr-lcoe} balances the device's lifetime cost with its lifetime energy production, it only measures economic viability if each Joule generated has equal value.
     On real grids, the value of electricity varies temporally and spatially, especially with growing electrification \citep{akdemir_opportunities_2023,bhattacharya_timing_2021,pennock_temporal_2022},
     so capturing nonuniform sources of \gls{acr-wec} value such as consistency or complementarity would require modifications (e.g.\ those proposed by \citet{mccabe_system_2023}) outside the scope of the present model.
-    Second, \gls{acr-lcoe} has high uncertainty for early-stage designs: the economic model assumes only structural and \gls{acr-pto} costs scale with design \citep{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($FCR$) could influence the optimal design.
+    Second, \gls{acr-lcoe} has high uncertainty for early-stage designs: the economic model assumes only structural and \gls{acr-pto} costs scale with design \citep{mccabe_development_2026}, so changes to fixed cost components or the fixed charge rate ($\gls{acr-fcr}$) could influence the optimal design.
     Third, \gls{acr-lcoe} has limited relevance for the off-grid and micro-grid use cases such as offshore aquaculture, autonomous underwater vehicle charging, ocean data collection, that have grown popular since the 2019 launch of the \gls{acr-doe}'s ``\gls{acr-pbe}'' initiative \citep{livecchi_powering_2019}.
     For a fixed power requirement, only cost reduction (not power increase) drives value, and some applications such as ocean observation are not financed at all, making the fixed charge rate obsolete \citep{jenne_powering_2021}.
     
@@ -91,19 +91,19 @@ Constraints are the most common but not the only enforcement mechanism.
   \requirement{positive_net_power}&$P_{\text{avg}}>0$& Positive net power& 2&Nonlin. ineq. constraint $g_{NL,14}$\\
   \hline
   \requirement{clearance_static}& $\gls{sym-h-fs-clear}>0$& Float spar tube clearance (static)& 3&Design variable bound\\
-  \requirement{tops_static}&$h_{fs,\text{up}}>0$& Float spar tops (static)& 3&Lin. ineq. constraint $g_{L,4}$\\
-  \requirement{base_static}& $h_{fs,\text{down}}>0$& Float spar base (static)& 3&Lin. ineq. constraint $g_{L,3}$\\
+  \requirement{tops_static}&\gls{sym-h-fs-up}>0& Float spar tops (static)& 3&Lin. ineq. constraint $g_{L,4}$\\
+  \requirement{base_static}& \gls{sym-h-fs-down}>0& Float spar base (static)& 3&Lin. ineq. constraint $g_{L,3}$\\
   \requirement{damping_plate_thickness}& $\gls{sym-t-d} < \gls{sym-h-d}$& Maximum damping plate thickness & 3 & Lin. ineq. constraint $g_{L,7}$\\
   \requirement{float_stiffener_height}& $\gls{sym-h-stiff-f} < \gls{sym-h-f} / 2$& Maximum float stiffener height& 3 &Lin. ineq. constraint $g_{L,8}$\\
-  \requirement{tops_dynamic}&$h_{fs,\text{up}}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
-  \requirement{base_dynamic}& $h_{fs,\text{down}}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
+  \requirement{tops_dynamic}&\gls{sym-h-fs-up}>|\gls{sym-xi-f}-\gls{sym-xi-s}|& Float spar tops (dynamics)& 3&Nonlin. ineq. constraint $g_{NL,19}$\\
+  \requirement{base_dynamic}& \gls{sym-h-fs-down}>|\gls{sym-xi-f}-\gls{sym-xi-s}|& Float spar base (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,20}$\\
   \requirement{clearance_dynamic}& $\gls{sym-h-fs-clear}>|\gls{sym-xi-f}-\gls{sym-xi-s}|$& Float spar tube clearance (dynamic)& 3&Nonlin. ineq. constraint $g_{NL,21}$\\
   \requirement{linear_amplitude}& $\gls{sym-xi-lin}>|\gls{sym-xi-f}|$& Float amplitude (linearity)& 3&Nonlin. ineq. constraint $g_{NL,22}$\\
-  \requirement{slam_amplitude}& $\xi_{\text{slam}}>|\gls{sym-xi-f}|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
-  \requirement{float_hydrostatics}&$V_{f,\text{struct},\text{min}} < V_{f,\text{struct}} < V_{f,\text{struct},\text{max}}$& Float hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
-  \requirement{spar_hydrostatics}&$V_{s,\text{struct},\text{min}} < V_{s,\text{struct}} < V_{s,\text{struct},\text{max}}$& Spar hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
+  \requirement{slam_amplitude}& $\gls{sym-xi-slam}>|\gls{sym-xi-f}|$& Float amplitude (slamming)& 3&Nonlin. ineq. constraint $g_{NL,23}-g_{NL,239}$\\
+  \requirement{float_hydrostatics}&$V_{f,\text{struct},\text{min}} < \gls{sym-V-f-struct} < V_{f,\text{struct},\text{max}}$& Float hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,1}-g_{NL,2}$\\
+  \requirement{spar_hydrostatics}&$V_{s,\text{struct},\text{min}} < \gls{sym-V-s-struct} < V_{s,\text{struct},\text{max}}$& Spar hydrostatics& 3&Nonlin. ineq. constraints $g_{NL,3}-g_{NL,4}$\\
   \requirement{FOS}&$FOS > FOS_{\text{min}}$& Structural factors of safety& 3&Nonlin. ineq. constraints $g_{NL,6}-g_{NL,13}$\\
-  \requirement{GM}&$GM > 0$& Metacentric height (pitch stability)& 3&Nonlin. ineq. constraint $g_{NL,5}$\\
+  \requirement{GM}&$\gls{sym-GM} > 0$& Metacentric height (pitch stability)& 3&Nonlin. ineq. constraint $g_{NL,5}$\\
   \requirement{force_max}&$\gls{sym-F-p} = \gls{sym-F-max}$& Maximum powertrain force& 3&Nonlin. ineq. constraint $g_{NL,16}-g_{NL,17}$\\
   \requirement{P_max}&$\gls{sym-p-pk-VI} = \gls{sym-P-max}$& Maximum powertrain power& 3&Nonlin. ineq. constraint $g_{NL,18}$\\
   \requirement{LCOE}&$LCOE<LCOE_{\text{max}}$& Maximum LCOE& 3&Nonlin. ineq. constraint $g_{NL,15}$\\
@@ -244,7 +244,7 @@ $\text{cost}_m$ & Material cost& 1.89 & \$/kg \\
 %$B_{\text{min}}$ & Minimum Buoyancy Ratio & 1 & -  \\ 
 $FOS_{\text{min}}$ & Minimum factor of safety& 1.5 & -  \\ 
 $\gls{sym-D-d-min}$ & Minimum damping plate diameter & 30 & m  \\ 
-$FCR$ & Fixed charge rate& 10.8 & \%  \\ 
+$\gls{acr-fcr}$ & Fixed charge rate& 10.8 & \%  \\ 
 $N_{WEC}$ & Number of \glspl{acr-wec} in array& 100 & -  \\ 
 $\gls{sym-D-d}/{\gls{sym-D-s}}$ & Normalized damping plate diameter & 5 & -  \\ 
 $\gls{sym-T-s}/{\gls{sym-D-s}}$ & Normalized spar draft& 5.83 & -  \\ 
