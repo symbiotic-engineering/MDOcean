@@ -1,6 +1,12 @@
 # Changelog
 ## Unreleased
 
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-25
+### Added
+- Dissertation: add name of all undergrads I've mentored in acknowledgements
+### Fixed
+- Paper: a few misc formatting and notation errors
+
 ## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
 ### Fixed
 - Sensitivities: rename mixed-up param sens figures (manually, since the root cause is still unknown)
