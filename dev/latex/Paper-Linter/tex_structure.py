@@ -260,6 +260,8 @@ def in_list(line):
 def in_equation(line):
     if "equation" in in_env and in_env["equation"][line]:
         return True
+    if "multline" in in_env and in_env["multline"][line]:
+        return True
     if "align" in in_env and in_env["align"][line]:
         return True
     if "align*" in in_env and in_env["align*"][line]:

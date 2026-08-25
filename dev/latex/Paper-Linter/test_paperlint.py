@@ -268,6 +268,29 @@ def test_theorem_prose_not_treated_as_equation_context():
     assert ts.in_equation(4) is True
 
 
+def test_multline_is_treated_as_equation_context_for_symbol_replacement():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "main.tex"
+        path.write_text(
+            "\\begin{multline}\n"
+            "x + y = z\\\\\n"
+            "\\end{multline}\n"
+        )
+
+        ts.next_file(str(path))
+        ts.preprocess()
+        replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+        updated, count = gs.replace_glossary_refs_in_line(
+            ts.tex_lines[1],
+            replacements,
+            equation_line=ts.in_equation(1),
+        )
+
+    assert ts.in_equation(1) is True
+    assert updated == r"\gls{sym-x} + y = z\\"
+    assert count == 1
+
+
 def test_acronym_replacement_does_not_modify_includegraphics_body():
     acronym_replacements = [
         ("wec", r"\gls{acr-wec}"),
