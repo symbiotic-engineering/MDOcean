@@ -294,13 +294,17 @@ The original WEC pseudo-spectral formulation by \citet{bacelli_numerical_2015} c
 
 Even more computational benefits, and the novel aspect of the QLPS approach, appear when two more assumptions are enforced.
 \assumption{no-freq-coupling} and \assumption{no-dof-coupling} require that the system has \textbf{no dynamic coupling between different frequencies and different control DOFs} respectively.
-\asmpref{no-freq-coupling} is satisfied as a result of \asmpref{waves-narrow-band} (narrow-band waves),
-and \asmpref{no-dof-coupling} is satisfied because the RM3 contains only a single controlled DOF.
+\asmpref{no-freq-coupling} is satisfied as a result of \asmpref{waves-narrow-band} (narrow-band waves) and \asmpref{system-low-pass} (low-pass WEC dynamics).
+\asmpref{no-dof-coupling} is satisfied because the RM3 contains only a single controlled DOF.
 \asmpref{no-dof-coupling} permits coupling between the body DOFs as long as there is a single controlled DOF as is present here,
 or it permits multiple controlled DOFs only if they are uncoupled when viewed from each control load port at which power is to be optimized
 (i.e. an array of non-interacting multi-DOF WECs for which off-diagonal terms of the intrinsic impedance matrix are negligible).
 
-Under \asmpref{no-freq-coupling} and \asmpref{no-dof-coupling}, the QCQP for all frequencies and DOFs can be separated into a set of single-order QCQPs, one for each frequency and DOF, which can be solved semi-analytically using the geometric properties of circles.
+Under \asmpref{no-freq-coupling} and \asmpref{no-dof-coupling}, the QCQP for all frequencies and DOFs can be separated into a set of single-order QCQPs,
+one for each frequency and DOF,
+which can be solved semi-analytically using the geometric properties of circles.
+In fact, this order reduction enables a semi-analytical solution even in the presence of certain nonlinear constraints or nonconvexities,
+in violation of \asmpref{quadratic-constraints} and \asmpref{passive-dynamics-convex}.
 
 \paragraph{Implementation}
 
