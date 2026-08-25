@@ -1,5 +1,8 @@
 # Changelog
 ## Unreleased
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-25
+### Fixed
+- Dissertation: editorial corrections - fix typos/misspellings, grammar
 
 ## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-15
 ### Added
