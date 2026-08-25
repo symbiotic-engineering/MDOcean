@@ -4,6 +4,10 @@
 ### Fixed
 - Dissertation: editorial corrections - fix typos/misspellings, grammar
 
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-15
+### Added
+- Paper: add dissertation glossaries integration with generated symbol and acronym source files plus `makeglossaries` support in `pubs/dissertation/.latexmkrc`.
+
 ## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
 ### Fixed
 - Sensitivities: rename mixed-up param sens figures (manually, since the root cause is still unknown)
