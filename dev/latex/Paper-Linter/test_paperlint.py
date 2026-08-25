@@ -151,6 +151,40 @@ def test_replace_glossary_refs_replaces_acronym_short_long_plural_and_possessive
     assert count == 5
 
 
+def test_replace_glossary_refs_does_not_replace_wec_in_wec_sim():
+    acronym_replacements = [("WEC", r"\gls{acr-wec}")]
+    line = "WEC-Sim is a simulation tool used alongside the WEC controller."
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert "WEC-Sim" in updated
+    assert r"\gls{acr-wec}-Sim" not in updated
+    assert updated == "WEC-Sim is a simulation tool used alongside the \\gls{acr-wec} controller."
+    assert count == 1
+
+
+def test_replace_glossary_refs_skips_requirement_and_url_commands():
+    acronym_replacements = [("WEC", r"\gls{acr-wec}")]
+    line = r"\requirement{WEC_float_diam} and \url{https://example.com/WEC} but WEC here"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert r"\requirement{WEC_float_diam}" in updated
+    assert r"\url{https://example.com/WEC}" in updated
+    assert updated.endswith(r"but \gls{acr-wec} here")
+    assert count == 1
+
+
 def test_special_mathbb_superscript_is_split_from_base_symbol():
     symbols = msp.extract_math_symbols(r"\mathbb{R}^{n} \mathbb{C}^{m}")
 

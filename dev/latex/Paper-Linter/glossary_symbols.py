@@ -55,6 +55,9 @@ AFFILIATION_COMMAND_RE = re.compile(r"\\affiliation\*?(?:\[[^\]]*\])?\{[^{}]*\}"
 REF_COMMANDS_RE = re.compile(r"\\(?:ref|eqref|cref|Cref|autoref|pageref|nameref)\*?\{[^{}]*\}")
 CITE_COMMANDS_RE = re.compile(r"\\(?:cite|citet|citep)\*?(?:\[[^\]]*\]){0,2}\{[^{}]*\}")
 DECLARE_FIGURE_OPTIONS_RE = re.compile(r"\\DeclareFigureOptions\*?\{[^{}]*\}\{[^{}]*\}\{[^{}]*\}")
+REQUIREMENT_COMMAND_RE = re.compile(r"\\requirement\*?(?:\[[^\]]*\])?\{[^{}]*\}")
+URL_COMMAND_RE = re.compile(r"\\url\*?\{[^{}]*\}")
+ACRONYM_REPLACEMENT_EXCEPTIONS_RE = re.compile(r"\bWEC-Sim\b")
 
 _skip_ws = shared_skip_ws
 _read_braced_group = shared_read_braced_group
@@ -213,6 +216,8 @@ def _mask_label_commands(text):
     masked = REF_COMMANDS_RE.sub(repl, masked)
     masked = CITE_COMMANDS_RE.sub(repl, masked)
     masked = DECLARE_FIGURE_OPTIONS_RE.sub(repl, masked)
+    masked = REQUIREMENT_COMMAND_RE.sub(repl, masked)
+    masked = URL_COMMAND_RE.sub(repl, masked)
     return masked, placeholders
 
 
@@ -227,12 +232,20 @@ def replace_acronym_refs_in_span(span_text, acronym_replacements):
     if not acronym_replacements:
         return span_text, 0
 
+    exception_placeholders = []
+
+    def mask_exception(match):
+        exception_placeholders.append(match.group(0))
+        return "__PAPERLINT_ACRONYM_EXCEPTION_%d__" % (len(exception_placeholders) - 1)
+
+    masked_text = ACRONYM_REPLACEMENT_EXCEPTIONS_RE.sub(mask_exception, span_text)
+
     updates = []
     for source, replacement in acronym_replacements:
         if not source:
             continue
         pattern = re.compile(r"(?<![A-Za-z0-9\\])%s(?![A-Za-z0-9])" % re.escape(source))
-        for match in pattern.finditer(span_text):
+        for match in pattern.finditer(masked_text):
             updates.append((match.start(), match.end(), replacement))
 
     if not updates:
@@ -246,9 +259,11 @@ def replace_acronym_refs_in_span(span_text, acronym_replacements):
             continue
         selected.append((start, end, replacement))
 
-    updated = span_text
+    updated = masked_text
     for start, end, replacement in reversed(selected):
         updated = updated[:start] + replacement + updated[end:]
+    for idx, original in enumerate(exception_placeholders):
+        updated = updated.replace("__PAPERLINT_ACRONYM_EXCEPTION_%d__" % idx, original)
     return updated, len(selected)
 
 
@@ -538,12 +553,18 @@ def collect_tex_files_under(roots):
 
 
 def find_unused_glossary_entries(glossary_dir, usage_roots):
-    """Return (path, key, symbol) for \\newsym entries never referenced via \\gls{sym-<key>}."""
+    """Return (path, key, symbol) for \\newsym entries never referenced via \\gls{sym-<key>}.
+
+    Entries in the auto-generated per-paper files are skipped since they are extracted
+    directly from bare equation symbols and so are never wrapped in \\gls{...} yet.
+    """
     entries = []
     if not glossary_dir or not os.path.isdir(glossary_dir):
         return entries
     used_labels = collect_glossary_labels_from_files(collect_tex_files_under(usage_roots))
     for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        if path.name.endswith("-generated.tex"):
+            continue
         for key, symbol, _ in parse_newsym_entries(path):
             if ("sym-%s" % key) not in used_labels:
                 entries.append((path, key, symbol))
@@ -572,12 +593,18 @@ def delete_unused_glossary_entries(glossary_dir, usage_roots):
 
 
 def find_missing_description_entries(glossary_dir, usage_roots):
-    """Return (path, key, symbol) for used \\newsym entries whose description is blank."""
+    """Return (path, key, symbol) for used \\newsym entries whose description is blank.
+
+    Entries in the auto-generated per-paper files are skipped since those are
+    always written with a blank description.
+    """
     entries = []
     if not glossary_dir or not os.path.isdir(glossary_dir):
         return entries
     used_labels = collect_glossary_labels_from_files(collect_tex_files_under(usage_roots))
     for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+        if path.name.endswith("-generated.tex"):
+            continue
         for key, symbol, description in parse_newsym_entries(path):
             if not description.strip() and ("sym-%s" % key) in used_labels:
                 entries.append((path, key, symbol))

@@ -17,6 +17,9 @@ GLOSSARY_USAGE_ROOTS = [
     os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs")),
     os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "mdocean", "simulation", "modules", "OpenFLASH", "pubs", "JFM")),
 ]
+# These checks assess the whole shared glossary directory rather than the current file,
+# so they are run once per invocation instead of once per linted file.
+GLOBAL_GLOSSARY_CHECKS = {"glossary-unused", "glossary-missing-description", "glossary-symbol-duplicate"}
 
 output_handle = sys.stdout
 use_color = True
@@ -105,6 +108,8 @@ def main():
             warnings = []
             suppressed = []
             for c in checks.checks:
+                if c[2] in GLOBAL_GLOSSARY_CHECKS:
+                    continue
                 state = options["check_states"].get(c[2], 1)
                 config = options["check_params"].get(c[2], {})
                 if state == 0:
@@ -117,10 +122,6 @@ def main():
                     elif state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
                         if c[2] == "glossary-refs":
                             c[3](file, SHARED_GLOSSARY_DIR, options["acronym_glossary_seed_file"])
-                        elif c[2] == "glossary-unused":
-                            c[3](SHARED_GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
-                        elif c[2] == "glossary-symbol-duplicate":
-                            c[3](SHARED_GLOSSARY_DIR)
                         elif c[2] == "prefix":
                             c[3](config.get("path"), config.get("prefix"), recursive=config.get("recursive", False), source_prefix=config.get("source_prefix"))
                         else:
@@ -149,6 +150,40 @@ def main():
 
             nr_warnings += checks.print_warnings(warnings, write_output, use_color=use_color)
             nr_suppressed += checks.print_warnings(suppressed, write_output, use_color=use_color, output=False)
+
+        global_warnings = []
+        global_suppressed = []
+        ran_global_glossary_checks = False
+        for c in checks.checks:
+            if c[2] not in GLOBAL_GLOSSARY_CHECKS:
+                continue
+            ran_global_glossary_checks = True
+            state = options["check_states"].get(c[2], 1)
+            if state == 0:
+                add_warn = []
+            else:
+                add_warn = c[0]()
+                pre_fix_warning_count = len(add_warn)
+                if state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
+                    if c[2] == "glossary-unused":
+                        c[3](SHARED_GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
+                    elif c[2] == "glossary-symbol-duplicate":
+                        c[3](SHARED_GLOSSARY_DIR)
+                    add_warn = c[0]()
+                    fixed_count = pre_fix_warning_count - len(add_warn)
+                    if fixed_count > 0:
+                        autofix_counts[c[2]] = autofix_counts.get(c[2], 0) + fixed_count
+                        autofix_files.setdefault(c[2], set()).add(SHARED_GLOSSARY_DIR)
+            if state > 0:
+                global_warnings += [(x, c[2]) for x in add_warn]
+            else:
+                global_suppressed += [(x, c[2]) for x in add_warn]
+
+        if ran_global_glossary_checks:
+            write_output("")
+            write_output("Checking glossary consistency across '%s'" % SHARED_GLOSSARY_DIR)
+            nr_warnings += checks.print_warnings(global_warnings, write_output, use_color=use_color)
+            nr_suppressed += checks.print_warnings(global_suppressed, write_output, use_color=use_color, output=False)
 
         write_output("")
         write_output("%d warnings printed; %d suppressed warnings" % (nr_warnings, nr_suppressed))

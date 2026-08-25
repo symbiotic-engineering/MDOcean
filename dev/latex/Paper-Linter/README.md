@@ -347,11 +347,11 @@ This category includes warnings for everything related to (cross-)references (sw
 * **Switch**: `glossary-refs`
 
 #### Unused Glossary Symbols
-* **Description**: Warns if a `\newsym` entry in `pubs/shared/glossary/` is never referenced with `\gls{...}` in `pubs/` or `mdocean/simulation/modules/OpenFLASH/pubs/JFM/`. Fix (`2`) deletes the unused `\newsym` entries.
+* **Description**: Warns if a `\newsym` entry in `pubs/shared/glossary/` is never referenced with `\gls{...}` in `pubs/` or `mdocean/simulation/modules/OpenFLASH/pubs/JFM/`. Entries in the auto-generated `glossary-symbols-<paper>-generated.tex` files are skipped, since those symbols are extracted straight from bare equations and so are never yet wrapped in `\gls{...}`. Fix (`2`) deletes the unused `\newsym` entries.
 * **Switch**: `glossary-unused`
 
 #### Glossary Symbols Missing a Description
-* **Description**: Warns if a `\newsym` entry is used with `\gls{...}` somewhere but has a blank description argument. Fix (`2`) is not implemented.
+* **Description**: Warns if a `\newsym` entry is used with `\gls{...}` somewhere but has a blank description argument. Entries in the auto-generated `glossary-symbols-<paper>-generated.tex` files are skipped, since those are always written with a blank description. Fix (`2`) is not implemented.
 * **Switch**: `glossary-missing-description`
 
 #### Duplicate Glossary Symbols
