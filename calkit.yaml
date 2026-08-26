@@ -150,6 +150,18 @@ pipeline:
       outputs:
         - path: calkit_stages.yaml
           storage: git
+    build-symbol-glossary-shared:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/merge_symbol_glossaries.py
+      inputs:
+        - pubs/applied-ocean-research-model/symbol-glossary-aor.tex
+        - pubs/renewable-energy-mdo/symbol-glossary-re.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/symbol-glossary-jfm.tex
+        # - pubs/UMERC-2025-grid-value/symbol-glossary-umerc.tex
+      outputs:
+        - path: pubs/dissertation/symbol-glossary-dissertation.tex
+          storage: git
     analysis-AllFigCompare:
       kind: shell-command
       environment: _system
@@ -5669,33 +5681,158 @@ pipeline:
         - src: pubs/shared/els-cas/cas-common.sty
           dest: pubs/renewable-energy-mdo/cas-common.sty
           kind: file-to-file
+        # glossary shared
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            pubs/applied-ocean-research-model/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            pubs/renewable-energy-mdo/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            pubs/UMERC-2025-grid-value/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: pubs/dissertation/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        # glossary acronyms
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: 
+            pubs/applied-ocean-research-model/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: pubs/renewable-energy-mdo/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: 
+            pubs/UMERC-2025-grid-value/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: pubs/dissertation/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        # glossary setup
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: 
+            pubs/applied-ocean-research-model/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: pubs/renewable-energy-mdo/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: pubs/UMERC-2025-grid-value/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: pubs/dissertation/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-setup.tex
+          kind: file-to-file
     paperlint-aor:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/applied-ocean-research-model/main.tex
-        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-aor.txt
+        - --params dev/latex/Paper-Linter/params-aor.txt
       inputs:
-        - pubs/applied-ocean-research-model/
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/content.tex
+        - pubs/applied-ocean-research-model/main.tex
+        - pubs/applied-ocean-research-model/sections/
+        # - pubs/applied-ocean-research-model/tables/
+        # - pubs/applied-ocean-research-model/figs/
+        - pubs/applied-ocean-research-model/references.bib
+        - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+        - pubs/applied-ocean-research-model/shared-pkg.tex
+        - dev/latex/Paper-Linter/params-aor.txt
+        - pubs/applied-ocean-research-model/glossary/
+        - dev/latex/Paper-Linter/settings.txt
       outputs:
         - path: dev/latex/Paper-Linter/lint-aor.txt
+          storage: git
+        - path: pubs/shared/glossary/glossary-symbols-aor-generated.tex
           storage: git
     paperlint-re:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/renewable-energy-mdo/mdocean.tex
-        - --ignore pubs/renewable-energy-mdo/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-re.txt
+        - --params dev/latex/Paper-Linter/params-re.txt
       inputs:
-        - pubs/renewable-energy-mdo/
+        - pubs/renewable-energy-mdo/commands-re.tex
+        - pubs/renewable-energy-mdo/content-re.tex
+        - pubs/renewable-energy-mdo/mdocean.tex
+        - pubs/renewable-energy-mdo/sections/
+        # - pubs/renewable-energy-mdo/tables/
+        # - pubs/renewable-energy-mdo/figs/
+        - pubs/renewable-energy-mdo/references.bib
+        - pubs/renewable-energy-mdo/zotero-meem-refs.bib
+        - pubs/renewable-energy-mdo/shared-pkg.tex
+        - dev/latex/Paper-Linter/params-re.txt
+        - pubs/renewable-energy-mdo/glossary/
+        - dev/latex/Paper-Linter/settings.txt
       outputs:
         - path: dev/latex/Paper-Linter/lint-re.txt
+          storage: git
+        - path: pubs/shared/glossary/glossary-symbols-re-generated.tex
+          storage: git
+    paperlint-umerc:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
+      args:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --output dev/latex/Paper-Linter/lint-umerc.txt
+        - --symbol-glossary-paper umerc
+      inputs:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+        - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/glossary/
+        - dev/latex/Paper-Linter/settings.txt
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-umerc.txt
+          storage: git
+        - path: 
+            pubs/shared/glossary/glossary-symbols-umerc-generated.tex
+          storage: git
+    paperlint-jfm:
+      kind: python-script
+      environment: pubs
+      always_run: true
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      args:
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --params dev/latex/Paper-Linter/params-jfm.txt
+      inputs:
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - dev/latex/Paper-Linter/params-jfm.txt
+        - dev/latex/Paper-Linter/settings.txt
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-jfm.txt
+          storage: git
+        - path: pubs/shared/glossary/glossary-symbols-jfm-generated.tex
           storage: git
     build-RE-paper:
       kind: latex
@@ -5715,7 +5852,8 @@ pipeline:
         - pubs/renewable-energy-mdo/shared-pkg.tex
         - pubs/renewable-energy-mdo/cas-dc.cls
         - pubs/renewable-energy-mdo/cas-sc.cls
-        - pubs/applied-ocean-research-model/cas-common.sty
+        - pubs/renewable-energy-mdo/glossary/
+        - pubs/renewable-energy-mdo/cas-common.sty
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/aux/
@@ -5741,6 +5879,7 @@ pipeline:
         - pubs/applied-ocean-research-model/shared-pkg.tex
         - pubs/applied-ocean-research-model/cas-dc.cls
         - pubs/applied-ocean-research-model/cas-common.sty
+        - pubs/applied-ocean-research-model/glossary/
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/aux/
@@ -5755,15 +5894,19 @@ pipeline:
         - pubs/UMERC-2025-grid-value/references.bib
         - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
         - pubs/UMERC-2025-grid-value/logo.jpg
+        - pubs/UMERC-2025-grid-value/glossary/
+        - pubs/UMERC-2025-grid-value/appendix-grid.tex
+        - pubs/UMERC-2025-grid-value/content-grid.tex
       outputs:
         - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
+      aux_dir: pubs/UMERC-2025-grid-value/aux/
     build-dissertation:
       kind: latex
       target_path: pubs/dissertation/sampleThesis.tex
       environment: tex
       latexmkrc_path: pubs/dissertation/.latexmkrc
       inputs:
-        - pubs/dissertation/cornell.cls
+        - pubs/dissertation/cornell-modified.cls
         - pubs/dissertation/hangcaption.sty
         - pubs/dissertation/.latexmkrc
         - pubs/dissertation/intro-contrib.tex
@@ -5782,7 +5925,7 @@ pipeline:
         - pubs/renewable-energy-mdo/tables/
         - pubs/renewable-energy-mdo/commands-re.tex
         - pubs/renewable-energy-mdo/content-re.tex
-        - pubs/UMERC-2025-grid-value/
+        # - pubs/UMERC-2025-grid-value/
         - pubs/dissertation/figs/
         - pubs/dissertation/images/
         - pubs/dissertation/references.bib
@@ -5796,6 +5939,7 @@ pipeline:
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm-appendix.tex
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
         - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        # - pubs/dissertation/glossary/
       outputs:
         - pubs/dissertation/sampleThesis.pdf
         - path: pubs/dissertation/aux/
@@ -5961,14 +6105,16 @@ publications:
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
-  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
-    title: PhD Defense Slides
-    description: Slides for PhD defense presentation
-    kind: presentation
   - path: pubs/dissertation/sampleThesis.pdf
     title: PhD Dissertation
     stage: build-dissertation
     description: dissertation manuscript
+    kind: phd-thesis
+presentations:
+  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
+    title: PhD Defense Slides
+    description: Slides for PhD defense presentation
+    kind: slides
 overleaf_sync:
   pubs/applied-ocean-research-model:
     url: https://www.overleaf.com/project/69ecde8851d14790c59f03d5
