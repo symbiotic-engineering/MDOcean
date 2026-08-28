@@ -129,7 +129,11 @@
 
 %\newcommand{\DECIDER}{} % comment out to remove decider
 
-\renewcommand{\caption}[1]{\singlespacing\hangcaption{#1}\normalspacing}
+\makeatletter
+% forward optional short-caption argument to \hangcaption for List of Figures/Tables entries
+\renewcommand{\caption}{\@dblarg{\dissertation@caption}}
+\newcommand{\dissertation@caption}[2]{\singlespacing\hangcaption[#1]{#2}\normalspacing}
+\makeatother
 \renewcommand{\topfraction}{0.85}
 \renewcommand{\textfraction}{0.1}
 \renewcommand{\floatpagefraction}{0.75}
