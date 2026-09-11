@@ -1,7 +1,7 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize an 
-  ocean wave energy converter (WEC).
+description: Multidisciplinary Design Optimization (MDO) to optimize
+  an ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
@@ -66,7 +66,7 @@ pipeline:
     svg2pdf:
       kind: command
       environment: inkscape
-      command: inkscape {name}.svg --export-type=pdf 
+      command: inkscape {name}.svg --export-type=pdf
         --export-filename={name}.pdf
       iterate_over:
         - arg_name: name
@@ -79,7 +79,7 @@ pipeline:
     mermaid-make-pdfs:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o 
+      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o
         mdocean/plots/non_matlab_figs/pdf/{name}.pdf -f
       iterate_over:
         - arg_name: name
@@ -92,7 +92,7 @@ pipeline:
     mermaid-make-pngs:
       kind: command
       environment: mermaid
-      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o 
+      command: -i mdocean/plots/non_matlab_figs/{name}.mmd -o
         mdocean/plots/non_matlab_figs/img/{name}.png
       iterate_over:
         - arg_name: name
@@ -115,7 +115,7 @@ pipeline:
     make-var-bounds:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); b = var_bounds(); 
+      command: ./mymatlab "add_mdocean_path(); b = var_bounds();
         save('./mdocean/inputs/var_bounds.mat','b');"
       inputs:
         - ./mdocean/inputs/var_bounds.m
@@ -165,7 +165,7 @@ pipeline:
     analysis-AllFigCompare:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare; 
+      command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -227,7 +227,7 @@ pipeline:
     postpro-AllFigCompare:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare; 
+      command: ./mymatlab "add_mdocean_path(); obj=AllFigCompare;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-AllFigCompare
@@ -295,7 +295,7 @@ pipeline:
     analysis-Comparison:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Comparison; 
+      command: ./mymatlab "add_mdocean_path(); obj=Comparison;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -367,7 +367,7 @@ pipeline:
     postpro-Comparison:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Comparison; 
+      command: ./mymatlab "add_mdocean_path(); obj=Comparison;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Comparison
@@ -453,7 +453,7 @@ pipeline:
     analysis-Constraints:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Constraints; 
+      command: ./mymatlab "add_mdocean_path(); obj=Constraints;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -515,7 +515,7 @@ pipeline:
     postpro-Constraints:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Constraints; 
+      command: ./mymatlab "add_mdocean_path(); obj=Constraints;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Constraints
@@ -583,7 +583,7 @@ pipeline:
     analysis-Cost:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Cost; 
+      command: ./mymatlab "add_mdocean_path(); obj=Cost;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -645,7 +645,7 @@ pipeline:
     postpro-Cost:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Cost; 
+      command: ./mymatlab "add_mdocean_path(); obj=Cost;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Cost
@@ -713,7 +713,7 @@ pipeline:
     analysis-DampingPlateStructures:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         obj=DampingPlateStructures; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -780,7 +780,7 @@ pipeline:
     postpro-DampingPlateStructures:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         obj=DampingPlateStructures; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DampingPlateStructures
@@ -852,7 +852,7 @@ pipeline:
     analysis-DescFcns:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DescFcns; 
+      command: ./mymatlab "add_mdocean_path(); obj=DescFcns;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -918,7 +918,7 @@ pipeline:
     postpro-DescFcns:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DescFcns; 
+      command: ./mymatlab "add_mdocean_path(); obj=DescFcns;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DescFcns
@@ -990,7 +990,7 @@ pipeline:
     analysis-DesignSpaceExploration:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         obj=DesignSpaceExploration; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1055,7 +1055,7 @@ pipeline:
     postpro-DesignSpaceExploration:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         obj=DesignSpaceExploration; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DesignSpaceExploration
@@ -1133,7 +1133,7 @@ pipeline:
     analysis-DesignVars:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DesignVars; 
+      command: ./mymatlab "add_mdocean_path(); obj=DesignVars;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1195,7 +1195,7 @@ pipeline:
     postpro-DesignVars:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DesignVars; 
+      command: ./mymatlab "add_mdocean_path(); obj=DesignVars;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DesignVars
@@ -1263,7 +1263,7 @@ pipeline:
     analysis-DragIntegral:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DragIntegral; 
+      command: ./mymatlab "add_mdocean_path(); obj=DragIntegral;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1326,7 +1326,7 @@ pipeline:
     postpro-DragIntegral:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=DragIntegral; 
+      command: ./mymatlab "add_mdocean_path(); obj=DragIntegral;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-DragIntegral
@@ -1402,7 +1402,7 @@ pipeline:
     analysis-FitOlaya:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=FitOlaya; 
+      command: ./mymatlab "add_mdocean_path(); obj=FitOlaya;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1482,7 +1482,7 @@ pipeline:
     postpro-FitOlaya:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=FitOlaya; 
+      command: ./mymatlab "add_mdocean_path(); obj=FitOlaya;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-FitOlaya
@@ -1652,7 +1652,7 @@ pipeline:
     analysis-ForceSaturationFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         obj=ForceSaturationFigFunc; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1725,7 +1725,7 @@ pipeline:
     postpro-ForceSaturationFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         obj=ForceSaturationFigFunc; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ForceSaturationFigFunc
@@ -1795,8 +1795,8 @@ pipeline:
     analysis-GradientOptimFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
-        obj.run_analysis();"
+      command: ./mymatlab "add_mdocean_path();
+        obj=GradientOptimFigFunc; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
@@ -1866,8 +1866,8 @@ pipeline:
     postpro-GradientOptimFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
-        obj.run_all_from_load();"
+      command: ./mymatlab "add_mdocean_path();
+        obj=GradientOptimFigFunc; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-GradientOptimFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1950,7 +1950,7 @@ pipeline:
         - results/GradientOptimFigFunc/lagrange_multipliers.fig
         - results/GradientOptimFigFunc/delta_x.fig
         - results/GradientOptimFigFunc/single_obj_convergence.fig
-        - path: 
+        - path:
             results/GradientOptimFigFunc/single_obj_optim_results.tex
           storage: git
         - results/GradientOptimFigFunc/end.mat
@@ -1959,7 +1959,7 @@ pipeline:
     analysis-HydroCoeffFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc; 
+      command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2023,7 +2023,7 @@ pipeline:
     postpro-HydroCoeffFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc; 
+      command: ./mymatlab "add_mdocean_path(); obj=HydroCoeffFigFunc;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-HydroCoeffFigFunc
@@ -2091,8 +2091,8 @@ pipeline:
     analysis-LocationSensitivity:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
-        obj.run_analysis();"
+      command: ./mymatlab "add_mdocean_path();
+        obj=LocationSensitivity; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
@@ -2171,8 +2171,8 @@ pipeline:
     postpro-LocationSensitivity:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
-        obj.run_all_from_load();"
+      command: ./mymatlab "add_mdocean_path();
+        obj=LocationSensitivity; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-LocationSensitivity
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2250,7 +2250,7 @@ pipeline:
     analysis-Meem:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Meem; 
+      command: ./mymatlab "add_mdocean_path(); obj=Meem;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2323,7 +2323,7 @@ pipeline:
     postpro-Meem:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Meem; 
+      command: ./mymatlab "add_mdocean_path(); obj=Meem;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Meem
@@ -2401,7 +2401,7 @@ pipeline:
     analysis-Multistart:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Multistart; 
+      command: ./mymatlab "add_mdocean_path(); obj=Multistart;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2474,7 +2474,7 @@ pipeline:
     postpro-Multistart:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Multistart; 
+      command: ./mymatlab "add_mdocean_path(); obj=Multistart;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Multistart
@@ -2557,7 +2557,7 @@ pipeline:
     analysis-ParamSensitivities:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2630,7 +2630,7 @@ pipeline:
     postpro-ParamSensitivities:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParamSensitivities
@@ -2747,7 +2747,7 @@ pipeline:
     analysis-Parameters:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Parameters; 
+      command: ./mymatlab "add_mdocean_path(); obj=Parameters;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2809,7 +2809,7 @@ pipeline:
     postpro-Parameters:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Parameters; 
+      command: ./mymatlab "add_mdocean_path(); obj=Parameters;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Parameters
@@ -2877,7 +2877,7 @@ pipeline:
     analysis-ParetoFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2951,7 +2951,7 @@ pipeline:
     postpro-ParetoFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParetoFigFunc;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParetoFigFunc
@@ -3033,7 +3033,7 @@ pipeline:
     analysis-ParetoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3095,7 +3095,7 @@ pipeline:
     postpro-ParetoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParetoSweep;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParetoSweep
@@ -3163,7 +3163,7 @@ pipeline:
     analysis-PtoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=PtoSweep; 
+      command: ./mymatlab "add_mdocean_path(); obj=PtoSweep;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3225,7 +3225,7 @@ pipeline:
     postpro-PtoSweep:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=PtoSweep; 
+      command: ./mymatlab "add_mdocean_path(); obj=PtoSweep;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-PtoSweep
@@ -3295,7 +3295,7 @@ pipeline:
     analysis-ReadNonMatlabFigs:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs; 
+      command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3357,7 +3357,7 @@ pipeline:
     postpro-ReadNonMatlabFigs:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs; 
+      command: ./mymatlab "add_mdocean_path(); obj=ReadNonMatlabFigs;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ReadNonMatlabFigs
@@ -3449,7 +3449,7 @@ pipeline:
     analysis-QPCircles:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=QPCircles; 
+      command: ./mymatlab "add_mdocean_path(); obj=QPCircles;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3513,7 +3513,7 @@ pipeline:
     postpro-QPCircles:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=QPCircles; 
+      command: ./mymatlab "add_mdocean_path(); obj=QPCircles;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-QPCircles
@@ -3581,7 +3581,7 @@ pipeline:
     analysis-RunSingleFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc; 
+      command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3665,7 +3665,7 @@ pipeline:
     postpro-RunSingleFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc; 
+      command: ./mymatlab "add_mdocean_path(); obj=RunSingleFigFunc;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-RunSingleFigFunc
@@ -3752,7 +3752,7 @@ pipeline:
     analysis-Runtime:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Runtime; 
+      command: ./mymatlab "add_mdocean_path(); obj=Runtime;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3818,7 +3818,7 @@ pipeline:
     postpro-Runtime:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Runtime; 
+      command: ./mymatlab "add_mdocean_path(); obj=Runtime;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Runtime
@@ -3893,7 +3893,7 @@ pipeline:
     analysis-Slamming:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Slamming; 
+      command: ./mymatlab "add_mdocean_path(); obj=Slamming;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3958,7 +3958,7 @@ pipeline:
     postpro-Slamming:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Slamming; 
+      command: ./mymatlab "add_mdocean_path(); obj=Slamming;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Slamming
@@ -4026,7 +4026,7 @@ pipeline:
     analysis-SparHydro:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SparHydro; 
+      command: ./mymatlab "add_mdocean_path(); obj=SparHydro;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4090,7 +4090,7 @@ pipeline:
     postpro-SparHydro:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SparHydro; 
+      command: ./mymatlab "add_mdocean_path(); obj=SparHydro;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-SparHydro
@@ -4158,7 +4158,7 @@ pipeline:
     analysis-SweepGeoms:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms; 
+      command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4230,7 +4230,7 @@ pipeline:
     postpro-SweepGeoms:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms; 
+      command: ./mymatlab "add_mdocean_path(); obj=SweepGeoms;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-SweepGeoms
@@ -4325,7 +4325,7 @@ pipeline:
     analysis-Validation:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Validation; 
+      command: ./mymatlab "add_mdocean_path(); obj=Validation;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -4393,7 +4393,7 @@ pipeline:
     postpro-Validation:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Validation; 
+      command: ./mymatlab "add_mdocean_path(); obj=Validation;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Validation
@@ -4467,11 +4467,11 @@ pipeline:
     analysis-Wecsim:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Wecsim; 
+      command: ./mymatlab "add_mdocean_path(); obj=Wecsim;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
-        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
+        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave
           Resource _SAM CSV.csv
         - ./mdocean/analysis/@Wecsim/Wecsim.m
         - ./mdocean/analysis/@Wecsim/analysis_fcn.m
@@ -4548,7 +4548,7 @@ pipeline:
     postpro-Wecsim:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=Wecsim; 
+      command: ./mymatlab "add_mdocean_path(); obj=Wecsim;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-Wecsim
@@ -4564,7 +4564,7 @@ pipeline:
         - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
         - ./mdocean/inputs/var_bounds.m
         - ./mdocean/inputs/var_bounds.mat
-        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
+        - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave
           Resource _SAM CSV.csv
         - ./mdocean/inputs/wave_conditions/trim_jpd.m
         - ./mdocean/optimization/find_nominal_inputs.m
@@ -5004,7 +5004,8 @@ pipeline:
     postpro-WithTables:
       kind: shell-command
       environment: _system
-      command: echo "Running postprocessing for all stages with tables."
+      command: echo "Running postprocessing for all stages with
+        tables."
       inputs:
         - from_stage_outputs: postpro-Comparison
         - from_stage_outputs: postpro-Constraints
@@ -5055,7 +5056,7 @@ pipeline:
     test-aor:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); addpath('tests'); 
+      command: ./mymatlab "add_mdocean_path(); addpath('tests');
         run_tests('AOR')"
       inputs:
         - from_stage_outputs: analysis-Comparison
@@ -5084,7 +5085,7 @@ pipeline:
     test-re:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); addpath('tests'); 
+      command: ./mymatlab "add_mdocean_path(); addpath('tests');
         run_tests('RE')"
       inputs:
         - from_stage_outputs: analysis-AllFigCompare
@@ -5113,7 +5114,7 @@ pipeline:
       notebook_path: results/fig_notebooks/AllFigCompare.ipynb
       inputs:
         - from_stage_outputs: postpro-AllFigCompare
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Comparison:
@@ -5122,7 +5123,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Comparison.ipynb
       inputs:
         - from_stage_outputs: postpro-Comparison
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Constraints:
@@ -5131,7 +5132,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Constraints.ipynb
       inputs:
         - from_stage_outputs: postpro-Constraints
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Cost:
@@ -5140,16 +5141,17 @@ pipeline:
       notebook_path: results/fig_notebooks/Cost.ipynb
       inputs:
         - from_stage_outputs: postpro-Cost
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DampingPlateStructures:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/DampingPlateStructures.ipynb
+      notebook_path:
+        results/fig_notebooks/DampingPlateStructures.ipynb
       inputs:
         - from_stage_outputs: postpro-DampingPlateStructures
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DescFcns:
@@ -5158,16 +5160,17 @@ pipeline:
       notebook_path: results/fig_notebooks/DescFcns.ipynb
       inputs:
         - from_stage_outputs: postpro-DescFcns
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DesignSpaceExploration:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/DesignSpaceExploration.ipynb
+      notebook_path:
+        results/fig_notebooks/DesignSpaceExploration.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignSpaceExploration
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DesignVars:
@@ -5176,7 +5179,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DesignVars.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignVars
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DragIntegral:
@@ -5185,7 +5188,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DragIntegral.ipynb
       inputs:
         - from_stage_outputs: postpro-DragIntegral
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-FitOlaya:
@@ -5194,16 +5197,17 @@ pipeline:
       notebook_path: results/fig_notebooks/FitOlaya.ipynb
       inputs:
         - from_stage_outputs: postpro-FitOlaya
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ForceSaturationFigFunc:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      notebook_path:
+        results/fig_notebooks/ForceSaturationFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ForceSaturationFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-GradientOptimFigFunc:
@@ -5212,7 +5216,7 @@ pipeline:
       notebook_path: results/fig_notebooks/GradientOptimFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-GradientOptimFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-HydroCoeffFigFunc:
@@ -5221,7 +5225,7 @@ pipeline:
       notebook_path: results/fig_notebooks/HydroCoeffFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-HydroCoeffFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-LocationSensitivity:
@@ -5230,7 +5234,7 @@ pipeline:
       notebook_path: results/fig_notebooks/LocationSensitivity.ipynb
       inputs:
         - from_stage_outputs: postpro-LocationSensitivity
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Meem:
@@ -5239,7 +5243,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Meem.ipynb
       inputs:
         - from_stage_outputs: postpro-Meem
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Multistart:
@@ -5248,7 +5252,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Multistart.ipynb
       inputs:
         - from_stage_outputs: postpro-Multistart
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParamSensitivities:
@@ -5257,7 +5261,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParamSensitivities.ipynb
       inputs:
         - from_stage_outputs: postpro-ParamSensitivities
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Parameters:
@@ -5266,7 +5270,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Parameters.ipynb
       inputs:
         - from_stage_outputs: postpro-Parameters
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoFigFunc:
@@ -5275,7 +5279,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoSweep:
@@ -5284,7 +5288,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoSweep
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-PtoSweep:
@@ -5293,7 +5297,7 @@ pipeline:
       notebook_path: results/fig_notebooks/PtoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-PtoSweep
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-QPCircles:
@@ -5302,7 +5306,7 @@ pipeline:
       notebook_path: results/fig_notebooks/QPCircles.ipynb
       inputs:
         - from_stage_outputs: postpro-QPCircles
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ReadNonMatlabFigs:
@@ -5311,7 +5315,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ReadNonMatlabFigs.ipynb
       inputs:
         - from_stage_outputs: postpro-ReadNonMatlabFigs
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-RunSingleFigFunc:
@@ -5320,7 +5324,7 @@ pipeline:
       notebook_path: results/fig_notebooks/RunSingleFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-RunSingleFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Runtime:
@@ -5329,7 +5333,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Runtime.ipynb
       inputs:
         - from_stage_outputs: postpro-Runtime
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Slamming:
@@ -5338,7 +5342,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Slamming.ipynb
       inputs:
         - from_stage_outputs: postpro-Slamming
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-SparHydro:
@@ -5347,7 +5351,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SparHydro.ipynb
       inputs:
         - from_stage_outputs: postpro-SparHydro
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-SweepGeoms:
@@ -5356,7 +5360,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SweepGeoms.ipynb
       inputs:
         - from_stage_outputs: postpro-SweepGeoms
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Validation:
@@ -5365,7 +5369,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Validation.ipynb
       inputs:
         - from_stage_outputs: postpro-Validation
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Wecsim:
@@ -5374,7 +5378,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Wecsim.ipynb
       inputs:
         - from_stage_outputs: postpro-Wecsim
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     pyxdsm:
@@ -5410,7 +5414,7 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/figs/from-matlab/
         - pubs/renewable-energy-mdo/tables/from-matlab/
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         move_results_to_pubs('RE');"
     move-aor-results:
       kind: shell-command
@@ -5442,7 +5446,7 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/figs/from-matlab/
         - pubs/applied-ocean-research-model/tables/from-matlab/
-      command: ./mymatlab "add_mdocean_path(); 
+      command: ./mymatlab "add_mdocean_path();
         move_results_to_pubs('AOR');"
     aor-results-to-latex:
       kind: json-to-latex
@@ -5611,9 +5615,9 @@ pipeline:
     copy-dissertation-only-figs-2:
       kind: map-paths
       paths:
-        - src: 
+        - src:
             mdocean/plots/non_matlab_figs/pdf/two_port_dimension_coeff_chain.pdf
-          dest: 
+          dest:
             pubs/dissertation/figs/two_port_dimension_coeff_chain.pdf
           kind: file-to-file
     copy-shared-latex:
@@ -5632,26 +5636,26 @@ pipeline:
         - src: pubs/shared/references.bib
           dest: pubs/UMERC-2025-grid-value/references.bib
           kind: file-to-file
-        - src: 
+        - src:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
           kind: file-to-file
-        - src: 
+        - src:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/renewable-energy-mdo/zotero-meem-refs.bib
           kind: file-to-file
-        - src: 
+        - src:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
           kind: file-to-file
                 #
-        - src: 
+        - src:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
           dest: pubs/applied-ocean-research-model/zotero-meem-refs.bib
           kind: file-to-file
         # bib style file
         - src: pubs/shared/elsarticle-num-names.bst
-          dest: 
+          dest:
             pubs/applied-ocean-research-model/elsarticle-num-names.bst
           kind: file-to-file
         - src: pubs/shared/elsarticle-num-names.bst
@@ -5683,46 +5687,47 @@ pipeline:
           kind: file-to-file
         # glossary shared
         - src: pubs/shared/glossary/glossary-symbols-shared.tex
-          dest: 
+          dest:
             pubs/applied-ocean-research-model/glossary/glossary-symbols-shared.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-symbols-shared.tex
-          dest: 
+          dest:
             pubs/renewable-energy-mdo/glossary/glossary-symbols-shared.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-symbols-shared.tex
-          dest: 
+          dest:
             pubs/UMERC-2025-grid-value/glossary/glossary-symbols-shared.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-symbols-shared.tex
           dest: pubs/dissertation/glossary/glossary-symbols-shared.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-symbols-shared.tex
-          dest: 
+          dest:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-shared.tex
           kind: file-to-file
         # glossary acronyms
         - src: pubs/shared/glossary/glossary-acronyms.tex
-          dest: 
+          dest:
             pubs/applied-ocean-research-model/glossary/glossary-acronyms.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-acronyms.tex
-          dest: pubs/renewable-energy-mdo/glossary/glossary-acronyms.tex
+          dest:
+            pubs/renewable-energy-mdo/glossary/glossary-acronyms.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-acronyms.tex
-          dest: 
+          dest:
             pubs/UMERC-2025-grid-value/glossary/glossary-acronyms.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-acronyms.tex
           dest: pubs/dissertation/glossary/glossary-acronyms.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-acronyms.tex
-          dest: 
+          dest:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-acronyms.tex
           kind: file-to-file
         # glossary setup
         - src: pubs/shared/glossary/glossary-setup.tex
-          dest: 
+          dest:
             pubs/applied-ocean-research-model/glossary/glossary-setup.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-setup.tex
@@ -5735,7 +5740,7 @@ pipeline:
           dest: pubs/dissertation/glossary/glossary-setup.tex
           kind: file-to-file
         - src: pubs/shared/glossary/glossary-setup.tex
-          dest: 
+          dest:
             mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-setup.tex
           kind: file-to-file
     paperlint-aor:
@@ -5763,7 +5768,8 @@ pipeline:
       outputs:
         - path: dev/latex/Paper-Linter/lint-aor.txt
           storage: git
-        - path: pubs/shared/glossary/glossary-symbols-aor-generated.tex
+        - path:
+            pubs/shared/glossary/glossary-symbols-aor-generated.tex
           storage: git
     paperlint-re:
       kind: python-script
@@ -5810,7 +5816,7 @@ pipeline:
       outputs:
         - path: dev/latex/Paper-Linter/lint-umerc.txt
           storage: git
-        - path: 
+        - path:
             pubs/shared/glossary/glossary-symbols-umerc-generated.tex
           storage: git
     paperlint-jfm:
@@ -5832,7 +5838,8 @@ pipeline:
       outputs:
         - path: dev/latex/Paper-Linter/lint-jfm.txt
           storage: git
-        - path: pubs/shared/glossary/glossary-symbols-jfm-generated.tex
+        - path:
+            pubs/shared/glossary/glossary-symbols-jfm-generated.tex
           storage: git
     build-RE-paper:
       kind: latex
@@ -5857,7 +5864,7 @@ pipeline:
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/aux/
-          storage: null
+          storage:
           delete_before_run: false
     build-AOR-paper:
       kind: latex
@@ -5883,11 +5890,12 @@ pipeline:
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
         - path: pubs/applied-ocean-research-model/aux/
-          storage: null
+          storage:
           delete_before_run: false
     build-UMERC-paper:
       kind: latex
-      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      target_path:
+        pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
       environment: tex
       inputs:
         - pubs/UMERC-2025-grid-value/figures/
@@ -5948,7 +5956,7 @@ pipeline:
     # all-writing:
     #   kind: shell-command
     #   environment: _system
-    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex
     #     -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     # all-latex:
     #   kind: shell-command
@@ -5960,7 +5968,7 @@ pipeline:
       notebook_path: pubs/applied-ocean-research-model/view_figs.ipynb
       inputs:
         - pubs/applied-ocean-research-model/figs/
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
     view-re-figs:
       kind: jupyter-notebook
@@ -5968,7 +5976,7 @@ pipeline:
       notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
       inputs:
         - pubs/renewable-energy-mdo/figs/
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
     all-viz:
       kind: shell-command
@@ -6053,8 +6061,8 @@ pipeline:
     #     - arg_name: name
     #       values:
     #         - parameter: latex_standalone_name
-    #   command: pdf2svg 
-    #     pubs/defense/latex-standalone/standalone_{name}.pdf 
+    #   command: pdf2svg
+    #     pubs/defense/latex-standalone/standalone_{name}.pdf
     #     pubs/defense/figs/standalone_{name}.svg
     #   inputs:
     #     - pubs/defense/latex-standalone/standalone_{name}.pdf
@@ -6089,19 +6097,20 @@ pipeline:
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
-    description: Development, Validation, and Benchmarking of a 
-      Multidisciplinary Semi-Analytical Model for Wave Energy Converters
+    description: Development, Validation, and Benchmarking of a
+      Multidisciplinary Semi-Analytical Model for Wave Energy
+      Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
     title: Optimization - Journal (Renewable Energy)
-    description: Leveraging Multidisciplinary Design Optimization to 
+    description: Leveraging Multidisciplinary Design Optimization to
       Advance Wave Energy Converter Viability
     kind: journal-article
     stage: build-RE-paper
   - path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
     title: Grid Value - Conference (UMERC)
-    description: WEC optimization to maximize grid economic value and 
+    description: WEC optimization to maximize grid economic value and
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
@@ -6162,3 +6171,19 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
+releases:
+  dissertation-submit-proquest:
+    kind: publication
+    path: pubs/dissertation/sampleThesis.pdf
+    git_rev: ef67d258
+    calkit_version: 0.45.3
+    date: '2026-09-11'
+    publisher: zenodo
+    record_id: 22713459
+    doi: 10.5281/zenodo.22713459
+    url: https://doi.org/10.5281/zenodo.22713459
+    description:
+    internal: false
+    stored_path:
+references:
+  - path: references.bib
