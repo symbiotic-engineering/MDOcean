@@ -1,5 +1,21 @@
 # Changelog
 ## Unreleased
+### Added
+- Paper: add short/long caption pairs (`\caption[short]{long}`) for figures and tables across the dissertation, applied-ocean-research-model, and renewable-energy-mdo publications, so concise captions appear in the List of Figures/Tables while full captions remain in-text; also fix the dissertation's custom `\caption` redefinition to forward the optional short-caption argument to `\hangcaption`.
+
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-25
+### Fixed
+- Dissertation: editorial corrections - fix typos/misspellings, grammar
+
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-15
+### Added
+- Paper: add dissertation glossaries integration with generated symbol and acronym source files plus `makeglossaries` support in `pubs/dissertation/.latexmkrc`.
+
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-8-25
+### Added
+- Dissertation: add name of all undergrads I've mentored in acknowledgements
+### Fixed
+- Paper: a few misc formatting and notation errors
 
 ## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
 ### Fixed

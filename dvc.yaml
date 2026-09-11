@@ -26,6 +26,10 @@ stages:
       - pubs/JFM/JFM-FLM_Au.cls
       - pubs/JFM/becca-zotero-refs.bib
       - pubs/JFM/figs/graph_abstract.tex
+      - pubs/JFM/glossary/glossary-acronyms.tex
+      - pubs/JFM/glossary/glossary-setup.tex
+      - pubs/JFM/glossary/glossary-symbols-jfm.tex
+      - pubs/JFM/glossary/glossary-symbols-shared.tex
       - pubs/JFM/jfm-appendix.tex
       - pubs/JFM/jfm.bib
       - pubs/JFM/jfm.bst
@@ -246,6 +250,22 @@ stages:
           persist: false
     desc: Automatically generated from the 'make-calkit-stages' stage 
       in calkit.yaml. Changes made here will be overwritten.
+  build-symbol-glossary-shared:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/merge_symbol_glossaries.py
+    deps:
+      - dev/latex/merge_symbol_glossaries.py
+      - pubs/applied-ocean-research-model/symbol-glossary-aor.tex
+      - pubs/renewable-energy-mdo/symbol-glossary-re.tex
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/symbol-glossary-jfm.tex
+      - .calkit/env-locks/pubs
+    outs:
+      - pubs/dissertation/symbol-glossary-dissertation.tex:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 
+      'build-symbol-glossary-shared' stage in calkit.yaml. Changes 
+      made here will be overwritten.
   analysis-AllFigCompare:
     cmd: bash --noprofile --norc -c "./mymatlab \"add_mdocean_path(); 
       obj=AllFigCompare; obj.run_analysis();\""
@@ -7783,7 +7803,7 @@ stages:
       , \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f} kW\"\
       , \"ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\"\
       , \"ptoSweepMinLCOE_LCOE\": \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\",
-      \"meemSweepSize\": \"{n_combos}\"}'"
+      \"meemSweepSize\": \"{n_combos:,}\"}'"
     deps:
       - pubs/applied-ocean-research-model/numbers.json
       - results/Parameters/end.json
@@ -7939,6 +7959,36 @@ stages:
       'pubs/shared/els-cas/cas-common.sty->pubs/applied-ocean-research-model/cas-common.sty'
       --file-to-file 
       'pubs/shared/els-cas/cas-common.sty->pubs/renewable-energy-mdo/cas-common.sty'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-symbols-shared.tex->pubs/applied-ocean-research-model/glossary/glossary-symbols-shared.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-symbols-shared.tex->pubs/renewable-energy-mdo/glossary/glossary-symbols-shared.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-symbols-shared.tex->pubs/UMERC-2025-grid-value/glossary/glossary-symbols-shared.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-symbols-shared.tex->pubs/dissertation/glossary/glossary-symbols-shared.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-symbols-shared.tex->mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-shared.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-acronyms.tex->pubs/applied-ocean-research-model/glossary/glossary-acronyms.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-acronyms.tex->pubs/renewable-energy-mdo/glossary/glossary-acronyms.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-acronyms.tex->pubs/UMERC-2025-grid-value/glossary/glossary-acronyms.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-acronyms.tex->pubs/dissertation/glossary/glossary-acronyms.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-acronyms.tex->mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-acronyms.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-setup.tex->pubs/applied-ocean-research-model/glossary/glossary-setup.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-setup.tex->pubs/renewable-energy-mdo/glossary/glossary-setup.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-setup.tex->pubs/UMERC-2025-grid-value/glossary/glossary-setup.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-setup.tex->pubs/dissertation/glossary/glossary-setup.tex'
+      --file-to-file 
+      'pubs/shared/glossary/glossary-setup.tex->mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-setup.tex'
     deps:
       - pubs/shared/references.bib
       - pubs/shared/references.bib
@@ -7957,6 +8007,21 @@ stages:
       - pubs/shared/els-cas/cas-sc.cls
       - pubs/shared/els-cas/cas-common.sty
       - pubs/shared/els-cas/cas-common.sty
+      - pubs/shared/glossary/glossary-symbols-shared.tex
+      - pubs/shared/glossary/glossary-symbols-shared.tex
+      - pubs/shared/glossary/glossary-symbols-shared.tex
+      - pubs/shared/glossary/glossary-symbols-shared.tex
+      - pubs/shared/glossary/glossary-symbols-shared.tex
+      - pubs/shared/glossary/glossary-acronyms.tex
+      - pubs/shared/glossary/glossary-acronyms.tex
+      - pubs/shared/glossary/glossary-acronyms.tex
+      - pubs/shared/glossary/glossary-acronyms.tex
+      - pubs/shared/glossary/glossary-acronyms.tex
+      - pubs/shared/glossary/glossary-setup.tex
+      - pubs/shared/glossary/glossary-setup.tex
+      - pubs/shared/glossary/glossary-setup.tex
+      - pubs/shared/glossary/glossary-setup.tex
+      - pubs/shared/glossary/glossary-setup.tex
     outs:
       - pubs/applied-ocean-research-model/references.bib:
           cache: false
@@ -8009,41 +8074,159 @@ stages:
       - pubs/renewable-energy-mdo/cas-common.sty:
           cache: false
           persist: true
+      - pubs/applied-ocean-research-model/glossary/glossary-symbols-shared.tex:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/glossary/glossary-symbols-shared.tex:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/glossary/glossary-symbols-shared.tex:
+          cache: false
+          persist: true
+      - pubs/dissertation/glossary/glossary-symbols-shared.tex:
+          cache: false
+          persist: true
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-shared.tex:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/glossary/glossary-acronyms.tex:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/glossary/glossary-acronyms.tex:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/glossary/glossary-acronyms.tex:
+          cache: false
+          persist: true
+      - pubs/dissertation/glossary/glossary-acronyms.tex:
+          cache: false
+          persist: true
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-acronyms.tex:
+          cache: false
+          persist: true
+      - pubs/applied-ocean-research-model/glossary/glossary-setup.tex:
+          cache: false
+          persist: true
+      - pubs/renewable-energy-mdo/glossary/glossary-setup.tex:
+          cache: false
+          persist: true
+      - pubs/UMERC-2025-grid-value/glossary/glossary-setup.tex:
+          cache: false
+          persist: true
+      - pubs/dissertation/glossary/glossary-setup.tex:
+          cache: false
+          persist: true
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-setup.tex:
+          cache: false
+          persist: true
     desc: Automatically generated from the 'copy-shared-latex' stage 
       in calkit.yaml. Changes made here will be overwritten.
   paperlint-aor:
     cmd: calkit xenv -n pubs --no-check -- python 
       dev/latex/Paper-Linter/paperlint.py 
-      pubs/applied-ocean-research-model/main.tex --ignore 
-      pubs/applied-ocean-research-model/numeric-results.tex --settings
-      dev/latex/Paper-Linter/settings.txt --output 
-      dev/latex/Paper-Linter/lint-aor.txt
+      pubs/applied-ocean-research-model/main.tex --settings 
+      dev/latex/Paper-Linter/settings.txt --params 
+      dev/latex/Paper-Linter/params-aor.txt
     deps:
       - dev/latex/Paper-Linter/paperlint.py
-      - pubs/applied-ocean-research-model/
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/content.tex
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - dev/latex/Paper-Linter/params-aor.txt
+      - pubs/applied-ocean-research-model/glossary/
+      - dev/latex/Paper-Linter/settings.txt
       - .calkit/env-locks/pubs
     outs:
       - dev/latex/Paper-Linter/lint-aor.txt:
           cache: false
           persist: false
+      - pubs/shared/glossary/glossary-symbols-aor-generated.tex:
+          cache: false
+          persist: false
+    always_changed: true
     desc: Automatically generated from the 'paperlint-aor' stage in 
       calkit.yaml. Changes made here will be overwritten.
   paperlint-re:
     cmd: calkit xenv -n pubs --no-check -- python 
       dev/latex/Paper-Linter/paperlint.py 
-      pubs/renewable-energy-mdo/mdocean.tex --ignore 
-      pubs/renewable-energy-mdo/numeric-results.tex --settings 
-      dev/latex/Paper-Linter/settings.txt --output 
-      dev/latex/Paper-Linter/lint-re.txt
+      pubs/renewable-energy-mdo/mdocean.tex --settings 
+      dev/latex/Paper-Linter/settings.txt --params 
+      dev/latex/Paper-Linter/params-re.txt
     deps:
       - dev/latex/Paper-Linter/paperlint.py
-      - pubs/renewable-energy-mdo/
+      - pubs/renewable-energy-mdo/commands-re.tex
+      - pubs/renewable-energy-mdo/content-re.tex
+      - pubs/renewable-energy-mdo/mdocean.tex
+      - pubs/renewable-energy-mdo/sections/
+      - pubs/renewable-energy-mdo/references.bib
+      - pubs/renewable-energy-mdo/zotero-meem-refs.bib
+      - pubs/renewable-energy-mdo/shared-pkg.tex
+      - dev/latex/Paper-Linter/params-re.txt
+      - pubs/renewable-energy-mdo/glossary/
+      - dev/latex/Paper-Linter/settings.txt
       - .calkit/env-locks/pubs
     outs:
       - dev/latex/Paper-Linter/lint-re.txt:
           cache: false
           persist: false
+      - pubs/shared/glossary/glossary-symbols-re-generated.tex:
+          cache: false
+          persist: false
+    always_changed: true
     desc: Automatically generated from the 'paperlint-re' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  paperlint-umerc:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/Paper-Linter/paperlint.py 
+      pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex --settings 
+      dev/latex/Paper-Linter/settings.txt --output 
+      dev/latex/Paper-Linter/lint-umerc.txt --symbol-glossary-paper 
+      umerc
+    deps:
+      - dev/latex/Paper-Linter/paperlint.py
+      - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      - pubs/UMERC-2025-grid-value/references.bib
+      - pubs/UMERC-2025-grid-value/glossary/
+      - dev/latex/Paper-Linter/settings.txt
+      - .calkit/env-locks/pubs
+    outs:
+      - dev/latex/Paper-Linter/lint-umerc.txt:
+          cache: false
+          persist: false
+      - pubs/shared/glossary/glossary-symbols-umerc-generated.tex:
+          cache: false
+          persist: false
+    always_changed: true
+    desc: Automatically generated from the 'paperlint-umerc' stage in 
+      calkit.yaml. Changes made here will be overwritten.
+  paperlint-jfm:
+    cmd: calkit xenv -n pubs --no-check -- python 
+      dev/latex/Paper-Linter/paperlint.py 
+      mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex 
+      --settings dev/latex/Paper-Linter/settings.txt --params 
+      dev/latex/Paper-Linter/params-jfm.txt
+    deps:
+      - dev/latex/Paper-Linter/paperlint.py
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+      - dev/latex/Paper-Linter/params-jfm.txt
+      - dev/latex/Paper-Linter/settings.txt
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/
+      - .calkit/env-locks/pubs
+    outs:
+      - dev/latex/Paper-Linter/lint-jfm.txt:
+          cache: false
+          persist: false
+      - pubs/shared/glossary/glossary-symbols-jfm-generated.tex:
+          cache: false
+          persist: false
+    always_changed: true
+    desc: Automatically generated from the 'paperlint-jfm' stage in 
       calkit.yaml. Changes made here will be overwritten.
   build-RE-paper:
     cmd: calkit latex build -e tex --no-check -r 
@@ -8063,7 +8246,8 @@ stages:
       - pubs/renewable-energy-mdo/shared-pkg.tex
       - pubs/renewable-energy-mdo/cas-dc.cls
       - pubs/renewable-energy-mdo/cas-sc.cls
-      - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/renewable-energy-mdo/glossary/
+      - pubs/renewable-energy-mdo/cas-common.sty
       - .calkit/env-locks/tex
       - pubs/renewable-energy-mdo/.latexmkrc
     outs:
@@ -8093,6 +8277,7 @@ stages:
       - pubs/applied-ocean-research-model/shared-pkg.tex
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
@@ -8103,7 +8288,8 @@ stages:
     desc: Automatically generated from the 'build-AOR-paper' stage in 
       calkit.yaml. Changes made here will be overwritten.
   build-UMERC-paper:
-    cmd: calkit latex build -e tex --no-check 
+    cmd: calkit latex build -e tex --no-check --aux-dir 
+      pubs/UMERC-2025-grid-value/aux/ 
       pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
     deps:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
@@ -8111,6 +8297,9 @@ stages:
       - pubs/UMERC-2025-grid-value/references.bib
       - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
       - pubs/UMERC-2025-grid-value/logo.jpg
+      - pubs/UMERC-2025-grid-value/glossary/
+      - pubs/UMERC-2025-grid-value/appendix-grid.tex
+      - pubs/UMERC-2025-grid-value/content-grid.tex
       - .calkit/env-locks/tex
     outs:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
@@ -8121,7 +8310,7 @@ stages:
       pubs/dissertation/.latexmkrc pubs/dissertation/sampleThesis.tex
     deps:
       - pubs/dissertation/sampleThesis.tex
-      - pubs/dissertation/cornell.cls
+      - pubs/dissertation/cornell-modified.cls
       - pubs/dissertation/hangcaption.sty
       - pubs/dissertation/.latexmkrc
       - pubs/dissertation/intro-contrib.tex
@@ -8140,7 +8329,6 @@ stages:
       - pubs/renewable-energy-mdo/tables/
       - pubs/renewable-energy-mdo/commands-re.tex
       - pubs/renewable-energy-mdo/content-re.tex
-      - pubs/UMERC-2025-grid-value/
       - pubs/dissertation/figs/
       - pubs/dissertation/images/
       - pubs/dissertation/references.bib

@@ -45,7 +45,7 @@
 %%   Right brace   \}     Tilde         \~}
 %%
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\ProvidesClass{cornell}
+\ProvidesClass{cornell-modified}
 [2008/4/17 v2.9
   Cornell University thesis class]
 \newif\ifphd
@@ -366,7 +366,7 @@
   \typeout{Vita}
   \pagestyle{plain}
   \pagenumbering{roman}
-  \setcounter{page}{8}
+  \setcounter{page}{6}
   \prelim@contents{Biographical Sketch}
   \chapter*{Biographical Sketch}
 }{%
@@ -414,8 +414,14 @@
   \prelim@contents{\listfigurename}
   \listoffigures
   \normalspacing
-  \clearpage
 }
+
+\newcommand{\acrnlist}{%
+  \listspacing{acrn}
+  \prelim@contents{List of Acronyms}
+  \chapter*{List of Acronyms}
+}
+
 \newcommand{\abbrlist}{%
   \listspacing{abbr}
   \prelim@contents{List of Abbreviations}
