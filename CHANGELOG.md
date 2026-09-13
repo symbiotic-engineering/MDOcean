@@ -4,6 +4,9 @@
 ### Changed
 - Pipeline: link AOR latexdiff dependencies from the generated DVC dependency list.
 
+### Fixed
+- Pipeline: provide the repository root to the AOR latexdiff DVC preparer.
+
 ## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
 ### Fixed
 - Sensitivities: rename mixed-up param sens figures (manually, since the root cause is still unknown)

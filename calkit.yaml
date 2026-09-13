@@ -5819,12 +5819,12 @@ pipeline:
     make-aor-latexdiff:
       kind: shell-command
       environment: tex
-      command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="$(pwd)" DVC_CACHE_DIR="$(pwd)/.dvc/cache"
-        DVC_DEPS_JSON="$(pwd)/aor-latexdiff-dvc-deps.json" git latexdiff --no-view --tmpdirprefix .
+      command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="/work" DVC_CACHE_DIR="/work/.dvc/cache"
+        DVC_DEPS_JSON="/work/aor-latexdiff-dvc-deps.json" git latexdiff --no-view --tmpdirprefix .
         --main pubs/applied-ocean-research-model/main.tex
         --whole-tree --filter 'dev/latex/latexdiff-link-figs.sh'
         --prepare 'python3 ../new/dev/latex/latexdiff-prepare.py'
-        -o pubs/applied-ocean-research-model/main-diff.pdf ad55aca --
+        -o pubs/applied-ocean-research-model/main-diff.pdf ad55aca -- < /dev/null
       inputs:
         - pubs/applied-ocean-research-model/sections/
         - pubs/applied-ocean-research-model/figs/from-matlab/

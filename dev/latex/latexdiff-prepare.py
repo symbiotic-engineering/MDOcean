@@ -3,203 +3,107 @@
 import json
 import os
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 
-# ======================================================================
-# Configuration
-# ======================================================================
-
-# The temporary git-latexdiff tree in which this script is running.
-WORK_ROOT = Path.cwd().resolve()
-
-# The real repository containing dvc.lock and .dvc/cache.
-DVC_REPO_ROOT = Path(
-    os.environ["DVC_REPO_ROOT"]
-).resolve()
-
-CACHE_DIR = Path(
-    os.environ.get(
-        "DVC_CACHE_DIR",
-        DVC_REPO_ROOT / ".dvc" / "cache",
-    )
-).resolve()
+REPO_ROOT = Path(os.environ["DVC_REPO_ROOT"]).resolve()
+CACHE_DIR = Path(os.environ["DVC_CACHE_DIR"]).resolve()
+MAPPING_FILE = Path(os.environ["DVC_DEPS_JSON"])
 
 
-# ======================================================================
-# DVC cache helpers
-# ======================================================================
+# ----------------------------------------------------------------------
+# DVC cache
+# ----------------------------------------------------------------------
 
 def cache_object(md5):
-    """
-    Return the path to a DVC cache object for an MD5 hash.
-
-    Supports both:
-
-        .dvc/cache/ab/cdef...
-        .dvc/cache/files/md5/ab/cdef...
-    """
-
-    candidates = [
+    for path in (
         CACHE_DIR / md5[:2] / md5[2:],
         CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:],
-    ]
-
-    for candidate in candidates:
-        if candidate.is_file():
-            return candidate
+    ):
+        if path.is_file():
+            return path
 
     return None
 
 
-# ======================================================================
-# Read dvc.lock using yq
-# ======================================================================
+# ----------------------------------------------------------------------
+# Directory -> .dir MD5 mapping
+# ----------------------------------------------------------------------
 
-def build_file_hash_map():
-    """
-    Build:
+with MAPPING_FILE.open() as f:
+    DVC_DIRS = json.load(f)
 
-        repository-relative file path -> DVC MD5
 
-    from the dvc.lock belonging to this working tree.
+# ----------------------------------------------------------------------
+# Expand .dir manifests into:
+#
+#     repo-relative file -> file MD5
+# ----------------------------------------------------------------------
 
-    yq is used to parse YAML; no PyYAML dependency is required.
-    """
+FILE_HASHES = {}
 
-    lockfile = WORK_ROOT / "dvc.lock"
+for directory, dir_md5 in DVC_DIRS.items():
 
-    if not lockfile.is_file():
+    # dvc.lock stores directory hashes as "...dir"
+    if dir_md5.endswith(".dir"):
+        dir_md5 = dir_md5[:-4]
+
+    manifest = cache_object(dir_md5)
+
+    if manifest is None:
         print(
-            f"WARNING: {lockfile} not found",
+            f"WARNING: DVC .dir object not found: "
+            f"{directory}: {dir_md5}",
             file=sys.stderr,
         )
-        return {}
+        continue
 
-    # Extract all directory outputs as:
-    #
-    #   <directory>\t<directory-md5.dir>
-    #
-    result = subprocess.run(
-        [
-            "yq",
-            "-r",
-            """
-            .stages[]
-            | .outs[]?
-            | select(.path != null and .md5 != null)
-            | select(.md5 | endswith(".dir"))
-            | [.path, .md5]
-            | @tsv
-            """,
-            str(lockfile),
-        ],
-        cwd=WORK_ROOT,
-        capture_output=True,
-        text=True,
-    )
-
-    if result.returncode != 0:
+    try:
+        entries = json.loads(manifest.read_text())
+    except Exception as exc:
         print(
-            f"WARNING: yq failed to read {lockfile}: "
-            f"{result.stderr.strip()}",
+            f"WARNING: could not read DVC .dir object "
+            f"{manifest}: {exc}",
             file=sys.stderr,
         )
-        return {}
+        continue
 
-    file_hashes = {}
+    for entry in entries:
+        relpath = entry.get("relpath")
+        md5 = entry.get("md5")
 
-    for line in result.stdout.splitlines():
-
-        if not line.strip():
-            continue
-
-        directory, directory_md5 = line.split("\t", 1)
-
-        # DVC stores directory hashes as "<md5>.dir".
-        dir_md5 = directory_md5.removesuffix(".dir")
-
-        manifest_path = cache_object(dir_md5)
-
-        if manifest_path is None:
-            print(
-                f"WARNING: DVC .dir object not found: "
-                f"{dir_md5}",
-                file=sys.stderr,
-            )
-            continue
-
-        try:
-            manifest = json.loads(
-                manifest_path.read_text()
-            )
-        except Exception as exc:
-            print(
-                f"WARNING: could not read DVC .dir object "
-                f"{manifest_path}: {exc}",
-                file=sys.stderr,
-            )
-            continue
-
-        for entry in manifest:
-
-            relpath = entry.get("relpath")
-            md5 = entry.get("md5")
-
-            if not relpath or not md5:
-                continue
-
-            repo_path = (
-                Path(directory) / relpath
-            ).as_posix()
-
-            file_hashes[repo_path] = md5
-
-    return file_hashes
+        if relpath and md5:
+            FILE_HASHES[
+                (Path(directory) / relpath).as_posix()
+            ] = md5
 
 
-HASHES = build_file_hash_map()
+# ----------------------------------------------------------------------
+# Resolve an includegraphics path
+# ----------------------------------------------------------------------
 
-
-# ======================================================================
-# Figure-path normalization
-# ======================================================================
-
-def repo_relative_figure_path(filename):
-    """
-    Convert an \\includegraphics filename into the repository-relative
-    path used by the DVC .dir manifest.
-    """
-
+def repo_relative_path(filename):
     path = Path(filename)
 
     if path.is_absolute():
         try:
-            return path.resolve().relative_to(
-                DVC_REPO_ROOT
-            ).as_posix()
+            return path.resolve().relative_to(REPO_ROOT).as_posix()
         except ValueError:
             return None
 
-    # The LaTeX source is in the temporary tree, but the repository
-    # structure is the same as the real repository.
-    #
-    # Find the path relative to the temporary tree.
     try:
         return (
-            WORK_ROOT / path
-        ).resolve().relative_to(
-            WORK_ROOT
-        ).as_posix()
+            REPO_ROOT / path
+        ).resolve().relative_to(REPO_ROOT).as_posix()
+
     except ValueError:
         return None
 
 
-# ======================================================================
-# \includegraphics rewriting
-# ======================================================================
+# ----------------------------------------------------------------------
+# \includegraphics
+# ----------------------------------------------------------------------
 
 INCLUDEGRAPHICS = re.compile(
     r"""
@@ -216,70 +120,48 @@ INCLUDEGRAPHICS = re.compile(
 
 
 def replace_graphic(match):
-    prefix = match.group(1)
     filename = match.group(2).strip()
-    suffix = match.group(3)
 
-    # Don't try to resolve dynamically generated paths.
+    # Don't touch dynamically constructed paths.
     if filename.startswith("\\"):
         return match.group(0)
 
-    repo_path = repo_relative_figure_path(filename)
+    repo_path = repo_relative_path(filename)
 
     if repo_path is None:
         return match.group(0)
 
-    md5 = HASHES.get(repo_path)
+    md5 = FILE_HASHES.get(repo_path)
 
     if md5 is None:
-        # Not a DVC-tracked file.
         return match.group(0)
 
     cached = cache_object(md5)
 
     if cached is None:
         print(
-            f"WARNING: DVC cache object missing for "
+            f"WARNING: DVC cache object missing: "
             f"{repo_path}: {md5}",
             file=sys.stderr,
         )
         return match.group(0)
 
-    print(
-        f"DVC: {repo_path} -> {md5}",
-        file=sys.stderr,
-    )
-
     return (
-        prefix
+        match.group(1)
         + str(cached)
-        + suffix
+        + match.group(3)
     )
 
 
-# ======================================================================
-# Process TeX files in the temporary tree
-# ======================================================================
+# ----------------------------------------------------------------------
+# stdin -> stdout
+# ----------------------------------------------------------------------
 
-for texfile in WORK_ROOT.rglob("*.tex"):
+text = sys.stdin.read()
 
-    if ".git" in texfile.parts or ".dvc" in texfile.parts:
-        continue
+text = INCLUDEGRAPHICS.sub(
+    replace_graphic,
+    text,
+)
 
-    try:
-        text = texfile.read_text()
-    except UnicodeDecodeError:
-        continue
-
-    new_text = INCLUDEGRAPHICS.sub(
-        replace_graphic,
-        text,
-    )
-
-    if new_text != text:
-        texfile.write_text(new_text)
-
-        print(
-            f"Updated {texfile}",
-            file=sys.stderr,
-        )
+sys.stdout.write(text)

@@ -31436,21 +31436,25 @@ stages:
       md5: 1e53e6f35f82313fc40df4b2e6ab6e04
       size: 16864408
   make-aor-latexdiff:
-    cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c "git 
-      latexdiff --no-view --tmpdirprefix . --main 
+    cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c "rm -rf 
+      git-latexdiff.* && DVC_REPO_ROOT=\"/work\" 
+      DVC_CACHE_DIR=\"/work/.dvc/cache\" 
+      DVC_DEPS_JSON=\"/work/aor-latexdiff-dvc-deps.json\" git latexdiff 
+      --no-view --tmpdirprefix . --main 
       pubs/applied-ocean-research-model/main.tex --whole-tree --filter 
-      'dev/latex/latexdiff-link-figs.sh' -o 
-      pubs/applied-ocean-research-model/main-diff.pdf ad55aca --"
+      'dev/latex/latexdiff-link-figs.sh' --prepare 'python3 
+      ../new/dev/latex/latexdiff-prepare.py' -o 
+      pubs/applied-ocean-research-model/main-diff.pdf ad55aca -- < /dev/null"
     deps:
     - path: .calkit/env-locks/tex
       hash: md5
       md5: bce75e09f8a3deb731513d66d450bb87.dir
       size: 1147
       nfiles: 1
-    - path: aor-latexdiff-dvc-deps.txt
+    - path: aor-latexdiff-dvc-deps.json
       hash: md5
-      md5: 542a8871790678ef79fb3ef5293355d3
-      size: 153
+      md5: b0cc6f1f78b488ea3c4bec325d32ae64
+      size: 291
     - path: dev/latex/latexdiff-link-figs.sh
       hash: md5
       md5: 75aee98d916c94a30d72595b5ebf182a
@@ -31520,7 +31524,7 @@ stages:
     outs:
     - path: pubs/applied-ocean-research-model/main-diff.pdf
       hash: md5
-      md5: d7b49cfae87799e64c5c87b28c201302
+      md5: df98b95680258ec14fc913e5b87a6e87
       size: 7717735
   get-aor-latexdiff-dvc-deps:
     cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "bash 
