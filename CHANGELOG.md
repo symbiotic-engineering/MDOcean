@@ -2,6 +2,8 @@
 ## Unreleased
 
 ## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-14
+### Added
+- Dissertation: add license for images
 ### Changed
 - Paper: add short/long caption pairs (`\caption[short]{long}`) so table of contents uses short captions
 ### Fixed
