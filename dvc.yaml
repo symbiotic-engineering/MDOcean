@@ -8071,7 +8071,7 @@ stages:
   build-AOR-paper-diff-c767dee:
     cmd: calkit latex diff -e tex --no-check --from
       ad55aca7e3fd27cd8e9fffda3c875beb01b62dc2 --to
-      b2806ba0006799eecc8fdff624ba310cd3230e86 --output-dir
+      36596018aab779edcdb4253756682c0e241f7a1a --output-dir
       .calkit/latex-diffs/c767dee pubs/applied-ocean-research-model/main.tex
     deps:
       - pubs/applied-ocean-research-model/main.tex
@@ -8173,9 +8173,10 @@ stages:
       DVC_CACHE_DIR=\"/work/.dvc/cache\"
       DVC_DEPS_JSON=\"/work/aor-latexdiff-dvc-deps.json\" git latexdiff
       --no-view --tmpdirprefix . --main
-      pubs/applied-ocean-research-model/main.tex --whole-tree --filter
-      'dev/latex/latexdiff-link-figs.sh' --prepare 'python3
-      ../new/dev/latex/latexdiff-prepare.py' -o
+      pubs/applied-ocean-research-model/main.tex --whole-tree
+      --ignore-latex-errors --latexmk --latexpand --makeatletter
+      --graphics-markup=both --filter 'dev/latex/latexdiff-link-figs.sh'
+      --prepare 'python3 ../new/dev/latex/latexdiff-prepare.py' -o
       pubs/applied-ocean-research-model/main-diff.pdf c767dee -- < /dev/null"
     deps:
       - pubs/applied-ocean-research-model/sections/
@@ -8192,7 +8193,9 @@ stages:
       - pubs/applied-ocean-research-model/shared-pkg.tex
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/.latexmkrc
       - dev/latex/latexdiff-link-figs.sh
+      - dev/latex/latexdiff-prepare.py
       - aor-latexdiff-dvc-deps.json
       - .calkit/env-locks/tex
     outs:

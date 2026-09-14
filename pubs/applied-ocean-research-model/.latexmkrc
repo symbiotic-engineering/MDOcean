@@ -2,7 +2,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 
 # method 1: folder of this script
-my $root = dirname(__FILE__);
+my $root = abs_path(dirname(__FILE__));
 
 # method 2: use cwd where script is called from
 #my $cwd = getcwd; # /work/
