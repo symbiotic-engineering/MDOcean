@@ -11,6 +11,12 @@ REPO_ROOT = Path(os.environ["DVC_REPO_ROOT"]).resolve()
 CACHE_DIR = Path(os.environ["DVC_CACHE_DIR"]).resolve()
 MAPPING_FILE = Path(os.environ["DVC_DEPS_JSON"])
 
+# git-latexdiff always runs this script from the "new" tree, but with cwd set
+# to whichever tree (old/new) is currently being prepared
+TREE = Path.cwd().name
+if TREE not in ("old", "new"):
+    TREE = "new"
+
 
 # ----------------------------------------------------------------------
 # DVC cache
@@ -33,7 +39,7 @@ def cache_object(md5):
 # ----------------------------------------------------------------------
 
 with MAPPING_FILE.open() as f:
-    DVC_DIRS = json.load(f)
+    DVC_DIRS = json.load(f)[TREE]
 
 
 # ----------------------------------------------------------------------
