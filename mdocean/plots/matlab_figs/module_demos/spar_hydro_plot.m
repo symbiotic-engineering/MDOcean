@@ -10,7 +10,7 @@ function f = spar_hydro_plot()
     
     f = figure;
     plot(r,A_s_over_rho_Dd_3*3)
-    xlabel('$r=\frac{D_s}{D_d}$','Interpreter','latex')
+    xlabel('$\varsigma=\frac{D_s}{D_d}$','Interpreter','latex')
     ylabel('$A_s/(\frac{1}{3}\rho_w D_d^3)$','Interpreter','latex')
     title('Spar Added Mass')
     improvePlot
