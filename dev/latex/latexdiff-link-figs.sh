@@ -2,7 +2,7 @@
 set -e
 
 repo_root="$(git rev-parse --show-toplevel)"
-deps_file="$repo_root/aor-latexdiff-dvc-deps.txt"
+deps_file="$repo_root/aor-latexdiff-dvc-deps.json"
 
 for tree in old new; do
     while IFS= read -r subfolder; do
