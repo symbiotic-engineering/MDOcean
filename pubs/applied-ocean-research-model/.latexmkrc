@@ -1,8 +1,12 @@
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 
-my $cwd = getcwd; # /work/
-my $root = File::Spec->catfile($cwd, 'pubs', 'applied-ocean-research-model'); # /work/pubs/applied-ocean-research-model
+# method 1: folder of this script
+my $root = dirname(__FILE__);
+
+# method 2: use cwd where script is called from
+#my $cwd = getcwd; # /work/
+#my $root = File::Spec->catfile($cwd, 'pubs', 'applied-ocean-research-model'); # /work/pubs/applied-ocean-research-model
 
 # Ensure BibTeX finds elsarticle-num-names.bst
 print "BSTINPUTS before: @BSTINPUTS\n";
