@@ -15,5 +15,5 @@ for tree in old new; do
             ln -s "$source" "$target"
             echo "Linked $source to $target"
         fi
-    done < <(jq -r 'keys[]' "$deps_file")
+    done < <(python3 -c 'import json, sys; print("\n".join(json.load(open(sys.argv[1]))))' "$deps_file")
 done
