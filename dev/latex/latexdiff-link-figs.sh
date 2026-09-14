@@ -14,5 +14,5 @@ for tree in old new; do
             mkdir -p "$(dirname "$target")"
             ln -s "$source" "$target"
         fi
-    done < "$deps_file"
+    done < <(jq -r 'keys[]' "$deps_file")
 done
