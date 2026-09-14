@@ -1,7 +1,7 @@
 stages:
   mermaid-make-pdfs:
-    cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+    cmd: calkit xenv -n mermaid --no-check -- -i
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o
       mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf -f
     deps:
       - mdocean/plots/non_matlab_figs/${item.name}.mmd
@@ -14,11 +14,11 @@ stages:
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
         - mod_freq_domain_ctrl_combined
-    desc: Automatically generated from the 'mermaid-make-pdfs' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'mermaid-make-pdfs' stage in
+      calkit.yaml. Changes made here will be overwritten.
   mermaid-make-pngs:
-    cmd: calkit xenv -n mermaid --no-check -- -i 
-      mdocean/plots/non_matlab_figs/${item.name}.mmd -o 
+    cmd: calkit xenv -n mermaid --no-check -- -i
+      mdocean/plots/non_matlab_figs/${item.name}.mmd -o
       mdocean/plots/non_matlab_figs/img/${item.name}.png
     deps:
       - mdocean/plots/non_matlab_figs/${item.name}.mmd
@@ -33,22 +33,21 @@ stages:
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
         - mod_freq_domain_ctrl_combined
-    desc: Automatically generated from the 'mermaid-make-pngs' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'mermaid-make-pngs' stage in
+      calkit.yaml. Changes made here will be overwritten.
   make-drag-integral:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      make_drag_integral"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); make_drag_integral"
     deps:
       - ./mdocean/inputs/make_drag_integral.m
       - ./mdocean/simulation/modules/dynamics/make_drag_integral_LUT.m
       - ./mdocean/simulation/modules/dynamics/compute_drag_integral.m
     outs:
       - ./mdocean/inputs/drag_integral.mat
-    desc: Automatically generated from the 'make-drag-integral' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'make-drag-integral' stage in
+      calkit.yaml. Changes made here will be overwritten.
   make-var-bounds:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); b = 
-      var_bounds(); save('./mdocean/inputs/var_bounds.mat','b');"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); b = var_bounds();
+      save('./mdocean/inputs/var_bounds.mat','b');"
     deps:
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/parameters.m
@@ -57,10 +56,10 @@ stages:
       - ./mdocean/plots/util/remove_underscores.m
     outs:
       - ./mdocean/inputs/var_bounds.mat
-    desc: Automatically generated from the 'make-var-bounds' stage in 
+    desc: Automatically generated from the 'make-var-bounds' stage in
       calkit.yaml. Changes made here will be overwritten.
   make-calkit-stages:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       analysis_to_calkit;"
     deps:
       - mdocean/analysis/
@@ -78,11 +77,11 @@ stages:
       - calkit_stages.yaml:
           cache: false
           persist: false
-    desc: Automatically generated from the 'make-calkit-stages' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'make-calkit-stages' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-AllFigCompare:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=AllFigCompare; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=AllFigCompare;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -140,11 +139,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/AllFigCompare/intermed.mat
-    desc: Automatically generated from the 'analysis-AllFigCompare' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-AllFigCompare' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-AllFigCompare:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=AllFigCompare; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=AllFigCompare;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@AllFigCompare/AllFigCompare.m
@@ -208,11 +207,11 @@ stages:
       - results/AllFigCompare/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-AllFigCompare' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-AllFigCompare' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Comparison:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Comparison; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Comparison;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Comparison/Comparison.m
@@ -280,11 +279,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Comparison/intermed.mat
-    desc: Automatically generated from the 'analysis-Comparison' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Comparison' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-Comparison:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Comparison; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Comparison;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Comparison/Comparison.m
@@ -363,11 +362,11 @@ stages:
       - results/Comparison/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Comparison' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Comparison' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Constraints:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Constraints; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Constraints;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Constraints/Constraints.m
@@ -425,11 +424,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Constraints/intermed.mat
-    desc: Automatically generated from the 'analysis-Constraints' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Constraints' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-Constraints:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Constraints; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Constraints;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Constraints/Constraints.m
@@ -494,8 +493,8 @@ stages:
       - results/Constraints/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Constraints' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Constraints' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Cost:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
       obj.run_analysis();"
@@ -556,8 +555,8 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Cost/intermed.mat
-    desc: Automatically generated from the 'analysis-Cost' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Cost' stage in calkit.yaml.
+      Changes made here will be overwritten.
   postpro-Cost:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Cost;
       obj.run_all_from_load();"
@@ -625,10 +624,10 @@ stages:
       - results/Cost/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Cost' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Cost' stage in calkit.yaml.
+      Changes made here will be overwritten.
   analysis-DampingPlateStructures:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=DampingPlateStructures; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -692,11 +691,10 @@ stages:
       - results/DampingPlateStructures/intermed_figs_1.fig
       - results/DampingPlateStructures/intermed_figs_2.fig
       - results/DampingPlateStructures/intermed_figs_3.fig
-    desc: Automatically generated from the 
-      'analysis-DampingPlateStructures' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'analysis-DampingPlateStructures'
+      stage in calkit.yaml. Changes made here will be overwritten.
   postpro-DampingPlateStructures:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=DampingPlateStructures; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -768,12 +766,11 @@ stages:
       - results/DampingPlateStructures/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 
-      'postpro-DampingPlateStructures' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'postpro-DampingPlateStructures'
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-DescFcns:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DescFcns; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DescFcns;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DescFcns/DescFcns.m
@@ -835,11 +832,11 @@ stages:
       - results/DescFcns/intermed_created_figs_1.fig
       - results/DescFcns/intermed_created_figs_3.fig
       - results/DescFcns/intermed_created_figs_2.fig
-    desc: Automatically generated from the 'analysis-DescFcns' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-DescFcns' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-DescFcns:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DescFcns; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DescFcns;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DescFcns/DescFcns.m
@@ -913,7 +910,7 @@ stages:
     desc: Automatically generated from the 'postpro-DescFcns' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-DesignSpaceExploration:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=DesignSpaceExploration; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -975,11 +972,10 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/DesignSpaceExploration/intermed.mat
-    desc: Automatically generated from the 
-      'analysis-DesignSpaceExploration' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'analysis-DesignSpaceExploration'
+      stage in calkit.yaml. Changes made here will be overwritten.
   postpro-DesignSpaceExploration:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=DesignSpaceExploration; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1054,12 +1050,11 @@ stages:
       - results/DesignSpaceExploration/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 
-      'postpro-DesignSpaceExploration' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'postpro-DesignSpaceExploration'
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-DesignVars:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DesignVars; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DesignVars;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DesignVars/DesignVars.m
@@ -1117,11 +1112,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/DesignVars/intermed.mat
-    desc: Automatically generated from the 'analysis-DesignVars' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-DesignVars' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-DesignVars:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DesignVars; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DesignVars;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DesignVars/DesignVars.m
@@ -1186,11 +1181,11 @@ stages:
       - results/DesignVars/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-DesignVars' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-DesignVars' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-DragIntegral:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DragIntegral; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DragIntegral;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -1249,11 +1244,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/DragIntegral/intermed.mat
-    desc: Automatically generated from the 'analysis-DragIntegral' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-DragIntegral' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-DragIntegral:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=DragIntegral; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=DragIntegral;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@DragIntegral/DragIntegral.m
@@ -1325,11 +1320,11 @@ stages:
       - results/DragIntegral/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-DragIntegral' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-DragIntegral' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-FitOlaya:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=FitOlaya; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=FitOlaya;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./dev/hydro_coeffs/damping_plate/3b_black.csv
@@ -1405,11 +1400,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/FitOlaya/intermed.mat
-    desc: Automatically generated from the 'analysis-FitOlaya' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-FitOlaya' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-FitOlaya:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=FitOlaya; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=FitOlaya;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@FitOlaya/FitOlaya.m
@@ -1578,7 +1573,7 @@ stages:
     desc: Automatically generated from the 'postpro-FitOlaya' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-ForceSaturationFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=ForceSaturationFigFunc; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1648,11 +1643,10 @@ stages:
       - results/ForceSaturationFigFunc/intermed.mat
       - results/ForceSaturationFigFunc/intermed_fig2_1.fig
       - results/ForceSaturationFigFunc/intermed_fig1_1.fig
-    desc: Automatically generated from the 
-      'analysis-ForceSaturationFigFunc' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'analysis-ForceSaturationFigFunc'
+      stage in calkit.yaml. Changes made here will be overwritten.
   postpro-ForceSaturationFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=ForceSaturationFigFunc; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1721,11 +1715,10 @@ stages:
       - results/ForceSaturationFigFunc/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 
-      'postpro-ForceSaturationFigFunc' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'postpro-ForceSaturationFigFunc'
+      stage in calkit.yaml. Changes made here will be overwritten.
   analysis-GradientOptimFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=GradientOptimFigFunc; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1793,11 +1786,10 @@ stages:
     outs:
       - results/GradientOptimFigFunc/intermed.mat
       - results/GradientOptimFigFunc/intermed_convergence_plot_1.fig
-    desc: Automatically generated from the 
-      'analysis-GradientOptimFigFunc' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'analysis-GradientOptimFigFunc' stage
+      in calkit.yaml. Changes made here will be overwritten.
   postpro-GradientOptimFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=GradientOptimFigFunc; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1888,11 +1880,10 @@ stages:
       - results/GradientOptimFigFunc/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 
-      'postpro-GradientOptimFigFunc' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'postpro-GradientOptimFigFunc' stage
+      in calkit.yaml. Changes made here will be overwritten.
   analysis-HydroCoeffFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=HydroCoeffFigFunc; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -1953,11 +1944,10 @@ stages:
     outs:
       - results/HydroCoeffFigFunc/intermed.mat
       - results/HydroCoeffFigFunc/intermed_created_figs_1.fig
-    desc: Automatically generated from the 
-      'analysis-HydroCoeffFigFunc' stage in calkit.yaml. Changes made 
-      here will be overwritten.
+    desc: Automatically generated from the 'analysis-HydroCoeffFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-HydroCoeffFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=HydroCoeffFigFunc; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2023,10 +2013,10 @@ stages:
       - results/HydroCoeffFigFunc/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-HydroCoeffFigFunc'
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-HydroCoeffFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-LocationSensitivity:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=LocationSensitivity; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2103,11 +2093,10 @@ stages:
       - results/LocationSensitivity/intermed_h_power_matrix_3.fig
       - results/LocationSensitivity/intermed_h_power_matrix_4.fig
       - results/LocationSensitivity/intermed_h_probability_PDF_1.fig
-    desc: Automatically generated from the 
-      'analysis-LocationSensitivity' stage in calkit.yaml. Changes 
-      made here will be overwritten.
+    desc: Automatically generated from the 'analysis-LocationSensitivity' stage
+      in calkit.yaml. Changes made here will be overwritten.
   postpro-LocationSensitivity:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=LocationSensitivity; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2189,9 +2178,8 @@ stages:
       - results/LocationSensitivity/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 
-      'postpro-LocationSensitivity' stage in calkit.yaml. Changes made
-      here will be overwritten.
+    desc: Automatically generated from the 'postpro-LocationSensitivity' stage
+      in calkit.yaml. Changes made here will be overwritten.
   analysis-Meem:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
       obj.run_analysis();"
@@ -2263,8 +2251,8 @@ stages:
       - results/Meem/intermed_figPotMatch_1.fig
       - results/Meem/intermed_fig_convergence_vs_omega_1.fig
       - results/Meem/intermed_fig_convergence_vs_NMK_1.fig
-    desc: Automatically generated from the 'analysis-Meem' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Meem' stage in calkit.yaml.
+      Changes made here will be overwritten.
   postpro-Meem:
     cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Meem;
       obj.run_all_from_load();"
@@ -2348,11 +2336,11 @@ stages:
       - results/Meem/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Meem' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Meem' stage in calkit.yaml.
+      Changes made here will be overwritten.
   analysis-Multistart:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Multistart; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Multistart;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Multistart/Multistart.m
@@ -2421,11 +2409,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Multistart/intermed.mat
-    desc: Automatically generated from the 'analysis-Multistart' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Multistart' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-Multistart:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Multistart; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Multistart;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/SAFE/PAWN/pawn_cdfs.m
@@ -2505,10 +2493,10 @@ stages:
       - results/Multistart/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Multistart' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Multistart' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-ParamSensitivities:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=ParamSensitivities; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2578,11 +2566,10 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/ParamSensitivities/intermed.mat
-    desc: Automatically generated from the 
-      'analysis-ParamSensitivities' stage in calkit.yaml. Changes made
-      here will be overwritten.
+    desc: Automatically generated from the 'analysis-ParamSensitivities' stage
+      in calkit.yaml. Changes made here will be overwritten.
   postpro-ParamSensitivities:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=ParamSensitivities; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2696,12 +2683,11 @@ stages:
       - results/ParamSensitivities/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 
-      'postpro-ParamSensitivities' stage in calkit.yaml. Changes made 
-      here will be overwritten.
+    desc: Automatically generated from the 'postpro-ParamSensitivities' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Parameters:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Parameters; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Parameters;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Parameters/Parameters.m
@@ -2759,11 +2745,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/Parameters/intermed.mat
-    desc: Automatically generated from the 'analysis-Parameters' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Parameters' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-Parameters:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Parameters; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Parameters;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Parameters/Parameters.m
@@ -2828,11 +2814,11 @@ stages:
       - results/Parameters/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Parameters' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Parameters' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoFigFunc; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoFigFunc;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -2902,11 +2888,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/ParetoFigFunc/intermed.mat
-    desc: Automatically generated from the 'analysis-ParetoFigFunc' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-ParetoFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-ParetoFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoFigFunc; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoFigFunc;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoFigFunc/ParetoFigFunc.m
@@ -2984,11 +2970,11 @@ stages:
       - results/ParetoFigFunc/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-ParetoFigFunc' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-ParetoFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-ParetoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoSweep; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoSweep;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3046,11 +3032,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/ParetoSweep/intermed.mat
-    desc: Automatically generated from the 'analysis-ParetoSweep' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-ParetoSweep' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-ParetoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=ParetoSweep; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=ParetoSweep;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@ParetoSweep/ParetoSweep.m
@@ -3114,11 +3100,11 @@ stages:
       - results/ParetoSweep/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-ParetoSweep' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-ParetoSweep' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-PtoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=PtoSweep; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=PtoSweep;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@PtoSweep/PtoSweep.m
@@ -3176,11 +3162,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/PtoSweep/intermed.mat
-    desc: Automatically generated from the 'analysis-PtoSweep' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-PtoSweep' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-PtoSweep:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=PtoSweep; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=PtoSweep;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@PtoSweep/PtoSweep.m
@@ -3249,7 +3235,7 @@ stages:
     desc: Automatically generated from the 'postpro-PtoSweep' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-ReadNonMatlabFigs:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=ReadNonMatlabFigs; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3308,11 +3294,10 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/ReadNonMatlabFigs/intermed.mat
-    desc: Automatically generated from the 
-      'analysis-ReadNonMatlabFigs' stage in calkit.yaml. Changes made 
-      here will be overwritten.
+    desc: Automatically generated from the 'analysis-ReadNonMatlabFigs' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-ReadNonMatlabFigs:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=ReadNonMatlabFigs; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3395,11 +3380,11 @@ stages:
       - results/ReadNonMatlabFigs/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-ReadNonMatlabFigs'
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-ReadNonMatlabFigs' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-QPCircles:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=QPCircles; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=QPCircles;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@QPCircles/QPCircles.m
@@ -3459,11 +3444,11 @@ stages:
     outs:
       - results/QPCircles/intermed.mat
       - results/QPCircles/intermed_figure_handle_1.fig
-    desc: Automatically generated from the 'analysis-QPCircles' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-QPCircles' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-QPCircles:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=QPCircles; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=QPCircles;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@QPCircles/QPCircles.m
@@ -3528,10 +3513,10 @@ stages:
       - results/QPCircles/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-QPCircles' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-QPCircles' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-RunSingleFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=RunSingleFigFunc; obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3612,10 +3597,10 @@ stages:
       - results/RunSingleFigFunc/intermed_created_figs_6.fig
       - results/RunSingleFigFunc/intermed_created_figs_7.fig
       - results/RunSingleFigFunc/intermed_created_figs_8.fig
-    desc: Automatically generated from the 'analysis-RunSingleFigFunc'
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-RunSingleFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-RunSingleFigFunc:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       obj=RunSingleFigFunc; obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -3707,11 +3692,11 @@ stages:
       - results/RunSingleFigFunc/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-RunSingleFigFunc' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-RunSingleFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Runtime:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Runtime; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Runtime;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Runtime/Runtime.m
@@ -3776,8 +3761,8 @@ stages:
     desc: Automatically generated from the 'analysis-Runtime' stage in
       calkit.yaml. Changes made here will be overwritten.
   postpro-Runtime:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Runtime; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Runtime;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Runtime/Runtime.m
@@ -3848,11 +3833,11 @@ stages:
       - results/Runtime/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Runtime' stage in 
+    desc: Automatically generated from the 'postpro-Runtime' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-Slamming:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Slamming; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Slamming;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Slamming/Slamming.m
@@ -3913,11 +3898,11 @@ stages:
     outs:
       - results/Slamming/intermed.mat
       - results/Slamming/intermed_figure_handle_1.fig
-    desc: Automatically generated from the 'analysis-Slamming' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Slamming' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-Slamming:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Slamming; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Slamming;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Slamming/Slamming.m
@@ -3985,8 +3970,8 @@ stages:
     desc: Automatically generated from the 'postpro-Slamming' stage in
       calkit.yaml. Changes made here will be overwritten.
   analysis-SparHydro:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SparHydro; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=SparHydro;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SparHydro/SparHydro.m
@@ -4046,11 +4031,11 @@ stages:
     outs:
       - results/SparHydro/intermed.mat
       - results/SparHydro/intermed_figure_handle_1.fig
-    desc: Automatically generated from the 'analysis-SparHydro' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-SparHydro' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-SparHydro:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SparHydro; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=SparHydro;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SparHydro/SparHydro.m
@@ -4115,11 +4100,11 @@ stages:
       - results/SparHydro/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-SparHydro' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-SparHydro' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-SweepGeoms:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SweepGeoms; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=SweepGeoms;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
@@ -4187,11 +4172,11 @@ stages:
       - ./mdocean/simulation/simulation.m
     outs:
       - results/SweepGeoms/intermed.mat
-    desc: Automatically generated from the 'analysis-SweepGeoms' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-SweepGeoms' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-SweepGeoms:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=SweepGeoms; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=SweepGeoms;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@SweepGeoms/SweepGeoms.m
@@ -4282,11 +4267,11 @@ stages:
       - results/SweepGeoms/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-SweepGeoms' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-SweepGeoms' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Validation:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Validation; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Validation;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Validation/Validation.m
@@ -4350,11 +4335,11 @@ stages:
     outs:
       - results/Validation/intermed.mat
       - results/Validation/intermed_fig_cost_vs_N_WEC_1.fig
-    desc: Automatically generated from the 'analysis-Validation' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'analysis-Validation' stage in
+      calkit.yaml. Changes made here will be overwritten.
   postpro-Validation:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Validation; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Validation;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Validation/Validation.m
@@ -4424,15 +4409,15 @@ stages:
       - results/Validation/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Validation' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-Validation' stage in
+      calkit.yaml. Changes made here will be overwritten.
   analysis-Wecsim:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Wecsim; obj.run_analysis();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Wecsim;
+      obj.run_analysis();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
-      - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
-        Resource _SAM CSV.csv
+      - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave Resource _SAM
+        CSV.csv
       - ./mdocean/analysis/@Wecsim/Wecsim.m
       - ./mdocean/analysis/@Wecsim/analysis_fcn.m
       - ./mdocean/analysis/GenericAnalysis.m
@@ -4505,11 +4490,11 @@ stages:
       - results/Wecsim/wecsim_sparcd0_floatcd0_multibody_1_meem_10_geom_report.mat
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_off_geom_report.mat
       - results/Wecsim/wecsim_sparcd1_floatcd1_multibody_1_meem_10_geom_report.mat
-    desc: Automatically generated from the 'analysis-Wecsim' stage in 
+    desc: Automatically generated from the 'analysis-Wecsim' stage in
       calkit.yaml. Changes made here will be overwritten.
   postpro-Wecsim:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      obj=Wecsim; obj.run_all_from_load();"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); obj=Wecsim;
+      obj.run_all_from_load();"
     deps:
       - ./mdocean/inputs/validation/RM3-CBS.xlsx
       - ./mdocean/analysis/@Wecsim/Wecsim.m
@@ -4523,8 +4508,8 @@ stages:
       - ./mdocean/inputs/validation/WECSim/wecsim_var_names.m
       - ./mdocean/inputs/var_bounds.m
       - ./mdocean/inputs/var_bounds.mat
-      - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave 
-        Resource _SAM CSV.csv
+      - ./mdocean/inputs/wave_conditions/Humboldt_California_Wave Resource _SAM
+        CSV.csv
       - ./mdocean/inputs/wave_conditions/trim_jpd.m
       - ./mdocean/optimization/find_nominal_inputs.m
       - ./mdocean/plots/matlab_figs/dynamics_results/make_ctrl_polar_plot.m
@@ -4962,11 +4947,11 @@ stages:
       - results/Wecsim/end.json:
           cache: false
           persist: false
-    desc: Automatically generated from the 'postpro-Wecsim' stage in 
+    desc: Automatically generated from the 'postpro-Wecsim' stage in
       calkit.yaml. Changes made here will be overwritten.
   postpro-WithTables:
-    cmd: bash --noprofile --norc -c "echo \"Running postprocessing for
-      all stages with tables.\""
+    cmd: bash --noprofile --norc -c "echo \"Running postprocessing for all
+      stages with tables.\""
     deps:
       - results/Comparison/overlaid_geometry.pdf
       - results/Comparison/overlaid_hydro_coeffs.pdf
@@ -5413,11 +5398,11 @@ stages:
       - results/Wecsim/end.mat
       - results/Wecsim/end.json
     outs: []
-    desc: Automatically generated from the 'postpro-WithTables' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'postpro-WithTables' stage in
+      calkit.yaml. Changes made here will be overwritten.
   all-postpro:
-    cmd: bash --noprofile --norc -c "echo \"Running postprocessing for
-      all stages.\""
+    cmd: bash --noprofile --norc -c "echo \"Running postprocessing for all
+      stages.\""
     deps:
       - results/AllFigCompare/runtime_bar_chart.pdf
       - results/AllFigCompare/runtime_bar_chart.fig
@@ -6190,11 +6175,11 @@ stages:
       - results/Wecsim/end.mat
       - results/Wecsim/end.json
     outs: []
-    desc: Automatically generated from the 'all-postpro' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'all-postpro' stage in calkit.yaml.
+      Changes made here will be overwritten.
   test-aor:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      addpath('tests'); run_tests('AOR')"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); addpath('tests');
+      run_tests('AOR')"
     deps:
       - tests/
       - mdocean/
@@ -6260,11 +6245,11 @@ stages:
       - code-coverage/aor/:
           cache: false
           persist: false
-    desc: Automatically generated from the 'test-aor' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'test-aor' stage in calkit.yaml.
+      Changes made here will be overwritten.
   test-re:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
-      addpath('tests'); run_tests('RE')"
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); addpath('tests');
+      run_tests('RE')"
     deps:
       - tests/
       - mdocean/
@@ -6294,10 +6279,10 @@ stages:
       - code-coverage/re/:
           cache: false
           persist: false
-    desc: Automatically generated from the 'test-re' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'test-re' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-AllFigCompare:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/AllFigCompare.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/AllFigCompare.ipynb
@@ -6309,10 +6294,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/AllFigCompare.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-AllFigCompare' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-AllFigCompare' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-Comparison:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Comparison.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Comparison.ipynb
@@ -6332,10 +6317,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Comparison.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Comparison' stage in 
+    desc: Automatically generated from the 'viz-Comparison' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-Constraints:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Constraints.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Constraints.ipynb
@@ -6346,10 +6331,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Constraints.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Constraints' stage in 
+    desc: Automatically generated from the 'viz-Constraints' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-Cost:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Cost.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Cost.ipynb
@@ -6360,10 +6345,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Cost.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Cost' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-Cost' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-DampingPlateStructures:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/DampingPlateStructures.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/DampingPlateStructures.ipynb
@@ -6379,11 +6364,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/DampingPlateStructures.ipynb:
           cache: false
-    desc: Automatically generated from the 
-      'viz-DampingPlateStructures' stage in calkit.yaml. Changes made 
-      here will be overwritten.
+    desc: Automatically generated from the 'viz-DampingPlateStructures' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-DescFcns:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/DescFcns.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/DescFcns.ipynb
@@ -6399,10 +6383,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/DescFcns.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-DescFcns' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-DescFcns' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-DesignSpaceExploration:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/DesignSpaceExploration.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/DesignSpaceExploration.ipynb
@@ -6415,11 +6399,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/DesignSpaceExploration.ipynb:
           cache: false
-    desc: Automatically generated from the 
-      'viz-DesignSpaceExploration' stage in calkit.yaml. Changes made 
-      here will be overwritten.
+    desc: Automatically generated from the 'viz-DesignSpaceExploration' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-DesignVars:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/DesignVars.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/DesignVars.ipynb
@@ -6430,10 +6413,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/DesignVars.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-DesignVars' stage in 
+    desc: Automatically generated from the 'viz-DesignVars' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-DragIntegral:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/DragIntegral.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/DragIntegral.ipynb
@@ -6456,7 +6439,7 @@ stages:
     desc: Automatically generated from the 'viz-DragIntegral' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-FitOlaya:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/FitOlaya.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/FitOlaya.ipynb
@@ -6570,10 +6553,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/FitOlaya.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-FitOlaya' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-FitOlaya' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-ForceSaturationFigFunc:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/ForceSaturationFigFunc.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/ForceSaturationFigFunc.ipynb
@@ -6587,11 +6570,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/ForceSaturationFigFunc.ipynb:
           cache: false
-    desc: Automatically generated from the 
-      'viz-ForceSaturationFigFunc' stage in calkit.yaml. Changes made 
-      here will be overwritten.
+    desc: Automatically generated from the 'viz-ForceSaturationFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-GradientOptimFigFunc:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/GradientOptimFigFunc.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/GradientOptimFigFunc.ipynb
@@ -6612,10 +6594,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/GradientOptimFigFunc.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-GradientOptimFigFunc' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-GradientOptimFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-HydroCoeffFigFunc:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/HydroCoeffFigFunc.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/HydroCoeffFigFunc.ipynb
@@ -6627,10 +6609,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/HydroCoeffFigFunc.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-HydroCoeffFigFunc' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-HydroCoeffFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-LocationSensitivity:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/LocationSensitivity.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/LocationSensitivity.ipynb
@@ -6651,10 +6633,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/LocationSensitivity.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-LocationSensitivity' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-LocationSensitivity' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-Meem:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Meem.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Meem.ipynb
@@ -6676,10 +6658,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Meem.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Meem' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-Meem' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-Multistart:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Multistart.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Multistart.ipynb
@@ -6696,10 +6678,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Multistart.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Multistart' stage in 
+    desc: Automatically generated from the 'viz-Multistart' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-ParamSensitivities:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/ParamSensitivities.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/ParamSensitivities.ipynb
@@ -6757,10 +6739,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/ParamSensitivities.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-ParamSensitivities' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-ParamSensitivities' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-Parameters:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Parameters.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Parameters.ipynb
@@ -6771,10 +6753,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Parameters.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Parameters' stage in 
+    desc: Automatically generated from the 'viz-Parameters' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-ParetoFigFunc:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/ParetoFigFunc.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/ParetoFigFunc.ipynb
@@ -6794,10 +6776,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/ParetoFigFunc.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-ParetoFigFunc' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-ParetoFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-ParetoSweep:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/ParetoSweep.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/ParetoSweep.ipynb
@@ -6809,10 +6791,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/ParetoSweep.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-ParetoSweep' stage in 
+    desc: Automatically generated from the 'viz-ParetoSweep' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-PtoSweep:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/PtoSweep.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/PtoSweep.ipynb
@@ -6826,10 +6808,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/PtoSweep.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-PtoSweep' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-PtoSweep' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-QPCircles:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/QPCircles.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/QPCircles.ipynb
@@ -6841,10 +6823,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/QPCircles.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-QPCircles' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-QPCircles' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-ReadNonMatlabFigs:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/ReadNonMatlabFigs.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/ReadNonMatlabFigs.ipynb
@@ -6872,10 +6854,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/ReadNonMatlabFigs.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-ReadNonMatlabFigs' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-ReadNonMatlabFigs' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-RunSingleFigFunc:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/RunSingleFigFunc.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/RunSingleFigFunc.ipynb
@@ -6905,10 +6887,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/RunSingleFigFunc.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-RunSingleFigFunc' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-RunSingleFigFunc' stage in
+      calkit.yaml. Changes made here will be overwritten.
   viz-Runtime:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Runtime.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Runtime.ipynb
@@ -6926,10 +6908,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Runtime.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Runtime' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-Runtime' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-Slamming:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Slamming.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Slamming.ipynb
@@ -6941,10 +6923,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Slamming.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Slamming' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-Slamming' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-SparHydro:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/SparHydro.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/SparHydro.ipynb
@@ -6956,10 +6938,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/SparHydro.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-SparHydro' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-SparHydro' stage in calkit.yaml.
+      Changes made here will be overwritten.
   viz-SweepGeoms:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/SweepGeoms.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/SweepGeoms.ipynb
@@ -6995,10 +6977,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/SweepGeoms.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-SweepGeoms' stage in 
+    desc: Automatically generated from the 'viz-SweepGeoms' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-Validation:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Validation.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Validation.ipynb
@@ -7011,10 +6993,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Validation.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Validation' stage in 
+    desc: Automatically generated from the 'viz-Validation' stage in
       calkit.yaml. Changes made here will be overwritten.
   viz-Wecsim:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "results/fig_notebooks/Wecsim.ipynb"
     deps:
       - .calkit/notebooks/cleaned/results/fig_notebooks/Wecsim.ipynb
@@ -7397,10 +7379,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/results/fig_notebooks/Wecsim.ipynb:
           cache: false
-    desc: Automatically generated from the 'viz-Wecsim' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'viz-Wecsim' stage in calkit.yaml.
+      Changes made here will be overwritten.
   pyxdsm:
-    cmd: calkit xenv -n pubs --no-check -- python 
+    cmd: calkit xenv -n pubs --no-check -- python
       mdocean/plots/non_matlab_figs/xdsm.py
     deps:
       - mdocean/plots/non_matlab_figs/xdsm.py
@@ -7413,10 +7395,10 @@ stages:
           cache: false
           persist: false
       - mdocean/plots/non_matlab_figs/pdf/xdsm.pdf
-    desc: Automatically generated from the 'pyxdsm' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'pyxdsm' stage in calkit.yaml.
+      Changes made here will be overwritten.
   move-re-results:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       move_results_to_pubs('RE');"
     deps:
       - results/ReadNonMatlabFigs/
@@ -7438,10 +7420,10 @@ stages:
     outs:
       - pubs/renewable-energy-mdo/figs/from-matlab/
       - pubs/renewable-energy-mdo/tables/from-matlab/
-    desc: Automatically generated from the 'move-re-results' stage in 
+    desc: Automatically generated from the 'move-re-results' stage in
       calkit.yaml. Changes made here will be overwritten.
   move-aor-results:
-    cmd: matlab -noFigureWindows -batch "add_mdocean_path(); 
+    cmd: matlab -noFigureWindows -batch "add_mdocean_path();
       move_results_to_pubs('AOR');"
     deps:
       - results/DragIntegral/
@@ -7475,24 +7457,20 @@ stages:
     cmd: "calkit latex from-json 'results/Parameters/end.json' 'results/RunSingleFigFunc/end.json'
       'results/Runtime/end.json' 'results/SweepGeoms/end.json' 'results/PtoSweep/end.json'
       'results/Wecsim/end.json' --output 'pubs/applied-ocean-research-model/numeric-results.tex'
-      --command resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
-      $/kWh\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
-      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
-      MN\", \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\"\
-      : \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"meemSweepTime\"\
-      : \"{geom_sweep_analysis_time/60:.0f} minutes\", \"pctRuntimeMEEM\"\
-      : \"{pctRuntimeMEEM:.0f}%\", \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\"\
-      , \"pctRuntimeOther\": \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\"\
-      : \"{wecsimAvgPowerErrorBestCase:.2f}%\", \"wecsimAvgPowerErrorWorstCase\"\
-      : \"{wecsimAvgPowerErrorWorstCase:.2f}%\", \"powerScaleFactor\": \"\
-      {powerScaleFactor:.2f}\", \"forceScaleFactor\": \"{forceScaleFactor:.2f}\"\
-      , \"massScaleFactor\": \"{massScaleFactor:.2f}\", \"ptoSweepMinLCOE_F_max\"\
-      : \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
-      : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\"\
-      : \"{ptoSweepMinLCOE_power/1e3:.0f} kW\", \"ptoSweepMinLCOE_cost\"\
-      : \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
-      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\", \"meemSweepSize\": \"{n_combos}\"\
-      }'"
+      --command resultsAOR --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\"\
+      : \"{surgeForceSparNominal/1e6:.0f} MN\", \"simRuntime\": \"{simRuntime*1000:.0f}
+      ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"meemSweepTime\"\
+      : \"{geom_sweep_analysis_time/60:.0f} minutes\", \"pctRuntimeMEEM\": \"{pctRuntimeMEEM:.0f}%\"\
+      , \"pctRuntimeDynamics\": \"{pctRuntimeDynamics:.0f}%\", \"pctRuntimeOther\"\
+      : \"{pctRuntimeOther:.0f}%\", \"wecsimAvgPowerErrorBestCase\": \"{wecsimAvgPowerErrorBestCase:.2f}%\"\
+      , \"wecsimAvgPowerErrorWorstCase\": \"{wecsimAvgPowerErrorWorstCase:.2f}%\"\
+      , \"powerScaleFactor\": \"{powerScaleFactor:.2f}\", \"forceScaleFactor\": \"\
+      {forceScaleFactor:.2f}\", \"massScaleFactor\": \"{massScaleFactor:.2f}\", \"\
+      ptoSweepMinLCOE_F_max\": \"{ptoSweepMinLCOE_F_max/1e6:.2f} MN\", \"ptoSweepMinLCOE_P_max\"\
+      : \"{ptoSweepMinLCOE_P_max/1e3:.0f} kW\", \"ptoSweepMinLCOE_power\": \"{ptoSweepMinLCOE_power/1e3:.0f}
+      kW\", \"ptoSweepMinLCOE_cost\": \"{ptoSweepMinLCOE_cost/1e6:.2f} $M\", \"ptoSweepMinLCOE_LCOE\"\
+      : \"{ptoSweepMinLCOE_LCOE:.2f} $/kWh\", \"meemSweepSize\": \"{n_combos}\"}'"
     deps:
       - results/Parameters/end.json
       - results/RunSingleFigFunc/end.json
@@ -7504,10 +7482,10 @@ stages:
       - pubs/applied-ocean-research-model/numeric-results.tex:
           cache: false
           persist: false
-    desc: Automatically generated from the 'aor-results-to-latex' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'aor-results-to-latex' stage in
+      calkit.yaml. Changes made here will be overwritten.
   check-dup-json-keys:
-    cmd: calkit xenv -n pubs --no-check -- python 
+    cmd: calkit xenv -n pubs --no-check -- python
       dev/latex/duplicate_json_key.py
     deps:
       - dev/latex/duplicate_json_key.py
@@ -7515,38 +7493,34 @@ stages:
       - pubs/renewable-energy-mdo/numbers.json
       - .calkit/env-locks/pubs
     outs: []
-    desc: Automatically generated from the 'check-dup-json-keys' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'check-dup-json-keys' stage in
+      calkit.yaml. Changes made here will be overwritten.
   re-results-to-latex:
-    cmd: "calkit latex from-json 'pubs/renewable-energy-mdo/numbers.json'
-      'results/Comparison/end.json' 'results/Constraints/end.json' 'results/ForceSaturationFigFunc/end.json'
-      'results/GradientOptimFigFunc/end.json' 'results/ParamSensitivities/end.json'
-      'results/Parameters/end.json' 'results/ParetoFigFunc/end.json' 'results/Runtime/end.json'
-      'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/numeric-results.tex'
-      --command resultsRE --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f}
-      $/kWh\", \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\"\
-      : \"{powerAvgNominal/1000:.0f} kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f}
-      kW\", \"powerAvgAtMinLCOE\": \"{powerAvgAtMinLCOE/1000:.0f} kW\",
-      \"powerAvgAtMinCapex\": \"{powerAvgAtMinCapex/1000:.0f} kW\", \"powerAvgMaxPower\"\
-      : \"{powerAvgMaxPower/1000:.0f} kW\", \"powerBalanced\": \"{powerBalanced/1000:.0f}
-      kW\", \"powerWhereCusp\": \"{powerWhereCusp/1000:.0f} kW\", \"powerWhereNonconvexEnds\"\
-      : \"{powerWhereNonconvexEnds/1000:.0f} kW\", \"dampingReactivePowerIntersect\"\
-      : \"{dampingReactivePowerIntersect/1000:.0f} kW\", \"structMassAtMinLCOE\"\
-      : \"{structMassAtMinLCOE/1000:.0f} Mg\", \"DfoptMinLCOE\": \"{DfoptMinLCOE:.1f}
-      m\", \"forceMaxAtMinLCOE\": \"{forceMaxAtMinLCOE/1e6:.0f} MN\", \"\
-      surgeForceFloatAtMinLCOE\": \"{surgeForceFloatAtMinLCOE/1e6:.0f} MN\"\
-      , \"surgeForceSparAtMinLCOE\": \"{surgeForceSparAtMinLCOE/1e6:.0f}
-      MN\", \"surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f}
-      MN\", \"surgeForceSparNominal\": \"{surgeForceSparNominal/1e6:.0f}
-      MN\", \"capexAtMinLCOE\": \"{capexAtMinLCOE/1e6:.0f} $M\", \"capexDesignAtMinLCOE\"\
-      : \"{capexDesignAtMinLCOE/1e6:.2f} $M\", \"capexDesignNominal\": \"\
-      {capexDesignNominal/1e6:.2f} $M\", \"capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f}
-      $M\", \"capexDesignMaxPower\": \"{capexDesignMaxPower/1e6:.2f} $M\"\
-      , \"simRuntime\": \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"\
-      {pctRuntimeMEEM/100*simRuntime*1000:.0f} ms\", \"singleObjRuntime\"\
-      : \"{singleObjRuntime/60:.1f} min\", \"paretoRuntime\": \"{paretoRuntime/60:.0f}
-      min\", \"gradientSensRuntime\": \"{runtime_post_optim/60:.1f} min\"\
-      , \"reoptimSensRuntime\": \"{runtime_re_optim/60:.0f} min\", \"pctImproveLCOEMinLCOE\"\
+    cmd: "calkit latex from-json 'pubs/renewable-energy-mdo/numbers.json' 'results/Comparison/end.json'
+      'results/Constraints/end.json' 'results/ForceSaturationFigFunc/end.json' 'results/GradientOptimFigFunc/end.json'
+      'results/ParamSensitivities/end.json' 'results/Parameters/end.json' 'results/ParetoFigFunc/end.json'
+      'results/Runtime/end.json' 'results/RunSingleFigFunc/end.json' --output 'pubs/renewable-energy-mdo/numeric-results.tex'
+      --command resultsRE --format-json '{\"nominalLCOE\": \"{nominalLCOE:.2f} $/kWh\"\
+      , \"minLCOE\": \"{minLCOE:.2f} $/kWh\", \"powerAvgNominal\": \"{powerAvgNominal/1000:.0f}
+      kW\", \"powerMaxAtMinLCOE\": \"{powerMaxAtMinLCOE/1000:.0f} kW\", \"powerAvgAtMinLCOE\"\
+      : \"{powerAvgAtMinLCOE/1000:.0f} kW\", \"powerAvgAtMinCapex\": \"{powerAvgAtMinCapex/1000:.0f}
+      kW\", \"powerAvgMaxPower\": \"{powerAvgMaxPower/1000:.0f} kW\", \"powerBalanced\"\
+      : \"{powerBalanced/1000:.0f} kW\", \"powerWhereCusp\": \"{powerWhereCusp/1000:.0f}
+      kW\", \"powerWhereNonconvexEnds\": \"{powerWhereNonconvexEnds/1000:.0f} kW\"\
+      , \"dampingReactivePowerIntersect\": \"{dampingReactivePowerIntersect/1000:.0f}
+      kW\", \"structMassAtMinLCOE\": \"{structMassAtMinLCOE/1000:.0f} Mg\", \"DfoptMinLCOE\"\
+      : \"{DfoptMinLCOE:.1f} m\", \"forceMaxAtMinLCOE\": \"{forceMaxAtMinLCOE/1e6:.0f}
+      MN\", \"surgeForceFloatAtMinLCOE\": \"{surgeForceFloatAtMinLCOE/1e6:.0f} MN\"\
+      , \"surgeForceSparAtMinLCOE\": \"{surgeForceSparAtMinLCOE/1e6:.0f} MN\", \"\
+      surgeForceFloatNominal\": \"{surgeForceFloatNominal/1e6:.0f} MN\", \"surgeForceSparNominal\"\
+      : \"{surgeForceSparNominal/1e6:.0f} MN\", \"capexAtMinLCOE\": \"{capexAtMinLCOE/1e6:.0f}
+      $M\", \"capexDesignAtMinLCOE\": \"{capexDesignAtMinLCOE/1e6:.2f} $M\", \"capexDesignNominal\"\
+      : \"{capexDesignNominal/1e6:.2f} $M\", \"capexDesignMinCapex\": \"{capexDesignMinCapex/1e6:.2f}
+      $M\", \"capexDesignMaxPower\": \"{capexDesignMaxPower/1e6:.2f} $M\", \"simRuntime\"\
+      : \"{simRuntime*1000:.0f} ms\", \"MEEMRuntime\": \"{pctRuntimeMEEM/100*simRuntime*1000:.0f}
+      ms\", \"singleObjRuntime\": \"{singleObjRuntime/60:.1f} min\", \"paretoRuntime\"\
+      : \"{paretoRuntime/60:.0f} min\", \"gradientSensRuntime\": \"{runtime_post_optim/60:.1f}
+      min\", \"reoptimSensRuntime\": \"{runtime_re_optim/60:.0f} min\", \"pctImproveLCOEMinLCOE\"\
       : \"{(nominalLCOE - minLCOE)/nominalLCOE*100:.0f}%\", \"pctImproveDesignCostMinLCOE\"\
       : \"{(capexDesignNominal - capexDesignAtMinLCOE)/capexDesignNominal*100:.0f}%\"\
       , \"pctImprovePowerMinLCOE\": \"{(powerAvgAtMinLCOE - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
@@ -7554,23 +7528,21 @@ stages:
       , \"pctWorsePowerMinCapex\": \"{(powerAvgNominal - powerAvgAtMinCapex)/powerAvgNominal*100:.0f}%\"\
       , \"pctImprovePowerMaxPower\": \"{(powerAvgMaxPower - powerAvgNominal)/powerAvgNominal*100:.0f}%\"\
       , \"pctWorseDesignCostMaxPower\": \"{(capexDesignNominal - capexDesignMaxPower)/capexDesignNominal*100:.0f}%\"\
-      , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\", \"\
-      lowestFmaxFactorMinLCOE\": \"{lowestFmaxFactorMinLCOE*100:.0f}%\"\
-      , \"percentParamsRightSign\": \"{percentParamsRightSign:.0f}%\", \"\
-      percentMeanAbsErrorParamSens\": \"{percentMeanAbsErrorParamSens:.0f}%\"\
-      , \"powerLossForceSatMinLCOE\": \"{powerLossForceSatMinLCOE:.1f} W\"\
-      , \"pctPowerLossForceSatMinLCOE\": \"{pctPowerLossForceSatMinLCOE:.3f}%\"\
-      , \"pctPTOSavingsForceSatMinLCOE\": \"{pctPTOSavingsForceSatMinLCOE:.0f}%\"\
-      , \"pctImproveLCOEForceSatMinLCOE\": \"{pctImproveLCOEForceSatMinLCOE:.0f}%\"\
-      , \"pctPowerGainForceSatOptMinLCOE\": \"{pctPowerGainForceSatOptMinLCOE:.1f}%\"\
-      , \"pctPTOCostIncreaseForceSatOptMinLCOE\": \"{pctPTOCostIncreaseForceSatOptMinLCOE:.0f}%\"\
-      , \"pctStructCostIncreaseForceSatOptMinLCOE\": \"{pctStructCostIncreaseForceSatOptMinLCOE:.0f}%\"\
-      , \"pctLCOEIncreaseForceSatOptMinLCOE\": \"{pctLCOEIncreaseForceSatOptMinLCOE:.0f}%\"\
-      , \"singleObjIters\": \"{singleObjIters:.0f}\", \"singleObjFcnEvals\"\
-      : \"{singleObjFcnEvals:,.0f}\", \"numReoptims\": \"{numReoptims:.0f}\"\
-      , \"paretoFcnEvals\": \"{paretoFcnEvals:,.0f}\", \"paretoPctTimeSeeds\"\
-      : \"{paretoPctTimeSeeds*100:.0f}%\", \"paretoPctTimePatternSearch\"\
-      : \"{paretoPctTimePatternSearch*100:.0f}%\"}'"
+      , \"pctCostSavingsFromPTO\": \"{pctCostSavingsFromPTO:.0f}%\", \"lowestFmaxFactorMinLCOE\"\
+      : \"{lowestFmaxFactorMinLCOE*100:.0f}%\", \"percentParamsRightSign\": \"{percentParamsRightSign:.0f}%\"\
+      , \"percentMeanAbsErrorParamSens\": \"{percentMeanAbsErrorParamSens:.0f}%\"\
+      , \"powerLossForceSatMinLCOE\": \"{powerLossForceSatMinLCOE:.1f} W\", \"pctPowerLossForceSatMinLCOE\"\
+      : \"{pctPowerLossForceSatMinLCOE:.3f}%\", \"pctPTOSavingsForceSatMinLCOE\":
+      \"{pctPTOSavingsForceSatMinLCOE:.0f}%\", \"pctImproveLCOEForceSatMinLCOE\":
+      \"{pctImproveLCOEForceSatMinLCOE:.0f}%\", \"pctPowerGainForceSatOptMinLCOE\"\
+      : \"{pctPowerGainForceSatOptMinLCOE:.1f}%\", \"pctPTOCostIncreaseForceSatOptMinLCOE\"\
+      : \"{pctPTOCostIncreaseForceSatOptMinLCOE:.0f}%\", \"pctStructCostIncreaseForceSatOptMinLCOE\"\
+      : \"{pctStructCostIncreaseForceSatOptMinLCOE:.0f}%\", \"pctLCOEIncreaseForceSatOptMinLCOE\"\
+      : \"{pctLCOEIncreaseForceSatOptMinLCOE:.0f}%\", \"singleObjIters\": \"{singleObjIters:.0f}\"\
+      , \"singleObjFcnEvals\": \"{singleObjFcnEvals:,.0f}\", \"numReoptims\": \"{numReoptims:.0f}\"\
+      , \"paretoFcnEvals\": \"{paretoFcnEvals:,.0f}\", \"paretoPctTimeSeeds\": \"\
+      {paretoPctTimeSeeds*100:.0f}%\", \"paretoPctTimePatternSearch\": \"{paretoPctTimePatternSearch*100:.0f}%\"\
+      }'"
     deps:
       - pubs/renewable-energy-mdo/numbers.json
       - results/Comparison/end.json
@@ -7586,35 +7558,35 @@ stages:
       - pubs/renewable-energy-mdo/numeric-results.tex:
           cache: false
           persist: false
-    desc: Automatically generated from the 're-results-to-latex' stage
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 're-results-to-latex' stage in
+      calkit.yaml. Changes made here will be overwritten.
   copy-shared-latex:
-    cmd: calkit map-paths --file-to-file 
-      'pubs/shared/references.bib->pubs/applied-ocean-research-model/references.bib'
-      --file-to-file 
-      'pubs/shared/references.bib->pubs/renewable-energy-mdo/references.bib'
-      --file-to-file 
-      'pubs/shared/references.bib->pubs/dissertation/references.bib' 
-      --file-to-file 
-      'pubs/shared/elsarticle-num-names.bst->pubs/applied-ocean-research-model/elsarticle-num-names.bst'
-      --file-to-file 
-      'pubs/shared/elsarticle-num-names.bst->pubs/renewable-energy-mdo/elsarticle-num-names.bst'
-      --file-to-file 
-      'pubs/shared/shared-pkg.tex->pubs/applied-ocean-research-model/shared-pkg.tex'
-      --file-to-file 
-      'pubs/shared/shared-pkg.tex->pubs/renewable-energy-mdo/shared-pkg.tex'
-      --file-to-file 
-      'pubs/shared/els-cas/cas-dc.cls->pubs/applied-ocean-research-model/cas-dc.cls'
-      --file-to-file 
-      'pubs/shared/els-cas/cas-dc.cls->pubs/renewable-energy-mdo/cas-dc.cls'
-      --file-to-file 
-      'pubs/shared/els-cas/cas-common.sty->pubs/applied-ocean-research-model/cas-common.sty'
-      --file-to-file 
-      'pubs/shared/els-cas/cas-common.sty->pubs/renewable-energy-mdo/cas-common.sty'
-      --file-to-file 
-      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib'
-      --file-to-file 
-      'mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/renewable-energy-mdo/zotero-meem-refs.bib'
+    cmd: calkit map-paths --file-to-file
+      "pubs/shared/references.bib->pubs/applied-ocean-research-model/references.bib"
+      --file-to-file
+      "pubs/shared/references.bib->pubs/renewable-energy-mdo/references.bib"
+      --file-to-file
+      "pubs/shared/references.bib->pubs/dissertation/references.bib"
+      --file-to-file
+      "pubs/shared/elsarticle-num-names.bst->pubs/applied-ocean-research-model/elsarticle-num-names.bst"
+      --file-to-file
+      "pubs/shared/elsarticle-num-names.bst->pubs/renewable-energy-mdo/elsarticle-num-names.bst"
+      --file-to-file
+      "pubs/shared/shared-pkg.tex->pubs/applied-ocean-research-model/shared-pkg.tex"
+      --file-to-file
+      "pubs/shared/shared-pkg.tex->pubs/renewable-energy-mdo/shared-pkg.tex"
+      --file-to-file
+      "pubs/shared/els-cas/cas-dc.cls->pubs/applied-ocean-research-model/cas-dc.cls"
+      --file-to-file
+      "pubs/shared/els-cas/cas-dc.cls->pubs/renewable-energy-mdo/cas-dc.cls"
+      --file-to-file
+      "pubs/shared/els-cas/cas-common.sty->pubs/applied-ocean-research-model/cas-common.sty"
+      --file-to-file
+      "pubs/shared/els-cas/cas-common.sty->pubs/renewable-energy-mdo/cas-common.sty"
+      --file-to-file
+      "mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/applied-ocean-research-model/zotero-meem-refs.bib"
+      --file-to-file
+      "mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib->pubs/renewable-energy-mdo/zotero-meem-refs.bib"
     deps:
       - pubs/shared/references.bib
       - pubs/shared/references.bib
@@ -7669,14 +7641,14 @@ stages:
       - pubs/renewable-energy-mdo/zotero-meem-refs.bib:
           cache: false
           persist: true
-    desc: Automatically generated from the 'copy-shared-latex' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'copy-shared-latex' stage in
+      calkit.yaml. Changes made here will be overwritten.
   paperlint-aor:
-    cmd: calkit xenv -n pubs --no-check -- python 
-      dev/latex/Paper-Linter/paperlint.py 
-      pubs/applied-ocean-research-model/main.tex --ignore 
+    cmd: calkit xenv -n pubs --no-check -- python
+      dev/latex/Paper-Linter/paperlint.py
+      pubs/applied-ocean-research-model/main.tex --ignore
       pubs/applied-ocean-research-model/numeric-results.tex --settings
-      dev/latex/Paper-Linter/settings.txt --output 
+      dev/latex/Paper-Linter/settings.txt --output
       dev/latex/Paper-Linter/lint-aor.txt
     deps:
       - dev/latex/Paper-Linter/paperlint.py
@@ -7686,14 +7658,13 @@ stages:
       - dev/latex/Paper-Linter/lint-aor.txt:
           cache: false
           persist: false
-    desc: Automatically generated from the 'paperlint-aor' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'paperlint-aor' stage in calkit.yaml.
+      Changes made here will be overwritten.
   paperlint-re:
-    cmd: calkit xenv -n pubs --no-check -- python 
-      dev/latex/Paper-Linter/paperlint.py 
-      pubs/renewable-energy-mdo/mdocean.tex --ignore 
-      pubs/renewable-energy-mdo/numeric-results.tex --settings 
-      dev/latex/Paper-Linter/settings.txt --output 
+    cmd: calkit xenv -n pubs --no-check -- python
+      dev/latex/Paper-Linter/paperlint.py pubs/renewable-energy-mdo/mdocean.tex
+      --ignore pubs/renewable-energy-mdo/numeric-results.tex --settings
+      dev/latex/Paper-Linter/settings.txt --output
       dev/latex/Paper-Linter/lint-re.txt
     deps:
       - dev/latex/Paper-Linter/paperlint.py
@@ -7703,12 +7674,11 @@ stages:
       - dev/latex/Paper-Linter/lint-re.txt:
           cache: false
           persist: false
-    desc: Automatically generated from the 'paperlint-re' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'paperlint-re' stage in calkit.yaml.
+      Changes made here will be overwritten.
   build-RE-paper:
-    cmd: calkit latex build -e tex --no-check -r 
-      pubs/renewable-energy-mdo/.latexmkrc 
-      pubs/renewable-energy-mdo/mdocean.tex
+    cmd: calkit latex build -e tex --no-check -r
+      pubs/renewable-energy-mdo/.latexmkrc pubs/renewable-energy-mdo/mdocean.tex
     deps:
       - pubs/renewable-energy-mdo/mdocean.tex
       - pubs/renewable-energy-mdo/figs/from-matlab/
@@ -7731,11 +7701,11 @@ stages:
       - pubs/renewable-energy-mdo/aux/:
           cache: false
           persist: true
-    desc: Automatically generated from the 'build-RE-paper' stage in 
+    desc: Automatically generated from the 'build-RE-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
   build-AOR-paper:
-    cmd: calkit latex build -e tex --no-check -r 
-      pubs/applied-ocean-research-model/.latexmkrc 
+    cmd: calkit latex build -e tex --no-check -r
+      pubs/applied-ocean-research-model/.latexmkrc
       pubs/applied-ocean-research-model/main.tex
     deps:
       - pubs/applied-ocean-research-model/main.tex
@@ -7761,10 +7731,10 @@ stages:
       - pubs/applied-ocean-research-model/aux/:
           cache: false
           persist: true
-    desc: Automatically generated from the 'build-AOR-paper' stage in 
+    desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
   build-UMERC-paper:
-    cmd: calkit latex build -e tex --no-check 
+    cmd: calkit latex build -e tex --no-check
       pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
     deps:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
@@ -7774,11 +7744,11 @@ stages:
       - .calkit/env-locks/tex
     outs:
       - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
-    desc: Automatically generated from the 'build-UMERC-paper' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'build-UMERC-paper' stage in
+      calkit.yaml. Changes made here will be overwritten.
   build-dissertation:
-    cmd: calkit latex build -e tex --no-check -r 
-      pubs/dissertation/.latexmkrc pubs/dissertation/sampleThesis.tex
+    cmd: calkit latex build -e tex --no-check -r pubs/dissertation/.latexmkrc
+      pubs/dissertation/sampleThesis.tex
     deps:
       - pubs/dissertation/sampleThesis.tex
       - pubs/dissertation/cornell.cls
@@ -7815,10 +7785,10 @@ stages:
       - pubs/dissertation/aux/:
           cache: false
           persist: true
-    desc: Automatically generated from the 'build-dissertation' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'build-dissertation' stage in
+      calkit.yaml. Changes made here will be overwritten.
   view-aor-figs:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "pubs/applied-ocean-research-model/view_figs.ipynb"
     deps:
       - .calkit/notebooks/cleaned/pubs/applied-ocean-research-model/view_figs.ipynb
@@ -7827,10 +7797,10 @@ stages:
     outs:
       - .calkit/notebooks/executed/pubs/applied-ocean-research-model/view_figs.ipynb:
           cache: false
-    desc: Automatically generated from the 'view-aor-figs' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'view-aor-figs' stage in calkit.yaml.
+      Changes made here will be overwritten.
   view-re-figs:
-    cmd: calkit nb execute --environment pubs --no-check 
+    cmd: calkit nb execute --environment pubs --no-check
       "pubs/renewable-energy-mdo/view_figs.ipynb"
     deps:
       - .calkit/notebooks/cleaned/pubs/renewable-energy-mdo/view_figs.ipynb
@@ -7839,11 +7809,11 @@ stages:
     outs:
       - .calkit/notebooks/executed/pubs/renewable-energy-mdo/view_figs.ipynb:
           cache: false
-    desc: Automatically generated from the 'view-re-figs' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'view-re-figs' stage in calkit.yaml.
+      Changes made here will be overwritten.
   all-viz:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c 
-      "echo \"All viz stages complete\""
+    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "echo
+      \"All viz stages complete\""
     deps:
       - .calkit/env-locks/pubs
       - .calkit/notebooks/executed/results/fig_notebooks/AllFigCompare.ipynb
@@ -7877,10 +7847,10 @@ stages:
       - .calkit/notebooks/executed/results/fig_notebooks/Validation.ipynb
       - .calkit/notebooks/executed/results/fig_notebooks/Wecsim.ipynb
     outs: []
-    desc: Automatically generated from the 'all-viz' stage in 
-      calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'all-viz' stage in calkit.yaml.
+      Changes made here will be overwritten.
   make-quarto-yaml:
-    cmd: calkit xenv -n pubs --no-check -- python 
+    cmd: calkit xenv -n pubs --no-check -- python
       pubs/defense/quarto/make_quarto_yaml.py
     deps:
       - pubs/defense/quarto/make_quarto_yaml.py
@@ -7899,9 +7869,9 @@ stages:
     desc: Automatically generated from the 'make-quarto-yaml' stage in
       calkit.yaml. Changes made here will be overwritten.
   make-standalone-tex-pdf:
-    cmd: calkit latex build -e tex --no-check -r 
-      mdocean/plots/non_matlab_figs/.latexmkrc --no-synctex 
-      mdocean/plots/non_matlab_figs/${item.name}.tex
+    cmd: calkit latex build -e tex --no-check -r
+      mdocean/plots/non_matlab_figs/.latexmkrc --no-synctex
+      'mdocean/plots/non_matlab_figs/${item.name}.tex'
     deps:
       - mdocean/plots/non_matlab_figs/${item.name}.tex
       - pubs/applied-ocean-research-model/figs/tikz/${item.name}.tikz
@@ -7928,11 +7898,11 @@ stages:
         - circuit_kinematics
         - control_method_venn_diagram
         - meem_dims
-    desc: Automatically generated from the 'make-standalone-tex-pdf' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'make-standalone-tex-pdf' stage in
+      calkit.yaml. Changes made here will be overwritten.
   move-standalone-pdfs:
-    cmd: calkit map-paths --file-to-file 
-      'mdocean/plots/non_matlab_figs/${item.name}.pdf->mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf'
+    cmd: calkit map-paths --file-to-file
+      "mdocean/plots/non_matlab_figs/${item.name}.pdf->mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf"
     deps:
       - mdocean/plots/non_matlab_figs/${item.name}.pdf
     outs:
@@ -7946,8 +7916,8 @@ stages:
         - circuit_kinematics
         - control_method_venn_diagram
         - meem_dims
-    desc: Automatically generated from the 'move-standalone-pdfs' 
-      stage in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'move-standalone-pdfs' stage in
+      calkit.yaml. Changes made here will be overwritten.
   render-quarto-html:
     cmd: quarto render pubs/defense/quarto/slides.qmd
     deps:
@@ -7965,11 +7935,11 @@ stages:
           cache: false
           persist: false
       - pubs/defense/quarto/slides_files/
-    desc: Automatically generated from the 'render-quarto-html' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'render-quarto-html' stage in
+      calkit.yaml. Changes made here will be overwritten.
   render-quarto-pdf:
-    cmd: calkit xenv -n playwright --no-check -- bash --noprofile 
-      --norc -c "python pubs/defense/quarto/html_to_pdf.py"
+    cmd: calkit xenv -n playwright --no-check -- bash --noprofile --norc -c
+      "python pubs/defense/quarto/html_to_pdf.py"
     deps:
       - pubs/defense/quarto/slides.html
       - pubs/defense/quarto/html_to_pdf.py
@@ -7978,5 +7948,5 @@ stages:
       - pubs/defense/quarto/slides.pdf:
           cache: true
           persist: false
-    desc: Automatically generated from the 'render-quarto-pdf' stage 
-      in calkit.yaml. Changes made here will be overwritten.
+    desc: Automatically generated from the 'render-quarto-pdf' stage in
+      calkit.yaml. Changes made here will be overwritten.
