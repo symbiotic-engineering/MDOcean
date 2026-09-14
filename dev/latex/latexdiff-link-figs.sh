@@ -13,6 +13,7 @@ for tree in old new; do
         if [[ ! -e "$target" ]]; then
             mkdir -p "$(dirname "$target")"
             ln -s "$source" "$target"
+            echo "Linked $source to $target"
         fi
     done < <(jq -r 'keys[]' "$deps_file")
 done
