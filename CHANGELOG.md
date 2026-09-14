@@ -1,11 +1,39 @@
 # Changelog
 ## Unreleased
 
-### Changed
-- Pipeline: link AOR latexdiff dependencies from the generated DVC dependency list.
+## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-14
+### Added
+- Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
 
+## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-14
+### Added
+- Dissertation: add license for images
+### Changed
+- Paper: add short/long caption pairs (`\caption[short]{long}`) so table of contents uses short captions
 ### Fixed
-- Pipeline: provide the repository root to the AOR latexdiff DVC preparer.
+- Dissertation: fix space after Cayuga in land acknowledgement
+
+## [v1.5.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.0) - 2026-9-13
+### Added
+- Paper: add dissertation glossary of symbols and acronyms. This adds the glossary entries themselves (in `glossary/` folders within each publication), glossary setup in `pubs/shared/shared_pkg.tex`, references of `\gls{}` in every `.tex` file, and `makeglossaries` compilation support in `pubs/dissertation/.latexmkrc`.
+- Dev: AI-coded upgrade to `dev/latex/Paper-Linter/`. Adds ability for linter to correct some issues rather than just identify them, and adds `params.txt` input for paper-specific lint settings. Adds the following check categories: mathmode subscripts, glossary references, unused glossary symbols, Glossary Symbols Missing a Description, Duplicate Glossary Symbols, Math Glossary Reference Coverage, Prefix, and Preferred Terminology. This replaces some standalone python scripts that were in `dev/latex/`.
+- Dev: adds tests for the paper linter.
+- Pipeline: adds stages to run paperlint on JFM and UMERC papers 
+### Changed
+- Paper: changes various symbols to avoid overlaps.
+- Pipeline: changes `dependencies` to `requirements` in `calkit.yaml` to avoid deprecation warning, and moves defense slides from `publications` to `presentations`.
+- Pipeline: make `paperlint-aor` and `paperlint-re` stages run every time.
+### Fixed
+- Dissertation: editorial corrections - fix typos/misspellings, grammar
+
+This version is the closest released version to the `dissertation-submit-proquest` tag (the official version of the dissertation on ProQuest) -- should be identical in content, slightly different in commit history.
+
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-9-11
+### Added
+- Dissertation: add name of all undergrads I've mentored in acknowledgements
+### Fixed
+- Paper: a few misc formatting and notation errors
+- Submodule: fix error introduced in v1.4.3 where a too-recent `OpenFLASH` submodule version (that contained glossary features not present in this branch of MDOcean) was used. This reverts `OpenFLASH` to 20038239, the version it was in MDOcean v1.4.2.
 
 ## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
 ### Fixed
