@@ -20,7 +20,7 @@ def cache_object(md5):
     for path in (
         CACHE_DIR / md5[:2] / md5[2:],
         CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:],
-        CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:] + ".dir",
+        CACHE_DIR / "files" / "md5" / md5[:2] / md5[2:].with_suffix(".dir"),
     ):
         if path.is_file():
             return path
