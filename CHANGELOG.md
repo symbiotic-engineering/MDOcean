@@ -1,6 +1,9 @@
 # Changelog
 ## Unreleased
 
+### Fixed
+- CI: write multiline release notes to `GITHUB_OUTPUT` without interpreting backslash escapes
+
 ## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-15
 ### Added
 - Dissertation: add license for images
