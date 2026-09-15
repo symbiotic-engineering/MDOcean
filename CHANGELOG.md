@@ -1,17 +1,18 @@
 # Changelog
 ## Unreleased
 
-## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-14
+## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-15
 ### Added
 - Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
 
-## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-14
+## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-15
 ### Added
 - Dissertation: add license for images
 ### Changed
 - Paper: add short/long caption pairs (`\caption[short]{long}`) so table of contents uses short captions
 ### Fixed
 - Dissertation: fix space after Cayuga in land acknowledgement
+- CI: fix release notes writing to `GITHUB_OUTPUT` without interpreting backslash escapes
 
 ## [v1.5.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.0) - 2026-9-13
 ### Added
