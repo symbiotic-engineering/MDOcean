@@ -22,12 +22,20 @@ jobs:
         run: |
           VERSION="v${{ steps.get_version.outputs.version }}"
           RELEASE_NOTES=$(awk -v v="$VERSION" '
-            $0 ~ "^## \\[" v "\\]" {flag=1; next}
-            /^## / {flag=0}
+            index($0, "## [" v "]") == 1 {flag=1; next}
+            /^## \[/ && flag {exit}
             flag
           ' CHANGELOG.md)
+          if [ -z "$RELEASE_NOTES" ]; then
+            echo "No release notes found for $VERSION in CHANGELOG.md" >&2
+            exit 1
+          fi
           echo "$RELEASE_NOTES"
-          echo -e "release_notes<<EOF\n$RELEASE_NOTES\nEOF" >> $GITHUB_OUTPUT
+          {
+            echo "release_notes<<EOF"
+            echo "$RELEASE_NOTES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
