@@ -23,7 +23,7 @@ jobs:
           VERSION="v${{ steps.get_version.outputs.version }}"
           RELEASE_NOTES=$(awk -v v="$VERSION" '
             $0 ~ "^## \\[" v "\\]" {flag=1; next}
-            flag && /^## \\[v[^]]+\\]/ {flag=0}
+            /^## / {flag=0}
             flag
           ' CHANGELOG.md)
           if [ -z "$RELEASE_NOTES" ]; then
@@ -31,7 +31,11 @@ jobs:
             exit 1
           fi
           echo "$RELEASE_NOTES"
-          echo -e "release_notes<<EOF\n$RELEASE_NOTES\nEOF" >> $GITHUB_OUTPUT
+          {
+            echo 'release_notes<<EOF'
+            printf '%s\n' "$RELEASE_NOTES"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
