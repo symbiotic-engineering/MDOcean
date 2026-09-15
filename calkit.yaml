@@ -5891,8 +5891,8 @@ pipeline:
           storage: git
           delete_before_run: false
       diffs:
-        - c767dee # first submission
-      #latexdiff_args: [--graphics-markup=both --keep-tex]
+        - aor-submitted # first submission
+      latexdiff_args: [--keep-tex]
     build-UMERC-paper:
       kind: latex
       target_path: 
@@ -5957,7 +5957,7 @@ pipeline:
     get-aor-latexdiff-dvc-deps:
       kind: shell-command
       environment: pubs
-      command: bash dev/latex/get-aor-latexdiff-dvc-deps.sh c767dee HEAD
+      command: bash dev/latex/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD
       inputs:
         - dev/latex/get-aor-latexdiff-dvc-deps.sh
       outputs:
@@ -5975,7 +5975,7 @@ pipeline:
         --graphics-markup=both
         --filter 'dev/latex/latexdiff-link-figs.sh'
         --prepare 'python3 ../new/dev/latex/latexdiff-prepare.py'
-        -o pubs/applied-ocean-research-model/main-diff.pdf c767dee -- < /dev/null
+        -o pubs/applied-ocean-research-model/main-diff.pdf aor-submitted -- < /dev/null
       # right now, graphics markup=both isn't useful since the same dvc hashes are being pulled
       inputs:
         - pubs/applied-ocean-research-model/sections/
