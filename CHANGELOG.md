@@ -1,6 +1,14 @@
 # Changelog
 ## Unreleased
 
+## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-14
+### Added
+- Dissertation: add license for images
+### Changed
+- Paper: add short/long caption pairs (`\caption[short]{long}`) so table of contents uses short captions
+### Fixed
+- Dissertation: fix space after Cayuga in land acknowledgement
+
 ## [v1.5.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.0) - 2026-9-13
 ### Added
 - Paper: add dissertation glossary of symbols and acronyms. This adds the glossary entries themselves (in `glossary/` folders within each publication), glossary setup in `pubs/shared/shared_pkg.tex`, references of `\gls{}` in every `.tex` file, and `makeglossaries` compilation support in `pubs/dissertation/.latexmkrc`.
