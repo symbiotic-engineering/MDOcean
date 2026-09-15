@@ -23,9 +23,13 @@ jobs:
           VERSION="v${{ steps.get_version.outputs.version }}"
           RELEASE_NOTES=$(awk -v v="$VERSION" '
             $0 ~ "^## \\[" v "\\]" {flag=1; next}
-            /^## / {flag=0}
+            flag && /^## \\[v[^]]+\\]/ {flag=0}
             flag
           ' CHANGELOG.md)
+          if [ -z "$RELEASE_NOTES" ]; then
+            echo "No changelog entry found for $VERSION in CHANGELOG.md"
+            exit 1
+          fi
           echo "$RELEASE_NOTES"
           echo -e "release_notes<<EOF\n$RELEASE_NOTES\nEOF" >> $GITHUB_OUTPUT
 
