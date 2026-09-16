@@ -11,8 +11,8 @@
 \label{fig:control-arch}
 \end{figure*}
 
+\paragraph{Multiple-Discipline-Feasible Analysis Architecture}
 \ifdefined\DISSERTATION
-    \paragraph{Multiple-Discipline-Feasible Analysis Architecture}
     All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
     The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
     The dynamics iteration occurs separately for each outer iteration of the optimizer.
@@ -27,8 +27,32 @@
     This means that even a substantial dynamics speedup represents only a small speedup of the full simulation and is unlikely to outweigh the slowdown of more (hydrodynamics-dominated) simulation evaluations.
     For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
     Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
+\else
+    In MDO, when governing equations circularly depend on one another within a module (an ``implicit'' discipline) or between modules (an interdisciplinary ``feedback loop''),
+    dependencies are often resolved with numerical iteration.
+    Two common architectures for doing so include multiple-discipline feasible (MDF) and simultaneous analysis and design (SAND).
+    They enforce governing equations differently: 
+    MDF converges residuals to zero directly \emph{inside the simulation},
+    while SAND incorporates the residuals as equality constraints in an \emph{external optimization} \citep{martins_multidisciplinary_2013}.
+    SAND reduces the cost of each simulation but can increase the number of simulations required to optimize, so the preference is problem-dependent.
+
+    In MDOcean, the only implicit module is dynamics, and there are no interdisciplinary feedback loops.
+    This means that it is the ratio of dynamics simulation cost to the total simulation cost, and the expected number of iterations required for convergence, that determines the choice of MDF and SAND.
+
+    However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
+    For this reason, MDF is adopted.
     
-    \paragraph{Control Optimization Architecture}
+    All modules except dynamics are explicit.
+    The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation.
+    This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
+    
+    An alternative simultaneous analysis and design (SAND) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
+    However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
+    For this reason, MDF is adopted.
+\fi
+
+\paragraph{Control Optimization Architecture}
+\ifdefined\DISSERTATION
     In control co-design, the nested and simultaneous architectures are often contrasted \citep{sundarrajan_towards_2021,herber_nested_2018}.
     The nested architecture, known as ``asymmetric subspace optimization'' in MDO literature \citep{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
     This takes advantage of the fact that the inner optimization is often convex and can be solved quickly.
@@ -52,31 +76,21 @@
 \else
     \paragraph{Choice of MDO and Control Co-Design Architecture}
     Control co-design problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
-    In the nested approach, control is optimized in an inner loop, while in the simultaneous approach control and design variables are optimized together.
-    In addition, optimal control-based formulations may determine control either explicitly or implicitly via optimality conditions. 
+    In the nested approach, control is optimized in an inner loop, while in the simultaneous approach, control and design variables are optimized together.
+    As an alternative to numerically optimizing the control, one can use an implicit or explicit optimality condition. 
     
-    These control formulations can be combined with both MDF and SAND analysis architectures.
-    In a multiple-discipline feasible (MDF) architecture, dynamics convergence is handled within each simulation call.
-    An alternative simultaneous analysis and design (SAND) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
-    However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
-    For this reason, MDF is adopted.
+    These four control formulations can be combined with both MDF and SAND analysis architectures.
+    
 
-    MDOcean uses an implicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
+    MDOcean uses an explicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
     The explicit formulation is preferred over implicit alternatives \hl{due to the structure of the derived optimal control conditions} (\Cref{sec:mod-freq-domain}).
     It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
     \citep{mccabe_dissertation_2026} provides detailed architecture rationale, coupling analysis, and the relation to MDO literature.
     
     \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-MDF formulation used in this study highlighted.
 
-    All modules except dynamics are explicit.
-    The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation.
-    This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
     
-    An alternative simultaneous analysis and design (SAND) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
-    However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
-    For this reason, MDF is adopted.
-    
-    \fi
+\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% XDSM and modules %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
