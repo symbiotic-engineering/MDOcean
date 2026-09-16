@@ -40,6 +40,9 @@ environments:
   bibtex-conda:
     path: dev/latex/environment.yml
     kind: conda
+  yq-conda:
+    path: dev/latex/latexdiff/environment.yml
+    kind: conda
 requirements:
   - docker
   # - matlab
@@ -5955,7 +5958,7 @@ pipeline:
           delete_before_run: false
     get-aor-latexdiff-dvc-deps:
       kind: shell-command
-      environment: pubs
+      environment: yq-conda
       command: bash dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD
       inputs:
         - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh
