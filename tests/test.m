@@ -212,6 +212,8 @@ classdef (SharedTestFixtures={ ...
 
         function assumptionsFigurePlumbing(testCase)
             [~, figs_in_AOR, ~, ~] = fig_tab_pub_mapping();
+            testCase.verifyEqual(length(figs_in_AOR), 60);
+            testCase.verifyEqual(figs_in_AOR{60}, 'ReadNonMatlabFigs.assumptions');
             testCase.verifyTrue(any(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions')));
 
             non_matlab_figs = fileread('mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m');
