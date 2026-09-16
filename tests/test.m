@@ -215,6 +215,9 @@ classdef (SharedTestFixtures={ ...
             idx = find(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions'));
             testCase.verifyEqual(numel(idx), 1);
 
+            obj = ReadNonMatlabFigs(struct(), struct());
+            testCase.verifyTrue(any(strcmp(obj.fig_names, 'assumptions')));
+
             intermed = ReadNonMatlabFigs.analysis_fcn([], []);
             testCase.verifyTrue(any(strcmp(intermed.file_names, 'assumptions.png')));
         end
