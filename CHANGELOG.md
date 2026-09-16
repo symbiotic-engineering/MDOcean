@@ -4,6 +4,8 @@
 ## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-15
 ### Added
 - Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
+### Fixed
+- Glossary: fixed mixup of slenderness factor with load distribution factor
 
 ## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-15
 ### Added
