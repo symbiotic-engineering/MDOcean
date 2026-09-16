@@ -210,6 +210,14 @@ classdef (SharedTestFixtures={ ...
     % Test methods
     methods(Test, ParameterCombination='sequential')
 
+        function assumptionsFigurePlumbing(testCase)
+            [~, figs_in_AOR, ~, ~] = fig_tab_pub_mapping();
+            testCase.verifyTrue(any(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions')));
+
+            non_matlab_figs = fileread('mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m');
+            testCase.verifyTrue(contains(non_matlab_figs, '''assumptions.png'''));
+        end
+
         % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
 
