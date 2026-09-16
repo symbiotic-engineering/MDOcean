@@ -46,6 +46,7 @@ requirements:
 env_vars:
   QT_QPA_PLATFORM: offscreen
   HOME: /tmp # for inkscape container, to avoid permission issues
+  UPSTREAM: main # for dvc merge
 parameters:
   mermaid_name:
     - taxonomy
@@ -6086,6 +6087,14 @@ pipeline:
         - pubs/defense/quarto/html_to_pdf.py
       outputs:
         - path: pubs/defense/quarto/slides.pdf
+    merge-ours:
+      kind: shell-command
+      command: git fetch origin $UPSTREAM && git merge origin/$UPSTREAM <<< "o"
+      environment: _system
+    merge-theirs:
+      kind: shell-command
+      command: git fetch origin $UPSTREAM && git merge origin/$UPSTREAM <<< "t"
+      environment: _system
 publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
