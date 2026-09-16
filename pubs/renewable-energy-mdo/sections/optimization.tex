@@ -9,12 +9,12 @@ The optimization solution and post-optimality analysis process is shown in \Cref
 \end{figure}
 
 \ifdefined\DISSERTATION
-    First, design space exploration is performed using a one-at-a-time (OAT) sweep, in which each design variable is individually varied while the others remain at their nominal values.
+    First, design space exploration is performed using a \gls{acr-oat} sweep, in which each design variable is individually varied while the others remain at their nominal values.
     This provides an initial understanding of the problem behavior, can reveal objective multimodality, and shows whether the objective and constraints are locally monotonic in each variable.
-    OAT does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \citep{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
+    \gls{acr-oat} does not capture the effect of coupling between design variables, which methods such as orthogonal arrays would expose \citep{box_statistics_1978}, but the cheapness of the simulation incentivizes moving directly to optimization rather than pursuing more thorough exploration.
 \else
-    First, design space exploration uses a one-at-a-time (OAT) sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality.
-    OAT does not capture inter-variable coupling \citep{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
+    First, design space exploration uses a \gls{acr-oat} sweep, varying each design variable individually while holding the others at nominal values to reveal local monotonicity and potential multimodality.
+    \gls{acr-oat} does not capture inter-variable coupling \citep{box_statistics_1978}, but the cheap simulation incentivizes proceeding directly to optimization.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,13 +37,13 @@ The single-objective algorithm is selected by characterizing the problem followi
     \end{tabular}
     \end{table}
 
-This motivates sequential quadratic programming (SQP) with multistart.
+This motivates \gls{acr-sqp} with multistart.
 \ifdefined\DISSERTATION
-    SQP is a gradient-based method that builds successive quadratic approximations of the objective and linear approximations of the constraints, solving each subproblem as an efficient quadratic program and updating the approximations every iteration to track the true nonlinear functions.
-    The MATLAB SQP implementation also guarantees that every intermediate design query obeys its bounds, which helps remain within the zone of model validity defined by the priority 1 requirements of \Cref{remdo:sec:requirements}.
+    \gls{acr-sqp} is a gradient-based method that builds successive quadratic approximations of the objective and linear approximations of the constraints, solving each subproblem as an efficient quadratic program and updating the approximations every iteration to track the true nonlinear functions.
+    The MATLAB \gls{acr-sqp} implementation also guarantees that every intermediate design query obeys its bounds, which helps remain within the zone of model validity defined by the priority 1 requirements of \Cref{remdo:sec:requirements}.
     Because only local, not global, optimality can be verified for a non-convex objective, the multistart method is used to search for better local optima across several initial guesses.
 \else
-    SQP is a gradient-based method that solves successive quadratic-program approximations of the objective and constraints.
+    \gls{acr-sqp} is a gradient-based method that solves successive quadratic-program approximations of the objective and constraints.
     The MATLAB implementation keeps every intermediate query within bounds, helping maintain the model validity required by the priority 1 requirements of \Cref{remdo:sec:requirements}.
     Since only local optimality can be verified for a non-convex objective, multistart searches for better local optima from several initial guesses.
 \fi
@@ -51,48 +51,48 @@ This motivates sequential quadratic programming (SQP) with multistart.
 
 %%%
 \paragraph{Derivatives}
-As a gradient-based optimizer, SQP requires derivatives of the objective and constraints with respect to the design variables.
+As a gradient-based optimizer, \gls{acr-sqp} requires derivatives of the objective and constraints with respect to the design variables.
 \ifdefined\DISSERTATION
-    Obtaining derivatives for WEC simulations is a difficult problem that few have approached.
-    WecOptTool uses the Python package JAX \citep{bradbury_jax_2018} to automatically differentiate the pseudo-spectral dynamics, but cannot differentiate the hydrodynamic coefficients.
-    Recently, \citet{rohrer_analytical_2024,khanal_fully_2025} introduce derivatives for BEM hydrodynamics packages, and the former reviews other work on hydrodynamic gradients.
+    Obtaining derivatives for \gls{acr-wec} simulations is a difficult problem that few have approached.
+    WecOptTool uses the Python package \gls{acr-jax} \citep{bradbury_jax_2018} to automatically differentiate the pseudo-spectral dynamics, but cannot differentiate the hydrodynamic coefficients.
+    Recently, \citet{rohrer_analytical_2024,khanal_fully_2025} introduce derivatives for \gls{acr-bem} hydrodynamics packages, and the former reviews other work on hydrodynamic gradients.
     Most similar to the present approach, \citet{gambarini_gradient_2024} uses semi-analytical hydrodynamics and analytically differentiates the linear system with respect to control and array-layout variables, but does not provide the body-dimension derivatives required here.
-    For the MEEM hydrodynamics used in this study, symbolic differentiation of the linear system was attempted but exhausts memory at any reasonable matrix size; obtaining MEEM gradients via adjoints or algorithmic differentiation remains future work.
+    For the \gls{acr-meem} hydrodynamics used in this study, symbolic differentiation of the linear system was attempted but exhausts memory at any reasonable matrix size; obtaining \gls{acr-meem} gradients via adjoints or algorithmic differentiation remains future work.
     This study therefore uses finite difference, with step size set automatically by the MATLAB Optimization Toolbox --- a viable choice given the simulation's low cost.
     Initial concerns that the oscillatory hydrodynamics would degrade the gradients \citep{mccabe_open-source_2024} proved unfounded, likely because the overall hydrodynamic coefficients are far smoother than their individual subfunctions, keeping gradients accurate even at larger step sizes.
 \else
-    Obtaining gradients for WEC simulations is difficult:
+    Obtaining gradients for \gls{acr-wec} simulations is difficult:
     existing automatic and analytical differentiation methods cover pseudo-spectral dynamics \citep{bradbury_jax_2018}
-    or BEM and semi-analytical hydrodynamics \citep{rohrer_analytical_2024,khanal_fully_2025,gambarini_gradient_2024}
-    but none supply the body-dimension derivatives of the MEEM hydrodynamics used here,
+    or \gls{acr-bem} and semi-analytical hydrodynamics \citep{rohrer_analytical_2024,khanal_fully_2025,gambarini_gradient_2024}
+    but none supply the body-dimension derivatives of the \gls{acr-meem} hydrodynamics used here,
     and a symbolic differentiation attempt exhausts memory.
     This study therefore uses finite difference, viable given the cheap simulation.
     Initial concerns about oscillatory hydrodynamics \citep{mccabe_open-source_2024} proved unfounded,
     as the overall coefficients are far smoother than their subfunctions.
-    Deriving MEEM gradients via adjoints or algorithmic differentiation remains future work.
+    Deriving \gls{acr-meem} gradients via adjoints or algorithmic differentiation remains future work.
 \fi
 
 \paragraph{Sensitivity Analysis}
-After optimization, sensitivity analysis is performed, first local then OAT global.
+After optimization, sensitivity analysis is performed, first local then \gls{acr-oat} global.
 \ifdefined\DISSERTATION
-    Local sensitivities are obtained from the Lagrange multiplier output of the SQP solver.
-    The Lagrange multiplier vector $\vec{\lambda}$ represents the sensitivity of the objective $J$ to a small change in each element of the constraint vector $\vec{g}$ \citep{martins_engineering_2022}:
+    Local sensitivities are obtained from the Lagrange multiplier output of the \gls{acr-sqp} solver.
+    The Lagrange multiplier vector $\gls{sym-vec-lambda}$ represents the sensitivity of the objective $\gls{sym-J}$ to a small change in each element of the constraint vector $\gls{sym-vec-g}$ \citep{martins_engineering_2022}:
     \begin{equation}
-        \vec{\lambda} = -\frac{dJ}{d\vec{g}} % eq 5.33 in MDO book
+        \gls{sym-vec-lambda} = -\frac{d\gls{sym-J}}{d\gls{sym-vec-g}} % eq 5.33 in MDO book
     \end{equation}
     Nonzero Lagrange multipliers imply the associated constraint is active at the optimum, larger values indicating a more influential constraint.
-    Beyond their inherent value for analyzing constraint activity, the multipliers facilitate calculation of local parameter sensitivities, obtained analytically from $\vec{\lambda}$, other solver outputs such as the Hessian $\mathbf{H}$ and gradient $\nabla J$, and additional finite-difference derivatives.
+    Beyond their inherent value for analyzing constraint activity, the multipliers facilitate calculation of local parameter sensitivities, obtained analytically from $\gls{sym-vec-lambda}$, other solver outputs such as the Hessian $\gls{sym-mathbf-H}$ and gradient $\gls{sym-vec-nabla}\gls{sym-J}$, and additional finite-difference derivatives.
     \Cref{remdo:sec:appendix-sensitivities-local} gives the details.
     These sensitivities estimate not only how the objective would change if a parameter changed at fixed design, but also how the optimal objective, optimal design, and constraint activity would change if the optimization were repeated with the modified parameter, without re-optimizing, and thus at very little cost.
     They serve as a screening step to identify high-sensitivity parameters for further study in the global sensitivity analysis.
 \else
-    Local sensitivities exploit the SQP solver's Lagrange multiplier vector $\vec{\lambda} = -dJ/d\vec{g}$ \citep{martins_engineering_2022}, which measures the objective's sensitivity to each constraint; nonzero multipliers mark active constraints, larger values more influential ones.
-    The multipliers yield local parameter sensitivities analytically (from $\vec\lambda$, the Hessian, the gradient, and a few finite-difference derivatives), estimating how the re-optimized objective, design, and constraint activity would respond to a parameter change without re-optimizing.
+    Local sensitivities exploit the \gls{acr-sqp} solver's Lagrange multiplier vector $\gls{sym-vec-lambda} = -d\gls{sym-J}/d\gls{sym-vec-g}$ \citep{martins_engineering_2022}, which measures the objective's sensitivity to each constraint; nonzero multipliers mark active constraints, larger values more influential ones.
+    The multipliers yield local parameter sensitivities analytically (from $\gls{sym-vec-lambda}$, the Hessian, the gradient, and a few finite-difference derivatives), estimating how the re-optimized objective, design, and constraint activity would respond to a parameter change without re-optimizing.
     \Cref{remdo:sec:appendix-sensitivities-local} gives the details.
     This screens for high-sensitivity parameters to study further in the global analysis.
 \fi
 
-%objective parameter sensitivity $dJ^*/dp$, the optimal design parameter sensitivity $\partial x^*/\partial p$, and the parameter change constraint activity threshold $\Delta p_{ij}$ associated with constraint $g_j$
+%objective parameter sensitivity $dJ^*/dp$, the optimal design parameter sensitivity $\partial x^*/\partial p$, and the parameter change constraint activity threshold $\gls{sym-Delta} p_{ij}$ associated with constraint $g_j$
 
 %\hl{Talk about global sensitivities and what the implications of OAT are.} 
 
@@ -102,15 +102,15 @@ Single-objective algorithms typically require adaptation for multiple objectives
 \ifdefined\DISSERTATION
     While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012}, solvers that use such multi-objective gradient information are rare, partly because Pareto front generation requires the exploration that gradient-based optimizers --- which excel at exploitation --- do not naturally provide.
     Two more common approaches exist: reformulating the multi-objective problem as repeated single-objective optimization to permit a gradient-based algorithm, or using a multi-objective derivative-free or heuristic method that extends readily from its single-objective counterpart.
-    This work pursues both: the epsilon-constraint method first creates an ensemble of single-objective problems solved by the familiar SQP algorithm, and these solutions then seed a derivative-free pattern search.
+    This work pursues both: the epsilon-constraint method first creates an ensemble of single-objective problems solved by the familiar \gls{acr-sqp} algorithm, and these solutions then seed a derivative-free pattern search.
     In the epsilon-constraint method, one objective is repeatedly optimized while a constraint on the second objective is swept, tracing out the Pareto front.
     Here the single-objective optima of each objective set the constraint values: the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$ becomes the center of a circle, and twenty constraint values are taken at equal angular spacing on that circle.
-    The MATLAB \texttt{paretosearch} function then executes a constrained multi-objective pattern search \citep{custodio_direct_2011}, starting from the SQP-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
+    The MATLAB \texttt{paretosearch} function then executes a constrained multi-objective pattern search \citep{custodio_direct_2011}, starting from the \gls{acr-sqp}-optimized epsilon-constraint points and maximizing Pareto hypervolume and spread to quickly fill gaps between them.
     This retains the benefit of gradient based optimization: guarantee of local optimality and faster convergence.
 \else
     While derivative criteria for local Pareto optimality exist \citep{desideri_multiple-gradient_2012},
     solvers using them are rare, since Pareto front generation demands exploration rather than the pure exploitation that gradient methods excel at.
-    This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by SQP
+    This work combines two approaches: the epsilon-constraint method recasts the problem as an ensemble of single-objective problems solved by \gls{acr-sqp}
     --- repeatedly optimizing one objective while sweeping a constraint on the other,
     with twenty constraint values placed at equal angular spacing on a circle centered at the nadir point $(J_1(J_2=J_2^*),\, J_2(J_1=J_1^*))$
     --- and these solutions then seed the MATLAB \texttt{paretosearch} derivative-free pattern search \citep{custodio_direct_2011},
