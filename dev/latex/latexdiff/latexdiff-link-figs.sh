@@ -55,9 +55,9 @@ for tree in old new; do
         fi
 
         if [[ "$md5" == *.dir ]]; then
-            link_directory "$md5" "$target"
+            link_directory "$md5" "$target" || { echo "Skipping $subfolder ($tree, $md5): cache object not found" >&2; continue; }
         else
-            source="$(resolve_cache_object "$md5")" || continue
+            source="$(resolve_cache_object "$md5")" || { echo "Skipping $subfolder ($tree, $md5): cache object not found" >&2; continue; }
             mkdir -p "$(dirname "$target")"
             ln -s "$source" "$target"
         fi
@@ -66,7 +66,7 @@ for tree in old new; do
     done < <(python3 -c '
 import json, sys
 with open(sys.argv[1]) as f:
-    deps = json.load(f)[sys.argv[2]]
+    deps = json.load(f).get(sys.argv[2], {})
 for path, md5 in deps.items():
     print(f"{path}\t{md5}")
 ' "$deps_file" "$tree")
