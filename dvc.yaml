@@ -8248,14 +8248,14 @@ stages:
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
       - pubs/applied-ocean-research-model/main.pdf
-      - pubs/applied-ocean-research-model/aux/main.bbl:
+      - pubs/applied-ocean-research-model/aux/:
           cache: false
           persist: true
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
   build-AOR-paper-diff-aor-submitted:
     cmd: calkit latex diff -e tex --no-check --from aor-submitted --to HEAD
-      --revision-key ecd622a0fa34..96baee73799c -r
+      --revision-key ecd622a0fa34..c62ec41e266f -r
       pubs/applied-ocean-research-model/.latexmkrc --input
       pubs/applied-ocean-research-model/sections/ --input
       pubs/applied-ocean-research-model/figs/from-matlab/ --input
@@ -8360,11 +8360,11 @@ stages:
     desc: Automatically generated from the 'build-dissertation' stage in
       calkit.yaml. Changes made here will be overwritten.
   get-aor-latexdiff-dvc-deps:
-    cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "bash
+    cmd: calkit xenv -n yq-conda --no-check -- bash --noprofile --norc -c "bash
       dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD"
     deps:
       - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh
-      - .calkit/env-locks/pubs
+      - .calkit/env-locks/yq-conda
     outs:
       - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json:
           cache: false
