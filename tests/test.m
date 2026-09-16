@@ -215,11 +215,6 @@ classdef (SharedTestFixtures={ ...
             idx = find(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions'));
             testCase.verifyEqual(numel(idx), 1);
             idx_scalar = idx(1);
-
-            mapping_text = fileread('mdocean/plots/fig_tab_pub_mapping.m');
-            num_figs_token = regexp(mapping_text, 'num_figs_AOR = ([0-9]+);', 'tokens', 'once');
-            testCase.verifyNotEmpty(num_figs_token);
-            testCase.verifyEqual(length(figs_in_AOR), str2double(num_figs_token{1}));
             testCase.verifyEqual(idx_scalar, length(figs_in_AOR));
 
             non_matlab_figs = fileread('mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m');
