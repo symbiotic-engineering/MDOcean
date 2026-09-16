@@ -40,6 +40,9 @@ environments:
   bibtex-conda:
     path: dev/latex/environment.yml
     kind: conda
+  yq-conda:
+    path: dev/latex/latexdiff/environment.yml
+    kind: conda
 requirements:
   - docker
   # - matlab
@@ -5887,8 +5890,8 @@ pipeline:
         - pubs/applied-ocean-research-model/glossary/
       outputs:
         - pubs/applied-ocean-research-model/main.pdf
-        - path: pubs/applied-ocean-research-model/aux/main.bbl
-          storage: git
+        - path: pubs/applied-ocean-research-model/aux/
+          storage:
           delete_before_run: false
       diffs:
         - aor-submitted # first submission
@@ -5955,7 +5958,7 @@ pipeline:
           delete_before_run: false
     get-aor-latexdiff-dvc-deps:
       kind: shell-command
-      environment: pubs
+      environment: yq-conda
       command: bash dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD
       inputs:
         - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh

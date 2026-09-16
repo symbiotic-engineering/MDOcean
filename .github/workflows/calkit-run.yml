@@ -128,6 +128,7 @@ jobs:
         uses: calkit/run-action@v2
         with:
           run_args: --keep-going --log build-AOR-paper view-aor-figs view-re-figs build-RE-paper all-viz check-dup-json-keys build-dissertation build-AOR-paper.diffs
+          pull_dvc: false
           save: false
           cache_dvc: false
       - name: calkit save build publications
@@ -168,117 +169,117 @@ jobs:
           grep -E "^!" pubs/renewable-energy-mdo/aux/mdocean.log || true
           grep -E "^!" pubs/dissertation/aux/sampleThesis.log || true
           
-      # - name: Run Calkit tests
-      #   id: run_calkit_tests
-      #   uses: calkit/run-action@v2
-      #   with:
-      #     run_args: --keep-going --log test-aor test-re
-      #     pull_dvc: false
-      #     save: false
-      #     cache_dvc: false
-      # - name: calkit save test lockfile
-      #   if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
-      #   run: |
-      #     if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
-      #       exit 0
-      #     fi
+      - name: Run Calkit tests
+        id: run_calkit_tests
+        uses: calkit/run-action@v2
+        with:
+          run_args: --keep-going --log test-aor test-re
+          pull_dvc: false
+          save: false
+          cache_dvc: false
+      - name: calkit save test lockfile
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
+        run: |
+          if ! git status --porcelain | grep -vE '^.. \.calkit/' | grep -q . && dvc status -q --no-updates; then
+            exit 0
+          fi
 
-      #     set +e
-      #     PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
-      #     PULL_STATUS=$?
+          set +e
+          PULL_OUTPUT=$(git pull --recurse-submodules 2>&1)
+          PULL_STATUS=$?
 
-      #     if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then
-      #       BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
-      #       echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
-      #       git checkout -b "$BRANCH"
-      #       git config branch."$BRANCH".remote origin
-      #       git config branch."$BRANCH".merge refs/heads/"$BRANCH"
-      #     fi
+          if [ $PULL_STATUS -ne 0 ] && ! echo "$PULL_OUTPUT" | grep -q 'not our ref'; then
+            BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
+            echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
+            git checkout -b "$BRANCH"
+            git config branch."$BRANCH".remote origin
+            git config branch."$BRANCH".merge refs/heads/"$BRANCH"
+          fi
 
-      #     calkit dvc pull
-      #     calkit save dvc.lock -m "Run pipeline tests"
-      #     PUSH_STATUS=$?
+          calkit dvc pull
+          calkit save dvc.lock -m "Run pipeline tests"
+          PUSH_STATUS=$?
 
-      #     if [ $PUSH_STATUS -ne 0 ]; then
-      #       echo "Push failed, perhaps due to dvc push timeout. Retrying."
-      #       calkit dvc push
-      #       git push || true
-      #     fi
+          if [ $PUSH_STATUS -ne 0 ]; then
+            echo "Push failed, perhaps due to dvc push timeout. Retrying."
+            calkit dvc push
+            git push || true
+          fi
 
-      # - name: Publish code coverage to codecov
-      #   uses: codecov/codecov-action@v5
-      #   if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
-      #   with:
-      #     fail_ci_if_error: true
-      #     directory: code-coverage
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     use_oidc: true
+      - name: Publish code coverage to codecov
+        uses: codecov/codecov-action@v5
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
+        with:
+          fail_ci_if_error: true
+          directory: code-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
 
-      # - name: Publish test report to codecov
-      #   uses: codecov/codecov-action@v5
-      #   if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
-      #   with:
-      #     fail_ci_if_error: true
-      #     directory: test-results
-      #     report_type: test_results
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     use_oidc: true
+      - name: Publish test report to codecov
+        uses: codecov/codecov-action@v5
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
+        with:
+          fail_ci_if_error: true
+          directory: test-results
+          report_type: test_results
+          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
 
-      # - name: Publish test report to GitHub UI
-      #   uses: mikepenz/action-junit-report@v6
-      #   if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
-      #   with:
-      #     report_paths: 'test-results/**/junit.xml'
-      #     job_name: main
+      - name: Publish test report to GitHub UI
+        uses: mikepenz/action-junit-report@v6
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
+        with:
+          report_paths: 'test-results/**/junit.xml'
+          job_name: main
 
-      # - name: Upload test report PDF
-      #   if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
-      #   uses: actions/upload-artifact@v6
-      #   with:
-      #     name: test-report
-      #     path: |
-      #       test-results/**/junit.xml
-      #       test-results/**/testreport.pdf
-      #       test-results/**/table_*.tex
-      #       code-coverage/**/coverage.xml
-      #       **/DynamicValidation_*.pdf
-      #       test-results/Figure_*.pdf
-      #       mdocean/optimization/multiobjective/pareto_search_results_*.mat
-      #       **/wecsim_*.mat
+      - name: Upload test report PDF
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-report
+          path: |
+            test-results/**/junit.xml
+            test-results/**/testreport.pdf
+            test-results/**/table_*.tex
+            code-coverage/**/coverage.xml
+            **/DynamicValidation_*.pdf
+            test-results/Figure_*.pdf
+            mdocean/optimization/multiobjective/pareto_search_results_*.mat
+            **/wecsim_*.mat
 
-      # - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
-      #   if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
-      #   continue-on-error: true
-      #   uses: dawidd6/action-download-artifact@v20
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
-      #     path: test-results-baseline
-      #     workflow_conclusion: completed
-      #     check_artifacts: true
-      #     allow_forks: true
+      - name: Get baseline test results (for PR, use base branch, for non-PR, use main branch)
+        if: always() && (steps.run_calkit_tests.conclusion == 'success' || steps.run_calkit_tests.conclusion == 'failure')
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v20
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+          path: test-results-baseline
+          workflow_conclusion: completed
+          check_artifacts: true
+          allow_forks: true
 
-      # - name: Compare test results to base branch
-      #   if: always()
-      #   id: compare_to_baseline
-      #   continue-on-error: true
-      #   run: |
-      #     if ls test-results-baseline/test-report/test-results 2>/dev/null; then
-      #       python tests/junit_regression.py test-results-baseline/test-report/test-results/**/junit.xml test-results/**/junit.xml test-results-baseline/delta-junit.xml
-      #       cat test-results-baseline/delta-junit.xml
-      #     else
-      #       echo 'No baseline test results found, skipping comparison'
-      #     fi
-      #   shell: bash
+      - name: Compare test results to base branch
+        if: always()
+        id: compare_to_baseline
+        continue-on-error: true
+        run: |
+          if ls test-results-baseline/test-report/test-results 2>/dev/null; then
+            python tests/junit_regression.py test-results-baseline/test-report/test-results/**/junit.xml test-results/**/junit.xml test-results-baseline/delta-junit.xml
+            cat test-results-baseline/delta-junit.xml
+          else
+            echo 'No baseline test results found, skipping comparison'
+          fi
+        shell: bash
 
-      # - name: Publish changed tests to GitHub UI
-      #   if: always() && (steps.compare_to_baseline.conclusion == 'success' || steps.compare_to_baseline.conclusion == 'failure')
-      #   uses: mikepenz/action-junit-report@v6
-      #   with:
-      #     report_paths: 'test-results-baseline/delta-junit.xml'
-      #     check_name: 'Changed Tests'
-      #     job_name: main
-      #     include_passed: true
+      - name: Publish changed tests to GitHub UI
+        if: always() && (steps.compare_to_baseline.conclusion == 'success' || steps.compare_to_baseline.conclusion == 'failure')
+        uses: mikepenz/action-junit-report@v6
+        with:
+          report_paths: 'test-results-baseline/delta-junit.xml'
+          check_name: 'Changed Tests'
+          job_name: main
+          include_passed: true
 
       - name: Clean up temp environment
         if: always()
