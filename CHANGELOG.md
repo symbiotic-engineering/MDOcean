@@ -1,13 +1,13 @@
 # Changelog
 ## Unreleased
 
-## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-15
+## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-16
 ### Added
 - Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
 ### Changed
 - Pipeline: update `paperlint-aor` to ignore `pubs/applied-ocean-research-model/numeric-results.tex`.
 - Paper: use glossary symbol references for the AOR spar interpolation term in `module-details.tex`.
-- Paper: add optional AOR glossary print blocks in `main.tex` for latexdiff/debug visibility.
+- Paper: add glossary to AOR (currently commented out)
 ### Fixed
 - Glossary: fixed mixup of slenderness factor with load distribution factor
 - Glossary: add shared glossary support for `\underline{}` symbol formatting in glossary sorting.
