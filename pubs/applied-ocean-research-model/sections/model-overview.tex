@@ -1,6 +1,15 @@
 \section{Model Structure}
 \label{sec:model-structure}
 
+The MDO and CCD literature offers various structures to combine dynamic and static analysis, design optimization, and optimal control.
+After considering eight possible analysis and control architectures, MDOcean adopts the explicit-MDF formulation, highlighted in \Cref{fig:control-arch},
+which is the most computationally efficient given the coupling and computational cost of its various disciplines.
+The analysis architecture determines whether it is a solver or an optimization constraint which converges the dynamic residuals, while the control architecture determines whether control variables are determined via simulation, residual solve, or simultaneous/nested optimization.
+The implementation follows the module structure depicted in \Cref{fig:n2}.
+\ifdefined\DISSERTATION
+\else
+    \citet{mccabe_dissertation_2026} provides more detailed architecture rationale, coupling analysis, the relation to MDO and CCD literature, and describes an earlier version of MDOcean using the implicit-MDF architecture.
+\fi
 % Point of this section: out of the 8 examples of CCD architecture and MDO architectures, I use the one in the box because it's fast.
 % I implement it with the module structure of the XDSM diagram.
 
@@ -11,7 +20,7 @@
 \label{fig:control-arch}
 \end{figure*}
 
-\paragraph{Multiple-Discipline-Feasible Analysis Architecture}
+\subsection{Multiple-Discipline-Feasible Analysis Architecture}
 \ifdefined\DISSERTATION
     All modules except the dynamics module are explicit, meaning they require no internal iteration to converge.
     The dynamics module requires iteration to incorporate nonlinearities into the quasi-linear frequency domain model, shown in the XDSM diagram as the orange box.
@@ -28,30 +37,27 @@
     For this reason, SAND would likely increase the runtime of the full optimization, motivating MDOcean's selection of MDF as the more suitable architecture.
     Another advantage of MDF over SAND is that the latter invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013} and requires optimizing a dummy constant objective to perform simulation without optimization.
 \else
-    In MDO, when governing equations circularly depend on one another within a module (an ``implicit'' discipline) or between modules (an interdisciplinary ``feedback loop''),
+    In MDO, when governing equations circularly depend on one another,
+    % within a module (an ``implicit'' discipline) or between modules (an interdisciplinary ``feedback loop''),
     dependencies are often resolved with numerical iteration.
     Two common architectures for doing so include multiple-discipline feasible (MDF) and simultaneous analysis and design (SAND).
     They enforce governing equations differently: 
-    MDF converges residuals to zero directly \emph{inside the simulation},
+    MDF converges residuals to zero \emph{inside the simulation},
     while SAND incorporates the residuals as equality constraints in an \emph{external optimization} \citep{martins_multidisciplinary_2013}.
-    SAND reduces the cost of each simulation but can increase the number of simulations required to optimize, so the preference is problem-dependent.
+    SAND reduces the cost of each simulation but can increase the number of simulations required to optimize,
+    so the preference is problem-dependent.
+    Separately, SAND has practical limitations:
+    it invites the possibility of inconsistent dynamics if the optimization terminates unsuccessfully \citep{martins_multidisciplinary_2013}
+    and requires optimizing a dummy constant objective to perform simulation without optimization.
 
-    In MDOcean, the only implicit module is dynamics, and there are no interdisciplinary feedback loops.
-    This means that it is the ratio of dynamics simulation cost to the total simulation cost, and the expected number of iterations required for convergence, that determines the choice of MDF and SAND.
-
-    However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
-    For this reason, MDF is adopted.
-    
-    All modules except dynamics are explicit.
-    The dynamics module requires an internal fixed-point iteration to resolve nonlinearities in the quasi-linear frequency-domain formulation.
-    This leads to a multiple-discipline feasible (MDF) architecture, where dynamics convergence is handled within each simulation call.
-    
-    An alternative simultaneous analysis and design (SAND) formulation \citep{martins_multidisciplinary_2013} would enforce dynamic residuals directly within the optimization, potentially reducing simulation cost but increasing optimization complexity.
-    However, since hydrodynamics dominates computational cost in this framework (\Cref{sec:sim-runtime}), the benefit of removing dynamics iteration is limited.
-    For this reason, MDF is adopted.
+    Only one of MDOcean's governing equations requires such iteration:
+    the resolution of nonlinearities in the quasi-linear frequency-domain formulation.
+    % governing equations contains no interdisciplinary feedback loops and the only implicit module is dynamics (to resolve nonlinearities in the quasi-linear frequency-domain formulation).
+    This means that the ratio of dynamics simulation cost to total simulation cost and the expected number of iterations required for convergence determine the choice of MDF and SAND.
+    Hydrodynamics, not dynamics, will be shown to dominate computational cost (\Cref{sec:sim-runtime}), and the dynamics iteration converges more rapidly than the design optimization, so MDF is chosen.
 \fi
 
-\paragraph{Control Optimization Architecture}
+\subsection{Explicit Optimal Control Architecture}
 \ifdefined\DISSERTATION
     In control co-design, the nested and simultaneous architectures are often contrasted \citep{sundarrajan_towards_2021,herber_nested_2018}.
     The nested architecture, known as ``asymmetric subspace optimization'' in MDO literature \citep{chittick_asymmetric_2009}, optimizes control variables in an inner loop for each iteration of the outer design optimization.
@@ -74,26 +80,17 @@
     Explicit-MDF is chosen over implicit-MDF because it avoids the latter's numerical root-finding and is thus faster, as \Cref{sec:mod-freq-domain} will detail.
     An early version of MDOcean used the implicit-MDF architecture, which is described in \Cref{sec:appendix-qp-numerical} for completeness.
 \else
-    \paragraph{Choice of MDO and Control Co-Design Architecture}
     Control co-design problems are commonly classified into nested and simultaneous formulations \citep{sundarrajan_towards_2021,herber_nested_2018}.
     In the nested approach, control is optimized in an inner loop, while in the simultaneous approach, control and design variables are optimized together.
-    As an alternative to numerically optimizing the control, one can use an implicit or explicit optimality condition. 
+    Alternatively, the control can be obtained without numerical optimization via an implicit or explicit optimality condition. 
+    An explicit optimal control condition is typically the fastest; though it is not available for all cases, its availability here (\Cref{sec:optimal-control}) makes it the natural choice.
     
-    These four control formulations can be combined with both MDF and SAND analysis architectures.
-    
-
-    MDOcean uses an explicit-MDF architecture: the dynamics module iterates internally to converge the quasi-linear drag and saturation describing functions, while all other modules are explicit.
-    The explicit formulation is preferred over implicit alternatives \hl{due to the structure of the derived optimal control conditions} (\Cref{sec:mod-freq-domain}).
-    It also avoids introducing control variables into the outer optimization while preserving optimal control behavior, minimizing total runtime given that hydrodynamics dominates computational cost (\Cref{sec:sim-runtime}).
-    \citep{mccabe_dissertation_2026} provides detailed architecture rationale, coupling analysis, and the relation to MDO literature.
-    
-    \Cref{fig:control-arch} summarizes the relationship between analysis and control architectures, with the explicit-MDF formulation used in this study highlighted.
-
-    
+    For comparison, the WecOptTool software would be considered either simultaneous-SAND or nested-SAND depending on whether a user adds additional design variables to the existing pseudo-spectral optimizer or in a separate loop outside, respectively \citep{coe_initial_2020}.
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% XDSM and modules %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Modular Decomposition and Coupling}
 The simulation is composed of five coupled modules: geometry, hydrodynamics, dynamics and control, structures, and economics.
 The geometry module computes derived properties such as areas, volumes, masses, centers of gravity, hydrostatics, and stability margins from bulk dimensions and structural thicknesses.
 The hydrodynamics module evaluates frequency-domain hydrodynamic coefficients using a semi-analytical formulation based on the device geometry.
@@ -105,6 +102,13 @@ Finally, the economics module estimates capital cost (PTO and structure) and lev
 Although this work does not perform optimization, the model is developed to support system-level design optimization.
 The module coupling structure is illustrated in the XDSM diagram in \Cref{fig:n2}.
 Inputs and outputs are organized according to standard MDO conventions \citep{lambe_extensions_2012}, and an optimizer would update design variables $x$ using objective $J$ and constraints $g$ until convergence to $x^*$.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[\FigureOptions{aor:figs/from-matlab/xdsm.pdf}]{figs/from-matlab/xdsm.pdf}
+\caption{Simplified XDSM diagram}
+\label{fig:n2}
+\end{figure*}
 
 \ifdefined\DISSERTATION
     \paragraph{Absence of Feedback Coupling}
@@ -127,19 +131,10 @@ Inputs and outputs are organized according to standard MDO conventions \citep{la
     If active, these constraints would make the system-level optimum material thickness larger than what is structurally necessary.
     Using a single optimizer to drive the design of all modules and consider all constraints addresses this non-monotonic coupling. 
 \else
-    The model exhibits strong design-variable coupling but no direct feedback coupling between modules, eliminating the need for a system-level consistency iteration.
+    The model exhibits strong design-variable coupling but no direct feedback coupling between modules, as expected from the prior observation that the only equation requiring iteration is within the dynamics module.
     This improves computational efficiency and is advantageous for optimization.
     Coupling occurs primarily through shared design variables, particularly bulk dimensions, which affect geometry, hydrodynamics, and structures, as well as generator ratings and structural thicknesses, which couple multiple subsystems.
     Feed-forward coupling is also present through inter-module dependencies.
     
     This coupling is both non-convex (e.g., larger bulk dimensions raise power but also raise structural loads and material requirements) and non-monotonic, motivating concurrent rather than sequential optimization.
 \end
-
-\begin{figure*}[htbp]
-\centering
-\includegraphics[\FigureOptions{aor:figs/from-matlab/xdsm.pdf}]{figs/from-matlab/xdsm.pdf}
-\caption{Simplified XDSM diagram}
-\label{fig:n2}
-\end{figure*}
-
-
