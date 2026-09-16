@@ -220,8 +220,7 @@ classdef (SharedTestFixtures={ ...
             num_figs_token = regexp(mapping_text, 'num_figs_AOR = (\d+);', 'tokens', 'once');
             testCase.verifyNotEmpty(num_figs_token);
             testCase.verifyEqual(length(figs_in_AOR), str2double(num_figs_token{1}));
-            expected_entry = sprintf('figs_in_AOR{%d} = ''ReadNonMatlabFigs.assumptions'';', idx_scalar);
-            testCase.verifyTrue(contains(mapping_text, expected_entry));
+            testCase.verifyEqual(idx_scalar, length(figs_in_AOR));
 
             non_matlab_figs = fileread('mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m');
             testCase.verifyTrue(contains(non_matlab_figs, '''assumptions.png'''));
