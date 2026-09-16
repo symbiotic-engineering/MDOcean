@@ -1,0 +1,42 @@
+flowchart TD
+    A1["A1 - nonlinearities-are-harmonics"]
+    A2["A2 - system-low-pass"]
+    A3["A3 - quasi-linearized"]
+    A4["A4 - stationary-ergodic"]
+    A5["A5 - waves-narrow-band"]
+    A6["A6 - signal-shape-known"]
+    A7["A7 - constraints-fundamental"]
+    A8["A8 - quadratic-objective"]
+    A9["A9 - quadratic-constraints"]
+    A10["A10 - passive-dynamics-convex"]
+    A11["A11 - no-freq-coupling"]
+    A12["A12 - no-dof-coupling"]
+
+    DFs["DFs"]
+    QLPS["QLPS"]
+    ConvexQLPS["convex QLPS"]
+    AnalyticalQLPS["analytical QLPS"]
+
+    A1 --> DFs
+    A2 --> DFs
+    A3 --> DFs
+    A4 --> DFs
+    A5 --> DFs
+    A6 --> DFs
+
+    A1 --> A3
+    A2 --> A3
+    A3 --> A7
+    A4 --> A7
+    A7 --> QLPS
+
+    A8 --> ConvexQLPS
+    A9 --> ConvexQLPS
+    A10 --> ConvexQLPS
+    QLPS --> ConvexQLPS
+
+    A2 --> A11
+    A5 --> A11
+    A11 --> AnalyticalQLPS
+    A12 --> AnalyticalQLPS
+    QLPS --> AnalyticalQLPS

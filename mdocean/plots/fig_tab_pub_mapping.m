@@ -9,7 +9,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 
 %% numbers
 num_figs_RE = 29;
-num_figs_AOR = 59;
+num_figs_AOR = 60;
 num_tabs_AOR = 3;
 num_tabs_RE = 6;
 
@@ -125,6 +125,7 @@ figs_in_AOR{56} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fu
 figs_in_AOR{57} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase';  % fig 37 subfig
 figs_in_AOR{58} = 'Wecsim.wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase'; % fig 37 subfig
 figs_in_AOR{59} = 'DampingPlateStructures.damping_plate_deflection'; % fig 45 subfig (b)
+figs_in_AOR{60} = 'ReadNonMatlabFigs.assumptions'; % module details assumptions graph
 
 %% TABLES
 
