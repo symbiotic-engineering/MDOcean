@@ -214,12 +214,13 @@ classdef (SharedTestFixtures={ ...
             [~, figs_in_AOR, ~, ~] = fig_tab_pub_mapping();
             idx = find(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions'));
             testCase.verifyEqual(numel(idx), 1);
+            idx_scalar = idx(1);
 
             mapping_text = fileread('mdocean/plots/fig_tab_pub_mapping.m');
             num_figs_token = regexp(mapping_text, 'num_figs_AOR = (\d+);', 'tokens', 'once');
             testCase.verifyNotEmpty(num_figs_token);
             testCase.verifyEqual(length(figs_in_AOR), str2double(num_figs_token{1}));
-            expected_entry = sprintf('figs_in_AOR{%d} = ''ReadNonMatlabFigs.assumptions'';', idx);
+            expected_entry = sprintf('figs_in_AOR{%d} = ''ReadNonMatlabFigs.assumptions'';', idx_scalar);
             testCase.verifyTrue(contains(mapping_text, expected_entry));
 
             non_matlab_figs = fileread('mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m');
