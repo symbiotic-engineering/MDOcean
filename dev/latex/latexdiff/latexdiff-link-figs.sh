@@ -3,7 +3,7 @@ set -e
 
 repo_root="${DVC_REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cache_dir="${DVC_CACHE_DIR:-$repo_root/.dvc/cache}"
-deps_file="${DVC_DEPS_JSON:-$repo_root/aor-latexdiff-dvc-deps.json}"
+deps_file="${DVC_DEPS_JSON:-$repo_root/dev/latex/latexdiff/aor-latexdiff-dvc-deps.json}"
 
 # resolve a DVC cache object path for a given file/directory-manifest md5
 resolve_cache_object() {

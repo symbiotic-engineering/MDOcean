@@ -5956,26 +5956,25 @@ pipeline:
     get-aor-latexdiff-dvc-deps:
       kind: shell-command
       environment: pubs
-      command: bash dev/latex/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD
+      command: bash dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD
       inputs:
-        - dev/latex/get-aor-latexdiff-dvc-deps.sh
+        - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh
       outputs:
-        - path: aor-latexdiff-dvc-deps.json
+        - path: dev/latex/latexdiff/aor-latexdiff-dvc-deps.json
           storage: git
     make-aor-latexdiff:
       kind: shell-command
       environment: tex
       command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="/work" DVC_CACHE_DIR="/work/.dvc/cache"
-        DVC_DEPS_JSON="/work/aor-latexdiff-dvc-deps.json"
+        DVC_DEPS_JSON="/work/dev/latex/latexdiff/aor-latexdiff-dvc-deps.json"
         git latexdiff --no-view --tmpdirprefix .
         --main pubs/applied-ocean-research-model/main.tex
         --whole-tree --ignore-latex-errors --latexmk
         --latexpand --makeatletter
         --graphics-markup=both
-        --filter 'dev/latex/latexdiff-link-figs.sh'
-        --prepare 'python3 ../new/dev/latex/latexdiff-prepare.py'
+        --filter 'dev/latex/latexdiff/latexdiff-link-figs.sh'
+        --prepare 'python3 ../new/dev/latex/latexdiff/latexdiff-prepare.py'
         -o pubs/applied-ocean-research-model/main-diff.pdf aor-submitted -- < /dev/null
-      # right now, graphics markup=both isn't useful since the same dvc hashes are being pulled
       inputs:
         - pubs/applied-ocean-research-model/sections/
         - pubs/applied-ocean-research-model/figs/from-matlab/
@@ -5992,9 +5991,9 @@ pipeline:
         - pubs/applied-ocean-research-model/cas-dc.cls
         - pubs/applied-ocean-research-model/cas-common.sty
         - pubs/applied-ocean-research-model/.latexmkrc
-        - dev/latex/latexdiff-link-figs.sh
-        - dev/latex/latexdiff-prepare.py
-        - aor-latexdiff-dvc-deps.json
+        - dev/latex/latexdiff/latexdiff-link-figs.sh
+        - dev/latex/latexdiff/latexdiff-prepare.py
+        - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json
       outputs:
         - pubs/applied-ocean-research-model/main-diff.pdf
     # all-writing:

@@ -50,4 +50,4 @@ old_json=$(deps_json_for_hash "$old_hash")
 new_json=$(deps_json_for_hash "$new_hash")
 
 jq -n --argjson old "$old_json" --argjson new "$new_json" '{old: $old, new: $new}' \
-  > aor-latexdiff-dvc-deps.json
+  > dev/latex/latexdiff/aor-latexdiff-dvc-deps.json

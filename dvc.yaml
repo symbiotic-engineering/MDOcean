@@ -8253,11 +8253,10 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
-  build-AOR-paper-diff-c767dee:
-    cmd: calkit latex diff -e tex --no-check --from c767dee --to HEAD
-      --revision-key cbc2dad0c474..96baee73799c -r
-      pubs/applied-ocean-research-model/.latexmkrc --latexdiff-arg
-      '--graphics-markup=both --keep-tex' --input
+  build-AOR-paper-diff-aor-submitted:
+    cmd: calkit latex diff -e tex --no-check --from aor-submitted --to HEAD
+      --revision-key ecd622a0fa34..96baee73799c -r
+      pubs/applied-ocean-research-model/.latexmkrc --input
       pubs/applied-ocean-research-model/sections/ --input
       pubs/applied-ocean-research-model/figs/from-matlab/ --input
       pubs/applied-ocean-research-model/figs/manual/ --input
@@ -8272,7 +8271,8 @@ stages:
       pubs/applied-ocean-research-model/cas-dc.cls --input
       pubs/applied-ocean-research-model/cas-common.sty --input
       pubs/applied-ocean-research-model/glossary/ --output-dir
-      .calkit/latex-diffs/c767dee pubs/applied-ocean-research-model/main.tex
+      .calkit/latex-diffs/aor-submitted
+      pubs/applied-ocean-research-model/main.tex
     deps:
       - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/sections/
@@ -8292,7 +8292,7 @@ stages:
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
-      - .calkit/latex-diffs/c767dee/pubs/applied-ocean-research-model/main.pdf
+      - .calkit/latex-diffs/aor-submitted/pubs/applied-ocean-research-model/main.pdf
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
   build-UMERC-paper:
@@ -8361,12 +8361,12 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   get-aor-latexdiff-dvc-deps:
     cmd: calkit xenv -n pubs --no-check -- bash --noprofile --norc -c "bash
-      dev/latex/get-aor-latexdiff-dvc-deps.sh c767dee HEAD"
+      dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD"
     deps:
-      - dev/latex/get-aor-latexdiff-dvc-deps.sh
+      - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh
       - .calkit/env-locks/pubs
     outs:
-      - aor-latexdiff-dvc-deps.json:
+      - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json:
           cache: false
           persist: false
     desc: Automatically generated from the 'get-aor-latexdiff-dvc-deps' stage in
@@ -8375,13 +8375,15 @@ stages:
     cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c "rm -rf
       git-latexdiff.* && DVC_REPO_ROOT=\"/work\"
       DVC_CACHE_DIR=\"/work/.dvc/cache\"
-      DVC_DEPS_JSON=\"/work/aor-latexdiff-dvc-deps.json\" git latexdiff
-      --no-view --tmpdirprefix . --main
+      DVC_DEPS_JSON=\"/work/dev/latex/latexdiff/aor-latexdiff-dvc-deps.json\"
+      git latexdiff --no-view --tmpdirprefix . --main
       pubs/applied-ocean-research-model/main.tex --whole-tree
       --ignore-latex-errors --latexmk --latexpand --makeatletter
-      --graphics-markup=both --filter 'dev/latex/latexdiff-link-figs.sh'
-      --prepare 'python3 ../new/dev/latex/latexdiff-prepare.py' -o
-      pubs/applied-ocean-research-model/main-diff.pdf c767dee -- < /dev/null"
+      --graphics-markup=both --filter
+      'dev/latex/latexdiff/latexdiff-link-figs.sh' --prepare 'python3
+      ../new/dev/latex/latexdiff/latexdiff-prepare.py' -o
+      pubs/applied-ocean-research-model/main-diff.pdf aor-submitted -- <
+      /dev/null"
     deps:
       - pubs/applied-ocean-research-model/sections/
       - pubs/applied-ocean-research-model/figs/from-matlab/
@@ -8398,9 +8400,9 @@ stages:
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
       - pubs/applied-ocean-research-model/.latexmkrc
-      - dev/latex/latexdiff-link-figs.sh
-      - dev/latex/latexdiff-prepare.py
-      - aor-latexdiff-dvc-deps.json
+      - dev/latex/latexdiff/latexdiff-link-figs.sh
+      - dev/latex/latexdiff/latexdiff-prepare.py
+      - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json
       - .calkit/env-locks/tex
     outs:
       - pubs/applied-ocean-research-model/main-diff.pdf
