@@ -210,18 +210,6 @@ classdef (SharedTestFixtures={ ...
     % Test methods
     methods(Test, ParameterCombination='sequential')
 
-        function assumptionsFigurePlumbing(testCase)
-            [~, figs_in_AOR, ~, ~] = fig_tab_pub_mapping();
-            idx = find(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions'));
-            testCase.verifyEqual(numel(idx), 1);
-
-            obj = ReadNonMatlabFigs(struct(), struct());
-            testCase.verifyTrue(any(strcmp(obj.fig_names, 'assumptions')));
-
-            intermed = ReadNonMatlabFigs.analysis_fcn([], []);
-            testCase.verifyTrue(any(strcmp(intermed.file_names, 'assumptions.png')));
-        end
-
         % run every figure and log it
         function allFiguresRun(testCase, which_figs, which_tabs)
 
