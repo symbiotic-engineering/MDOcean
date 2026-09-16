@@ -215,8 +215,8 @@ classdef (SharedTestFixtures={ ...
             idx = find(strcmp(figs_in_AOR, 'ReadNonMatlabFigs.assumptions'));
             testCase.verifyEqual(numel(idx), 1);
 
-            non_matlab_figs = fileread('mdocean/analysis/@ReadNonMatlabFigs/analysis_fcn.m');
-            testCase.verifyTrue(contains(non_matlab_figs, '''assumptions.png'''));
+            intermed = ReadNonMatlabFigs.analysis_fcn([], []);
+            testCase.verifyTrue(any(strcmp(intermed.file_names, 'assumptions.png')));
         end
 
         % run every figure and log it
