@@ -217,7 +217,7 @@ classdef (SharedTestFixtures={ ...
             idx_scalar = idx(1);
 
             mapping_text = fileread('mdocean/plots/fig_tab_pub_mapping.m');
-            num_figs_token = regexp(mapping_text, 'num_figs_AOR = (\d+);', 'tokens', 'once');
+            num_figs_token = regexp(mapping_text, 'num_figs_AOR = ([0-9]+);', 'tokens', 'once');
             testCase.verifyNotEmpty(num_figs_token);
             testCase.verifyEqual(length(figs_in_AOR), str2double(num_figs_token{1}));
             testCase.verifyEqual(idx_scalar, length(figs_in_AOR));
