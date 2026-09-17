@@ -9,7 +9,15 @@ s = split(mfilename('fullpath'), filesep);
 MDOcean_folder = strjoin(s(1:end-5), filesep); % up from add_wecsim_path -> WECSim -> validation -> inputs -> mdocean -> MDOcean root
 mdocean_folder = fullfile(MDOcean_folder, 'mdocean');
 
-% allow WEC-Sim if it's installed in the parent directory of MDOcean or inside MDOcean
+% WEC-Sim may already be on the path, provided by mip from the project
+% environment ./.mip (see mip.yaml and setup_mip; add_mdocean_path loads it)
+if exist('wecSim', 'file') == 2
+    set_param(0, 'ErrorIfLoadNewModel', 'off')
+    addpath(fullfile(mdocean_folder, 'inputs', 'validation', 'WECSim'),'-begin') % make sure MDOcean's modified readWAMIT takes precedence over WecSim's
+    return
+end
+
+% otherwise, allow WEC-Sim if it's installed in the parent directory of MDOcean or inside MDOcean
 wecSim_folder_outside = fullfile(MDOcean_folder, '..', 'WEC-Sim');
 wecSim_folder_inside = fullfile(MDOcean_folder, 'WEC-Sim');
 exist_outside = exist(wecSim_folder_outside,'dir');
