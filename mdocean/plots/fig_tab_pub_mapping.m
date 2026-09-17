@@ -10,7 +10,7 @@ function [figs_in_RE, figs_in_AOR, tabs_in_RE, tabs_in_AOR] = fig_tab_pub_mappin
 %% numbers
 num_figs_RE = 29;
 num_figs_AOR = 59;
-num_tabs_AOR = 2;
+num_tabs_AOR = 3;
 num_tabs_RE = 6;
 
 %% RE figures
@@ -130,7 +130,8 @@ figs_in_AOR{59} = 'DampingPlateStructures.damping_plate_deflection'; % fig 45 su
 
 tabs_in_AOR = cell(1,num_tabs_AOR);
 tabs_in_AOR{1} = 'Cost.cost_parameters';
-tabs_in_AOR{2} = 'Validation.validation';
+tabs_in_AOR{2} = 'Validation.validation_smaller';
+tabs_in_AOR{3} = 'Validation.validation_larger';
 
 tabs_in_RE = cell(1,num_tabs_RE);
 tabs_in_RE{1} = 'Constraints.constraints';

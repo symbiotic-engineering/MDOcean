@@ -109,16 +109,16 @@ function constr_fcn = eval_constraint(p,c,r)
         constr_fcn = zeros(0,length(r));
         return
     end
-    cx = c(:,1).';
-    cy = c(:,2).';
-    rr = r(:).';
+    cx = c(:,1);
+    cy = c(:,2);
+    rr = r(:);
     if isvector(p) && numel(p) == 2
-        constr_fcn = hypot(p(1) - cx, p(2) - cy) - rr;
+        constr_fcn = (hypot(p(1) - cx, p(2) - cy) - rr).';
         return
     end
-    dx = p(:,1) - cx;
-    dy = p(:,2) - cy;
-    constr_fcn = hypot(dx,dy) - rr;
+    dx = p(:,1) - cx.';
+    dy = p(:,2) - cy.';
+    constr_fcn = hypot(dx,dy) - rr.';
 end
 
 function pair_idx = pair_indices_2comb(N)

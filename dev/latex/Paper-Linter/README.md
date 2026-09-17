@@ -4,7 +4,7 @@ This script checks for common mistakes in LaTeX source files of scientific paper
 
 ## Usage
 
-    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--output <output-file>] [--error]
+    python3 paperlint.py <file.tex/path> [-x <switch>] [-i <switch>] [--ignore <file-or-name>] [--settings <settings-file>] [--params <params-file>] [--output <output-file>] [--symbol-glossary-paper <paper-name>] [--replace-glossary-refs] [--error]
 
 Provide either a single .tex file to check or a path to recursively check all .tex files in that directory.
 By default, all rules are used for checking the document.
@@ -12,9 +12,13 @@ The switches can be configured with the `-x` and `-i` parameters to exclude and 
 The include/exclude switches are evaluated in the order they are specified. 
 For example, `-i typography` only activates the typography rules, whereas `-i all -x typography -i cite-space` enables all rules without the typography rules, but enables the `cite-space` rule from the typography category. 
 
-If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1 <switch>` (`1` enables, `0` disables).
+If `--settings` is provided, switches are loaded from a settings file with lines of the form `0|1|2 <switch>` (`2` enables a check and runs its fix action when available).
+If `--params` is provided, paper-specific parameters are loaded from a parameter file as `key=value` pairs.
+Supported params include `symbol_glossary_paper` and `acronym_glossary_seed` for glossary-based rewrite workflows.
 The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
+If `--symbol-glossary-paper <paper-name>` is provided, equation symbols extracted from the document are compared against every `\newsym{key}{symbol}{description}` entry already defined in `pubs/shared/glossary/`, and any symbols not yet documented there are written as new `\newsym{key}{symbol}{}` entries to `pubs/shared/glossary/glossary-symbols-<paper-name>-generated.tex`. Symbols that get documented elsewhere in `pubs/shared/glossary/` afterwards are dropped from the generated file on the next run, and manually-added descriptions in the generated file are preserved until then.
+If `--replace-glossary-refs` is provided, the linter rewrites matched math-mode symbol bodies to `\gls{...}` references in place using `pubs/shared/symbol-glossary-shared.tex` as the source of glossary labels, and can also rewrite acronym short/long forms when `acronym_glossary_seed` is configured.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings
@@ -77,6 +81,10 @@ This category includes typography-related issues, such as wrong punctuation (swi
 #### Math/Text Mode Mixing
 * **Description**: Warns if text-like content is used inside math mode without explicit text markup
 * **Switch**: `math-text-mix`
+
+#### Mathmode Subscripts
+* **Description**: Warns if prose words in math subscripts should be wrapped in `\text{...}`
+* **Switch**: `mathmode-subscripts`
 
 #### Large Numbers without siunit
 * **Description**: Warns if large numbers are not formatted with the `sinuit` package
@@ -333,3 +341,27 @@ This category includes warnings for everything related to (cross-)references (sw
 #### Equation Symbols Mentioned in Text
 * **Description**: Warns if a symbol first used in an equation is not mentioned inline in the surrounding text
 * **Switch**: `symbol-mention`
+
+#### Glossary References
+* **Description**: Warns if math symbols should be replaced with glossary references where available
+* **Switch**: `glossary-refs`
+
+#### Unused Glossary Symbols
+* **Description**: Warns if a `\newsym` entry in `pubs/shared/glossary/` is never referenced with `\gls{...}` in `pubs/` or `mdocean/simulation/modules/OpenFLASH/pubs/JFM/`. Entries in the auto-generated `glossary-symbols-<paper>-generated.tex` files are skipped, since those symbols are extracted straight from bare equations and so are never yet wrapped in `\gls{...}`. Fix (`2`) deletes the unused `\newsym` entries.
+* **Switch**: `glossary-unused`
+
+#### Glossary Symbols Missing a Description
+* **Description**: Warns if a `\newsym` entry is used with `\gls{...}` somewhere but has a blank description argument. Entries in the auto-generated `glossary-symbols-<paper>-generated.tex` files are skipped, since those are always written with a blank description. Fix (`2`) is not implemented.
+* **Switch**: `glossary-missing-description`
+
+#### Duplicate Glossary Symbols
+* **Description**: Warns if two or more `\newsym` entries in `pubs/shared/glossary/` share the same symbol (second argument) under different keys. Fix (`2`) appends a `_2`, `_3`, etc. subscript to all but the first entry's symbol to make them unique.
+* **Switch**: `glossary-symbol-duplicate`
+
+#### Math Glossary Reference Coverage
+* **Description**: Warns if an equation has fewer than two `\gls{...}` references or an inline/display math span has none
+* **Switch**: `math-gls-coverage`
+
+#### Prefix
+* **Description**: Warns if labels and references should be prefixed according to the paper-specific parameters file
+* **Switch**: `prefix`
