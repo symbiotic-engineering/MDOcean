@@ -16,7 +16,7 @@
 
     When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
     In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
-    When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint (s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
+    When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
     Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of active set possibilities instead of a continuous control domain as it would be in a direct optimal control method.
     The main advantage of the indirect approach is its ability to handle arbitrary nonlinear\footnote{Nonlinear meaning greater than second order in an optimization sense, not in a dynamic sense, because the dynamics are already quasi-linearized here} constraints, although for the quadratic constraints considered here, the analytical approach described in \Cref{sec:appendix-qp-solution} is more efficient.
 \fi
@@ -239,12 +239,12 @@ and $1i$ is the imaginary unit.
 The closest-point candidates $\gls{sym-mathcal-C-cl}$ match the solution that \citet[\equationautorefname~4]{mccabe_force-limited_2024} derive for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\gls{sym-mathcal-F}$, only compute $\gls{sym-mathcal-C}$ and then check whether each candidate point is feasible.
-\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $\gls{sym-r-mu}=4$, $\gls{sym-S}_{\gls{sym-mu}}=1$, and various $\gls{sym-Gamma-c-mu}$.
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $\gls{sym-r-mu}=4$, $\gls{sym-S-mu}=1$, and various $\gls{sym-Gamma-c-mu}$.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/qp_circles.pdf}]{figs/from-matlab/qp_circles.pdf}
     \caption[Visualization of the optimization problem in the complex plane of $\gls{sym-Gamma}$]{Visualization of the optimization problem \Cref{eq:opt-problem-gamma} in the complex plane of $\gls{sym-Gamma}$.
-Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all with radius $\gls{sym-r-mu}=4$ and $\gls{sym-S}_{\gls{sym-mu}}=1$, demonstrate the various solution cases in \Cref{eq:gamma-opt-quadratic}.}
+Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all with radius $\gls{sym-r-mu}=4$ and $\gls{sym-S-mu}=1$, demonstrate the various solution cases in \Cref{eq:gamma-opt-quadratic}.}
     \label{fig:qp-solution-geometry}
 \end{figure}
 
@@ -257,7 +257,7 @@ The same types of critical points (now consisting of line-line, circle-line, and
 \label{sec:appendix-mag-S-constraints}
 While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\gls{sym-vec-x}$, constraints on the magnitude of apparent power $|\gls{sym-S}|<|\gls{sym-S}_{\text{max}}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\gls{sym-vec-x}$ and thus $\gls{sym-Gamma}$.
 This results in a ``Cassini oval'' curve \citep{weisstein_cassini_2026} on the complex plane of $\gls{sym-Gamma}$, which consists of two closed curves when $|\gls{sym-S}_{\text{max}}|<|\gls{sym-S-0}|$ and one curve when $|\gls{sym-S}_{\text{max}}|\geq|\gls{sym-S-0}|$, where $|\gls{sym-S-0}|$ is the apparent power of the unconstrained optimum.
-Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\gls{sym-mathcal-C}_{int,\text{oval}-\text{circ}}$, oval-oval intersections, and oval closest points $\gls{sym-mathcal-C}_{cl,\text{oval}}$ to the set of candidate points $\gls{sym-mathcal-C}$.
+Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\gls{sym-mathcal-C-int-oval-circ}$, oval-oval intersections, and oval closest points $\gls{sym-mathcal-C-cl-oval}$ to the set of candidate points $\gls{sym-mathcal-C}$.
 The new candidate points are:
 \begin{equation}
 \begin{aligned}
