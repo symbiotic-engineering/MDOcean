@@ -17,7 +17,7 @@ function [fig_array,...
             
             tab = intermed_result_struct.constraint_names;
             
-            fig_array = [];
+            fig_array = MDF_vs_SAND();
             
             tab_array_display = {tab};
             tab_array_latex = {tab};
