@@ -3,15 +3,88 @@
 \section{Validation and Benchmarking}
 \label{sec:validation-benchmarking}
 This section demonstrates MDOcean's accuracy and speed through verification (checking that the code reliably implements the specified assumptions), calibration (tuning the model to replicate specified outputs), validation (checking that the specified assumptions are realistic), and benchmarking (measuring model runtime).
+The majority of checks are implemented as unit tests in a continuous integration workflow reproducibility pipeline following software engineering best practices.
+
+\subsection{Verification, Calibration, and Validation: Hydrodynamics Module}
+To verify and validate MDOcean's hydrodynamics module, we compare against analytically expected behavior, previously published MEEM results for various geometries, and existing BEM solutions for RM3 \cite{RM3}.
+Hydrodynamic calibration is not necessary.
+
+\subsubsection{Hydrodynamics Verification}
+MDOcean's results satisfy the following analytically expected behaviors for a variety of geometries:
+damping goes to zero at high and low frequency;
+added mass is logarithmically singular at low frequency and constant at high frequency;
+added mass and damping matrices are positive definite
+(\hl{XX}\% of geometries require truncating the coupling terms as described in \Cref{sec:});
+potential and radial velocity match at the boundary of adjacent fluid regions
+(see \cite[Fig.~\hl{XX}]{mccabe_open-source_2024});
+and
+hydrodynamic coefficients have converged with respect to chosen series truncation order
+(see \cite[Fig.~\hl{XX}]{mccabe_open-source_2024}).
+Additionally, potential and hydrodynamic coefficients match previously published MEEM results for a reference geometry
+(see \cite[Fig.~\hl{XX}]{mccabe_open-source_2024}).
+
+\subsubsection{Hydrodynamics Validation}
+Hydrodynamic validation for the float, spar/coupling, and system radiation impedance shows that MDOcean agrees well with \gls{acr-bem} and damping-plate-inclusive \gls{acr-meem}.
+\ifdefined\DISSERTATION
+    The \gls{acr-meem} hydrodynamic coefficients for the nominal \gls{acr-rm3} geometry match \gls{acr-wamit} \gls{acr-bem} results closely, as previously shown in Fig.~5 of \citep{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
+    This is expected because the \gls{acr-bem} solution assumes infinite depth, which requires a finite added mass at low frequency, whereas \gls{acr-meem} uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \citep{mciver_added_1991}.
+    For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
+    After the publication of reference~\citet{mccabe_open-source_2024}, excitation phase was added to the \gls{acr-meem} implementation.
+    It also matches \gls{acr-wamit} results well.
+\else
+    Validating the assumption that the slanted surfaces of the float can be approximated as flat,
+    the \gls{acr-meem} hydrodynamic coefficients for the nominal \gls{acr-rm3} geometry match \gls{acr-wamit} \gls{acr-bem} results closely for $\gls{sym-omega} \geq 0.3$~rad/s (Fig.~5 of \citet{mccabe_open-source_2024}).
+    The divergence at lower frequencies arises from differing finite-depth versus infinite-depth assumptions \citep{mciver_added_1991} and is not a concern for the site considered (minimum sea-state frequency 0.4~rad/s).
+\fi
+Meanwhile, the spar and coupling coefficients for the RM3 geometry match the \gls{acr-wamit} \gls{acr-bem} results perfectly due to the interpolation scheme.
+Therefore, spar and coupling coefficient validation is performed with the data used to determine dimensional scalings \citep{olaya_hydrodynamic_2015}.
+%\Cref{fig:olaya-validation} shows the results.
+At the system level, it is the magnitude and phase of the system radiation impedance that determines how hydrodynamic errors propagate to power and amplitude.
+The third subfigure of \Cref{fig:error-histogram} shows the corresponding power and amplitude errors after running the coefficients through the dynamics and controls module, turning drag off to eliminate the effect of any dynamics linearization errors.
+Prior studies have successfully validated \gls{acr-meem} \cite{} and \gls{acr-bem} \cite{} coefficients (and their assumptions of linear wave theory) against experimental response data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Verification, Calibration, and Validation: Dynamics and Control Module}
+To verify, calibrate, and validate MDOcean's dynamics and controls module, we compare against analytical solutions, the software WEC-Sim \citep{ruehl_wec-simwec-sim_2024}, and to the reference model report power matrix \cite{RM3}.
+
+\subsubsection{Dynamics Verification}
+Numerical checks confirm that
+the power, motion, and forces for any WEC with an unconstrained controller match the analytical impedance-matched solution;
+the power output for a WEC with no drag, lossless PTO, and unconstrained control does not exceed the radiation limit;
+the power output for a WEC with no drag, lossless PTO, and amplitude-constrained control does not exceed the Budal upper bound;
+and
+the response for any WEC with constrained control does not violate constraint limits.
+
+The first subfigure in \Cref{fig:error-histogram} shows that the power and motion amplitude for RM3 with no drag, lossless PTO, and a reactive scheme
+match those predicted by WEC-Sim with identical hydrodynamic inputs,
+verifying correct implementation of the dynamics for a linear system.
+Promisingly, the mode of the histogram is less than one percent error,
+although a minority of sea states exhibit substantially larger errors.
+These large errors vanish when drag is turned on or when control is switched to a damping scheme.
+We theorize that this represents an error in the WEC-Sim results, rather than an error in MDOcean, arising from transient normal modes that have not had enough time to decay in the highly-undamped system.
+Future work should confirm this hypothesis by extending the time-domain simulation period past 
+Because the same percent error can have disproportionate impact in different sea states,
+vertical lines indicate the most relevant summary statistic for each metric:
+annual average power (\hl{XX}\% error) and maximum float amplitude (\hl{XX}\% error).
+Results are similar for damping control (not shown).
+
+
 
 - verification = under matched assumptions, did i implement the assumptions that I say I'm going to implement correctly?
  --- left side of figure 12 (first subfigure)
 
  --- Fig 37: drag numerical amplitude and phase are not very correct (but doesn't matter too much)
 
+\subsubsection{Dynamics Calibration}
+
+
 - calibration = for the outputs that didn't pass verification, apply tuning to make them match
+
+\subsubsection{Dynamics Validation}
+- 
+
+- the power for RM3 with drag, lossless PTO, and damping control match that predicted by the reference model report
 
 - validation = how accurate are my assumptions?
  --- subfigures 2,3,4 of figure 12
@@ -89,16 +162,7 @@ and the ability to quickly evaluate a large number of design options.
 \subsection{Static Validation}
 \label{sec:static-validation}
 
-\ifdefined\DISSERTATION
-    The \gls{acr-meem} hydrodynamic coefficients for the nominal \gls{acr-rm3} geometry match \gls{acr-wamit} \gls{acr-bem} results closely, as previously shown in Fig.~5 of \citep{mccabe_open-source_2024}, except at frequencies below 0.3~rad/s.
-    This is expected because the \gls{acr-bem} solution assumes infinite depth, which requires a finite added mass at low frequency, whereas \gls{acr-meem} uses finite depth, where the added mass must grow logarithmically toward infinity at zero frequency \citep{mciver_added_1991}.
-    For the site under consideration, the lowest-frequency sea state containing any energy is 0.4~rad/s, so the discrepancy is not a concern.
-    After the publication of reference~\citet{mccabe_open-source_2024}, excitation phase was added to the \gls{acr-meem} implementation.
-It also matches \gls{acr-wamit} results well.
-\else
-    The \gls{acr-meem} hydrodynamic coefficients for the nominal \gls{acr-rm3} geometry match \gls{acr-wamit} \gls{acr-bem} results closely for $\gls{sym-omega} \geq 0.3$~rad/s (Fig.~5 of \citet{mccabe_open-source_2024});
-    the divergence at lower frequencies arises from differing finite-depth versus infinite-depth assumptions \citep{mciver_added_1991} and is not a concern for the site considered (minimum sea-state frequency 0.4~rad/s).
-\fi
+
 
 The overall model is validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \citet{RM3}, as shown in \Cref{tab:validation}.
 \ifdefined\DISSERTATION
