@@ -1,7 +1,7 @@
 name: mdocean
 title: MDOcean
-description: Multidisciplinary Design Optimization (MDO) to optimize an 
-  ocean wave energy converter (WEC).
+description: Multidisciplinary Design Optimization (MDO) to optimize 
+  an ocean wave energy converter (WEC).
 environments:
   tex:
     kind: docker
@@ -40,7 +40,10 @@ environments:
   bibtex-conda:
     path: dev/latex/environment.yml
     kind: conda
-dependencies:
+  yq-conda:
+    path: dev/latex/latexdiff/environment.yml
+    kind: conda
+requirements:
   - docker
   # - matlab
 env_vars:
@@ -59,6 +62,7 @@ parameters:
     - circuit_kinematics
     - control_method_venn_diagram
     - meem_dims
+    - two_port_dimension_coeff_chain
 subprojects:
   - path: mdocean/simulation/modules/OpenFLASH
 pipeline:
@@ -149,6 +153,18 @@ pipeline:
         - mdocean/simulation/
       outputs:
         - path: calkit_stages.yaml
+          storage: git
+    build-symbol-glossary-shared:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/merge_symbol_glossaries.py
+      inputs:
+        - pubs/applied-ocean-research-model/symbol-glossary-aor.tex
+        - pubs/renewable-energy-mdo/symbol-glossary-re.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/symbol-glossary-jfm.tex
+        # - pubs/UMERC-2025-grid-value/symbol-glossary-umerc.tex
+      outputs:
+        - path: pubs/dissertation/symbol-glossary-dissertation.tex
           storage: git
     analysis-AllFigCompare:
       kind: shell-command
@@ -1783,8 +1799,8 @@ pipeline:
     analysis-GradientOptimFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
-        obj.run_analysis();"
+      command: ./mymatlab "add_mdocean_path(); 
+        obj=GradientOptimFigFunc; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@GradientOptimFigFunc/GradientOptimFigFunc.m
@@ -1854,8 +1870,8 @@ pipeline:
     postpro-GradientOptimFigFunc:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=GradientOptimFigFunc;
-        obj.run_all_from_load();"
+      command: ./mymatlab "add_mdocean_path(); 
+        obj=GradientOptimFigFunc; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-GradientOptimFigFunc
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2079,8 +2095,8 @@ pipeline:
     analysis-LocationSensitivity:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
-        obj.run_analysis();"
+      command: ./mymatlab "add_mdocean_path(); 
+        obj=LocationSensitivity; obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
         - ./mdocean/analysis/@LocationSensitivity/LocationSensitivity.m
@@ -2159,8 +2175,8 @@ pipeline:
     postpro-LocationSensitivity:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=LocationSensitivity; 
-        obj.run_all_from_load();"
+      command: ./mymatlab "add_mdocean_path(); 
+        obj=LocationSensitivity; obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-LocationSensitivity
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2545,7 +2561,7 @@ pipeline:
     analysis-ParamSensitivities:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities;
         obj.run_analysis();"
       inputs:
         - ./mdocean/inputs/validation/RM3-CBS.xlsx
@@ -2618,7 +2634,7 @@ pipeline:
     postpro-ParamSensitivities:
       kind: shell-command
       environment: _system
-      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities; 
+      command: ./mymatlab "add_mdocean_path(); obj=ParamSensitivities;
         obj.run_all_from_load();"
       inputs:
         - from_stage_outputs: analysis-ParamSensitivities
@@ -4992,7 +5008,8 @@ pipeline:
     postpro-WithTables:
       kind: shell-command
       environment: _system
-      command: echo "Running postprocessing for all stages with tables."
+      command: echo "Running postprocessing for all stages with 
+        tables."
       inputs:
         - from_stage_outputs: postpro-Comparison
         - from_stage_outputs: postpro-Constraints
@@ -5101,7 +5118,7 @@ pipeline:
       notebook_path: results/fig_notebooks/AllFigCompare.ipynb
       inputs:
         - from_stage_outputs: postpro-AllFigCompare
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Comparison:
@@ -5110,7 +5127,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Comparison.ipynb
       inputs:
         - from_stage_outputs: postpro-Comparison
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Constraints:
@@ -5119,7 +5136,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Constraints.ipynb
       inputs:
         - from_stage_outputs: postpro-Constraints
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Cost:
@@ -5128,16 +5145,17 @@ pipeline:
       notebook_path: results/fig_notebooks/Cost.ipynb
       inputs:
         - from_stage_outputs: postpro-Cost
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DampingPlateStructures:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/DampingPlateStructures.ipynb
+      notebook_path: 
+        results/fig_notebooks/DampingPlateStructures.ipynb
       inputs:
         - from_stage_outputs: postpro-DampingPlateStructures
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DescFcns:
@@ -5146,16 +5164,17 @@ pipeline:
       notebook_path: results/fig_notebooks/DescFcns.ipynb
       inputs:
         - from_stage_outputs: postpro-DescFcns
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DesignSpaceExploration:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/DesignSpaceExploration.ipynb
+      notebook_path: 
+        results/fig_notebooks/DesignSpaceExploration.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignSpaceExploration
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DesignVars:
@@ -5164,7 +5183,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DesignVars.ipynb
       inputs:
         - from_stage_outputs: postpro-DesignVars
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-DragIntegral:
@@ -5173,7 +5192,7 @@ pipeline:
       notebook_path: results/fig_notebooks/DragIntegral.ipynb
       inputs:
         - from_stage_outputs: postpro-DragIntegral
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-FitOlaya:
@@ -5182,16 +5201,17 @@ pipeline:
       notebook_path: results/fig_notebooks/FitOlaya.ipynb
       inputs:
         - from_stage_outputs: postpro-FitOlaya
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ForceSaturationFigFunc:
       kind: jupyter-notebook
       environment: pubs
-      notebook_path: results/fig_notebooks/ForceSaturationFigFunc.ipynb
+      notebook_path: 
+        results/fig_notebooks/ForceSaturationFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ForceSaturationFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-GradientOptimFigFunc:
@@ -5200,7 +5220,7 @@ pipeline:
       notebook_path: results/fig_notebooks/GradientOptimFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-GradientOptimFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-HydroCoeffFigFunc:
@@ -5209,7 +5229,7 @@ pipeline:
       notebook_path: results/fig_notebooks/HydroCoeffFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-HydroCoeffFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-LocationSensitivity:
@@ -5218,7 +5238,7 @@ pipeline:
       notebook_path: results/fig_notebooks/LocationSensitivity.ipynb
       inputs:
         - from_stage_outputs: postpro-LocationSensitivity
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Meem:
@@ -5227,7 +5247,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Meem.ipynb
       inputs:
         - from_stage_outputs: postpro-Meem
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Multistart:
@@ -5236,7 +5256,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Multistart.ipynb
       inputs:
         - from_stage_outputs: postpro-Multistart
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParamSensitivities:
@@ -5245,7 +5265,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParamSensitivities.ipynb
       inputs:
         - from_stage_outputs: postpro-ParamSensitivities
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Parameters:
@@ -5254,7 +5274,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Parameters.ipynb
       inputs:
         - from_stage_outputs: postpro-Parameters
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoFigFunc:
@@ -5263,7 +5283,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ParetoSweep:
@@ -5272,7 +5292,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ParetoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-ParetoSweep
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-PtoSweep:
@@ -5281,7 +5301,7 @@ pipeline:
       notebook_path: results/fig_notebooks/PtoSweep.ipynb
       inputs:
         - from_stage_outputs: postpro-PtoSweep
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-QPCircles:
@@ -5290,7 +5310,7 @@ pipeline:
       notebook_path: results/fig_notebooks/QPCircles.ipynb
       inputs:
         - from_stage_outputs: postpro-QPCircles
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-ReadNonMatlabFigs:
@@ -5299,7 +5319,7 @@ pipeline:
       notebook_path: results/fig_notebooks/ReadNonMatlabFigs.ipynb
       inputs:
         - from_stage_outputs: postpro-ReadNonMatlabFigs
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-RunSingleFigFunc:
@@ -5308,7 +5328,7 @@ pipeline:
       notebook_path: results/fig_notebooks/RunSingleFigFunc.ipynb
       inputs:
         - from_stage_outputs: postpro-RunSingleFigFunc
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Runtime:
@@ -5317,7 +5337,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Runtime.ipynb
       inputs:
         - from_stage_outputs: postpro-Runtime
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Slamming:
@@ -5326,7 +5346,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Slamming.ipynb
       inputs:
         - from_stage_outputs: postpro-Slamming
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-SparHydro:
@@ -5335,7 +5355,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SparHydro.ipynb
       inputs:
         - from_stage_outputs: postpro-SparHydro
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-SweepGeoms:
@@ -5344,7 +5364,7 @@ pipeline:
       notebook_path: results/fig_notebooks/SweepGeoms.ipynb
       inputs:
         - from_stage_outputs: postpro-SweepGeoms
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Validation:
@@ -5353,7 +5373,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Validation.ipynb
       inputs:
         - from_stage_outputs: postpro-Validation
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     viz-Wecsim:
@@ -5362,7 +5382,7 @@ pipeline:
       notebook_path: results/fig_notebooks/Wecsim.ipynb
       inputs:
         - from_stage_outputs: postpro-Wecsim
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
       outputs: []
     pyxdsm:
@@ -5489,7 +5509,7 @@ pipeline:
         ptoSweepMinLCOE_cost: "{ptoSweepMinLCOE_cost/1e6:.2f} $M"
         ptoSweepMinLCOE_LCOE: "{ptoSweepMinLCOE_LCOE:.2f} $/kWh"
         # numbers
-        meemSweepSize: "{n_combos}"
+        meemSweepSize: "{n_combos:,}"
     check-dup-json-keys:
       kind: python-script
       environment: pubs
@@ -5596,6 +5616,14 @@ pipeline:
         - src: results/SparHydro/spar_added_mass.pdf
           dest: pubs/dissertation/figs/from-matlab/spar_added_mass.pdf
           kind: file-to-file
+    copy-dissertation-only-figs-2:
+      kind: map-paths
+      paths:
+        - src: 
+            mdocean/plots/non_matlab_figs/pdf/two_port_dimension_coeff_chain.pdf
+          dest: 
+            pubs/dissertation/figs/two_port_dimension_coeff_chain.pdf
+          kind: file-to-file
     copy-shared-latex:
       kind: map-paths
       paths:
@@ -5661,33 +5689,160 @@ pipeline:
         - src: pubs/shared/els-cas/cas-common.sty
           dest: pubs/renewable-energy-mdo/cas-common.sty
           kind: file-to-file
+        # glossary shared
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            pubs/applied-ocean-research-model/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            pubs/renewable-energy-mdo/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            pubs/UMERC-2025-grid-value/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: pubs/dissertation/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-symbols-shared.tex
+          dest: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-shared.tex
+          kind: file-to-file
+        # glossary acronyms
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: 
+            pubs/applied-ocean-research-model/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: pubs/renewable-energy-mdo/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: 
+            pubs/UMERC-2025-grid-value/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: pubs/dissertation/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-acronyms.tex
+          dest: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-acronyms.tex
+          kind: file-to-file
+        # glossary setup
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: 
+            pubs/applied-ocean-research-model/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: pubs/renewable-energy-mdo/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: pubs/UMERC-2025-grid-value/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: pubs/dissertation/glossary/glossary-setup.tex
+          kind: file-to-file
+        - src: pubs/shared/glossary/glossary-setup.tex
+          dest: 
+            mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-setup.tex
+          kind: file-to-file
     paperlint-aor:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/applied-ocean-research-model/main.tex
-        - --ignore pubs/applied-ocean-research-model/numeric-results.tex
+        - --ignore 
+          pubs/applied-ocean-research-model/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-aor.txt
+        - --params dev/latex/Paper-Linter/params-aor.txt
       inputs:
-        - pubs/applied-ocean-research-model/
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/content.tex
+        - pubs/applied-ocean-research-model/main.tex
+        - pubs/applied-ocean-research-model/sections/
+        # - pubs/applied-ocean-research-model/tables/
+        # - pubs/applied-ocean-research-model/figs/
+        - pubs/applied-ocean-research-model/references.bib
+        - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+        - pubs/applied-ocean-research-model/shared-pkg.tex
+        - dev/latex/Paper-Linter/params-aor.txt
+        - pubs/applied-ocean-research-model/glossary/
+        - dev/latex/Paper-Linter/settings.txt
       outputs:
         - path: dev/latex/Paper-Linter/lint-aor.txt
+          storage: git
+        - path: pubs/shared/glossary/glossary-symbols-aor-generated.tex
           storage: git
     paperlint-re:
       kind: python-script
       environment: pubs
       script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
       args:
         - pubs/renewable-energy-mdo/mdocean.tex
-        - --ignore pubs/renewable-energy-mdo/numeric-results.tex
         - --settings dev/latex/Paper-Linter/settings.txt
-        - --output dev/latex/Paper-Linter/lint-re.txt
+        - --params dev/latex/Paper-Linter/params-re.txt
       inputs:
-        - pubs/renewable-energy-mdo/
+        - pubs/renewable-energy-mdo/commands-re.tex
+        - pubs/renewable-energy-mdo/content-re.tex
+        - pubs/renewable-energy-mdo/mdocean.tex
+        - pubs/renewable-energy-mdo/sections/
+        # - pubs/renewable-energy-mdo/tables/
+        # - pubs/renewable-energy-mdo/figs/
+        - pubs/renewable-energy-mdo/references.bib
+        - pubs/renewable-energy-mdo/zotero-meem-refs.bib
+        - pubs/renewable-energy-mdo/shared-pkg.tex
+        - dev/latex/Paper-Linter/params-re.txt
+        - pubs/renewable-energy-mdo/glossary/
+        - dev/latex/Paper-Linter/settings.txt
       outputs:
         - path: dev/latex/Paper-Linter/lint-re.txt
+          storage: git
+        - path: pubs/shared/glossary/glossary-symbols-re-generated.tex
+          storage: git
+    paperlint-umerc:
+      kind: python-script
+      environment: pubs
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      always_run: true
+      args:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --output dev/latex/Paper-Linter/lint-umerc.txt
+        - --symbol-glossary-paper umerc
+      inputs:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+        - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/glossary/
+        - dev/latex/Paper-Linter/settings.txt
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-umerc.txt
+          storage: git
+        - path: 
+            pubs/shared/glossary/glossary-symbols-umerc-generated.tex
+          storage: git
+    paperlint-jfm:
+      kind: python-script
+      environment: pubs
+      always_run: true
+      script_path: dev/latex/Paper-Linter/paperlint.py
+      args:
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+        - --settings dev/latex/Paper-Linter/settings.txt
+        - --params dev/latex/Paper-Linter/params-jfm.txt
+      inputs:
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        - dev/latex/Paper-Linter/params-jfm.txt
+        - dev/latex/Paper-Linter/settings.txt
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/
+      outputs:
+        - path: dev/latex/Paper-Linter/lint-jfm.txt
+          storage: git
+        - path: pubs/shared/glossary/glossary-symbols-jfm-generated.tex
           storage: git
     build-RE-paper:
       kind: latex
@@ -5707,17 +5862,129 @@ pipeline:
         - pubs/renewable-energy-mdo/shared-pkg.tex
         - pubs/renewable-energy-mdo/cas-dc.cls
         - pubs/renewable-energy-mdo/cas-sc.cls
-        - pubs/applied-ocean-research-model/cas-common.sty
+        - pubs/renewable-energy-mdo/glossary/
+        - pubs/renewable-energy-mdo/cas-common.sty
       outputs:
         - pubs/renewable-energy-mdo/mdocean.pdf
         - path: pubs/renewable-energy-mdo/aux/
-          storage: null
+          storage:
           delete_before_run: false
+    build-AOR-review-response:
+      kind: latex
+      target_path: pubs/applied-ocean-research-model/reviewer_response.tex
+      environment: tex
     build-AOR-paper:
       kind: latex
       target_path: pubs/applied-ocean-research-model/main.tex
       environment: tex
       latexmkrc_path: pubs/applied-ocean-research-model/.latexmkrc
+      inputs:
+        - pubs/applied-ocean-research-model/sections/
+        - pubs/applied-ocean-research-model/figs/from-matlab/
+        - pubs/applied-ocean-research-model/figs/manual/
+        - pubs/applied-ocean-research-model/figs/tikz/
+        - pubs/applied-ocean-research-model/tables/
+        - pubs/applied-ocean-research-model/numeric-results.tex
+        - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+        - pubs/applied-ocean-research-model/references.bib
+        - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/shared-pkg.tex
+        - pubs/applied-ocean-research-model/cas-dc.cls
+        - pubs/applied-ocean-research-model/cas-common.sty
+        - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+        - pubs/applied-ocean-research-model/glossary/
+      outputs:
+        - pubs/applied-ocean-research-model/main.pdf
+        - path: pubs/applied-ocean-research-model/aux/
+          storage:
+          delete_before_run: false
+      diffs:
+        - aor-submitted # first submission
+    build-UMERC-paper:
+      kind: latex
+      target_path: 
+        pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
+      environment: tex
+      inputs:
+        - pubs/UMERC-2025-grid-value/figures/
+        - pubs/UMERC-2025-grid-value/references.bib
+        - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
+        - pubs/UMERC-2025-grid-value/logo.jpg
+        - pubs/UMERC-2025-grid-value/glossary/
+        - pubs/UMERC-2025-grid-value/appendix-grid.tex
+        - pubs/UMERC-2025-grid-value/content-grid.tex
+      outputs:
+        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
+      aux_dir: pubs/UMERC-2025-grid-value/aux/
+    build-dissertation:
+      kind: latex
+      target_path: pubs/dissertation/sampleThesis.tex
+      environment: tex
+      latexmkrc_path: pubs/dissertation/.latexmkrc
+      inputs:
+        - pubs/dissertation/cornell-modified.cls
+        - pubs/dissertation/hangcaption.sty
+        - pubs/dissertation/.latexmkrc
+        - pubs/dissertation/intro-contrib.tex
+        - pubs/dissertation/abstract.tex
+        - pubs/dissertation/acknowledgements.tex
+        - pubs/applied-ocean-research-model/numeric-results.tex
+        - pubs/applied-ocean-research-model/content.tex
+        - pubs/applied-ocean-research-model/sections/
+        - pubs/applied-ocean-research-model/figs/
+        - pubs/applied-ocean-research-model/tables/
+        - pubs/applied-ocean-research-model/appendices.tex
+        - pubs/applied-ocean-research-model/commands-aor.tex
+        - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+        - pubs/renewable-energy-mdo/numeric-results.tex
+        - pubs/renewable-energy-mdo/sections/
+        - pubs/renewable-energy-mdo/figs/
+        - pubs/renewable-energy-mdo/tables/
+        - pubs/renewable-energy-mdo/commands-re.tex
+        - pubs/renewable-energy-mdo/content-re.tex
+        # - pubs/UMERC-2025-grid-value/
+        - pubs/dissertation/figs/
+        - pubs/dissertation/images/
+        - pubs/dissertation/references.bib
+        - pubs/dissertation/dissertation-conclusion.tex
+        - pubs/dissertation/dynamic-toc-depth.tex
+        - pubs/shared/shared-pkg.tex
+        - pubs/shared/table-column-specs.tex
+        - pubs/shared/figure-widths.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm-appendix.tex
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
+        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
+        # - pubs/dissertation/glossary/
+      outputs:
+        - pubs/dissertation/sampleThesis.pdf
+        - path: pubs/dissertation/aux/
+          storage: dvc
+          delete_before_run: false
+    get-aor-latexdiff-dvc-deps:
+      kind: shell-command
+      environment: yq-conda
+      command: bash dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD
+      inputs:
+        - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh
+      outputs:
+        - path: dev/latex/latexdiff/aor-latexdiff-dvc-deps.json
+          storage: git
+    make-aor-latexdiff:
+      kind: shell-command
+      environment: tex
+      command: rm -rf git-latexdiff.* && DVC_REPO_ROOT="/work" DVC_CACHE_DIR="/work/.dvc/cache"
+        DVC_DEPS_JSON="/work/dev/latex/latexdiff/aor-latexdiff-dvc-deps.json"
+        git latexdiff --no-view --tmpdirprefix .
+        --main pubs/applied-ocean-research-model/main.tex
+        --whole-tree --ignore-latex-errors --latexmk
+        --latexpand --makeatletter
+        --graphics-markup=both
+        --filter 'dev/latex/latexdiff/latexdiff-link-figs.sh'
+        --prepare 'python3 ../new/dev/latex/latexdiff/latexdiff-prepare.py'
+        -o pubs/applied-ocean-research-model/main-diff.pdf aor-submitted -- < /dev/null
       inputs:
         - pubs/applied-ocean-research-model/sections/
         - pubs/applied-ocean-research-model/figs/from-matlab/
@@ -5733,69 +6000,16 @@ pipeline:
         - pubs/applied-ocean-research-model/shared-pkg.tex
         - pubs/applied-ocean-research-model/cas-dc.cls
         - pubs/applied-ocean-research-model/cas-common.sty
+        - pubs/applied-ocean-research-model/.latexmkrc
+        - dev/latex/latexdiff/latexdiff-link-figs.sh
+        - dev/latex/latexdiff/latexdiff-prepare.py
+        - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json
       outputs:
-        - pubs/applied-ocean-research-model/main.pdf
-        - path: pubs/applied-ocean-research-model/aux/
-          storage: null
-          delete_before_run: false
-    build-UMERC-paper:
-      kind: latex
-      target_path: pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.tex
-      environment: tex
-      inputs:
-        - pubs/UMERC-2025-grid-value/figures/
-        - pubs/UMERC-2025-grid-value/references.bib
-        - pubs/UMERC-2025-grid-value/zotero-meem-refs.bib
-        - pubs/UMERC-2025-grid-value/logo.jpg
-      outputs:
-        - pubs/UMERC-2025-grid-value/UMERC_2025_grid_value.pdf
-    build-dissertation:
-      kind: latex
-      target_path: pubs/dissertation/sampleThesis.tex
-      environment: tex
-      latexmkrc_path: pubs/dissertation/.latexmkrc
-      inputs:
-        - pubs/dissertation/cornell.cls
-        - pubs/dissertation/hangcaption.sty
-        - pubs/dissertation/.latexmkrc
-        - pubs/dissertation/intro-contrib.tex
-        - pubs/dissertation/abstract.tex
-        - pubs/dissertation/acknowledgements.tex
-        - pubs/applied-ocean-research-model/numeric-results.tex
-        - pubs/applied-ocean-research-model/content.tex
-        - pubs/applied-ocean-research-model/sections/
-        - pubs/applied-ocean-research-model/figs/
-        - pubs/applied-ocean-research-model/tables/
-        - pubs/applied-ocean-research-model/appendices.tex
-        - pubs/applied-ocean-research-model/commands-aor.tex
-        - pubs/renewable-energy-mdo/numeric-results.tex
-        - pubs/renewable-energy-mdo/sections/
-        - pubs/renewable-energy-mdo/figs/
-        - pubs/renewable-energy-mdo/tables/
-        - pubs/renewable-energy-mdo/commands-re.tex
-        - pubs/renewable-energy-mdo/content-re.tex
-        - pubs/UMERC-2025-grid-value/
-        - pubs/dissertation/figs/
-        - pubs/dissertation/images/
-        - pubs/dissertation/references.bib
-        - pubs/dissertation/dissertation-conclusion.tex
-        - pubs/dissertation/dynamic-toc-depth.tex
-        - pubs/shared/shared-pkg.tex
-        - pubs/shared/table-column-specs.tex
-        - pubs/shared/figure-widths.tex
-        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/figs/
-        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/FLMguide.tex
-        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
-        - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-      outputs:
-        - pubs/dissertation/sampleThesis.pdf
-        - path: pubs/dissertation/aux/
-          storage: dvc
-          delete_before_run: false
+        - pubs/applied-ocean-research-model/main-diff.pdf
     # all-writing:
     #   kind: shell-command
     #   environment: _system
-    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex 
+    #   command: calkit run -s move-aor-results -s move-re-results -s aor-results-to-latex -s re-results-to-latex
     #     -s copy-shared-latex -s build-AOR-paper -s build-RE-paper -s build-UMERC-paper -s build-dissertation
     # all-latex:
     #   kind: shell-command
@@ -5807,7 +6021,7 @@ pipeline:
       notebook_path: pubs/applied-ocean-research-model/view_figs.ipynb
       inputs:
         - pubs/applied-ocean-research-model/figs/
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
     view-re-figs:
       kind: jupyter-notebook
@@ -5815,7 +6029,7 @@ pipeline:
       notebook_path: pubs/renewable-energy-mdo/view_figs.ipynb
       inputs:
         - pubs/renewable-energy-mdo/figs/
-      html_storage: null
+      html_storage:
       executed_ipynb_storage: git
     all-viz:
       kind: shell-command
@@ -5900,8 +6114,8 @@ pipeline:
     #     - arg_name: name
     #       values:
     #         - parameter: latex_standalone_name
-    #   command: pdf2svg 
-    #     pubs/defense/latex-standalone/standalone_{name}.pdf 
+    #   command: pdf2svg
+    #     pubs/defense/latex-standalone/standalone_{name}.pdf
     #     pubs/defense/figs/standalone_{name}.svg
     #   inputs:
     #     - pubs/defense/latex-standalone/standalone_{name}.pdf
@@ -5937,7 +6151,8 @@ publications:
   - path: pubs/applied-ocean-research-model/main.pdf
     title: Modeling - Journal (Applied Ocean Research)
     description: Development, Validation, and Benchmarking of a 
-      Multidisciplinary Semi-Analytical Model for Wave Energy Converters
+      Multidisciplinary Semi-Analytical Model for Wave Energy 
+      Converters
     kind: journal-article
     stage: build-AOR-paper
   - path: pubs/renewable-energy-mdo/mdocean.pdf
@@ -5952,14 +6167,16 @@ publications:
       avoided emissions
     kind: conference-paper
     stage: build-pubs-umerc-2025-grid-value
-  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
-    title: PhD Defense Slides
-    description: Slides for PhD defense presentation
-    kind: presentation
   - path: pubs/dissertation/sampleThesis.pdf
     title: PhD Dissertation
     stage: build-dissertation
     description: dissertation manuscript
+    kind: phd-thesis
+presentations:
+  - path: pubs/defense/ppt/McCabe_Dissertation_Defense.pdf
+    title: PhD Defense Slides
+    description: Slides for PhD defense presentation
+    kind: slides
 overleaf_sync:
   pubs/applied-ocean-research-model:
     url: https://www.overleaf.com/project/69ecde8851d14790c59f03d5
@@ -6007,3 +6224,19 @@ overleaf_sync:
       - logo.jpg
     push_paths:
       - figures
+releases:
+  dissertation-submit-proquest:
+    kind: publication
+    path: pubs/dissertation/sampleThesis.pdf
+    git_rev: ef67d258
+    calkit_version: 0.45.3
+    date: '2026-09-11'
+    publisher: zenodo
+    record_id: 22713459
+    doi: 10.5281/zenodo.22713459
+    url: https://doi.org/10.5281/zenodo.22713459
+    description: null
+    internal: false
+    stored_path: null
+references:
+  - path: references.bib

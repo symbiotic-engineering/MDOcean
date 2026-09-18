@@ -1,0 +1,185 @@
+% Load TikZ libraries needed for brace decorations and node fitting
+\usetikzlibrary{decorations.pathreplacing,fit}
+
+\begin{tikzpicture}[
+    wire/.style={line width=0.9pt},
+    infoarrow/.style={->, line width=0.9pt, color=blue!70!black},
+    lowerblock/.style={draw, minimum width=1.45cm, minimum height=2cm, align=center},
+    upperblock/.style={draw=blue!70!black, fill=blue!12, text=blue!70!black, minimum width=1.45cm, minimum height=0.75cm, align=center, text width=1.98cm, font=\footnotesize},
+    uppertext/.style={text width=1.98cm, align=center, font=\footnotesize, color=black},
+    opaqueuppertext/.style={text width=1.98cm, align=center, font=\footnotesize, fill=white, fill opacity=0.8, text opacity=1, inner sep=1pt, text=black}
+]
+    % Global dimensions for easy editing
+    \def\blockh{2.8}         % vertical block height
+    \def\xsep{2.38}           % horizontal spacing between blocks
+    \def\rightshift{1.4}     % horizontal spacing around grid impedance
+    \def\sourcegap{0.8}      % horizontal spacing from sources to block edges
+    \def\arrowpos{0.58}      % horizontal spacing of arrowhead on main wires
+    \def\rightarrowpos{0.68} % horizontal spacing of arrowhead on rightmost wire
+    \def\uppery{2.7}         % vertical position of upper blocks
+    \pgfmathsetmacro{\wireoffset}{0.25*\blockh} % vertical offset of wires from top/bottom of lower blocks
+    \def\dimtexty{3.8}       % vertical position of dimension design variable text
+    \def\typetexty{5}     % vertical position of the type labels
+    \def\coeftexty{1.8}      % vertical position of coefficient intermed variable text
+
+    % Five lower two-port blocks and five upper blocks
+    \node[upperblock] (Uleft) at (-\xsep,\uppery) {Wave statistics analysis};
+    \foreach \i/\label in {
+        1/{\mathbf{Z}_i},
+        2/{\mathbf{h}_{\mathrm{kin}}},
+        3/{\mathbf{a}_{\mathrm{drive}}},
+        4/{\mathbf{a}_{\mathrm{gen}}},
+        5/{},
+        6/{}
+    } {
+        \pgfmathsetmacro{\x}{(\i-1)*\xsep}
+        \node[lowerblock] (L\i) at (\x,0) {$\label$};
+        \node[upperblock] (U\i) at (\x,\uppery) {\strut
+            \ifnum\i=1 Floating body analysis\fi
+            \ifnum\i=2 Kinematic analysis\fi
+            \ifnum\i=3 Drivetrain analysis\fi
+            \ifnum\i=4 Generator analysis\fi
+            \ifnum\i=5 Electrical analysis\fi
+            \ifnum\i=6 Control analysis\fi
+        };
+
+        \node[uppertext] (Type\i) at (\x,\typetexty) {\strut
+            \ifnum\i=1 floating body type\fi
+            \ifnum\i=2 degrees of freedom\fi
+            \ifnum\i=3 drivetrain type\fi
+            \ifnum\i=4 generator type\fi
+            \ifnum\i=5 converter type\fi
+            \ifnum\i=6 controller structure\fi
+        };
+
+        \node[uppertext] (Dim\i) at (\x,\dimtexty) {\strut
+            \ifnum\i=1 floating body dimensions\fi
+            \ifnum\i=2 linkage geometry\fi
+            \ifnum\i=3 drivetrain dimensions\fi
+            \ifnum\i=4 generator dimensions\fi
+            \ifnum\i=5 converter components\fi
+            \ifnum\i=6 constraint limits\fi
+        };
+
+        %\ifnum\i=2
+        %    \draw[infoarrow] (Type\i.south) -- (U\i.north);
+        %\else
+            \draw[infoarrow] (Type\i.south) -- (Dim\i.north);
+            \draw[infoarrow] (Dim\i.south) -- (U\i.north);
+        %\fi
+        \draw[infoarrow] (U\i.south) -- (L\i.north);
+        \node[opaqueuppertext] (Coef\i) at (\x,\coeftexty) {\strut
+            \ifnum\i=1 hydro. coefficients \fi
+            \ifnum\i=2 kinematic coefficients \fi
+            \ifnum\i=3 drivetrain coefficients \fi
+            \ifnum\i=4 generator coefficients \fi
+            \ifnum\i=5 converter coefficients \fi
+            \ifnum\i=6 control coefficients \fi
+        };
+    }
+    
+    % Merged lower block covering blocks 5 and 6
+    \pgfmathsetmacro{\xmerge}{4.5*\xsep}
+    \pgfmathsetmacro{\mergewidth}{\xsep+1.45}
+    \node[lowerblock, minimum width=\mergewidth cm, fill=white] (L56) at (\xmerge,0) {$\mathbf{a}_{\mathrm{elec}}$};
+
+    % Left and right sinusoidal voltage sources
+    \path (L1.west) ++(-\sourcegap,0) coordinate (leftsource);
+    \path (L6.east) ++(\sourcegap+\rightshift,0) coordinate (rightsource);
+    \draw[wire] ([yshift=-\wireoffset cm]leftsource) to[sinusoidal voltage source] ([yshift=\wireoffset cm]leftsource);
+    \draw[wire] ([yshift=-\wireoffset cm]rightsource) to[sinusoidal voltage source] ([yshift=\wireoffset cm]rightsource);
+    \node[font=\small] at ([yshift=8pt,xshift=-18pt]leftsource) {$+$};
+    \node[font=\small] at ([yshift=-8pt,xshift=-18pt]leftsource) {$-$};
+    \node[font=\small] at ([yshift=8pt,xshift=18pt]rightsource) {$+$};
+    \node[font=\small] at ([yshift=-8pt,xshift=18pt]rightsource) {$-$};
+    \node[font=\small, anchor=east] at ([xshift=-12pt]leftsource) {$\zeta$};
+    \node[font=\small] (VGridPoint) at ([xshift= 24pt]rightsource) {$V_{\mathrm{grid}}$};
+
+    % location and wave environment (left source inputs)
+    \node[uppertext] (Loc) at (-\xsep,\typetexty) {location};
+    \draw[infoarrow] (Loc.south) -- (Uleft.north);
+    \draw[infoarrow] (Uleft.south) -- ([xshift=-.3cm, yshift=.3cm]leftsource);
+    \node[opaqueuppertext] (Env) at (-\xsep,\coeftexty) {wave params.};
+
+    % Right-side brace covering controller structure down to control analysis
+    \draw[decorate,decoration={brace,amplitude=6pt}] ($(Type6.north)+(1,-.2)$) -- ($(U6.north)+(1,.2)$) node[midway,right=8pt] (Bracket) {};
+
+    % Cost analysis and value analysis blocks
+    \pgfmathsetmacro{\xcost}{6*\xsep}
+    \pgfmathsetmacro{\xvalue}{8*\xsep}
+    \pgfmathsetmacro{\yvalue}{\coeftexty - .2}
+    \node[upperblock,text width=1.6cm] (Ucost) at (\xcost,\uppery) {Cost analysis};
+    \node[upperblock] (Uvalue) at (\xvalue,\yvalue) {Value analysis};
+
+    % all design inputs coordinate, text, arrow
+    \path let \p1 = (Bracket.east) in coordinate (DesignInputsMid) at (\xcost, \y1);
+    \draw[infoarrow] (Bracket.east) -- (DesignInputsMid) -- (Ucost.north);
+    \node[opaqueuppertext,text width=1.3cm] at ([xshift=10pt]DesignInputsMid) {all design inputs};
+
+    % power (right source output)
+    \draw[infoarrow] ([xshift=9pt,yshift=10pt]rightsource) -- (Uvalue.west) node[opaqueuppertext,midway,xshift=10pt] (PowerTextbox) {power};
+
+    % sum junction
+    \node[draw,circle] (Sum) at (\xvalue,\uppery) {$\Sigma$};
+
+    % net value arrow
+    \draw[infoarrow] (Sum.north east) -- ++(0.8cm,0.8cm) node[opaqueuppertext,midway] {net value};
+
+    % cost arrow
+    \draw[infoarrow] (Ucost.east) -- (Sum.west) node[midway,above,uppertext] (CostPoint) {cost};
+
+    % value arrow
+    \draw[infoarrow] (Uvalue.north) -- (Sum.south) node[midway,right=-15pt,uppertext] {value};
+
+
+    % Horizontal wire connections
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift=\wireoffset cm]leftsource) -- ([yshift=\wireoffset cm]L1.west);
+    \draw[wire] ([yshift=-\wireoffset cm]leftsource) -- ([yshift=-\wireoffset cm]L1.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L1.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$\dot{\xi}$} ([yshift= \wireoffset cm]L2.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L2.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$\dot{X}_{\mathrm{pto}}$} ([yshift= \wireoffset cm]L3.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L3.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$\Omega$} ([yshift= \wireoffset cm]L4.west);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \arrowpos with {\arrow{stealth}}}] ([yshift= \wireoffset cm]L4.east) -- node[midway, below=2pt] {$+$} node[midway, above=1pt] {$I$} ([yshift= \wireoffset cm]L5.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L1.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$F_p$} ([yshift=-\wireoffset cm]L2.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L2.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$F_{\mathrm{pto}}$} ([yshift=-\wireoffset cm]L3.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L3.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$\tau$} ([yshift=-\wireoffset cm]L4.west);
+    \draw[wire] ([yshift=-\wireoffset cm]L4.east) -- node[midway, above=1.5pt] {$-$} node[midway, above=10pt] {$V$} ([yshift=-\wireoffset cm]L5.west);
+
+    % Connections from block 6 to right source
+    \draw[wire] ([yshift=\wireoffset cm]L6.east) -- ($([yshift=\wireoffset cm]L6.east)+(0.5,0)$)
+        to[european resistor, l^={$Z_{grid}$}] ($([yshift=\wireoffset cm]L6.east)+(1.6,0)$);
+    \draw[wire,postaction={decorate},decoration={markings, mark=at position \rightarrowpos with {\arrow{stealth}}}] ($([yshift=\wireoffset cm]L6.east)+(1.6,0)$) -- node[right, xshift=4pt, above=-1pt] {$I_{\mathrm{grid}}$} ([yshift=\wireoffset cm]rightsource);
+    \draw[wire] ([yshift=-\wireoffset cm]L6.east) -- ([yshift=-\wireoffset cm]rightsource);
+    
+    % Red MDOcean scope polygon
+    \pgfmathsetmacro{\xleft}{-1.5*\xsep-0.1}
+    \pgfmathsetmacro{\xzero}{-.5*\xsep}
+    \pgfmathsetmacro{\xafterone}{.5*\xsep}
+    \pgfmathsetmacro{\xmidright}{4.5*\xsep}
+    \pgfmathsetmacro{\xright}{7.5*\xsep-.1}
+    \pgfmathsetmacro{\yhigh}{\typetexty+0.4}
+    \pgfmathsetmacro{\ymidhigh}{\typetexty-0.8}
+    \pgfmathsetmacro{\ymid}{\uppery-0.54}
+    \pgfmathsetmacro{\ybot}{-1.2}
+    \path let \p1 = ([xshift=15pt]PowerTextbox) in coordinate (RedBoxRightTop) at (\x1,\yhigh);
+    \path let \p1 = ([xshift=15pt]PowerTextbox) in coordinate (RedBoxRightBottom) at (\x1,\ybot);
+    \draw[red, thick, dashed, fill=none] (\xleft,\ymid) -- (\xzero,\ymid) -- (\xzero,\ymidhigh)-- (\xafterone,\ymidhigh) -- (\xafterone,\ymid) -- (\xmidright,\ymid) -- (\xmidright,\yhigh) -- (RedBoxRightTop) -- (RedBoxRightBottom) -- (\xleft,\ybot) -- cycle;
+
+    % blue dynamics dashed line
+    \pgfmathsetmacro{\xleftbox}{-1.1*\xsep}
+    \pgfmathsetmacro{\yboxupper}{\coeftexty-0.38}
+    \pgfmathsetmacro{\yboxlower}{-1.1}
+    \path let \p1 = (VGridPoint.east) in coordinate (BlueBoxRightTop) at (\x1,\yboxupper);
+    \path let \p1 = (VGridPoint.east) in coordinate (BlueBoxRightBottom) at (\x1,\yboxlower);
+    \draw[blue, thick, dotted] (\xleftbox,\yboxupper) rectangle (BlueBoxRightBottom);
+
+    % Legend in the lower-right corner
+    \node[anchor=south east, font=\scriptsize, fill=white, fill opacity=0.9, inner sep=2pt] at ([xshift=-0.1cm,yshift=0.2cm]current bounding box.south east) {
+        \begin{tabular}{@{}l@{}}
+            \tikz \draw[red, thick, dashed]  (0,0) rectangle (0.45,0.18); \hspace{2pt} MDOcean scope \\
+            \tikz \draw[blue, thick, dotted] (0,0) rectangle (0.45,0.18); \hspace{2pt} Dynamics analysis \\
+            \raisebox{0.2ex}{\tikz[baseline=-0.5ex] \draw[blue!70!black, line width=0.9pt, ->] (0,0) -- (0.45,0); } \hspace{2pt} Information flow \\
+            \raisebox{0.2ex}{\tikz[baseline=-0.5ex] \draw[black, line width=0.9pt, postaction={decorate}, decoration={markings, mark=at position 0.58 with {\arrow{stealth}}}] (0,0) -- (0.45,0); } \hspace{2pt} Power flow
+        \end{tabular}
+    };
+
+\end{tikzpicture}

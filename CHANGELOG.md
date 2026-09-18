@@ -1,6 +1,68 @@
 # Changelog
 ## Unreleased
 
+## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-16
+### Added
+- Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
+### Changed
+- Pipeline: update `paperlint-aor` to ignore `pubs/applied-ocean-research-model/numeric-results.tex`.
+- Paper: use glossary symbol references for the AOR spar interpolation term in `module-details.tex`.
+- Paper: add glossary to AOR (currently commented out)
+### Fixed
+- Glossary: fixed mixup of slenderness factor with load distribution factor
+- Glossary: add shared glossary support for `\underline{}` symbol formatting in glossary sorting.
+- Glossary: use journal-specific `N_0` and `\phi` glossary wording for Applied Ocean Research.
+
+## [v1.5.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.1) - 2026-9-15
+### Added
+- Dissertation: add license for images
+### Changed
+- Paper: add short/long caption pairs (`\caption[short]{long}`) so table of contents uses short captions
+### Fixed
+- Dissertation: fix space after Cayuga in land acknowledgement
+- CI: fix release notes writing to `GITHUB_OUTPUT` without interpreting backslash escapes
+
+## [v1.5.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.0) - 2026-9-13
+### Added
+- Paper: add dissertation glossary of symbols and acronyms. This adds the glossary entries themselves (in `glossary/` folders within each publication), glossary setup in `pubs/shared/shared_pkg.tex`, references of `\gls{}` in every `.tex` file, and `makeglossaries` compilation support in `pubs/dissertation/.latexmkrc`.
+- Dev: AI-coded upgrade to `dev/latex/Paper-Linter/`. Adds ability for linter to correct some issues rather than just identify them, and adds `params.txt` input for paper-specific lint settings. Adds the following check categories: mathmode subscripts, glossary references, unused glossary symbols, Glossary Symbols Missing a Description, Duplicate Glossary Symbols, Math Glossary Reference Coverage, Prefix, and Preferred Terminology. This replaces some standalone python scripts that were in `dev/latex/`.
+- Dev: adds tests for the paper linter.
+- Pipeline: adds stages to run paperlint on JFM and UMERC papers 
+### Changed
+- Paper: changes various symbols to avoid overlaps.
+- Pipeline: changes `dependencies` to `requirements` in `calkit.yaml` to avoid deprecation warning, and moves defense slides from `publications` to `presentations`.
+- Pipeline: make `paperlint-aor` and `paperlint-re` stages run every time.
+### Fixed
+- Dissertation: editorial corrections - fix typos/misspellings, grammar
+
+This version is the closest released version to the `dissertation-submit-proquest` tag (the official version of the dissertation on ProQuest) -- should be identical in content, slightly different in commit history.
+
+## [v1.4.5](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.5) - 2026-9-11
+### Added
+- Dissertation: add name of all undergrads I've mentored in acknowledgements
+### Fixed
+- Paper: a few misc formatting and notation errors
+- Submodule: fix error introduced in v1.4.3 where a too-recent `OpenFLASH` submodule version (that contained glossary features not present in this branch of MDOcean) was used. This reverts `OpenFLASH` to 20038239, the version it was in MDOcean v1.4.2.
+
+## [v1.4.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.4) - 2026-8-15
+### Fixed
+- Sensitivities: rename mixed-up param sens figures (manually, since the root cause is still unknown)
+
+## [v1.4.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.3) - 2026-8-15
+### Fixed
+- Paper: nicer spacing of tables and equations in dissertation
+- Pipeline: add forgotten JFM appendix dependency to dissertation
+
+## [v1.4.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.2) - 2026-8-11
+### Added
+- Figures: add a TikZ block diagram showing static analyses and dynamics including five two-ports
+### Fixed
+- Paper: avoid `geometry` and `hyperref` option clashes in Elsevier manuscript builds by conditionally loading these packages only for non-Elsevier document classes.
+
+## [v1.4.1](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.1) - 2026-8-11
+### Added
+- Dissertation: AI acknowledgement, Cayuga nation land acknowledgement, and UTF-8 inputs for Cayuga special characters
+
 ## [v1.4.0](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.4.0) - 2026-8-5
 Represents changes made after journal submission in preparation for dissertation submission.
 Predominately writing and aesthetics changes, plus some dynamics speedups, a change to the maximum capture width calculation, a runtime measurement fix, and some pipeline cleanup.
