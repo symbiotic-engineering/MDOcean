@@ -10,11 +10,12 @@ To verify and validate MDOcean's hydrodynamics module, we compare against analyt
 Hydrodynamic calibration is not necessary.
 
 \subsubsection{Hydrodynamics Verification}
-MDOcean's results satisfy the following analytically expected behaviors for a variety of geometries:
+MDOcean's results satisfy analytically expected behaviors for a set of 6,250 geometries representing a full-factorial design sweep.
+We confirm that:
 damping goes to zero at high and low frequency;
-added mass is logarithmically singular at low frequency and constant at high frequency;
+added mass is logarithmically singular at low frequency (16.8\% of geometries have at least one frequency where a non-finite value is capped) and constant at high frequency;
 added mass and damping matrices are positive definite
-(\hl{XX}\% of geometries require truncating the coupling terms as described in \Cref{sec:});
+(6.9\% of geometries require truncating the coupling terms as described in \Cref{sec:appendix-additional-hydro});
 potential and radial velocity match at the boundary of adjacent fluid regions
 (see \cite[Fig.~\hl{XX}]{mccabe_open-source_2024});
 and
@@ -100,8 +101,8 @@ Despite a poor match of the drag force magnitude, the overall system dynamics an
 
 \paragraph{\glspl{acr-df}: Excellent Agreement}
 To validate \asmpref{system-low-pass}, we confirm that the float displacement waveform is very nearly sinusoidal, with a \gls{acr-thd} of less than 1\% in all sea states.
-We also check \asmpref{known-signal-shape}, finding an RMS error of \resultsAOR[dragShapeRmsErrorPercent] averaged across sea states. 
-\Cref{fig:wecsim-thd} and \Cref{fig:drag-shape} in \Cref{sec:appendix-dynamic-validation} provide detailed results.
+We also check \asmpref{signal-shape-known}, finding an RMS error of \resultsAOR[dragShapeRmsErrorPercent] averaged across sea states. 
+\Cref{fig:wecsim-thd} and \Cref{fig:wecsim-drag-waveform} in \Cref{sec:appendix-dynamic-validation} provide detailed results.
 
 \paragraph{System Response: Good Agreement}
 The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
@@ -122,7 +123,7 @@ Validation of various effort and flow magnitudes all show good agreement with WE
 The systematic trend in phase error is particularly concerning, suggesting a sign error in the drag force derivation or implementation.
 MDOcean users should avoid drawing conclusions specifically about the effect of drag until the discrepancy is understood and eliminated,
 although thankfully overall power or amplitude predictions remain reliable.
-Other gaps in validation include the lack of direct testing of \asmpref{waves-narrowband} (narrowband wave assumption) and comparison of the \gls{acr-qcqp} controller to a time-domain numerical optimal controller.
+Other gaps in validation include the lack of direct testing of \asmpref{waves-narrow-band} (narrowband wave assumption) and comparison of the \gls{acr-qcqp} controller to a time-domain numerical optimal controller.
 Even given this possible error, the authors believe that for early-stage design and tradeoff analysis, MDOcean is preferable over other dynamic models,
 %simple damping-only drag models
 since it captures nonlinearities and coupling effects and does not compromise power and amplitude predictions.
