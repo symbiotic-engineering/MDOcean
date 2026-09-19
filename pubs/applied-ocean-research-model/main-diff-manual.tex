@@ -1,7 +1,7 @@
 %DIF 1c1-4
 %DIF LATEXDIFF DIFFERENCE FILE
-%DIF DEL .calkit/local/latex-diff-build/base/pubs/applied-ocean-research-model/main.tex   Sat Sep 19 02:13:52 2026
-%DIF ADD .calkit/local/latex-diff-build/head/pubs/applied-ocean-research-model/main.tex   Sat Sep 19 02:13:53 2026
+%DIF DEL .calkit/local/latex-diff-build/base/pubs/applied-ocean-research-model/main.tex   Sat Sep 19 02:40:23 2026
+%DIF ADD .calkit/local/latex-diff-build/head/pubs/applied-ocean-research-model/main.tex   Sat Sep 19 02:40:24 2026
 %DIF < \documentclass[a4paper,fleqn,colorlinks,unicode,hypertexnames=false]{cas-dc}
 %DIF -------
 \documentclass[a4paper,fleqn,colorlinks,unicode]{cas-dc} %DIF > 
@@ -44,20 +44,35 @@
 \usepackage{stmaryrd}  % element wise division symbol used in hessian scaling
 \SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n} % avoid warning about bold stmry font
 
-%DIF 31-32c36-395
+%DIF 31-34c36-38
 %DIF < \newcommand{\singleColMacro}[1]{
 %DIF <     \ifdefined\DISSERATION 
+%DIF <     \else
+%DIF <         \onecolumn
 %DIF -------
 \newcommand{\singleColMacro}[1]{% %DIF > 
     \ifdefined\JOURNALTWOCOLUMN %DIF > 
       \onecolumn% %DIF > 
-    \fi %DIF > 
+%DIF -------
+    \fi
+%DIF 36-39c40-42
+%DIF <     {#1}
+%DIF <     \ifdefined\DISSERATION 
+%DIF <     \else
+%DIF <         \twocolumn
+%DIF -------
     {#1}% %DIF > 
     \ifdefined\JOURNALTWOCOLUMN %DIF > 
       \twocolumn% %DIF > 
-    \fi %DIF > 
+%DIF -------
+    \fi
+%DIF 41c44
+%DIF < }
+%DIF -------
 }% %DIF > 
- %DIF > 
+%DIF -------
+
+%DIF 43a46-74
 % for 11x17 pages %DIF > 
 \makeatletter %DIF > 
 \@ifclassloaded{cas-sc}{}{% %DIF > 
@@ -87,9 +102,14 @@
   \fi %DIF > 
 }% %DIF > 
  %DIF > 
-\usepackage{verbatim}  % word counts %DIF > 
-\usepackage{textcomp}  % cent symbol %DIF > 
- %DIF > 
+%DIF -------
+\usepackage{verbatim}  % word counts
+\usepackage{textcomp}  % cent symbol
+
+%DIF 46-47c78-278
+%DIF < \ifdefined\DISSERTATION
+%DIF <   \usepackage[numbers,square]{natbib}    % citep command
+%DIF -------
 \makeatletter %DIF > 
 \@ifclassloaded{cas-sc}{}{% %DIF > 
   \@ifclassloaded{cas-dc}{}{% %DIF > 
@@ -102,124 +122,6 @@
 % glossary - must come after hyperref %DIF > 
 \usepackage[nopostdot,automake,acronym,abbreviations,symbols,nogroupskip,toc=false,sanitizesort=false,section=subsection]{glossaries-extra} %DIF > 
 \usepackage{morewrites} %DIF > 
- %DIF > 
-% \makeatletter %DIF > 
- %DIF > 
-% % glossary sorting of greek letters and removal of math symbols %DIF > 
- %DIF > 
-% % Greek letters -> numeric sort order %DIF > 
-% \def\greeksort@alpha{01} %DIF > 
-% \def\greeksort@beta{02} %DIF > 
-% \def\greeksort@gamma{03}% %DIF > 
-% \def\greeksort@delta{04}% %DIF > 
-% \def\greeksort@epsilon{05}% %DIF > 
-% \def\greeksort@zeta{06}% %DIF > 
-% \def\greeksort@eta{07}% %DIF > 
-% \def\greeksort@theta{08}% %DIF > 
-% \def\greeksort@iota{09}% %DIF > 
-% \def\greeksort@kappa{10}% %DIF > 
-% \def\greeksort@lambda{11}% %DIF > 
-% \def\greeksort@mu{12}% %DIF > 
-% \def\greeksort@nu{13}% %DIF > 
-% \def\greeksort@xi{14}% %DIF > 
-% \def\greeksort@omicron{15}% %DIF > 
-% \def\greeksort@pi{16}% %DIF > 
-% \def\greeksort@rho{17}% %DIF > 
-% \def\greeksort@sigma{18}% %DIF > 
-% \def\greeksort@tau{19}% %DIF > 
-% \def\greeksort@upsilon{20}% %DIF > 
-% \def\greeksort@psi{23}% %DIF > 
-% \def\greeksort@omega{24}% %DIF > 
- %DIF > 
-% % Formatting commands -> nothing %DIF > 
-% \def\greeksort@vec{} %DIF > 
-% \def\greeksort@mathbf{} %DIF > 
-% \def\greeksort@boldsymbol{} %DIF > 
-% \def\greeksort@mathbb{} %DIF > 
-% \def\greeksort@hat{} %DIF > 
-% \def\greeksort@dot{} %DIF > 
-% \def\greeksort@ddot{} %DIF > 
-% \def\greeksort@bar{} %DIF > 
-% \def\greeksort@tilde{} %DIF > 
-% \def\greeksort@mathcal{} %DIF > 
-% \def\greeksort@mathrm{} %DIF > 
- %DIF > 
- %DIF > 
-% \newcommand{\greeksort}[1]{% %DIF > 
-%   \ifcsname greeksort@#1\endcsname %DIF > 
-%     \csname greeksort@#1\endcsname %DIF > 
-%   \else %DIF > 
-%     00#1% %DIF > 
-%   \fi %DIF > 
-% } %DIF > 
- %DIF > 
-% \def\compoundsortkeyaux#1-#2\@nil{% %DIF > 
-%   \greeksort{#1}% %DIF > 
-%   \if\relax\detokenize{#2}\relax %DIF > 
-%   \else %DIF > 
-%     -\compoundsortkeyaux#2\@nil %DIF > 
-%   \fi %DIF > 
-% } %DIF > 
- %DIF > 
-% \newcommand{\mysortkey}[1]{% %DIF > 
-%   \compoundsortkeyaux#1-\@nil %DIF > 
-% } %DIF > 
- %DIF > 
-% \makeatother %DIF > 
- %DIF > 
-% % Convert a symbol name to its LaTeX representation. %DIF > 
-% % Greek names -> Greek commands; everything else -> unchanged. %DIF > 
-% \newcommand{\greeksymbol}[1]{% %DIF > 
-%   \ifstrequal{#1}{alpha}{\alpha}{% %DIF > 
-%   \ifstrequal{#1}{beta}{\beta}{% %DIF > 
-%   \ifstrequal{#1}{gamma}{\gamma}{% %DIF > 
-%   \ifstrequal{#1}{delta}{\delta}{% %DIF > 
-%   \ifstrequal{#1}{epsilon}{\epsilon}{% %DIF > 
-%   \ifstrequal{#1}{zeta}{\zeta}{% %DIF > 
-%   \ifstrequal{#1}{eta}{\eta}{% %DIF > 
-%   \ifstrequal{#1}{theta}{\theta}{% %DIF > 
-%   \ifstrequal{#1}{iota}{\iota}{% %DIF > 
-%   \ifstrequal{#1}{kappa}{\kappa}{% %DIF > 
-%   \ifstrequal{#1}{lambda}{\lambda}{% %DIF > 
-%   \ifstrequal{#1}{mu}{\mu}{% %DIF > 
-%   \ifstrequal{#1}{nu}{\nu}{% %DIF > 
-%   \ifstrequal{#1}{xi}{\xi}{% %DIF > 
-%   \ifstrequal{#1}{omicron}{o}{% %DIF > 
-%   \ifstrequal{#1}{pi}{\pi}{% %DIF > 
-%   \ifstrequal{#1}{rho}{\rho}{% %DIF > 
-%   \ifstrequal{#1}{sigma}{\sigma}{% %DIF > 
-%   \ifstrequal{#1}{tau}{\tau}{% %DIF > 
-%   \ifstrequal{#1}{upsilon}{\upsilon}{% %DIF > 
-%   \ifstrequal{#1}{phi}{\phi}{% %DIF > 
-%   \ifstrequal{#1}{chi}{\chi}{% %DIF > 
-%   \ifstrequal{#1}{psi}{\psi}{% %DIF > 
-%   \ifstrequal{#1}{omega}{\omega}{% %DIF > 
-%   #1% %DIF > 
-%   }}}}}}}}}}}}}}}}}}}}}}}}% %DIF > 
-% } %DIF > 
- %DIF > 
-% % Return the first component of a compound key. %DIF > 
-% % alpha-x -> \alpha %DIF > 
-% % x-alpha -> x %DIF > 
-% \newcommand{\firstsymbol}[1]{% %DIF > 
-%   \firstsymbolaux#1-\@nil %DIF > 
-% } %DIF > 
- %DIF > 
-% \def\firstsymbolaux#1-#2\@nil{% %DIF > 
-%   \greeksymbol{#1}% %DIF > 
-% } %DIF > 
- %DIF > 
-% % glossary definition macro %DIF > 
-% \newcommand{\newsym}[3]{% %DIF > 
-%   \edef\newsym@sortkey{\mysortkey{#1}} %DIF > 
-%   \glsxtrnewsymbol[ %DIF > 
-%     description={#3}, %DIF > 
-%     sort={\newsym@sortkey}, %DIF > 
-%     type={\firstsymbol{#1}} %DIF > 
-%   ]{sym-#1}{\ensuremath{#2}}% %DIF > 
-% } %DIF > 
-% \makeatother %DIF > 
- %DIF > 
  %DIF > 
 \newglossary{sym-A}{A.sly}{A.sls}{A} %DIF > 
 \newglossary{sym-B}{B.sly}{B.sls}{B} %DIF > 
@@ -400,6 +302,7 @@
 \def\symfmt@overline{1} %DIF > 
 \def\symfmt@angle{1} %DIF > 
 \def\symfmt@dDelta{1} %DIF > 
+\def\symfmt@underline{1} %DIF > 
  %DIF > 
 % ============================================================ %DIF > 
 % Sort one component %DIF > 
@@ -410,8 +313,8 @@
     % formatting command: ignore it %DIF > 
 %DIF -------
   \else
-%DIF 34c397-400
-%DIF <         \onecolumn
+%DIF 49c280-283
+%DIF <   %\usepackage[numbers]{natbib}             % citep command
 %DIF -------
     \ifcsname symgreek@#1\endcsname %DIF > 
       \csname symgreek@#1\endcsname %DIF > 
@@ -419,14 +322,25 @@
       00#1% %DIF > 
 %DIF -------
     \fi
-%DIF 36-37c402-412
-%DIF <     {#1}
-%DIF <     \ifdefined\DISSERATION 
+%DIF 51-52c285-286
+%DIF < \usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
+%DIF < \usepackage{cleveref}
 %DIF -------
   \fi %DIF > 
 } %DIF > 
- %DIF > 
- %DIF > 
+%DIF -------
+
+%DIF 54-55d288
+%DIF < \newcommand*\rot{\rotatebox{90}} % for rotated table headers
+%DIF < \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
+%DIF -------
+
+%DIF 57-60c289-306
+%DIF < \newcommand{\summarytexcount}[1]{\textbf{Word Count}
+%DIF <   \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
+%DIF <   \verbatiminput%
+%DIF < {#1.wcsum}%
+%DIF -------
 % ============================================================ %DIF > 
 % Sort entire key %DIF > 
 % ============================================================ %DIF > 
@@ -434,18 +348,12 @@
 \def\sym@sortaux#1-#2\@nil{% %DIF > 
   \ifcsname symfmt@#1\endcsname %DIF > 
     % skip formatting component %DIF > 
-%DIF -------
-  \else
-%DIF 39c414-417
-%DIF <         \twocolumn
-%DIF -------
+  \else %DIF > 
     \sym@sortcomponent{#1}% %DIF > 
     \ifx\relax#2\relax %DIF > 
     \else %DIF > 
       -% %DIF > 
-%DIF -------
-    \fi
-%DIF 41a419-423
+    \fi %DIF > 
   \fi %DIF > 
   \ifx\relax#2\relax %DIF > 
   \else %DIF > 
@@ -454,19 +362,16 @@
 %DIF -------
 }
 
-%DIF 43-44c426-428
-%DIF < \usepackage{verbatim}  % word counts
-%DIF < \usepackage{textcomp}  % cent symbol
+%DIF 63-66c309-346
+%DIF < \newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
+%DIF <   \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
+%DIF <   \verbatiminput%
+%DIF < {#1.wcdetail}
 %DIF -------
 \newcommand{\mysortkey}[1]{% %DIF > 
   \sym@sortaux#1-\@nil %DIF > 
 } %DIF > 
-%DIF -------
-
-%DIF 46-47c430-441
-%DIF < \ifdefined\DISSERTATION
-%DIF <   \usepackage[numbers,square]{natbib}    % citep command
-%DIF -------
+ %DIF > 
  %DIF > 
 % ============================================================ %DIF > 
 % First actual symbol %DIF > 
@@ -479,63 +384,18 @@
 \def\sym@firstaux#1-#2\@nil{% %DIF > 
   \ifcsname symfmt@#1\endcsname %DIF > 
     \sym@firstaux#2\@nil %DIF > 
-%DIF -------
-  \else
-%DIF 49c443-446
-%DIF <   %\usepackage[numbers]{natbib}             % citep command
-%DIF -------
+  \else %DIF > 
     \ifcsname symgreek@#1\endcsname %DIF > 
       #1% %DIF > 
     \else %DIF > 
       \firstletter{#1}% %DIF > 
-%DIF -------
-    \fi
-%DIF 51-52c448-449
-%DIF < \usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
-%DIF < \usepackage{cleveref}
-%DIF -------
+    \fi %DIF > 
   \fi %DIF > 
 } %DIF > 
-%DIF -------
-
-%DIF 54-55c451-453
-%DIF < \newcommand*\rot{\rotatebox{90}} % for rotated table headers
-%DIF < \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
-%DIF -------
+ %DIF > 
 \newcommand{\mysymgroup}[1]{% %DIF > 
   \sym@firstaux#1-\@nil %DIF > 
 } %DIF > 
-%DIF -------
-
-%DIF 57-60c455-468
-%DIF < \newcommand{\summarytexcount}[1]{\textbf{Word Count}
-%DIF <   \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
-%DIF <   \verbatiminput%
-%DIF < {#1.wcsum}%
-%DIF -------
- %DIF > 
-% ============================================================ %DIF > 
-% Symbol name for display %DIF > 
-% ============================================================ %DIF > 
- %DIF > 
-\newcommand{\greeksymbol}[1]{% %DIF > 
-  \ifstrequal{#1}{alpha}{\alpha}{% %DIF > 
-  \ifstrequal{#1}{beta}{\beta}{% %DIF > 
-  \ifstrequal{#1}{gamma}{\gamma}{% %DIF > 
-  % ... all the remaining Greek letters ... %DIF > 
-  \ifstrequal{#1}{psi}{\psi}{% %DIF > 
-  \ifstrequal{#1}{omega}{\omega}{% %DIF > 
-  #1% %DIF > 
-  }}}}}% %DIF > 
-%DIF -------
-}
-
-%DIF 63-66c471-480
-%DIF < \newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
-%DIF <   \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
-%DIF <   \verbatiminput%
-%DIF < {#1.wcdetail}
-%DIF -------
  %DIF > 
 % ============================================================ %DIF > 
 % Glossary entry %DIF > 
@@ -548,20 +408,20 @@
       The symbol label `sym-#1' has already been defined. %DIF > 
 %DIF -------
     }%
-%DIF 68a482-491
+%DIF 68a348-357
   }{}% %DIF > 
   \edef\newsym@sortkey{\mysortkey{#1}}% %DIF > 
-  % \glsxtrnewsymbol[ %DIF > 
-  %   description={#3}, %DIF > 
-  %   sort={\newsym@sortkey}, %DIF > 
-  %   type={sym-\mysymgroup{#1}} %DIF > 
-  % ]{sym-#1}{\ensuremath{#2}}% %DIF > 
-  \newglossaryentry{sym-#1}{name={\ensuremath{#2}},category={symbol},sort={\newsym@sortkey}, type={sym-\mysymgroup{#1}},description={#3}} %DIF > 
+  \newglossaryentry{sym-#1}{ %DIF > 
+    name={\ensuremath{#2}}, %DIF > 
+    category={symbol}, %DIF > 
+    sort={\newsym@sortkey}, %DIF > 
+    type={sym-\mysymgroup{#1}}, %DIF > 
+    description={#3}} %DIF > 
 } %DIF > 
 \makeatother %DIF > 
 %DIF -------
 
-%DIF 69a493-773
+%DIF 69a359-648
 \newglossary[clg]{control}{cld}{cln}{Control Acronyms} %DIF > 
 % control related %DIF > 
 \newabbreviation[type=control]{acr-dp}{DP}{Dynamic Programming} %DIF > 
@@ -789,8 +649,17 @@
 \newsym{vec-xi}{\vec{\xi}}{Time domain vector of vertical positions of each body degree of freedom} %DIF > 
 \newsym{phi-e}       {\phi^e}{Total (particular + homogeneous) radiation potential in the exterior region $e$ in \gls{acr-meem}} %DIF > 
 \newsym{vec-b}{\vec{b}}{Right-hand side vector in MEEM matrix solve, contains information about particular potentials} %DIF > 
-\newsym{N-0}{N_0}{Exterior-region vertical eigenfunction normalization term \gls{sym-N-n-e} evaluated at mode $n_e$ = 0} %DIF > 
-\newsym{phi}{\phi}{Complex-valued radiation potential phasor as a function of space. Shorthand for \gls{sym-phi-mathrm-R}} %DIF > 
+ %DIF > 
+\ifdefined\whichjournal %DIF > 
+\ifthenelse{\equal{\whichjournal}{Applied Ocean Research}} %DIF > 
+{ %DIF > 
+    \newsym{N-0}{N_0}{Exterior-region vertical eigenfunction normalization term \gls{sym-N-k} evaluated at mode \gls{sym-k-index}=0.} %DIF > 
+    \newsym{phi}{\phi}{Complex-valued radiation potential phasor as a function of space.} %DIF > 
+}{} %DIF > 
+\else %DIF > 
+    \newsym{N-0}{N_0}{Exterior-region vertical eigenfunction normalization term \gls{sym-N-n-e} evaluated at mode \gls{sym-n-e}=0.} %DIF > 
+    \newsym{phi}{\phi}{Complex-valued radiation potential phasor as a function of space. Shorthand for \gls{sym-phi-mathrm-R}.} %DIF > 
+\fi %DIF > 
  %DIF > 
 % bessel functions %DIF > 
 \newsym{mathrm-H-0-1}{\mathrm{H}_0^1}{Hankel function of the first kind, order zero} %DIF > 
@@ -916,44 +785,38 @@
 % \fi
 % \fi
 % }
-%DIF 141a846
-\makeatother %DIF > 
-%DIF -------
-
-%DIF 142a848
-% references to appendix sections should be called "appendix" instead of "section" %DIF > 
-%DIF -------
-\AddToHook{cmd/appendices/before}{%
-%DIF 143-146c850-853
+%DIF 141-147d721
+%DIF < 
+%DIF < \AddToHook{cmd/appendices/before}{%
 %DIF <   \crefalias{section}{appendix}%
 %DIF <   \crefalias{subsection}{appendix}
 %DIF <   \crefalias{subsubsection}{appendix}
 %DIF <   \crefalias{chapter}{appendix}
+%DIF < }
 %DIF -------
-  \crefalias{section}{suppsec}% %DIF > 
-  \crefalias{subsection}{suppsec} %DIF > 
-  \crefalias{subsubsection}{suppsec} %DIF > 
-  \crefalias{chapter}{suppsec} %DIF > 
-%DIF -------
-}
-%DIF 148c855-861
-%DIF < \makeatother
-%DIF -------
-\AddToHook{cmd/subappendices/before}{% %DIF > 
-  \crefalias{section}{suppsec}% %DIF > 
-  \crefalias{subsection}{suppsec} %DIF > 
-  \crefalias{subsubsection}{suppsec} %DIF > 
-  \crefalias{chapter}{suppsec} %DIF > 
-} %DIF > 
-\crefname{suppsec}{appendix}{appendices} %DIF > 
-%DIF -------
+\makeatother
 
-%DIF 150a863
+%DIF 150a723-738
+% references to appendix sections should be called "appendix" instead of "section" %DIF > 
+% \AddToHook{cmd/appendices/before}{% %DIF > 
+%   \crefalias{section}{suppsec}% %DIF > 
+%   \crefalias{subsection}{suppsec} %DIF > 
+%   \crefalias{subsubsection}{suppsec} %DIF > 
+%   \crefalias{chapter}{suppsec} %DIF > 
+% } %DIF > 
+% \AddToHook{cmd/subappendices/before}{% %DIF > 
+%   \crefalias{section}{suppsec}% %DIF > 
+%   \crefalias{subsection}{suppsec} %DIF > 
+%   \crefalias{subsubsection}{suppsec} %DIF > 
+%   \crefalias{chapter}{suppsec} %DIF > 
+% } %DIF > 
+\crefname{suppsec}{appendix}{appendices} %DIF > 
+ %DIF > 
  %DIF > 
 %DIF -------
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-%DIF 152a866-868
+%DIF 152a741-743
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}} %DIF > 
 \newcolumntype{?}{!{\vrule width 1.5pt}} %DIF > 
  %DIF > 
@@ -965,12 +828,12 @@
 \usepackage{microtype}
 \usepackage{subcaption} % for subfigures
 \usepackage{tikz}
-%DIF 159a876
+%DIF 159a751
 \usepackage{fmtcount} % for \ordinalstringnum command in discussion.tex (imported from results) %DIF > 
 %DIF -------
 %\usepackage[section]{placeins} % prevent figs from going in wrong section
 
-%DIF 161a879-891
+%DIF 161a754-766
 \makeatletter %DIF > 
 \def\DeclareFigureOptions#1#2#3{% %DIF > 
     \if\relax\detokenize{#2}\relax %DIF > 
@@ -986,7 +849,7 @@
 } %DIF > 
 %DIF -------
 
-%DIF 162c893-959
+%DIF 162c768-834
 %DIF < \newcommand{\journal}{Applied Ocean Research}
 %DIF -------
 \ifdefined\JOURNALTWOCOLUMN %DIF > 
@@ -1058,7 +921,7 @@
 \DeclareFigureOptions{aor:figs/manual/pto_sweep_3.pdf}{\linewidth}{\linewidth} %DIF > 
 %DIF -------
 
-%DIF 164a961-1823
+%DIF 164a836-1698
 \DeclareFigureOptions{re:figs/from-matlab/RM3_image.pdf}{1\linewidth}{.6\linewidth} %DIF > 
 \DeclareFigureOptions{re:figs/from-matlab/control_analysis_flowcharts.pdf}{1.1\linewidth}{1.1\linewidth} %DIF > 
 \DeclareFigureOptions{re:figs/from-matlab/delta_x.pdf}{\linewidth}{.7\linewidth} %DIF > 
@@ -1938,7 +1801,7 @@
     }
     \end{tikzpicture}
 }
-%DIF 179a1839-1843
+%DIF 179a1714-1718
  %DIF > 
  %DIF > 
 \newcommand{\assumption}[1]{\refstepcounter{asmpnumber}\label{aor:asmp:#1}A\arabic{asmpnumber}} %DIF > 
@@ -1962,13 +1825,13 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@out{%
     \{%
-%DIF 196a1861
+%DIF 196a1736
       "simRuntimeOldSeconds": 0.04, % %DIF > 
 %DIF -------
       "forceScaleFactor": "0.28", %
       "powerScaleFactor": "0.49", %
       "massScaleFactor": "1.12", %
-%DIF 199-200c1865-1866
+%DIF 199-200c1740-1741
 %DIF <       "postpro\_time": 289.096547, %
 %DIF <       "analysis\_time": 2125.897354, %
 %DIF -------
@@ -1978,7 +1841,7 @@
       "nominalLCOE": "0.89 \$/kWh", %
       "surgeForceFloatNominal": "10 MN", %
       "surgeForceSparNominal": "3 MN", %
-%DIF 204-210c1870-1877
+%DIF 204-210c1745-1752
 %DIF <       "capexDesignNominal": 2190114.3223833465, %
 %DIF <       "powerAvgNominal": 72822.42633091437, %
 %DIF <       "simRuntime": "151 ms", %
@@ -1997,7 +1860,7 @@
       "percent\_nans": 18.0288, % %DIF > 
 %DIF -------
       "n\_combos": 93750, %
-%DIF 212c1879
+%DIF 212c1754
 %DIF <       "geom\_sweep\_analysis\_time": 1446.594815, %
 %DIF -------
       "geom\_sweep\_analysis\_time": 2030.303147, % %DIF > 
@@ -2011,14 +1874,14 @@
         \{%
           "pct\_error\_baseline": {[}%
             36.46449630326281, %
-%DIF 222c1889
+%DIF 222c1764
 %DIF <             38.53447655036626%
 %DIF -------
             38.53447655036638% %DIF > 
 %DIF -------
           {]}, %
           "pct\_error\_drag": {[}%
-%DIF 225c1892
+%DIF 225c1767
 %DIF <             10.790884267350611, %
 %DIF -------
             10.790884267350643, % %DIF > 
@@ -2026,7 +1889,7 @@
             5.002294575560603%
           {]}, %
           "pct\_error\_meem": {[}%
-%DIF 229-230c1896-1897
+%DIF 229-230c1771-1772
 %DIF <             16.86150791429175, %
 %DIF <             66.75213581378641%
 %DIF -------
@@ -2035,7 +1898,7 @@
 %DIF -------
           {]}, %
           "pct\_error\_total": {[}%
-%DIF 233-234c1900-1901
+%DIF 233-234c1775-1776
 %DIF <             {-}12.715966046141702, %
 %DIF <             5.090339861457585%
 %DIF -------
@@ -2064,7 +1927,7 @@
         \}, %
         \{%
           "pct\_error\_baseline": {[}%
-%DIF 257c1924
+%DIF 257c1799
 %DIF <             36.49457444223329, %
 %DIF -------
             36.494574442233315, % %DIF > 
@@ -2074,7 +1937,7 @@
             null%
           {]}, %
           "pct\_error\_drag": {[}%
-%DIF 263-264c1930-1931
+%DIF 263-264c1805-1806
 %DIF <             65.47109436867538, %
 %DIF <             {-}11.439039626615637, %
 %DIF -------
@@ -2085,7 +1948,7 @@
             null%
           {]}, %
           "pct\_error\_meem": {[}%
-%DIF 269c1936
+%DIF 269c1811
 %DIF <             36.49457444223329, %
 %DIF -------
             36.494574442233315, % %DIF > 
@@ -2095,7 +1958,7 @@
             null%
           {]}, %
           "pct\_error\_total": {[}%
-%DIF 275-276c1942-1943
+%DIF 275-276c1817-1818
 %DIF <             65.47109436867538, %
 %DIF <             {-}10.810656387995564, %
 %DIF -------
@@ -2109,7 +1972,7 @@
       {]}, %
       "wecsimAvgPowerErrorBestCase": "0.16\%", %
       "wecsimAvgPowerErrorWorstCase": "12.72\%", %
-%DIF 284-286c1951-1956
+%DIF 284-286c1826-1831
 %DIF <       "MEEMRuntime": "105 ms", %
 %DIF <       "meemSweepTime": "24 minutes", %
 %DIF <       "meemSweepSize": "93750"%
@@ -2123,7 +1986,7 @@
 %DIF -------
     \}}%
   \else%
-%DIF 289a1959-1962
+%DIF 289a1834-1837
     \ifnum\pdfstrcmp{#1}{simRuntimeOldSeconds}=0% %DIF > 
       \def\resultsAOR@out{% %DIF > 
     0.04}% %DIF > 
@@ -2143,7 +2006,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{postpro_time}=0%
       \def\resultsAOR@out{%
-%DIF 303c1977
+%DIF 303c1852
 %DIF <     289.096547}%
 %DIF -------
     424.790568}% %DIF > 
@@ -2151,7 +2014,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{analysis_time}=0%
       \def\resultsAOR@out{%
-%DIF 307c1981
+%DIF 307c1856
 %DIF <     2125.897354}%
 %DIF -------
     2302.972065}% %DIF > 
@@ -2169,7 +2032,7 @@
       \def\resultsAOR@out{%
     3 MN}%
     \else%
-%DIF 321a1995-1998
+%DIF 321a1870-1873
       \ifnum\pdfstrcmp{#1}{heaveForceNominal}=0% %DIF > 
       \def\resultsAOR@out{% %DIF > 
     9 MN}% %DIF > 
@@ -2177,7 +2040,7 @@
 %DIF -------
       \ifnum\pdfstrcmp{#1}{capexDesignNominal}=0%
       \def\resultsAOR@out{%
-%DIF 323c2001
+%DIF 323c1876
 %DIF <     2190114.3223833465}%
 %DIF -------
     2190114.3223833675}% %DIF > 
@@ -2185,7 +2048,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{powerAvgNominal}=0%
       \def\resultsAOR@out{%
-%DIF 327c2005
+%DIF 327c1880
 %DIF <     72822.42633091437}%
 %DIF -------
     72822.42633091439}% %DIF > 
@@ -2193,7 +2056,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{simRuntime}=0%
       \def\resultsAOR@out{%
-%DIF 331c2009
+%DIF 331c1884
 %DIF <     151 ms}%
 %DIF -------
     149 ms}% %DIF > 
@@ -2201,7 +2064,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{pctRuntimeDynamics}=0%
       \def\resultsAOR@out{%
-%DIF 335c2013
+%DIF 335c1888
 %DIF <     23\%}%
 %DIF -------
     20\%}% %DIF > 
@@ -2209,7 +2072,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{pctRuntimeMEEM}=0%
       \def\resultsAOR@out{%
-%DIF 339c2017
+%DIF 339c1892
 %DIF <     70\%}%
 %DIF -------
     72\%}% %DIF > 
@@ -2217,7 +2080,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{pctRuntimeOther}=0%
       \def\resultsAOR@out{%
-%DIF 343c2021
+%DIF 343c1896
 %DIF <     8\%}%
 %DIF -------
     7\%}% %DIF > 
@@ -2225,7 +2088,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{percent_nans}=0%
       \def\resultsAOR@out{%
-%DIF 347c2025
+%DIF 347c1900
 %DIF <     18.029866666666667}%
 %DIF -------
     18.0288}% %DIF > 
@@ -2237,7 +2100,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{geom_sweep_analysis_time}=0%
       \def\resultsAOR@out{%
-%DIF 355c2033
+%DIF 355c1908
 %DIF <     1446.594815}%
 %DIF -------
     2030.303147}% %DIF > 
@@ -2276,7 +2139,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{MEEMRuntime}=0%
       \def\resultsAOR@out{%
-%DIF 390c2068
+%DIF 390c1943
 %DIF <     105 ms}%
 %DIF -------
     108 ms}% %DIF > 
@@ -2284,13 +2147,13 @@
     \else%
       \ifnum\pdfstrcmp{#1}{meemSweepTime}=0%
       \def\resultsAOR@out{%
-%DIF 394c2072
+%DIF 394c1947
 %DIF <     24 minutes}%
 %DIF -------
     34 minutes}% %DIF > 
 %DIF -------
     \else%
-%DIF 396a2074-2085
+%DIF 396a1949-1960
       \ifnum\pdfstrcmp{#1}{meemSweepTimePerCombo}=0% %DIF > 
       \def\resultsAOR@out{% %DIF > 
     22 ms}% %DIF > 
@@ -2306,7 +2169,7 @@
 %DIF -------
       \ifnum\pdfstrcmp{#1}{meemSweepSize}=0%
       \def\resultsAOR@out{%
-%DIF 398c2088
+%DIF 398c1963
 %DIF <     93750}%
 %DIF -------
     93,750}% %DIF > 
@@ -2314,7 +2177,7 @@
     \else%
       \def\resultsAOR@out{%
     ??}%
-%DIF 402c2092
+%DIF 402c1967
 %DIF <     \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
 %DIF -------
     \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi %DIF > 
@@ -2328,14 +2191,14 @@
       \{%
         "pct\_error\_baseline": {[}%
           36.46449630326281, %
-%DIF 412c2102
+%DIF 412c1977
 %DIF <           38.53447655036626%
 %DIF -------
           38.53447655036638% %DIF > 
 %DIF -------
         {]}, %
         "pct\_error\_drag": {[}%
-%DIF 415c2105
+%DIF 415c1980
 %DIF <           10.790884267350611, %
 %DIF -------
           10.790884267350643, % %DIF > 
@@ -2343,7 +2206,7 @@
           5.002294575560603%
         {]}, %
         "pct\_error\_meem": {[}%
-%DIF 419-420c2109-2110
+%DIF 419-420c1984-1985
 %DIF <           16.86150791429175, %
 %DIF <           66.75213581378641%
 %DIF -------
@@ -2352,7 +2215,7 @@
 %DIF -------
         {]}, %
         "pct\_error\_total": {[}%
-%DIF 423-424c2113-2114
+%DIF 423-424c1988-1989
 %DIF <           {-}12.715966046141702, %
 %DIF <           5.090339861457585%
 %DIF -------
@@ -2381,7 +2244,7 @@
       \}, %
       \{%
         "pct\_error\_baseline": {[}%
-%DIF 447c2137
+%DIF 447c2012
 %DIF <           36.49457444223329, %
 %DIF -------
           36.494574442233315, % %DIF > 
@@ -2391,7 +2254,7 @@
           null%
         {]}, %
         "pct\_error\_drag": {[}%
-%DIF 453-454c2143-2144
+%DIF 453-454c2018-2019
 %DIF <           65.47109436867538, %
 %DIF <           {-}11.439039626615637, %
 %DIF -------
@@ -2402,7 +2265,7 @@
           null%
         {]}, %
         "pct\_error\_meem": {[}%
-%DIF 459c2149
+%DIF 459c2024
 %DIF <           36.49457444223329, %
 %DIF -------
           36.494574442233315, % %DIF > 
@@ -2412,7 +2275,7 @@
           null%
         {]}, %
         "pct\_error\_total": {[}%
-%DIF 465-466c2155-2156
+%DIF 465-466c2030-2031
 %DIF <           65.47109436867538, %
 %DIF <           {-}10.810656387995564, %
 %DIF -------
@@ -2445,14 +2308,14 @@
     \{%
       "pct\_error\_baseline": {[}%
         36.46449630326281, %
-%DIF 493c2183
+%DIF 493c2058
 %DIF <         38.53447655036626%
 %DIF -------
         38.53447655036638% %DIF > 
 %DIF -------
       {]}, %
       "pct\_error\_drag": {[}%
-%DIF 496c2186
+%DIF 496c2061
 %DIF <         10.790884267350611, %
 %DIF -------
         10.790884267350643, % %DIF > 
@@ -2460,7 +2323,7 @@
         5.002294575560603%
       {]}, %
       "pct\_error\_meem": {[}%
-%DIF 500-501c2190-2191
+%DIF 500-501c2065-2066
 %DIF <         16.86150791429175, %
 %DIF <         66.75213581378641%
 %DIF -------
@@ -2469,7 +2332,7 @@
 %DIF -------
       {]}, %
       "pct\_error\_total": {[}%
-%DIF 504-505c2194-2195
+%DIF 504-505c2069-2070
 %DIF <         {-}12.715966046141702, %
 %DIF <         5.090339861457585%
 %DIF -------
@@ -2540,7 +2403,7 @@
     \def\resultsAOR@IV@out{%
     \{%
       "pct\_error\_baseline": {[}%
-%DIF 570c2260
+%DIF 570c2135
 %DIF <         36.49457444223329, %
 %DIF -------
         36.494574442233315, % %DIF > 
@@ -2550,7 +2413,7 @@
         null%
       {]}, %
       "pct\_error\_drag": {[}%
-%DIF 576-577c2266-2267
+%DIF 576-577c2141-2142
 %DIF <         65.47109436867538, %
 %DIF <         {-}11.439039626615637, %
 %DIF -------
@@ -2561,7 +2424,7 @@
         null%
       {]}, %
       "pct\_error\_meem": {[}%
-%DIF 582c2272
+%DIF 582c2147
 %DIF <         36.49457444223329, %
 %DIF -------
         36.494574442233315, % %DIF > 
@@ -2571,7 +2434,7 @@
         null%
       {]}, %
       "pct\_error\_total": {[}%
-%DIF 588-589c2278-2279
+%DIF 588-589c2153-2154
 %DIF <         65.47109436867538, %
 %DIF <         {-}10.810656387995564, %
 %DIF -------
@@ -2605,7 +2468,7 @@
     \def\resultsAOR@V@out{%
     {[}%
       36.46449630326281, %
-%DIF 617c2307
+%DIF 617c2182
 %DIF <       38.53447655036626%
 %DIF -------
       38.53447655036638% %DIF > 
@@ -2618,7 +2481,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@V@out{%
-%DIF 626c2316
+%DIF 626c2191
 %DIF <     38.53447655036626}%
 %DIF -------
     38.53447655036638}% %DIF > 
@@ -2633,7 +2496,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@VI@out{%
     {[}%
-%DIF 637c2327
+%DIF 637c2202
 %DIF <       10.790884267350611, %
 %DIF -------
       10.790884267350643, % %DIF > 
@@ -2643,7 +2506,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@VI@out{%
-%DIF 643c2333
+%DIF 643c2208
 %DIF <     10.790884267350611}%
 %DIF -------
     10.790884267350643}% %DIF > 
@@ -2662,7 +2525,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@VII@out{%
     {[}%
-%DIF 658-659c2348-2349
+%DIF 658-659c2223-2224
 %DIF <       16.86150791429175, %
 %DIF <       66.75213581378641%
 %DIF -------
@@ -2673,7 +2536,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@VII@out{%
-%DIF 664c2354
+%DIF 664c2229
 %DIF <     16.86150791429175}%
 %DIF -------
     16.861507914291764}% %DIF > 
@@ -2681,7 +2544,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@VII@out{%
-%DIF 668c2358
+%DIF 668c2233
 %DIF <     66.75213581378641}%
 %DIF -------
     66.75213581378652}% %DIF > 
@@ -2696,7 +2559,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@VIII@out{%
     {[}%
-%DIF 679-680c2369-2370
+%DIF 679-680c2244-2245
 %DIF <       {-}12.715966046141702, %
 %DIF <       5.090339861457585%
 %DIF -------
@@ -2707,7 +2570,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@VIII@out{%
-%DIF 685c2375
+%DIF 685c2250
 %DIF <     {-}12.715966046141702}%
 %DIF -------
     {-}12.715966046141624}% %DIF > 
@@ -2715,7 +2578,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@VIII@out{%
-%DIF 689c2379
+%DIF 689c2254
 %DIF <     5.090339861457585}%
 %DIF -------
     5.090339861457517}% %DIF > 
@@ -2814,7 +2677,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XIII@out{%
     {[}%
-%DIF 784c2474
+%DIF 784c2349
 %DIF <       36.49457444223329, %
 %DIF -------
       36.494574442233315, % %DIF > 
@@ -2826,7 +2689,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XIII@out{%
-%DIF 792c2482
+%DIF 792c2357
 %DIF <     36.49457444223329}%
 %DIF -------
     36.494574442233315}% %DIF > 
@@ -2853,7 +2716,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XIV@out{%
     {[}%
-%DIF 815-816c2505-2506
+%DIF 815-816c2380-2381
 %DIF <       65.47109436867538, %
 %DIF <       {-}11.439039626615637, %
 %DIF -------
@@ -2866,7 +2729,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XIV@out{%
-%DIF 823c2513
+%DIF 823c2388
 %DIF <     65.47109436867538}%
 %DIF -------
     65.47109436867527}% %DIF > 
@@ -2874,7 +2737,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@XIV@out{%
-%DIF 827c2517
+%DIF 827c2392
 %DIF <     {-}11.439039626615637}%
 %DIF -------
     {-}11.439039626615426}% %DIF > 
@@ -2897,7 +2760,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XV@out{%
     {[}%
-%DIF 846c2536
+%DIF 846c2411
 %DIF <       36.49457444223329, %
 %DIF -------
       36.494574442233315, % %DIF > 
@@ -2909,7 +2772,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XV@out{%
-%DIF 854c2544
+%DIF 854c2419
 %DIF <     36.49457444223329}%
 %DIF -------
     36.494574442233315}% %DIF > 
@@ -2936,7 +2799,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XVI@out{%
     {[}%
-%DIF 877-878c2567-2568
+%DIF 877-878c2442-2443
 %DIF <       65.47109436867538, %
 %DIF <       {-}10.810656387995564, %
 %DIF -------
@@ -2949,7 +2812,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XVI@out{%
-%DIF 885c2575
+%DIF 885c2450
 %DIF <     65.47109436867538}%
 %DIF -------
     65.47109436867527}% %DIF > 
@@ -2957,7 +2820,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@XVI@out{%
-%DIF 889c2579
+%DIF 889c2454
 %DIF <     {-}10.810656387995564}%
 %DIF -------
     {-}10.810656387995223}% %DIF > 
@@ -2980,7 +2843,7 @@
 \makeatother%
 
 \usepackage[authoryear]{natbib}
-%DIF 908a2598
+%DIF 908a2473
 \tracinglostchars=1 % get rid of nullfont warnings %DIF > 
 %DIF -------
 
@@ -3875,7 +3738,7 @@ Inputs and outputs are organized according to standard MDO conventions \mbox{%DI
 , and an optimizer would update design variables $x$ using objective $J$ and constraints $g$ until convergence to $x^*$.
     }%DIFDELCMD < 
 
-%DIFDELCMD < \begin{figure}[htbp]
+%DIFDELCMD < \begin{figure*}[htbp]
 %DIFDELCMD < %%%
 \DIFdelendFL \DIFaddbeginFL \begin{foldoutpage}
         \begin{figure}
@@ -3885,8 +3748,8 @@ Inputs and outputs are organized according to standard MDO conventions \mbox{%DI
 {%DIFAUXCMD
 \DIFdelFL{Simplified XDSM diagram}}%DIFAUXCMD
 %DIFDELCMD < \label{fig:n2}
-%DIFDELCMD < \end{figure}
-%DIFDELCMD < \begin{figure}[b!]
+%DIFDELCMD < \end{figure*}
+%DIFDELCMD < \begin{figure*}[b!]
 %DIFDELCMD < \centering
 %DIFDELCMD < %%%
 \DIFdelFL{\includegraphics[width=1\linewidth]{figs/from-matlab/control_analysis_flowcharts.pdf}
@@ -3895,7 +3758,7 @@ Inputs and outputs are organized according to standard MDO conventions \mbox{%DI
 \DIFdelFL{Optimization architectures organized by analysis method (MDF and SAND) and control method (explicit, implicit, simultaneous, and nested).}}
 %DIFAUXCMD
 %DIFDELCMD < \label{fig:control-arch}
-%DIFDELCMD < \end{figure}
+%DIFDELCMD < \end{figure*}
 %DIFDELCMD < %%%
 \DIFdelend \DIFaddbegin \DIFadd{\includegraphics[width=\textwidth]{figs/two_port_dimension_coeff_chain.pdf}
         }\caption[Full \gls{acr-wec} design space and scope of MDOcean's analyses]{\DIFadd{Flowchart showing the full }\gls{acr-wec} \DIFadd{design space and the scope of MDOcean's static, dynamic, and optimal control analyses.
@@ -4075,12 +3938,12 @@ Inputs and outputs are organized according to standard }\gls{acr-mdo} \DIFadd{co
 and an optimizer would update design variables $\gls{sym-vec-x}$ using objective $\gls{sym-J}$ and constraints $\gls{sym-g}$ until convergence to $\gls{sym-vec-x}^*$.
 }
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
 \DIFaddFL{\includegraphics[\FigureOptions{aor:figs/from-matlab/xdsm.pdf}]{figs/from-matlab/xdsm.pdf}
 }\caption{\DIFaddFL{Simplified }\gls{acr-xdsm} \DIFaddFL{diagram}}
 \label{fig:n2}
-\end{figure}
+\end{figure*}
 
 \ifdefined\DISSERTATION
     \paragraph{\DIFadd{Absence of Feedback Coupling}}
@@ -4114,7 +3977,7 @@ and an optimizer would update design variables $\gls{sym-vec-x}$ using objective
     Feed-forward coupling is also present through inter-module dependencies.
 
     This coupling is both non-convex (e.g., larger bulk dimensions raise power but also raise structural loads and material requirements) and non-monotonic, motivating concurrent rather than sequential optimization.
-\DIFaddbegin \end
+\DIFaddbegin \fi
 \DIFaddend 
 
 \DIFdelbegin \paragraph{\DIFdel{MDO Architecture}}
@@ -4714,7 +4577,7 @@ evaluation (simulation of an arbitrary controller's power performance, where the
 
 %DIFDELCMD < %%%
 \DIFdel{MDOcean uses QLPS }\DIFdelend \DIFaddbegin \DIFadd{MDOcean uses }\gls{acr-qlps} \DIFaddend for both control synthesis and evaluation.
-\DIFaddbegin \begin{figure}[htbp]
+\DIFaddbegin \begin{figure*}[htbp]
 \centering
 \caption[Flowchart depicting the \gls{acr-qlps} method (M1)]{\DIFaddFL{Flowchart depicting the }\gls{acr-qlps} \DIFaddFL{method (M1). The }\acrlong{acr-df}\DIFaddFL{s for response/constraint, controller, and plant are shown in yellow, pink, and blue respectively.}}
 \begin{subfigure}[t]{.9\linewidth}
@@ -4734,7 +4597,7 @@ evaluation (simulation of an arbitrary controller's power performance, where the
     }\caption{\DIFaddFL{Combined synthesis and evaluation.}}
     \label{fig:mod-freq-domain-combined}
 \end{subfigure}
-\end{figure}
+\end{figure*}
 
 \DIFadd{\mbox{%DIFAUXCMD
 \Cref{sec:optimal-control} }\hskip0pt%DIFAUXCMD
@@ -4755,7 +4618,7 @@ We refer to these as the \DIFdelbegin \DIFdel{modified frequency-domain }\DIFdel
 In contrast, the present work applies \DIFdelbegin \DIFdel{QLPS and other modified frequency-domain }\DIFdelend \DIFaddbegin \gls{acr-qlps} \DIFadd{and other }\gls{acr-mfd} \DIFaddend methods to control synthesis, enabling nonlinear controller design within a frequency-domain formulation.
 This differs from linearization approaches such as stochastic linearization, which are generally limited to linear controller design.
 
-\DIFdelbegin %DIFDELCMD < \begin{figure}[htbp]
+\DIFdelbegin %DIFDELCMD < \begin{figure*}[htbp]
 %DIFDELCMD < \centering
 %DIFDELCMD < %%%
 %DIFDELCMD < \caption{%
@@ -4791,7 +4654,7 @@ This differs from linearization approaches such as stochastic linearization, whi
     %DIFAUXCMD
 %DIFDELCMD < \label{fig:mod-freq-domain-combined}
 %DIFDELCMD < \end{subfigure}
-%DIFDELCMD < \end{figure}
+%DIFDELCMD < \end{figure*}
 %DIFDELCMD < %%%
 \DIFdelend \DIFaddbegin \gls{acr-mfd} \DIFadd{methods besides }\gls{acr-qlps} \DIFadd{can be considerably easier to implement and may be of interest to practitioners seeking simpler alternatives to assess the effect of dynamic constraints,
 or to provide a path forward when the assumptions of }\gls{acr-qlps} \DIFadd{are not fully satisfied but the computational cost of time-domain optimal control is prohibitive.
@@ -6098,7 +5961,7 @@ MDOcean is run with MEEM as usual, and separately also run with the WAMIT coeffi
 \DIFdel{in the worst case, with an error breakdown for all simulation scenarios and sea states shown in \mbox{%DIFAUXCMD
 \Cref{fig:error-histogram}}\hskip0pt%DIFAUXCMD
 .
-}%DIFDELCMD < \begin{figure}[htbp]
+}%DIFDELCMD < \begin{figure*}[htbp]
 %DIFDELCMD <     \centering
 %DIFDELCMD <     %%%
 \DIFdelFL{\includegraphics[width=1\linewidth]{../../../base/pubs/applied-ocean-research-model/figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
@@ -6107,7 +5970,7 @@ MDOcean is run with MEEM as usual, and separately also run with the WAMIT coeffi
 \DIFdelFL{Error breakdown based on WEC-Sim Verification Runs}}
     %DIFAUXCMD
 %DIFDELCMD < \label{fig:error-histogram}
-%DIFDELCMD < \end{figure}
+%DIFDELCMD < \end{figure*}
 %DIFDELCMD < %%%
 \DIFdel{The detailed error breakdown across drag-on/drag-off and MEEM/WAMIT coefficient configurations is provided in \mbox{%DIFAUXCMD
 \Cref{sec:appendix-dynamic-validation}}\hskip0pt%DIFAUXCMD
@@ -6332,12 +6195,12 @@ The WEC-Sim }\gls{acr-rm3} \DIFadd{example is run with regular waves and with th
 with an error breakdown for all simulation scenarios and sea states shown in \mbox{%DIFAUXCMD
 \Cref{fig:error-histogram}}\hskip0pt%DIFAUXCMD
 .
-}\begin{figure}[htbp]
+}\begin{figure*}[htbp]
     \centering
     \DIFaddFL{\includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}]{figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
     }\caption[WEC-Sim verification error breakdown]{\DIFaddFL{Error breakdown based on WEC-Sim Verification Runs}}
     \label{fig:error-histogram}
-\end{figure}
+\end{figure*}
 \DIFadd{Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag
 (}\resultsAOR[wecsimAvgPowerErrorBestCase] \DIFadd{and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself,
 but in the way that the model amplifies errors in drag and hydrodynamic coefficient inputs.
@@ -6600,7 +6463,7 @@ will show the tradeoff of radiation efficiency with nondimensionalized surface a
 }\DIFaddend \fi
 
 \paragraph{Best Design as a function of Wave Environment}
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \begin{subfigure}[t]{0.48\linewidth}
         \DIFdelbeginFL \DIFdelFL{\includegraphics[width=\linewidth]{../../../base/pubs/applied-ocean-research-model/figs/from-matlab/sweep_geoms_line.pdf}
@@ -6618,7 +6481,7 @@ will show the tradeoff of radiation efficiency with nondimensionalized surface a
     \DIFdelbeginFL %DIFDELCMD < \caption{%%%
 \DIFdelendFL \DIFaddbeginFL \caption[Effect of wave environment and design variables on efficiency and capture width]{\DIFaddendFL Effect of wave environment and hydrodynamic design variables on (a) radiation efficiency and (b) capture width ratio}
     \label{fig:meem-sweep-m0h}
-\end{figure}
+\end{figure*}
 
 \ifdefined\DISSERTATION
     Starting with \Cref{fig:meem-sweep-eff}, we observe that the most efficient design depends on the frequency-depth regime \DIFdelbegin \DIFdel{$m_0h$ }\DIFdelend \DIFaddbegin \DIFadd{$\gls{sym-m-0}\gls{sym-h}$ }\DIFaddend of the wave environment, shown on the x-axis.
@@ -6721,14 +6584,14 @@ We next move to a simultaneous sweep of both the force limit and the power limit
     The unsaturated solution is in the top right corner, past which power is constant because the unconstrained reactive controller satisfies the limit in all sea states.
 \fi
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
 \DIFdelbeginFL \DIFdelFL{\includegraphics[width=\linewidth]{../../../base/pubs/applied-ocean-research-model/figs/manual/pto_sweep_3.pdf.pdf}
 }%DIFDELCMD < \caption{%%%
 \DIFdelendFL \DIFaddbeginFL \DIFaddFL{\includegraphics[\FigureOptions{aor:figs/manual/pto_sweep_3.pdf}]{figs/manual/pto_sweep_3.pdf}
 }\caption[Effect of force and power limits on power and \gls{acr-lcoe}]{\DIFaddendFL Effect of Generator Force Limit and Power Limit on Annual Average Power and \DIFdelbeginFL \DIFdelFL{LCOE}\DIFdelendFL \DIFaddbeginFL \gls{acr-lcoe}\DIFaddendFL }
 \label{fig:force-power-limit-sweep}
-\end{figure}
+\end{figure*}
 Notably, the minimum \DIFdelbegin \DIFdel{LCOE }\DIFdelend \DIFaddbegin \gls{acr-lcoe} \DIFaddend point occurs at a force limit far below the unsaturated solution because the cost savings from a smaller \DIFdelbegin \DIFdel{PTO }\DIFdelend \DIFaddbegin \gls{acr-pto} \DIFaddend outweigh the loss in power.
 \ifdefined\DISSERTATION
     If a full design optimization were performed to adjust the structural thicknesses to take advantage of the reduced structural loads, we expect an even lower force limit to be optimal.
@@ -6838,13 +6701,13 @@ This multiplicative decomposition allows isolation of the effect of each design 
     Low-period sea states achieve higher radiation efficiency, while high-period sea states have lower radiation efficiency but contribute significantly to total production due to their higher energy content; despite the most probable period being 6--8~s, 10~s waves contribute the most to annual energy production \citep{zou_practical_2023}.
 \fi
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
 \DIFdelbeginFL \DIFdelFL{\includegraphics[width=.95\linewidth]{../../../base/pubs/applied-ocean-research-model/figs/from-matlab/nominal_power_matrix.pdf}
 }\DIFdelendFL \DIFaddbeginFL \DIFaddFL{\includegraphics[\FigureOptions{aor:figs/from-matlab/nominal_power_matrix.pdf}]{figs/from-matlab/nominal_power_matrix.pdf}
 }\DIFaddendFL \caption{Power matrix decomposition}
 \label{fig:power-matrix-decomposition}
-\end{figure}
+\end{figure*}
 The effect of drag is most significant in the 11-12 second range, corresponding to the spar's natural frequency.
 \ifdefined\DISSERTATION
     Interestingly, this is also where the force limit has the strongest effect, indicating that the large amplitudes at the natural frequency drive up the force more than the larger stiffnesses required for reactive control at frequencies far from the natural frequency.
