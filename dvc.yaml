@@ -162,6 +162,7 @@ stages:
       - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
     matrix:
       name:
+        - assumptions
         - taxonomy
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
@@ -181,6 +182,7 @@ stages:
           persist: false
     matrix:
       name:
+        - assumptions
         - taxonomy
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
@@ -8253,6 +8255,7 @@ stages:
       - pubs/applied-ocean-research-model/shared-pkg.tex
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
@@ -8265,7 +8268,7 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   build-AOR-paper-diff-aor-submitted:
     cmd: calkit latex diff -e tex --no-check --from aor-submitted --to HEAD
-      --revision-key ecd622a0fa34..9659e1da6d40 -r
+      --revision-key ecd622a0fa34..94cc34c37c9c -r
       pubs/applied-ocean-research-model/.latexmkrc --input
       pubs/applied-ocean-research-model/sections/ --input
       pubs/applied-ocean-research-model/figs/from-matlab/ --input
@@ -8280,6 +8283,7 @@ stages:
       pubs/applied-ocean-research-model/shared-pkg.tex --input
       pubs/applied-ocean-research-model/cas-dc.cls --input
       pubs/applied-ocean-research-model/cas-common.sty --input
+      pubs/applied-ocean-research-model/stars-cc-by-sa.tex --input
       pubs/applied-ocean-research-model/glossary/ --output-dir
       .calkit/latex-diffs/aor-submitted
       pubs/applied-ocean-research-model/main.tex
@@ -8298,6 +8302,7 @@ stages:
       - pubs/applied-ocean-research-model/shared-pkg.tex
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
@@ -8341,6 +8346,7 @@ stages:
       - pubs/applied-ocean-research-model/tables/
       - pubs/applied-ocean-research-model/appendices.tex
       - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/renewable-energy-mdo/numeric-results.tex
       - pubs/renewable-energy-mdo/sections/
       - pubs/renewable-energy-mdo/figs/
@@ -8564,3 +8570,17 @@ stages:
           persist: false
     desc: Automatically generated from the 'render-quarto-pdf' stage in
       calkit.yaml. Changes made here will be overwritten.
+  merge-ours:
+    cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge
+      origin/$UPSTREAM <<< \"o\""
+    deps: []
+    outs: []
+    desc: Automatically generated from the 'merge-ours' stage in calkit.yaml.
+      Changes made here will be overwritten.
+  merge-theirs:
+    cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge
+      origin/$UPSTREAM <<< \"t\""
+    deps: []
+    outs: []
+    desc: Automatically generated from the 'merge-theirs' stage in calkit.yaml.
+      Changes made here will be overwritten.

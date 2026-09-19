@@ -61,6 +61,7 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git config merge.dvclock.driver "python dev/dvc_lock_merge.py %O %A %B"
       - name: Setup uv
         uses: astral-sh/setup-uv@v7
       - name: Install node.js (required for uv builds of calkit)

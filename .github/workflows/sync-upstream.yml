@@ -1,0 +1,124 @@
+name: Sync dvc upstream
+description: Sync the upstream git and dvc.lock
+on:
+  workflow_dispatch:
+    inputs:
+      dvcLockMergeStrategy:
+        description: 'Which branch dominates if there are dvc.lock conflicts'
+        required: true
+        default: 'ours'
+        type: choice
+        options:
+        - ours
+        - theirs
+      upstream:
+        description: 'The upstream branch to sync with'
+        required: true
+        default: 'main'
+        type: string
+
+permissions:
+  contents: write
+  checks: write
+  id-token: write
+
+# Make sure we only ever run one per branch so we don't have issues pushing
+# after running the pipeline
+concurrency:
+  group: sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  main:
+    name: Run
+    runs-on: self-hosted
+    timeout-minutes: 1440 # 24 hours
+    steps:
+      - name: Clear stale submodule caches
+        run: |
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
+      - uses: actions/checkout@v6
+        with:
+          # For PRs, checkout the head ref to avoid detached HEAD
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
+          persist-credentials: false
+      - name: Init submodules
+        run: git submodule update --init --recursive
+      - name: Configure Git credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git config merge.dvclock.driver "python dev/dvc_lock_merge.py %O %A %B"
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install node.js (required for uv builds of calkit)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Calkit
+        run: uv tool install git+https://github.com/calkit/calkit.git@rmccabe-dvc-pull-warn
+        #run: uv tool install --upgrade calkit-python
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v3
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Install python dependencies
+        run: pip install ruamel.yaml
+        
+      - name: Run Calkit build publications
+        id: run_calkit_build
+        uses: calkit/run-action@v2
+        with:
+          run_args: merge-{{inputs.dvcLockMergeStrategy}}
+          pull_dvc: true
+          save: true
+          cache_dvc: false
+        env:
+          upstream: ${{ inputs.upstream }}
+      # - name: calkit save
+      #   if: always() && 
+      #     (steps.run_calkit_build.conclusion == 'success' || steps.run_calkit_build.conclusion == 'failure')
+      #   run: |
+      #     if ! git status --porcelain | grep -q . && dvc status -q --no-updates; then
+      #       exit 0    # Exit without saving if nothing changed
+      #     fi
+  
+      #     set +e # Continue even if pull fails
+      #     upstream="{{git.events.pull_request.base.ref}}" || main
+      #     git fetch origin $upstream
+      #     MERGE_OUTPUT=$(git merge origin/$upstream 2>&1)
+      #     PULL_STATUS=$?
+
+      #     if [ $PULL_STATUS -ne 0 ] && ! echo "$MERGE_OUTPUT" | grep -q 'not our ref'; then
+      #       BRANCH="calkit-run-${{github.run_number}}-${{github.run_id}}"
+      #       echo "Pull failed due to merge conflict. Creating a new branch $BRANCH."
+      #       git checkout -b "$BRANCH"
+      #       # git config below does the equivalent of the --set-upstream option of git push
+      #       git config branch."$BRANCH".remote origin
+      #       git config branch."$BRANCH".merge refs/heads/"$BRANCH"
+      #     fi
+
+      #     calkit dvc pull
+      #     calkit save dvc.lock dvc.yaml .calkit/ calkit.yaml calkit_stages.yaml pubs/applied-ocean-research-model/numeric-results.tex pubs/renewable-energy-mdo/numeric-results.tex mdocean/plots/non_matlab_figs/img/taxonomy.svg mdocean/plots/non_matlab_figs/xdsm.tikz mdocean/plots/non_matlab_figs/xdsm.tex results/**/end.json results/**/*.tex -m "Run pipeline"
+      #     PUSH_STATUS=$?
+
+      #     if [ $PUSH_STATUS -ne 0 ]; then
+      #       echo "Push failed, perhaps due to dvc push timeout. Retrying."
+      #       calkit dvc push
+      #       git push || true
+      #     fi
