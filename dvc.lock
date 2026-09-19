@@ -32094,3 +32094,27 @@ stages:
   merge-ours:
     cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge 
       origin/$UPSTREAM <<< \"o\""
+  make-AOR-diff-manual:
+    cmd: bash --noprofile --norc -c "calkit latex diff -e tex --no-check --from 
+      aor-submitted --to HEAD --revision-key ecd622a0fa34..e06f6d2d3a97 -r 
+      pubs/applied-ocean-research-model/.latexmkrc --input 
+      pubs/applied-ocean-research-model/sections/ --input 
+      pubs/applied-ocean-research-model/figs/from-matlab/ --input 
+      pubs/applied-ocean-research-model/figs/manual/ --input 
+      pubs/applied-ocean-research-model/figs/tikz/ --input 
+      pubs/applied-ocean-research-model/tables/ --input 
+      pubs/applied-ocean-research-model/numeric-results.tex --input 
+      pubs/applied-ocean-research-model/elsarticle-num-names.bst --input 
+      pubs/applied-ocean-research-model/references.bib --input 
+      pubs/applied-ocean-research-model/zotero-meem-refs.bib --input 
+      pubs/applied-ocean-research-model/commands-aor.tex --input 
+      pubs/applied-ocean-research-model/shared-pkg.tex --input 
+      pubs/applied-ocean-research-model/cas-dc.cls --input 
+      pubs/applied-ocean-research-model/cas-common.sty --input 
+      pubs/applied-ocean-research-model/stars-cc-by-sa.tex --input 
+      pubs/applied-ocean-research-model/glossary/ --output-dir 
+      .calkit/latex-diffs/aor-submitted 
+      pubs/applied-ocean-research-model/main.tex --keep-tex ; tail -n +3 
+      pubs/applied-ocean-research-model/main-diff.tex | python 
+      dev/latex/latexdiff/glossary-latexdiff-filter.py > 
+      pubs/applied-ocean-research-model/main-diff-manual.tex"
