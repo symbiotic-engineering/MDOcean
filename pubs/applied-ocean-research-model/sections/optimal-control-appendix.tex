@@ -16,7 +16,7 @@
 
     When multiple constraints exist, the situation is more complex, since it is possible for a given constraint to be violated by the unconstrained solution but not active in the constrained solution, or for multiple constraints to be active simultaneously.
     In the special case where the unconstrained solution violates no more than one constraint, that constraint is active and the solver can proceed as described above.
-    When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint (s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
+    When the unconstrained solution violates multiple constraints, the solver must try all subsets of 1-2 of those constraint(s) as the active set, find which of these active sets produces the largest power while satisfying all constraints, and then set the error as the deviation of the guessed solution from the constrained solution for that active set.
     Since the active set cannot be calculated a-priori as in the simpler case, this approach ends up looking more like a numerical optimization than a numerical root-finding, although the optimization is over a finite set of active set possibilities instead of a continuous control domain as it would be in a direct optimal control method.
     The main advantage of the indirect approach is its ability to handle arbitrary nonlinear\footnote{Nonlinear meaning greater than second order in an optimization sense, not in a dynamic sense, because the dynamics are already quasi-linearized here} constraints, although for the quadratic constraints considered here, the analytical approach described in \Cref{sec:appendix-qp-solution} is more efficient.
 \fi
@@ -239,12 +239,12 @@ and $1i$ is the imaginary unit.
 The closest-point candidates $\gls{sym-mathcal-C-cl}$ match the solution that \citet[\equationautorefname~4]{mccabe_force-limited_2024} derive for problems with only one constraint.
 
 Importantly, we need not compute the entire feasible space $\gls{sym-mathcal-F}$, only compute $\gls{sym-mathcal-C}$ and then check whether each candidate point is feasible.
-\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $\gls{sym-r-mu}=4$, $\gls{sym-S}_{\gls{sym-mu}}=1$, and various $\gls{sym-Gamma-c-mu}$.
+\Cref{fig:qp-solution-geometry} illustrates the various cases for feasibility and optimality for a toy problem with $\gls{sym-r-mu}=4$, $\gls{sym-S-mu}=1$, and various $\gls{sym-Gamma-c-mu}$.
 \begin{figure}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/qp_circles.pdf}]{figs/from-matlab/qp_circles.pdf}
     \caption[Visualization of the optimization problem in the complex plane of $\gls{sym-Gamma}$]{Visualization of the optimization problem \Cref{eq:opt-problem-gamma} in the complex plane of $\gls{sym-Gamma}$.
-Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all with radius $\gls{sym-r-mu}=4$ and $\gls{sym-S}_{\gls{sym-mu}}=1$, demonstrate the various solution cases in \Cref{eq:gamma-opt-quadratic}.}
+Toy problems with various constraint circle centers $\gls{sym-Gamma-c-mu}$, all with radius $\gls{sym-r-mu}=4$ and $\gls{sym-S-mu}=1$, demonstrate the various solution cases in \Cref{eq:gamma-opt-quadratic}.}
     \label{fig:qp-solution-geometry}
 \end{figure}
 
@@ -257,7 +257,7 @@ The same types of critical points (now consisting of line-line, circle-line, and
 \label{sec:appendix-mag-S-constraints}
 While constraints on effort and flow magnitudes and real and reactive power are quadratic in $\gls{sym-vec-x}$, constraints on the magnitude of apparent power $|\gls{sym-S}|<|\gls{sym-S}_{\text{max}}|$, and therefore the maximum and minimum instantaneous power, are fourth-order in $\gls{sym-vec-x}$ and thus $\gls{sym-Gamma}$.
 This results in a ``Cassini oval'' curve \citep{weisstein_cassini_2026} on the complex plane of $\gls{sym-Gamma}$, which consists of two closed curves when $|\gls{sym-S}_{\text{max}}|<|\gls{sym-S-0}|$ and one curve when $|\gls{sym-S}_{\text{max}}|\geq|\gls{sym-S-0}|$, where $|\gls{sym-S-0}|$ is the apparent power of the unconstrained optimum.
-Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\gls{sym-mathcal-C}_{int,\text{oval}-\text{circ}}$, oval-oval intersections, and oval closest points $\gls{sym-mathcal-C}_{cl,\text{oval}}$ to the set of candidate points $\gls{sym-mathcal-C}$.
+Though the optimization is no longer a quadratically constrained quadratic program, the same geometric solution procedure applies, adding circle-oval intersections $\gls{sym-mathcal-C-int-oval-circ}$, oval-oval intersections, and oval closest points $\gls{sym-mathcal-C-cl-oval}$ to the set of candidate points $\gls{sym-mathcal-C}$.
 The new candidate points are:
 \begin{equation}
 \begin{aligned}
@@ -667,86 +667,3 @@ Application of the adjoint method has recently enabled efficient computation of 
 but the adjoint method has not yet been implemented for the semi-analytical \gls{acr-meem} model used here.
 Implementing the adjoint for a linear solve is relatively straightforward in a \gls{acr-mdo} package like OpenMDAO,
 and would unlock a fully semi-analytical differentiation workflow.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Force Saturation}
-\label{sec:appendix-force-sat}
-\Cref{sec:dynamics} introduces the use of describing functions to quantify the fundamental amplitude of non-sinusoidal force waveforms, which can achieve higher powers than the equivalent sinusoidal waveform for the same force limit.
-
-The simulation permits the nonsinusoidal waveform to have a maximum fundamental a factor of $\frac{4}{\gls{sym-pi}}$ above the force limit.
-This coincides with the fundamental to peak ratio of a square wave, which is the limiting case both for the bang-singular-bang controller (a piecewise-discontinuous sine-square wave combination that \citet{hendrikx_optimal_2017} finds as the analytically optimal solution), and for the saturated sine controller (a piecewise-continuous sine-square wave combination that \citet{coe_initial_2020} finds as numerically optimal).
-In fact, the optimization need not specify the exact nonlinear waveform, since under the describing function filtering hypothesis, only the fundamental matters for simulation purposes.
-For hardware implementation purposes, the nonlinear controller can be obtained for the saturated-sine controller by the process outlined in the study \cite{mccabe_force-limited_2024}.
-
-The appropriate complex scale factor from the optimal unsaturated controller (damping or reactive respectively) is found as described in \Cref{sec:appendix-qp-solution} and will be real for the damping control case and complex in the reactive control case.
-
-%Mathematically, a saturation factor $0< \gls{sym-f}_{sat}\leq 1$ is computed as the ratio between the fundamental amplitude of the saturated torque and the original unsaturated torque signal,
-%\begin{equation}
-%    f_{sat} = \min\left(\alpha\frac{\tau_{max}}{\tau}, 1\right),
-%\end{equation}
-%where $\gls{sym-tau}_{\text{max}}$ is the maximum permissible generator torque and $\gls{sym-alpha}$ is the ratio between the fundamental amplitude of the saturated waveform and the maximum torque $\gls{sym-tau}_{\text{max}}$, using the describing function derived in \citep{mccabe_force-limited_2024},
-%\begin{equation}
-%    \alpha = \frac{2}{\pi} \left(\frac{F_p}{\tau_{max}}\sin^{-1}\frac{\tau_{max}}{F_p} +  \sqrt{1 - \left(\frac{\tau_{max}}{F_p}\right)^2} \right).
-%\end{equation}
-
-%When $\frac{\gls{sym-F-p}}{\gls{sym-tau}_{\text{max}}}$ = 1 (no saturation), then $\gls{sym-alpha}= 1$;
-%when $\frac{\gls{sym-F-p}}{\gls{sym-tau}_{\text{max}}} \rightarrow \infty$ (full saturation), then $\gls{sym-alpha}= \frac{4}{\gls{sym-pi}}$.
-%This makes sense because $\frac{4}{\gls{sym-pi}}$ is the harmonic amplitude of a unit square wave,
-%and in full saturation the saturated signal approaches a square wave.
-%$\gls{sym-alpha}$ is plotted in \Cref{fig:alpha-fit}.
-
-%The factor $\gls{sym-f-sat}$ describes the ratio of the saturated and unsaturated torque signal.
-%Previous work \citet{mccabe_multidisciplinary_2022} implies that this is also the ratio of the saturated and unsaturated control gains, $\gls{sym-m-sat}$, but this is not the case because the \gls{acr-wec} response also changes with saturation.
-
-% %Substituting $\gls{sym-f}_{sat}$ back into the equation of motion reveals that the control gain saturation multiplier $\gls{sym-m-sat}$ is the solution to a quadratic equation $\gls{sym-a-q} \gls{sym-m-sat}^2 + \gls{sym-b-q} \gls{sym-m-sat} + \gls{sym-c-q} = 0$. If the uncontrolled dynamics have a natural frequency $\gls{sym-omega}_{\gls{sym-n},\gls{sym-u}}$ and damping ratio $\gls{sym-zeta-u}$, and the controlled unsaturated dynamics have natural frequency $\gls{sym-omega-n}$ and damping ratio $\gls{sym-zeta}$, then the quadratic coefficients can be expressed as:
-
-% \begin{equation}\label{eq:abc-matrix}
-%     \begin{bmatrix}
-%         a_q \\ b_q \\ c_q
-%     \end{bmatrix}
-%     =
-%     \begingroup % keep the row spacing change local
-%     \setlength\arraycolsep{2pt}
-%     \begin{bmatrix} -4 & \frac{4}{f_{sat}^2} & \frac{1}{f_{sat}^2} & -1 & 0 & 0\\
-%     8 & 0 & 0 & 2 & 8 & 2\\
-%     -4 & -4 & -1 & -1 & -8 & -2 \end{bmatrix}
-%     \endgroup
-%     \begin{bmatrix}
-%  (\theta_1)^2  \\
-%   (\theta_2)^2 \\
-%    (\theta_3)^2 \\
-%    (\theta_4)^2  \\
-%    \theta_1 \theta_2 \\
-%     \theta_3 \theta_4
-%     \end{bmatrix}
-% \end{equation}
-% where the basis vector $\vec{\gls{sym-theta}}$ is a dimensionless function of the natural frequencies and damping ratios:
-% \begin{equation}\label{eq:theta-basis}
-%         \begin{bmatrix}
-%   \theta_1  \\
-%   \theta_2 \\
-%    \theta_3 \\
-%    \theta_4  \\
-%     \end{bmatrix} =     \begin{bmatrix}
-% ~ \overline{\omega} (\zeta_u - \overline{\omega}_n\zeta)  \\
-%   \overline{\omega} ~\overline{\omega}_n \zeta \\
-%   \overline{\omega}^2 - \overline{\omega}_n^2\\
-%    \overline{\omega}_n^2 - 1  \\
-%     \end{bmatrix}
-% \end{equation}
-% and the overlined frequencies indicate nondimensionalization by the uncontrolled natural frequency: $\overline{\gls{sym-omega}} = \frac{\gls{sym-omega}}{\gls{sym-omega}_{\gls{sym-n},\gls{sym-u}}}, \overline{\gls{sym-omega}}_{\gls{sym-n}} = \frac{\gls{sym-omega-n}}{\gls{sym-omega}_{\gls{sym-n},\gls{sym-u}}}$. The quadratic equation is then solved for $\gls{sym-m-sat}$, and of the two roots, the one that is real-valued and between 0 and 1 is used.
-
-% The no saturation case ($\gls{sym-f}_{sat} = 1$) for \eqref{abc-matrix} yields $\gls{sym-m-sat}=1$. This confirms the expected behavior that when no force reduction is required, the powertrain coefficients can remain unchanged.
-
-% Equations \eqref{eq:abc-matrix} and \eqref{eq:theta-basis} are an equivalent reformulation of \citet{mccabe_force-limited_2024}, which uses expressions for the complex reflection coefficient $\gls{sym-Gamma}$ common in electrical engineering, rather than the damping ratio and natural frequency more common in mechanical engineering. The equivalence is:
-% \begin{equation}
-%     \Gamma = \frac{z-1}{z+1}, \quad z = \frac{2\theta_1 + i~ \theta_4}{-2 (\theta_1+\theta_2) + i~(\theta_3+\theta_4)}
-% \end{equation}
-% % I am inputting zeta and omega_n corresponding to mechanical dynamcis when calculating m_sat, but I really should be inputting them corresponding to electrical dynamics. Maybe describe that?
-
-% The gain saturation multiplier $\gls{sym-m-sat}$ is then used to modify the powertrain coefficients,
-% \begin{align}
-%     B_{p,sat} &= m_{sat} B_p, & K_{p,sat} &= m_{sat} K_p.
-% \end{align}
-% and these new control gains are then plugged into equation \eqref{eq:eom-freq-domain} to find the saturated displacement amplitude $\gls{sym-X}_{sat}$.

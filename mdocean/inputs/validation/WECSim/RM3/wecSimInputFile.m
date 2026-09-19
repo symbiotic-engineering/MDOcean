@@ -70,7 +70,11 @@ simu.mode = 'accelerator';                   % Specify Simulation Mode ('normal'
 simu.explorer = 'off';                   % Turn SimMechanics Explorer (on/off)
 simu.startTime = 0;                     % Simulation Start Time [s]
 simu.rampTime = 100;                    % Wave Ramp Time [s]
-simu.endTime = 200;                     % Simulation End Time [s]
+if p.C_d_spar == 0 && p.C_d_float == 0 && strcmp(p.control_type,'reactive')
+    simu.endTime = 600;                     % Simulation End Time [s]
+else
+    simu.endTime = 200;                     % Simulation End Time [s]
+end
 simu.solver = 'ode4';                   % simu.solver = 'ode4' for fixed step & simu.solver = 'ode45' for variable step 
 simu.dt = 0.01; 							% Simulation time-step [s]
 simu.mcrMatFile = 'mcrMDOcean.mat';

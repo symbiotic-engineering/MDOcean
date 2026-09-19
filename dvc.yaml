@@ -162,6 +162,7 @@ stages:
       - mdocean/plots/non_matlab_figs/pdf/${item.name}.pdf
     matrix:
       name:
+        - assumptions
         - taxonomy
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
@@ -181,6 +182,7 @@ stages:
           persist: false
     matrix:
       name:
+        - assumptions
         - taxonomy
         - mod_freq_domain_ctrl_synthesis
         - mod_freq_domain_ctrl_evaluation
@@ -8093,7 +8095,8 @@ stages:
   paperlint-aor:
     cmd: calkit xenv -n pubs --no-check -- python
       dev/latex/Paper-Linter/paperlint.py
-      pubs/applied-ocean-research-model/main.tex --settings
+      pubs/applied-ocean-research-model/main.tex --ignore
+      pubs/applied-ocean-research-model/numeric-results.tex --settings
       dev/latex/Paper-Linter/settings.txt --params
       dev/latex/Paper-Linter/params-aor.txt
     deps:
@@ -8223,6 +8226,16 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-RE-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
+  build-AOR-review-response:
+    cmd: calkit latex build -e tex --no-check
+      pubs/applied-ocean-research-model/reviewer_response.tex
+    deps:
+      - pubs/applied-ocean-research-model/reviewer_response.tex
+      - .calkit/env-locks/tex
+    outs:
+      - pubs/applied-ocean-research-model/reviewer_response.pdf
+    desc: Automatically generated from the 'build-AOR-review-response' stage in
+      calkit.yaml. Changes made here will be overwritten.
   build-AOR-paper:
     cmd: calkit latex build -e tex --no-check -r
       pubs/applied-ocean-research-model/.latexmkrc
@@ -8234,7 +8247,6 @@ stages:
       - pubs/applied-ocean-research-model/figs/manual/
       - pubs/applied-ocean-research-model/figs/tikz/
       - pubs/applied-ocean-research-model/tables/
-      - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
@@ -8243,6 +8255,7 @@ stages:
       - pubs/applied-ocean-research-model/shared-pkg.tex
       - pubs/applied-ocean-research-model/cas-dc.cls
       - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
       - pubs/applied-ocean-research-model/.latexmkrc
@@ -8253,6 +8266,105 @@ stages:
           persist: true
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
+  build-AOR-paper-diff-aor-submitted:
+    cmd: calkit latex diff -e tex --no-check --from aor-submitted --to HEAD
+      --revision-key ecd622a0fa34..1a0269088d1f -r
+      pubs/applied-ocean-research-model/.latexmkrc --input
+      pubs/applied-ocean-research-model/sections/ --input
+      pubs/applied-ocean-research-model/figs/from-matlab/ --input
+      pubs/applied-ocean-research-model/figs/manual/ --input
+      pubs/applied-ocean-research-model/figs/tikz/ --input
+      pubs/applied-ocean-research-model/tables/ --input
+      pubs/applied-ocean-research-model/numeric-results.tex --input
+      pubs/applied-ocean-research-model/elsarticle-num-names.bst --input
+      pubs/applied-ocean-research-model/references.bib --input
+      pubs/applied-ocean-research-model/zotero-meem-refs.bib --input
+      pubs/applied-ocean-research-model/commands-aor.tex --input
+      pubs/applied-ocean-research-model/shared-pkg.tex --input
+      pubs/applied-ocean-research-model/cas-dc.cls --input
+      pubs/applied-ocean-research-model/cas-common.sty --input
+      pubs/applied-ocean-research-model/stars-cc-by-sa.tex --input
+      pubs/applied-ocean-research-model/glossary/ --output-dir
+      .calkit/latex-diffs/aor-submitted
+      pubs/applied-ocean-research-model/main.tex
+    deps:
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/figs/from-matlab/
+      - pubs/applied-ocean-research-model/figs/manual/
+      - pubs/applied-ocean-research-model/figs/tikz/
+      - pubs/applied-ocean-research-model/tables/
+      - pubs/applied-ocean-research-model/numeric-results.tex
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+      - pubs/applied-ocean-research-model/glossary/
+      - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/.latexmkrc
+    outs:
+      - .calkit/latex-diffs/aor-submitted/pubs/applied-ocean-research-model/main.pdf
+    desc: Automatically generated from the 'build-AOR-paper' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  make-AOR-diff-manual:
+    cmd: bash --noprofile --norc -c "calkit latex diff -e tex --no-check --from
+      aor-submitted --to HEAD --revision-key ecd622a0fa34..e06f6d2d3a97 -r
+      pubs/applied-ocean-research-model/.latexmkrc --input
+      pubs/applied-ocean-research-model/sections/ --input
+      pubs/applied-ocean-research-model/figs/from-matlab/ --input
+      pubs/applied-ocean-research-model/figs/manual/ --input
+      pubs/applied-ocean-research-model/figs/tikz/ --input
+      pubs/applied-ocean-research-model/tables/ --input
+      pubs/applied-ocean-research-model/numeric-results.tex --input
+      pubs/applied-ocean-research-model/elsarticle-num-names.bst --input
+      pubs/applied-ocean-research-model/references.bib --input
+      pubs/applied-ocean-research-model/zotero-meem-refs.bib --input
+      pubs/applied-ocean-research-model/commands-aor.tex --input
+      pubs/applied-ocean-research-model/shared-pkg.tex --input
+      pubs/applied-ocean-research-model/cas-dc.cls --input
+      pubs/applied-ocean-research-model/cas-common.sty --input
+      pubs/applied-ocean-research-model/stars-cc-by-sa.tex --input
+      pubs/applied-ocean-research-model/glossary/ --output-dir
+      .calkit/latex-diffs/aor-submitted
+      pubs/applied-ocean-research-model/main.tex --keep-tex ; tail -n +3
+      pubs/applied-ocean-research-model/main-diff.tex | python
+      dev/latex/latexdiff/glossary-latexdiff-filter.py >
+      pubs/applied-ocean-research-model/main-diff-manual.tex"
+    deps: []
+    outs: []
+    desc: Automatically generated from the 'make-AOR-diff-manual' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  build-AOR-paper-diff-manual:
+    cmd: calkit latex build -e tex --no-check -r
+      pubs/applied-ocean-research-model/.latexmkrc
+      pubs/applied-ocean-research-model/main-diff-manual.tex
+    deps:
+      - pubs/applied-ocean-research-model/main-diff-manual.tex
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/figs/from-matlab/
+      - pubs/applied-ocean-research-model/figs/manual/
+      - pubs/applied-ocean-research-model/figs/tikz/
+      - pubs/applied-ocean-research-model/tables/
+      - pubs/applied-ocean-research-model/numeric-results.tex
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+      - pubs/applied-ocean-research-model/glossary/
+      - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/.latexmkrc
+    outs:
+      - pubs/applied-ocean-research-model/main-diff-manual.pdf
+    desc: Automatically generated from the 'build-AOR-paper-diff-manual' stage
+      in calkit.yaml. Changes made here will be overwritten.
   build-UMERC-paper:
     cmd: calkit latex build -e tex --no-check --aux-dir
       pubs/UMERC-2025-grid-value/aux/
@@ -8289,6 +8401,7 @@ stages:
       - pubs/applied-ocean-research-model/tables/
       - pubs/applied-ocean-research-model/appendices.tex
       - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/renewable-energy-mdo/numeric-results.tex
       - pubs/renewable-energy-mdo/sections/
       - pubs/renewable-energy-mdo/figs/
@@ -8316,6 +8429,55 @@ stages:
           cache: true
           persist: true
     desc: Automatically generated from the 'build-dissertation' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  get-aor-latexdiff-dvc-deps:
+    cmd: calkit xenv -n yq-conda --no-check -- bash --noprofile --norc -c "bash
+      dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh aor-submitted HEAD"
+    deps:
+      - dev/latex/latexdiff/get-aor-latexdiff-dvc-deps.sh
+      - .calkit/env-locks/yq-conda
+    outs:
+      - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'get-aor-latexdiff-dvc-deps' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  make-aor-latexdiff:
+    cmd: calkit xenv -n tex --no-check -- bash --noprofile --norc -c "rm -rf
+      git-latexdiff.* && DVC_REPO_ROOT=\"/work\"
+      DVC_CACHE_DIR=\"/work/.dvc/cache\"
+      DVC_DEPS_JSON=\"/work/dev/latex/latexdiff/aor-latexdiff-dvc-deps.json\"
+      git latexdiff --no-view --tmpdirprefix . --main
+      pubs/applied-ocean-research-model/main.tex --whole-tree
+      --ignore-latex-errors --latexmk --latexpand --makeatletter
+      --graphics-markup=both --filter
+      'dev/latex/latexdiff/latexdiff-link-figs.sh' --prepare 'python3
+      ../new/dev/latex/latexdiff/latexdiff-prepare.py' -o
+      pubs/applied-ocean-research-model/main-diff.pdf aor-submitted -- <
+      /dev/null"
+    deps:
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/figs/from-matlab/
+      - pubs/applied-ocean-research-model/figs/manual/
+      - pubs/applied-ocean-research-model/figs/tikz/
+      - pubs/applied-ocean-research-model/tables/
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/numeric-results.tex
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/.latexmkrc
+      - dev/latex/latexdiff/latexdiff-link-figs.sh
+      - dev/latex/latexdiff/latexdiff-prepare.py
+      - dev/latex/latexdiff/aor-latexdiff-dvc-deps.json
+      - .calkit/env-locks/tex
+    outs:
+      - pubs/applied-ocean-research-model/main-diff.pdf
+    desc: Automatically generated from the 'make-aor-latexdiff' stage in
       calkit.yaml. Changes made here will be overwritten.
   view-aor-figs:
     cmd: calkit nb execute --environment pubs --no-check

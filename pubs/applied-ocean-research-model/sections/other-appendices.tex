@@ -56,9 +56,27 @@ This intends to lower the likelihood of creating saturation behavior (where a di
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Dynamics and Control Module Details}
+\label{sec:appendix-dynamics}
 This section provides supplementary derivations and implementation details for the dynamics and control module.
 
+\subsection{Describing Function Details}
+\label{sec:appendix-force-sat}
+\input{sections/describing-function-appendix}
+
 \subsection{Multiport Model Details}
+
+The mass matrix for the operational and storm cases is given by:
+\begin{equation}
+    \gls{sym-M-op}=
+    \begin{bmatrix}
+        \gls{sym-m-f} & 0 \\ 0 & \gls{sym-m-s}
+    \end{bmatrix},
+    \quad
+    \gls{sym-M-storm}=
+    \begin{bmatrix}
+        \gls{sym-m-f} + \gls{sym-m-s}
+    \end{bmatrix}
+\end{equation}
 \input{sections/multiport-appendix}
 
 \subsection{Optimal Control Details}
@@ -69,13 +87,57 @@ This section provides supplementary derivations and implementation details for t
 \label{sec:appendix-drag}}
 \input{sections/drag-appendix}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Slamming and Submersion Amplitude}
-\label{sec:appendix-slam}
-\input{sections/slamming-appendix}
-
 %%%%%%%%%%%%%%%
-\subsection{Conservatism of the Fundamental-Amplitude Approximation}
+\subsection{Relationship Between Peak and Fundamental Amplitudes}
+\label{sec:appendix-peak-fundamental}
+
+\ifdefined\DISSERTATION
+    The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the \gls{acr-pto} force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
+    The distributed nature of the inertial force means that the float and spar structures experience internal loads that vary not only in time but also in space along their lengths.
+    Due to force balance in dynamic equilibrium, the maximum magnitude of internal heave force in space at any given time, $\gls{sym-F-heave-f}(\gls{sym-t})$, is the greater of the absolute value of the \gls{acr-pto} force and the fluid force.
+    Expressing the latter as the difference between the inertial force and the \gls{acr-pto} force, this gives:
+\else
+    By force balance, the peak internal heave force at any cross-section of each body is the greater of the \gls{acr-pto} force and the fluid (inertial minus \gls{acr-pto}) force:
+\fi
+\begin{equation}\label{eq:heave-force-decomp}
+\begin{aligned}
+    \gls{sym-F-heave-f} (\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p} (\gls{sym-t})|,~ |\gls{sym-m-f}\gls{sym-ddot-xi-f} (\gls{sym-t})-\gls{sym-F-p} (\gls{sym-t})|\right) \\
+    \gls{sym-F-heave-s} (\gls{sym-t}) &=\max\!\left(|\gls{sym-F-p} (\gls{sym-t})|,~ |\gls{sym-m-s}\gls{sym-ddot-xi-s} (\gls{sym-t})-\gls{sym-F-p} (\gls{sym-t})|\right)
+\end{aligned}
+\end{equation}
+In operational seas, $\gls{sym-F-p}(\gls{sym-t})$ is determined by the generator torque $\gls{sym-tau}(\gls{sym-t})$ cascaded through the \gls{acr-pto} dynamics matrix $\gls{sym-mathbf-a}_{\gls{sym-F-p}\gls{sym-dot-xi}\leftarrow \gls{sym-tau}\gls{sym-Omega}}$.
+In storm seas, $\gls{sym-F-p}(\gls{sym-t})$ represents the brake force, and its fundamental amplitude is obtained by solving the 2-\gls{acr-dof} equation of motion for the force necessary to enforce zero relative motion between the float and spar.
+\ifdefined\DISSERTATION
+    Maximizing over time requires more care because nonlinearity-induced harmonics cannot be neglected for peak force analysis like they can for power production.
+    The peak of $\gls{sym-tau}(\gls{sym-t})$ is lower than its fundamental amplitude due to generator force saturation at \gls{sym-tau-max}, so using \gls{sym-tau-max} rather than $|\gls{sym-hat-tau}|$ is both less conservative and more realistic.
+    Assuming conservatively that the shaft torque constructively interferes with the saturated generator torque, for the operational case we use:
+\else
+    Saturation caps the operational generator torque at $\gls{sym-tau-max}$, which is a less conservative and more realistic peak than the fundamental amplitude $|\gls{sym-hat-tau}|$.
+    Assuming constructive interference with the shaft torque,
+\fi
+\begin{equation}\label{eq:peak-pto-force}
+\max_{\gls{sym-t}} | \gls{sym-F-p-op} (\gls{sym-t}) |
+\approx \frac{1}{\gls{sym-R-gear}}
+\left(
+\left| \gls{sym-Z-shaft} \gls{sym-hat-Omega} \right|
+                         + \gls{sym-tau-max} \right).
+\end{equation}
+The storm case lacks the control saturation nonlinearity and uses the fundamental amplitude $\gls{sym-hat-F-p-st}$ directly.
+
+The fluid force nonlinearities $|\gls{sym-m}\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ are harder to handle, since unlike the generator torque, the peak of the drag force exceeds its fundamental.
+MDOcean currently uses the fundamental amplitude for both load cases:
+\begin{equation}\label{eq:peak-fluid-force}
+\max_{\gls{sym-t}} \left|\gls{sym-m}\gls{sym-ddot-xi}(\gls{sym-t}) - \gls{sym-F-p}(\gls{sym-t})\right| \approx \left|-\gls{sym-m}\gls{sym-omega}^2 \gls{sym-hat-xi} - \gls{sym-hat-F-p}\right|.
+\end{equation}
+This approximation can either under- or overestimate the true peak depending on whether harmonics interfere constructively or destructively with the fundamental; further discussion is in \Cref{sec:appendix-peak-fluid-force}.
+\ifdefined\DISSERTATION
+    The fundamental amplitudes are also used to calculate the peak float and spar displacements $\max_{\gls{sym-t}} |\gls{sym-xi-f}(\gls{sym-t})|$ and $\max_{\gls{sym-t}} |\gls{sym-xi-s}(\gls{sym-t})|$ in both cases.
+    Using the fundamental for the response displacements is more accurate than for the forces because the system dynamics filter out high frequency inputs.
+\else
+    Peak float and spar displacements likewise use fundamental amplitudes; the second-order plant filters out higher harmonics, making the approximation more accurate for displacements than for forces.
+\fi
+
+\subsubsection{Conservatism of the Fundamental-Amplitude Approximation}
 \label{sec:appendix-peak-fluid-force}
 
 \Cref{eq:peak-fluid-force} approximates the peak fluid force by the magnitude of its fundamental harmonic phasor.
@@ -86,6 +148,23 @@ The fundamental is more accurate for displacements than for forces because the s
 
 A future refinement could explicitly reconstruct the time-domain drag force from the describing function and track its peak directly, at the cost of either time-domain integration or additional Fourier-component bookkeeping in the frequency-domain formulation.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slamming and Submersion Amplitude}
+\label{sec:appendix-slam}
+\input{sections/slamming-appendix}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Narrow-band Wave Approximation}
+\label{sec:appendix-narrowband}
+\Cref{sec:irregular-waves} introduced the narrow-band wave environment approximation,
+in which an irregular sea state is approximated by a regular wave at its energy-equivalent period and wave height.
+
+In addition to enabling the QCQP formulation for the linearized system to be single-frequency and thus solvable analytically,
+even for the nonlinear system the regular wave assumption may be desirable to avoid the time-consuming convolution integral or state-space identification that is typically required to simulate nonlinear dynamics subject to irregular wave forcing.
+
+In the absence of dynamic constraints, the regular wave assumption does not significantly affect power production if the ultimate design utilizes a high-order linear controller capable of impedance matching over the bandwidth of each sea state.
+If the ultimate design instead utilizes a simple PI controller, the assumption slightly overestimates the power produced in a broadband wave environment.
+\citet{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Dynamic Validation}
@@ -411,7 +490,7 @@ Next, deflection of the stiffened plate is equal to the deflection of the equiva
 
 The maximum stress $\gls{sym-sigma}$ of the stiffened plate is then:
 \begin{equation}\label{eq:plate-stress}
-    \gls{sym-sigma}= 12\gls{sym-M} \gls{sym-z}_{\text{max}}/\gls{sym-t-eq}^3
+    \gls{sym-sigma}= 12\gls{sym-M} \gls{sym-z-max}/\gls{sym-t-eq}^3
 \end{equation}
 where $\gls{sym-M}$ is the maximum moment per unit length and $z_{\text{max}}$ is the maximum distance from the neutral axis of the stiffened section.
 This parallels the stress for an unstiffened plate of thickness $\gls{sym-t}$, which is $\gls{sym-sigma}=6\gls{sym-M}/\gls{sym-t}^2 = 12 \gls{sym-M}(\gls{sym-t}/2)/\gls{sym-t}^3$.
