@@ -1,122 +1,4 @@
 
-% \makeatletter
-
-% % glossary sorting of greek letters and removal of math symbols
-
-% % Greek letters -> numeric sort order
-% \def\greeksort@alpha{01}
-% \def\greeksort@beta{02}
-% \def\greeksort@gamma{03}%
-% \def\greeksort@delta{04}%
-% \def\greeksort@epsilon{05}%
-% \def\greeksort@zeta{06}%
-% \def\greeksort@eta{07}%
-% \def\greeksort@theta{08}%
-% \def\greeksort@iota{09}%
-% \def\greeksort@kappa{10}%
-% \def\greeksort@lambda{11}%
-% \def\greeksort@mu{12}%
-% \def\greeksort@nu{13}%
-% \def\greeksort@xi{14}%
-% \def\greeksort@omicron{15}%
-% \def\greeksort@pi{16}%
-% \def\greeksort@rho{17}%
-% \def\greeksort@sigma{18}%
-% \def\greeksort@tau{19}%
-% \def\greeksort@upsilon{20}%
-% \def\greeksort@psi{23}%
-% \def\greeksort@omega{24}%
-
-% % Formatting commands -> nothing
-% \def\greeksort@vec{}
-% \def\greeksort@mathbf{}
-% \def\greeksort@boldsymbol{}
-% \def\greeksort@mathbb{}
-% \def\greeksort@hat{}
-% \def\greeksort@dot{}
-% \def\greeksort@ddot{}
-% \def\greeksort@bar{}
-% \def\greeksort@tilde{}
-% \def\greeksort@mathcal{}
-% \def\greeksort@mathrm{}
-
-
-% \newcommand{\greeksort}[1]{%
-%   \ifcsname greeksort@#1\endcsname
-%     \csname greeksort@#1\endcsname
-%   \else
-%     00#1%
-%   \fi
-% }
-
-% \def\compoundsortkeyaux#1-#2\@nil{%
-%   \greeksort{#1}%
-%   \if\relax\detokenize{#2}\relax
-%   \else
-%     -\compoundsortkeyaux#2\@nil
-%   \fi
-% }
-
-% \newcommand{\mysortkey}[1]{%
-%   \compoundsortkeyaux#1-\@nil
-% }
-
-% \makeatother
-
-% % Convert a symbol name to its LaTeX representation.
-% % Greek names -> Greek commands; everything else -> unchanged.
-% \newcommand{\greeksymbol}[1]{%
-%   \ifstrequal{#1}{alpha}{\alpha}{%
-%   \ifstrequal{#1}{beta}{\beta}{%
-%   \ifstrequal{#1}{gamma}{\gamma}{%
-%   \ifstrequal{#1}{delta}{\delta}{%
-%   \ifstrequal{#1}{epsilon}{\epsilon}{%
-%   \ifstrequal{#1}{zeta}{\zeta}{%
-%   \ifstrequal{#1}{eta}{\eta}{%
-%   \ifstrequal{#1}{theta}{\theta}{%
-%   \ifstrequal{#1}{iota}{\iota}{%
-%   \ifstrequal{#1}{kappa}{\kappa}{%
-%   \ifstrequal{#1}{lambda}{\lambda}{%
-%   \ifstrequal{#1}{mu}{\mu}{%
-%   \ifstrequal{#1}{nu}{\nu}{%
-%   \ifstrequal{#1}{xi}{\xi}{%
-%   \ifstrequal{#1}{omicron}{o}{%
-%   \ifstrequal{#1}{pi}{\pi}{%
-%   \ifstrequal{#1}{rho}{\rho}{%
-%   \ifstrequal{#1}{sigma}{\sigma}{%
-%   \ifstrequal{#1}{tau}{\tau}{%
-%   \ifstrequal{#1}{upsilon}{\upsilon}{%
-%   \ifstrequal{#1}{phi}{\phi}{%
-%   \ifstrequal{#1}{chi}{\chi}{%
-%   \ifstrequal{#1}{psi}{\psi}{%
-%   \ifstrequal{#1}{omega}{\omega}{%
-%   #1%
-%   }}}}}}}}}}}}}}}}}}}}}}}}%
-% }
-
-% % Return the first component of a compound key.
-% % alpha-x -> \alpha
-% % x-alpha -> x
-% \newcommand{\firstsymbol}[1]{%
-%   \firstsymbolaux#1-\@nil
-% }
-
-% \def\firstsymbolaux#1-#2\@nil{%
-%   \greeksymbol{#1}%
-% }
-
-% % glossary definition macro
-% \newcommand{\newsym}[3]{%
-%   \edef\newsym@sortkey{\mysortkey{#1}}
-%   \glsxtrnewsymbol[
-%     description={#3},
-%     sort={\newsym@sortkey},
-%     type={\firstsymbol{#1}}
-%   ]{sym-#1}{\ensuremath{#2}}%
-% }
-% \makeatother
-
-
 \newglossary{sym-A}{A.sly}{A.sls}{A}
 \newglossary{sym-B}{B.sly}{B.sls}{B}
 \newglossary{sym-C}{C.sly}{C.sls}{C}
@@ -296,6 +178,7 @@
 \def\symfmt@overline{1}
 \def\symfmt@angle{1}
 \def\symfmt@dDelta{1}
+\def\symfmt@underline{1}
 
 % ============================================================
 % Sort one component
@@ -363,23 +246,6 @@
   \sym@firstaux#1-\@nil
 }
 
-
-% ============================================================
-% Symbol name for display
-% ============================================================
-
-\newcommand{\greeksymbol}[1]{%
-  \ifstrequal{#1}{alpha}{\alpha}{%
-  \ifstrequal{#1}{beta}{\beta}{%
-  \ifstrequal{#1}{gamma}{\gamma}{%
-  % ... all the remaining Greek letters ...
-  \ifstrequal{#1}{psi}{\psi}{%
-  \ifstrequal{#1}{omega}{\omega}{%
-  #1%
-  }}}}}%
-}
-
-
 % ============================================================
 % Glossary entry
 % ============================================================
@@ -392,12 +258,12 @@
     }%
   }{}%
   \edef\newsym@sortkey{\mysortkey{#1}}%
-  % \glsxtrnewsymbol[
-  %   description={#3},
-  %   sort={\newsym@sortkey},
-  %   type={sym-\mysymgroup{#1}}
-  % ]{sym-#1}{\ensuremath{#2}}%
-  \newglossaryentry{sym-#1}{name={\ensuremath{#2}},category={symbol},sort={\newsym@sortkey}, type={sym-\mysymgroup{#1}},description={#3}}
+  \newglossaryentry{sym-#1}{
+    name={\ensuremath{#2}},
+    category={symbol},
+    sort={\newsym@sortkey},
+    type={sym-\mysymgroup{#1}},
+    description={#3}}
 }
 \makeatother
 

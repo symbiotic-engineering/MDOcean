@@ -8268,7 +8268,7 @@ stages:
       calkit.yaml. Changes made here will be overwritten.
   build-AOR-paper-diff-aor-submitted:
     cmd: calkit latex diff -e tex --no-check --from aor-submitted --to HEAD
-      --revision-key ecd622a0fa34..94cc34c37c9c -r
+      --revision-key ecd622a0fa34..a20214e04869 -r
       pubs/applied-ocean-research-model/.latexmkrc --input
       pubs/applied-ocean-research-model/sections/ --input
       pubs/applied-ocean-research-model/figs/from-matlab/ --input
@@ -8310,6 +8310,33 @@ stages:
       - .calkit/latex-diffs/aor-submitted/pubs/applied-ocean-research-model/main.pdf
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
+  build-AOR-paper-diff-manual:
+    cmd: calkit latex build -e tex --no-check -r
+      pubs/applied-ocean-research-model/.latexmkrc
+      pubs/applied-ocean-research-model/main-diff.tex
+    deps:
+      - pubs/applied-ocean-research-model/main-diff.tex
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/figs/from-matlab/
+      - pubs/applied-ocean-research-model/figs/manual/
+      - pubs/applied-ocean-research-model/figs/tikz/
+      - pubs/applied-ocean-research-model/tables/
+      - pubs/applied-ocean-research-model/numeric-results.tex
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+      - pubs/applied-ocean-research-model/glossary/
+      - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/.latexmkrc
+    outs:
+      - pubs/applied-ocean-research-model/main-diff.pdf
+    desc: Automatically generated from the 'build-AOR-paper-diff-manual' stage
+      in calkit.yaml. Changes made here will be overwritten.
   build-UMERC-paper:
     cmd: calkit latex build -e tex --no-check --aux-dir
       pubs/UMERC-2025-grid-value/aux/
