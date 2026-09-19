@@ -95,35 +95,68 @@ Prior to calibration, the structural force in storm waves differs significantly 
 Ultimately, the scaled quantities match within 1\% of the reference model report.
 
 \subsubsection{Dynamics Validation}
- --- Fig 37: drag numerical amplitude and phase are not very correct (but doesn't matter too much)
+Validation tests the assumptions introduced in \Cref{sec:dynamics}, focusing on those that are non-standard in \gls{acr-wec} modeling.
+Despite a poor match of the drag force magnitude, the overall system dynamics and fundamental dynamic assumptions agree well with the WEC-Sim results.
 
-- the power for RM3 with drag, lossless PTO, and damping control match that predicted by the reference model report
+\paragraph{\glspl{acr-df}: Excellent Agreement}
+To validate \asmpref{system-low-pass}, we confirm that the float displacement waveform is very nearly sinusoidal, with a \gls{acr-thd} of less than 1\% in all sea states.
+We also check \asmpref{known-signal-shape}, finding an RMS error of \resultsAOR[dragShapeRmsErrorPercent] averaged across sea states. 
+\Cref{fig:wecsim-thd} and \Cref{fig:drag-shape} in \Cref{sec:appendix-dynamic-validation} provide detailed results.
 
-- validation = how accurate are my assumptions?
- --- subfigures 2,3,4 of figure 12
+\paragraph{System Response: Good Agreement}
+The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
+with an error breakdown for all simulation scenarios and sea states shown in \Cref{fig:error-histogram}.
+\begin{figure*}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}]{figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
+    \caption[WEC-Sim validation error breakdown]{Error breakdown based on WEC-Sim Validation Runs}
+    \label{fig:error-histogram}
+\end{figure*}
+% Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag
+% (\resultsAOR[wecsimAvgPowerErrorBestCase] and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself,
+% but in the way that the model amplifies errors in drag and hydrodynamic coefficient inputs.
+\Cref{sec:appendix-dynamic-validation} provides errors of additional outputs as a function of sea state.
 
- Assumption: use describing function for drag
---- Fig 38: THD figure (with the assumed shape, harmonics are negligible)
---- Fig 39: drag signal shape (proves shape is correct)
+\paragraph{Drag Force: Poor Agreement}
+Validation of various effort and flow magnitudes all show good agreement with WEC-Sim, with the exception of drag force.
+The systematic trend in phase error is particularly concerning, suggesting a sign error in the drag force derivation or implementation.
+MDOcean users should avoid drawing conclusions specifically about the effect of drag until the discrepancy is understood and eliminated,
+although thankfully overall power or amplitude predictions remain reliable.
+Other gaps in validation include the lack of direct testing of \asmpref{waves-narrowband} (narrowband wave assumption) and comparison of the \gls{acr-qcqp} controller to a time-domain numerical optimal controller.
+Even given this possible error, the authors believe that for early-stage design and tradeoff analysis, MDOcean is preferable over other dynamic models,
+%simple damping-only drag models
+since it captures nonlinearities and coupling effects and does not compromise power and amplitude predictions.
 
- Assumption: use meem for hydro coeffs
- Assumption: simultaneous interaction of (use describing function for drag) and (use meem for hydro coeffs)
+%\Gls{acr-thd} measures how a signal's higher harmonics compare to its fundamental;
+%pure sinusoids have a \gls{acr-thd} of 0 and square waves have a \gls{acr-thd} of approximately 48.3\%.
+% \Cref{sec:appendix-dynamic-validation} also validates the describing-function approximation itself,
+% showing total harmonic distortion below 1\% in the worst sea state
+% and excellent agreement between the assumed and actual drag force waveforms at all four corners of the \gls{acr-jpd}.
+
+%  --- Fig 37: drag numerical amplitude and phase are not very correct (but doesn't matter too much)
+
+% - the power for RM3 with drag, lossless PTO, and damping control match that predicted by the reference model report
+
+% - validation = how accurate are my assumptions?
+%  --- subfigures 2,3,4 of figure 12
+
+%  Assumption: use meem for hydro coeffs
+%  Assumption: simultaneous interaction of (use describing function for drag) and (use meem for hydro coeffs)
  
-Assumption: linearization
--- linearization of drag: validated above
--- linearization of PTO saturation: not directly validated, but the drag linearization validates the concept that it stands on (low pass filter)
-Assumption: regular waves (narrowband)
--- not yet validated, but refer to 92\% study
-Assumption: peak fluid force uses the fundamental
--- not yet validated
-Assumption: peak amplitude uses the fundamental
--- not directly validated, but the low drag THD validates the concept that it stands on (low pass filter)
-Assumption: you only care about sinusoidal steady state, no transients
--- not directly validated, but the drag linearization validates the concept that it stands on (low pass filter bc transients are high frequency)
-Assumption: surge force is not contributing to the structural stress
--- not yet validated
+% Assumption: linearization
+% -- linearization of drag: validated above
+% -- linearization of PTO saturation: not directly validated, but the drag linearization validates the concept that it stands on (low pass filter)
+% Assumption: regular waves (narrowband)
+% -- not yet validated, but refer to 92\% study
+% Assumption: peak fluid force uses the fundamental
+% -- not yet validated
+% Assumption: peak amplitude uses the fundamental
+% -- not directly validated, but the low drag THD validates the concept that it stands on (low pass filter)
+% Assumption: you only care about sinusoidal steady state, no transients
+% -- not directly validated, but the drag linearization validates the concept that it stands on (low pass filter bc transients are high frequency)
 
-Table of assumptions, whether I validate it, and if I don't validate it if that's because it doesn't need validating or because it's not validated yet.
+
+% Table of assumptions, whether I validate it, and if I don't validate it if that's because it doesn't need validating or because it's not validated yet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Dynamic Validation Using WEC-Sim}\label{sec:dynamic-validation}
@@ -142,34 +175,15 @@ The WEC-Sim \gls{acr-rm3} example is run with regular waves and with the device 
     to separate dynamics-model error from hydrodynamic-coefficient error.
 \fi
 
-The absolute error in average power compared to the WEC-Sim power is less than \resultsAOR[wecsimAvgPowerErrorBestCase] in the best case and \resultsAOR[wecsimAvgPowerErrorWorstCase] in the worst case,
-with an error breakdown for all simulation scenarios and sea states shown in \Cref{fig:error-histogram}.
-\begin{figure*}[htbp]
-    \centering
-    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}]{figs/from-matlab/wecsim_wcsm_multi__histogram.pdf}
-    \caption[WEC-Sim verification error breakdown]{Error breakdown based on WEC-Sim Verification Runs}
-    \label{fig:error-histogram}
-\end{figure*}
-Though this seems large, the extremely low errors when enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag
-(\resultsAOR[wecsimAvgPowerErrorBestCase] and 1.9\% in power and amplitude respectively) indicate that this is not an error in the dynamic model itself,
-but in the way that the model amplifies errors in drag and hydrodynamic coefficient inputs.
-\Cref{sec:appendix-dynamic-validation} provides errors of additional outputs as a function of sea state.
-
-\Cref{sec:appendix-dynamic-validation} also validates the describing-function approximation itself,
-showing total harmonic distortion below 1\% in the worst sea state
-and excellent agreement between the assumed and actual drag force waveforms at all four corners of the \gls{acr-jpd}.
 
 These errors are deemed acceptable for the purposes of this study,
 since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines
 and the ability to quickly evaluate a large number of preliminary design options, rather than to conduct late-stage refinement of a known design.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Static Validation}
-\label{sec:static-validation}
-
-
-
 
 \subsection{Verification, Calibration, and Validation: Other Modules}
+\label{sec:static-validation}
+
 \subsubsection{Verification}
 
 The overall model is validated by comparing simulated structural forces, power, mass, and cost results to the nominal values in \citet{RM3}, as shown in \Cref{tab:validation}.
@@ -228,6 +242,9 @@ The average percent errors are included in \Cref{tab:validation}, with additiona
 \else
     A structural-mass scale factor (of \resultsAOR[massScaleFactor]) accounts for unmodeled subcomponents (spar stiffeners, damping plate circumferential stiffeners, flanges, enclosures, access mounts).
 \fi
+
+% Assumption: surge force is not contributing to the structural stress
+% -- not yet validated
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Runtime Benchmarking}
