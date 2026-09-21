@@ -1,0 +1,35 @@
+% This work, "No appendix glossary", is adapted from
+% "Glossary per chapter or section" by Nikola Talbot,
+% used under CC BY 4.0 and available at https://tex.stackexchange.com/a/89501.
+% "No appendix glossary" is licensed under CC BY 4.0 by Rebecca McCabe.
+
+\usepackage{datatool-base} % for DTLifinlist command
+
+\newcounter{myglossarycounter}
+\AddToHook{cmd/appendix/before}{\stepcounter{myglossarycounter}}
+\setupglossaries{counter=myglossarycounter}
+\GlsSetXdyMinRangeLength{0}
+
+\newglossarystyle{mystyle}%
+{%
+  \setglossarystyle{list}%
+  \renewcommand*{\glossaryentrynumbers}[1]{\striprelax##1\endstriprelax}%
+  \renewcommand*{\glsXmyglossarycounterXglsnumberformat}[2]{##2}%
+  \renewcommand*{\delimR}{,}%
+  \renewcommand*{\glossentry}[2]{%
+    \edef\doifinlocation{\noexpand\ifinlocation{0}{##2}}%
+    \doifinlocation
+    {%
+      \item \glossentryname{##1} \glossentrydesc{##1}%
+    }%
+  }%
+}
+
+% syntax: \ifinlocation{number}{location list}{body}
+\newcommand{\ifinlocation}[3]{%
+ \DTLifinlist{#1}{#2}{#3}{}%
+}
+
+\def\striprelax\relax#1\endstriprelax{#1}
+
+\setglossarystyle{mystyle}
