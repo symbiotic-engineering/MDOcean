@@ -1,0 +1,100 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\gls{acr-rm3} \gls{acr-cbs}}
+\label{sec:appendix-econ-cbs}
+
+The MDOcean economic model is calibrated against the \gls{acr-rm3} \gls{acr-cbs} of \citet{neary_reference_2014}, reproduced in \Cref{tab:CBS}.
+Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\gls{sym-N-WEC}=100$) cases to illustrate the economies-of-scale trend captured by the power-law scaling \Cref{eq:cost-power-law}.
+
+\begin{table}[htbp]
+    \centering
+
+    \caption{\gls{acr-cbs}}
+    \label{tab:CBS}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{aor:cbs}}
+    }
+         \gls{acr-cbs} Category&  Nominal \% for $\gls{sym-N-WEC}=1$& Nominal \% for $\gls{sym-N-WEC}=100$&Scales with design?\\\hline
+         1.1 - Development&  26\%&  3\%&No\\
+         1.2 - Infrastructure&  6\%&  4\%&No\\
+         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
+         1.4 - Structural&  17\%&  46\%&$\gls{sym-V-struct}$\\
+         1.5 - \gls{acr-pto}&  4\%&  11\%&$\gls{sym-F-max}, \gls{sym-P-max}$\\
+         1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
+         1.7 - Installation&  34\%&  10\%&No\\
+         1.8 - Decommissioning&  9\%&  9\%&No\\
+         1.9 - Contingency&  9\%&  9\%&No\\
+ \textbf{Total 1.1-1.9 (\gls{acr-capex})}& 93.3\%& 97.6\%&-\\\hline
+ 2.1 - Insurance& 1.3\%& 0.4\%&No\\
+ 2.2 - Environmental/Regulatory& 4.1\%& 0.3\%&No\\
+ 2.3 - Marine Operations& 0.2\%& 0.3\%&No\\
+ 2.4 - Shoreside Operations& 0.8\%& 0.2\%&No\\
+ 2.5 - Replacement Parts& 0.3\%& 1.0\%&No\\
+ 2.6 - Consumables& $<$0.1\%& 0.2\%&No\\
+ \textbf{Total 2.1-2.6 (\gls{acr-opex})}& 6.7\%& 2.4\%&-\\
+    \endtabular
+    \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power-Law Scaling with Number of Devices}
+\label{sec:appendix-econ-power-law}
+
+The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
+($\gls{sym-C}_{\text{fixed}}$,
+ $\gls{sym-C}_{pto,\text{constant}}$, 
+ $\gls{sym-p-P}$,
+ $\gls{sym-p-F}$,
+ $\gls{sym-p-s}$)
+each decrease with the number of devices $\gls{sym-N-WEC}$ according to
+\begin{equation}\label{eq:cost-power-law}
+    \gls{sym-C} = \gls{sym-C-infty}+ (\gls{sym-C-1} - \gls{sym-C-infty})
+                    \cdot (\gls{sym-N-WEC})^{-\gls{sym-beta-expo}},
+\end{equation}
+where $\gls{sym-C-infty}$ is the asymptotic large-scale unit cost,
+$\gls{sym-C-1}$ is the single-unit cost,
+and $\gls{sym-beta-expo}$ is the rate of decrease.
+
+The values of $\gls{sym-C-infty}$, $\gls{sym-C-1}$, and $\gls{sym-beta-expo}$ for each \gls{acr-cbs} category
+were obtained by curve-fitting \Cref{eq:cost-power-law} to the \gls{acr-cbs} estimates
+for $\gls{sym-N-WEC} \in \{1, 10, 50, 100\}$ \citep{neary_reference_2014},
+and are tabulated in \Cref{tab:econ-model-values}.
+
+\begin{table}[h]
+    \centering
+    \caption{Cost model values for each \gls{acr-cbs} category. Cost values are in 2012 USD.}
+    \label{tab:econ-model-values}
+    \expanded{
+        \noexpand\tabular{\TableColumnSpecs{aor:econ-model-values}}
+    }
+         \gls{acr-cbs} Category& Expo. $\gls{sym-beta-expo}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
+         \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. \gls{acr-capex}& 0.741& 1.24 \$M &13.92 \$M\\
+         \textbf{1.4} - Structural \gls{acr-capex} & 0.481& 2.387 \$/kg&4.294 \$/kg\\
+         \textbf{1.5} - \gls{acr-pto} \gls{acr-capex}& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
+ \textbf{2.1-2.6} - \gls{acr-opex}&0.557& 0&1.193 \$M\\
+    \endtabular
+    \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear \gls{acr-pto} Cost Scaling}
+\label{sec:appendix-econ-pto-scaling}
+
+Linear \gls{acr-pto} cost scaling is common for \gls{acr-wec} techno-economic analysis.
+The \gls{acr-rm3} cost numbers \citep{RM3} which MDOcean uses as a baseline are themselves scaled from estimates for a smaller device: the reference model project applies linear scaling with peak power to an unpublished 2011 cost estimate by ReVision Consulting for a 100~kW peak hydraulic \gls{acr-pto} (except for the riser cable and control system, whose cost does not scale with power).
+The \gls{acr-nrel} \gls{acr-sam} assumes that hydraulic \gls{acr-pto} cost scales slightly less than linearly with power (exponent 0.91), and one study uses regression to obtain separate linear models for the cost of commercial induction and permanent magnet generators as a function of torque capability \citep{nakhai_techno-economic_2022}.
+%the cheaper of the induction and permanent magnet machines is chosen with a torque threshold:
+% \begin{equation}
+%     \gls{sym-C}_{gen} = \begin{cases}
+%     80.86 \gls{sym-tau} + 1032, & 0~\leq\gls{sym-tau} <47~\text{Nm, ~~~~induction generator} \\
+%     9.151 \gls{sym-tau} + 4386, & 47\leq\gls{sym-tau} \leq 4000~\text{Nm, permanent magnet generator}
+%     \end{cases}
+% \end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Economic Validation}
+\label{sec:appendix-econ-validation}
+\Cref{fig:econ-nwec-validate} shows the scaling behavior of economic outputs (\gls{acr-capex}, \gls{acr-opex}, and \gls{acr-lcoe}) against the number of \glspl{acr-wec} in the farm, comparing MDOcean results against the \citet{RM3} reference values.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/cost_vs_N_WEC.pdf}]{figs/from-matlab/cost_vs_N_WEC.pdf}
+    \caption{Validation for cost scaling with number of \glspl{acr-wec}}
+    \label{fig:econ-nwec-validate}
+\end{figure}

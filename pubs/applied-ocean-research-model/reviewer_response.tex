@@ -9,6 +9,7 @@
 \usepackage{longtable}
 \usepackage{parskip}
 \usepackage{xr}
+\usepackage{cleveref}
 \externaldocument[aor:]{aux/main}
 \usepackage[authoryear]{natbib}
 
@@ -63,16 +64,24 @@ We thank Reviewer~1 for the detailed review and for noting that the conclusions 
 
 % ---------------- Questionnaire ----------------
 \rcomment{Reviewer 1, Question 1}{The study objectives are generally clear, but they could be stated more explicitly at the end of the Introduction.}
-\response We thank the reviewer for this suggestion. \fillin{We have added a paragraph at the end of the Introduction (Section 1.4, p.~X, lines~A-B) that states the objectives of the study explicitly and briefly previews the main findings. It reads: ``[new text]''.}
+\response We thank the reviewer for this suggestion.
+We have added a sentence at the end of the Introduction 
+(Section 1.4, p.~\pageref{aor:lne:summary-objective-start}, lines~\ref{aor:lne:summary-objective-start}--\ref{aor:lne:summary-objective-end})
+that states the objectives of the study explicitly.
+It reads: ``In summary, this study aims to develop a model that has sufficient speed and scope to support early-stage multidisciplinary design optimization and tradeoff analysis of wave energy converters.''
 
 \rcomment{Reviewer 1, Question 2}{Please provide more implementation details, including key model parameters and default settings.}
-\response We thank the reviewer for this suggestion. Key model parameters are listed in Table~20 (Appendix~F). \fillin{We now refer to this table in Section 3 (p.~X, lines~A-B) and have extended it to include the solver settings (MEEM truncation orders, sea-state discretization, fixed-point iteration tolerance and typical number of iterations) and the default values of all design variables.} The code and scripts used to produce all results are available open source; please see our response to Question~6.
+\response We thank the reviewer for this suggestion. Key model parameters are listed in Table~20 (Appendix~F, p.\pageref{aor:tab:parameters}).
+We have also added \Cref{aor:tab:hyperparams} to this Appendix to document the solver hyperparameters such as MEEM truncation order and fixed-point iteration tolerance.
+We now refer to this Appendix in Section 3 (p.~\pageref{aor:lne:appendix-parameters}, line~\ref{aor:lne:appendix-parameters}).
+%and the default values of all design variables.}
+For more minute implementation details, the code and scripts used to produce all results are available open source; please see our response to Question~6.
 
 \rcomment{Reviewer 1, Question 4}{Add a workflow diagram summarizing the complete MDOcean framework.}
 \response We thank the reviewer for this suggestion.
 The complete MDOcean workflow is shown in the XDSM diagram in \Cref{aor:fig:n2} (Section~2), which traces how the design variables pass through the geometry, hydrodynamics, dynamics and control, structures, and economics modules to the objective and constraints.
 We recognize that XDSM notation may be unfamiliar to readers outside the design optimization community, so we have revised the caption to explain how to read the diagram.
-We have also added a new scope diagram (\Cref{fig:design-scope}) that places this workflow in the broader context of WEC modeling.
+We have also added a new scope diagram (\Cref{aor:fig:design-scope}) that places this workflow in the broader context of WEC modeling.
 
 \rcomment{Reviewer 1, Question 6}{Better highlight the open-source availability and multidisciplinary integration.}
 \response We thank the reviewer for this suggestion.
@@ -92,7 +101,14 @@ Figure~3 and the associated text show how the different disciplines integrate to
 
 % ---------------- Final comments ----------------
 \rcomment{Reviewer 1, Comment 1}{The manuscript is overly long and should be significantly condensed to improve readability.}
-\response We thank the reviewer and agree that the main narrative was too long. \fillin{We have shortened the main text from X to Y pages by moving [the discussion of MDO architectures in Section 2, the classification of modified frequency-domain methods in Section 3.3.3, and Figures 16-17] to the appendices.} Material added at the reviewers' request, such as the notation list and parameter tables, has been placed in \fillin{the front matter and appendices} so that it does not lengthen the main narrative.
+\response We thank the reviewer and agree that the main narrative was too long. \fillin{We have shortened the main text from X to Y pages by moving the following to the appendix:
+\begin{itemize}
+  \item The equation for the wave velocity as a function of lateral position, now \Cref{aor:eq:wave-velocity-phasor} 
+  \item Information about the drag iteration, now moved to \Cref{aor:sec:appendix-drag-iterative}
+  \item The mass matrix definition, now moved to \Cref{aor:sec:appendix-multiport}
+\end{itemize}
+
+[the discussion of MDO architectures in Section 2, the classification of modified frequency-domain methods in Section 3.3.3, and Figures 16-17] to the appendices.} Material added at the reviewers' request, such as the notation list and parameter tables, has been placed in \fillin{the front matter and appendices} so that it does not lengthen the main narrative.
 
 \rcomment{Reviewer 1, Comment 2}{All key terms and parameters must be clearly defined at first use to avoid ambiguity and improve clarity.}
 \response We thank the reviewer. \fillin{We have checked that every acronym and key term is defined at its first use in the main text, and have added a notation list (p.~X) that collects all acronyms and symbols.}
@@ -115,13 +131,21 @@ The same numbering system is used in the validation section to show which assump
 \response We thank the reviewer for this suggestion. \fillin{We have added Table~N (Section 4.X, p.~X), which summarizes the accuracy of each modeling approximation against its reference (WEC-Sim, WAMIT, or the RM3 report) alongside the runtime of each approach. Please see also our response to Reviewer~4, Minor Comment~7.} \fillin{[Note: draft said ``Not addressed.'' If no table is added, explain why instead.]}
 
 \rcomment{Reviewer 1, Comment 8}{Several mathematical derivations are difficult to follow and require clearer explanations or simplification.}
-\response We thank the reviewer. \fillin{[Write reply. Suggestion: describe the reorganization of Section 3.3 (concepts defined before they are used), the numbered assumptions, and the notation list; state which derivations moved to appendices.]}
+\response We thank the reviewer.
+We hope that the reorganization of Section 3.3, the numbered assumptions, and the notation list have made the mathematics easier to follow.
+If this is not the case, we welcome specific feedback on which derivations remain difficult to follow and which steps are unclear so that we can further improve the clarity of the manuscript.
 
 \rcomment{Reviewer 1, Comment 9}{The structural and economic models are relatively simplified and need stronger justification for their applicability.}
 \response We thank the reviewer. \fillin{[Write reply. Suggestion: justify the models by their purpose -- ranking and screening designs in early-stage design rather than detailed sizing -- and cite the evidence in Table~9 and Figure~41 (1.4-1.8\% average error in CAPEX, OPEX, and LCOE across 1-100 devices). Cross-reference Reviewer~4, Major Comment~3.]}
 
 \rcomment{Reviewer 1, Comment 10}{The manuscript lacks a comprehensive sensitivity or uncertainty analysis of key design parameters.}
-\response We thank the reviewer. The manuscript includes a local sensitivity analysis. The one-at-a-time design sweep in Section~5.1.4 (Figure~21) shows the effect of each design variable on LCOE and cost, Figures~19-20 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(35)). \fillin{We now describe Section 5.1.4 explicitly as a local sensitivity analysis (lines~A-B).} A global sensitivity and uncertainty analysis is the subject of a separate study \fillin{[citation]}, which allows the present manuscript to focus on the development and validation of the model. \fillin{We have noted this in Section 5.3 (lines~C-D).}
+\response We thank the reviewer. The manuscript includes several local sensitivity analyses that show the effect of modifying the design variables around their nominal RM3 values.
+The one-at-a-time design sweep in Section~5.1.4 (Figure~21) shows the effect of each design variable on LCOE and cost, Figures~19-20 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(35)).
+We now describe \Cref{aor:sec:design-space-exploration} explicitly as a local sensitivity analysis (line~\ref{aor:lne:local-sens-doe}).
+
+A more comprehensive sensitivity analysis, including the sensitivity to parameters and to design variables around design points other than the nominal, is the subject of a separate study \citep{aor:mccabe_leveraging_2026}.
+This allows the present manuscript to focus on the development and validation of the model.
+% \fillin{We have noted this in Section 5.3 (lines~C-D).}
 
 \rcomment{Reviewer 1, Comment 11}{The relevant paper should be reviewed and cited. [Four papers listed.]}
 \response We thank the reviewer for these suggestions and note that each of the four the suggested papers shares nearly the same authorship.
@@ -133,7 +157,7 @@ apply more directly to this manuscript.
 The second suggested citation uses FEA to perform structural analysis of a offshore wind turbine tension leg platform.
 While we see this as the most relevant paper of the four suggestions, the tension leg platform is still a fundamentally different geometry than the two-body point absorber WEC considered here.
 We deem it not sufficiently relevant compared to existing references
-\citet{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022,an_optimal_2024,ambuhl_reliability-based_2014}
+\citet{aor:coe_survey_2018,aor:ove_arup__partners_ltd_structural_2016,aor:paduano_towards_2024,aor:giannini_wave_2022,aor:an_optimal_2024,aor:ambuhl_reliability-based_2014}
 (see p.~\pageref{aor:lne:struct-refs-start}, lines~\ref{aor:lne:struct-refs-start}--\ref{aor:lne:struct-refs-end}) which describe structural analysis of WECs.
 
 The third suggested citation is a conference paper which studies the dynamic response and loads of the same offshore wind turbine using a time-domain simulation approach.
@@ -164,14 +188,17 @@ The previously 254-word abstract has been shortened to 249 words, within the 250
 \rcomment{Reviewer 1, Comment 16}{There should be references in the equations.}
 \response We thank the reviewer. Equations taken from prior work are cited where they appear; equations without a citation were derived in this work.
 To make this explicit, we have added the following sentence at the start of Section~3
-(p.~\pageref{lne:equation-cite-start}, lines~\ref{lne:equation-cite-start}--\ref{lne:equation-cite-end}):
-``Equations drawn from prior work are cited where they appear; uncited equations are derived in this work, with full derivations in the appendices.''
+(p.~\pageref{aor:lne:equation-cite-start}, lines~\ref{aor:lne:equation-cite-start}--\ref{aor:lne:equation-cite-end}):
+``Equations drawn from prior work are cited where they appear;
+uncited equations are derived in this work, with full derivations in the appendices.''
 
 \rcomment{Reviewer 1, Comment 17}{all parameters of equations appearing in the equations need to be clearly defined and explained.}
 \response We thank the reviewer. \fillin{Each symbol is now defined where it first appears in an equation, and all symbols are collected in the notation list (p.~X).} Please see also our response to Comment~3.
 
 \rcomment{Reviewer 1, Comment 18}{put figures in their places.}
-\response We thank the reviewer. \fillin{We have revised the figure placement so that each figure appears close to where it is first cited in the text. [Note: Figures still appear after the main text. Fix this in revised manuscript.]}
+\response We thank the reviewer. 
+Figures are in their places in the source, and their rendering at the end of the document is a result of the provided Elsevier \latex~template.
+% \fillin{We have revised the figure placement so that each figure appears close to where it is first cited in the text. [Note: Figures still appear after the main text. Fix this in revised manuscript.]}
 
 \rcomment{Reviewer 1, Comment 19}{what can understand from fig 16? fig 17? it is to messy.}
 \response We thank the reviewer and agree that Figures~16 and~17 were difficult to read. We have added a paragraph (Section~5.1.1, \fillin{lines~A-B}) explaining how the six design variables are shown by marker size, marker shape, and color. \fillin{In addition, we have [moved the figures to Appendix X / simplified them to show only the trends discussed in the text].}
@@ -199,10 +226,10 @@ We have renamed the two parts as follows:
 the ``Constrained'' part has been renamed to ``Constrained, Linear Controller (M2)''.
 the ``Nonlinear controller'' part has been renamed to ``Constrained, Nonlinear Control (M1.2)''.
 
-Section 3.3.3 adds a section \textit{Method Choice for Each Nonlinearity} (p.~\pageref{sec:mfd-method-choice}) to explain why different constraint-handling methods (M1--M5) are used for different types of constraints.
+Section 3.3.3 adds a section \textit{Method Choice for Each Nonlinearity} (p.~\pageref{aor:sec:mfd-method-choice}) to explain why different constraint-handling methods (M1--M5) are used for different types of constraints.
 The text reads,
 \begin{quote}
-For the control force limit, the corresponding describing function (saturated-sine) is simple to implement, and prior \gls{acr-rm3} optimizations \citep{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024} show the constraint to be frequently active and impact results strongly, justifying the use of M1.2 (full \gls{acr-qlps}).
+For the control force limit, the corresponding describing function (saturated-sine) is simple to implement, and prior \gls{acr-rm3} optimizations \citep{aor:mccabe_multidisciplinary_2022,aor:gaebele_tpl_2025,aor:mcgilton_optimal_2024} show the constraint to be frequently active and impact results strongly, justifying the use of M1.2 (full \gls{acr-qlps}).
 For amplitude limits in the operational design load case, M1.2 produces the same result as M2 due to the low-pass assumption that makes the constrained quantity a pure sinusoid, so we use the simpler M2 without loss of optimality.
 
 For a power limit, under cases where the power limit is the only constraint, applying M2 is straightforward, and applying M1.2 is possible but more cumbersome:
@@ -326,7 +353,7 @@ We have added the repository link into the Introduction (Section 1.4, line~\ref{
 The Data Availability Statement now gives the version number, documentation status, and where to find the full instructions:
 \begin{quote}
   The MATLAB code for all simulation, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at
-  \url{https://github.com/symbiotic-engineering/MDOcean} \citep{mccabe_mdocean_2024}.
+  \url{https://github.com/symbiotic-engineering/MDOcean} \citep{aor:mccabe_mdocean_2024}.
   The version used in this paper is v1.5.3.
   Questions and contributions via GitHub issues and pull requests are welcomed.
   %A Python version using the \texttt{OpenMDAO} package is forthcoming.
