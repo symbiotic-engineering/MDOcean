@@ -69,14 +69,20 @@ We thank Reviewer~1 for the detailed review and for noting that the conclusions 
 \response We thank the reviewer for this suggestion. Key model parameters are listed in Table~20 (Appendix~F). \fillin{We now refer to this table in Section 3 (p.~X, lines~A-B) and have extended it to include the solver settings (MEEM truncation orders, sea-state discretization, fixed-point iteration tolerance and typical number of iterations) and the default values of all design variables.} The code and scripts used to produce all results are available open source; please see our response to Question~6.
 
 \rcomment{Reviewer 1, Question 4}{Add a workflow diagram summarizing the complete MDOcean framework.}
-\response We thank the reviewer for this suggestion. The complete MDOcean workflow is shown in the XDSM diagram in Figure~3 (Section~2), which traces how the design variables pass through the geometry, hydrodynamics, dynamics and control, structures, and economics modules to the objective and constraints. We recognize that XDSM notation may be unfamiliar to readers outside the design optimization community, so \fillin{we have revised the caption and accompanying text (p.~X, lines~A-B) to explain how to read the diagram as a workflow, and added a new scope diagram (Figure~N) that places this workflow in the broader context of WEC modeling. [Note: Make sure scope diagram is in revised paper.]}
+\response We thank the reviewer for this suggestion.
+The complete MDOcean workflow is shown in the XDSM diagram in \Cref{aor:fig:n2} (Section~2), which traces how the design variables pass through the geometry, hydrodynamics, dynamics and control, structures, and economics modules to the objective and constraints.
+We recognize that XDSM notation may be unfamiliar to readers outside the design optimization community, so we have revised the caption to explain how to read the diagram.
+We have also added a new scope diagram (\Cref{fig:design-scope}) that places this workflow in the broader context of WEC modeling.
 
 \rcomment{Reviewer 1, Question 6}{Better highlight the open-source availability and multidisciplinary integration.}
 \response We thank the reviewer for this suggestion.
+We have added the words ``open-source'' to the first contributions bullet (p.~\pageref{aor:lne:open-source}, line~\ref{aor:lne:open-source}).
+The final sentence of the conclusion (line~\ref{aor:lne:open-source-conclusion}) also notes the open-source availability.
+The paper emphasizes the multidisciplinary nature in Section 1, Section 5.2, and the title.
+Figure~3 and the associated text show how the different disciplines integrate together.
+% \fillin{We have moved the repository link and code version into the Introduction (Section 1.4, lines~A-B) and the Abstract, in addition to the Data Availability Statement. Please see also our response to Reviewer~4, Minor Comment~4.}
 
-\emph{Open-source availability:} \fillin{We have moved the repository link and code version into the Introduction (Section 1.4, lines~A-B) and the Abstract, in addition to the Data Availability Statement. Please see also our response to Reviewer~4, Minor Comment~4.}
-
-\emph{Multidisciplinary integration:} \fillin{[Write reply. Suggestion: present integration as a source of findings, not only a feature. Point to results that are only visible because the disciplines are coupled -- e.g., the constraint scaling law (Eq.~35), every constraint being active in at least one sea state at the LCOE optimum, and the fatigue constraint fragmenting the feasible design space (Fig.~21) -- and say where the text now highlights this.]}
+% \emph{Multidisciplinary integration:} \fillin{[Write reply. Suggestion: present integration as a source of findings, not only a feature. Point to results that are only visible because the disciplines are coupled -- e.g., the constraint scaling law (Eq.~35), every constraint being active in at least one sea state at the LCOE optimum, and the fatigue constraint fragmenting the feasible design space (Fig.~21) -- and say where the text now highlights this.]}
 
 \rcomment{Reviewer 1, Question 7}{Discuss the limitations associated with the semi-analytical assumptions.}
 \response We thank the reviewer. Please see our response to Comment~6 below, which addresses this point.
@@ -101,7 +107,9 @@ We thank Reviewer~1 for the detailed review and for noting that the conclusions 
 \response We thank the reviewer and agree that additional reference cases would further demonstrate the robustness of the model. Validating other WEC designs requires reference data (hydrodynamic, structural, and cost) comparable to those available for RM3, which is beyond the scope of this revision. Instead, we have \fillin{restricted our claims throughout the manuscript to two-body axisymmetric point absorbers (Abstract, lines~A-B; Section 5.3, lines~C-D; Conclusion, lines~E-F)} and clarified how thoroughly this archetype has been evaluated. The dynamics module is compared with WEC-Sim across all sea states at the site \fillin{(Section 4.X, Figure~12)}, the MEEM hydrodynamic coefficients are compared with WAMIT results \fillin{(Section 4.X, Appendix~A.5)}, and the cost model is compared with the RM3 cost estimates for 1 to 100 devices (Appendix~D.4, Figure~41). The restriction to a single WEC archetype is listed as a limitation in Section~5.3 \fillin{(lines~G-H)}.
 
 \rcomment{Reviewer 1, Comment 6}{The assumptions behind the semi-analytical approach and their impact on accuracy require deeper discussion.}
-\response We thank the reviewer. The assumptions underlying the dynamics formulation are now numbered (A1-A12) and stated where they are introduced (Sections 3.3.1-3.3.2, \fillin{lines~A-B}). \fillin{[Complete reply. Suggestion: point to the new table in Section 4 that lists each assumption, how it was verified or validated, and its effect on accuracy -- the same table answers Reviewer~2, Comment~8 and Reviewer~4, Minor Comment~7.]}
+\response We thank the reviewer. The assumptions underlying the dynamics formulation are now numbered (A1-A12) and stated explicitly where they are introduced (Sections 3.3.1-3.3.2, lines~\ref{aor:lne:A1-start}-\ref{aor:lne:A6-end} and lines~\ref{aor:lne:A7-start}-\ref{aor:lne:A12-end}).
+The same numbering system is used in the validation section to show which assumptions are validated and their accuracy.
+% \fillin{[Complete reply. Suggestion: point to the new table in Section 4 that lists each assumption, how it was verified or validated, and its effect on accuracy -- the same table answers Reviewer~2, Comment~8 and Reviewer~4, Minor Comment~7.]}
 
 \rcomment{Reviewer 1, Comment 7}{The benchmarking focuses mainly on computational speed, while accuracy comparisons should be expanded.}
 \response We thank the reviewer for this suggestion. \fillin{We have added Table~N (Section 4.X, p.~X), which summarizes the accuracy of each modeling approximation against its reference (WEC-Sim, WAMIT, or the RM3 report) alongside the runtime of each approach. Please see also our response to Reviewer~4, Minor Comment~7.} \fillin{[Note: draft said ``Not addressed.'' If no table is added, explain why instead.]}
@@ -116,7 +124,22 @@ We thank Reviewer~1 for the detailed review and for noting that the conclusions 
 \response We thank the reviewer. The manuscript includes a local sensitivity analysis. The one-at-a-time design sweep in Section~5.1.4 (Figure~21) shows the effect of each design variable on LCOE and cost, Figures~19-20 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(35)). \fillin{We now describe Section 5.1.4 explicitly as a local sensitivity analysis (lines~A-B).} A global sensitivity and uncertainty analysis is the subject of a separate study \fillin{[citation]}, which allows the present manuscript to focus on the development and validation of the model. \fillin{We have noted this in Section 5.3 (lines~C-D).}
 
 \rcomment{Reviewer 1, Comment 11}{The relevant paper should be reviewed and cited. [Four papers listed.]}
-\response We thank the reviewer for these suggestions. \fillin{We have added [reference] to Section X (lines~A-B), where [what it supports], and [reference] to Section Y (lines~C-D).} The remaining references address the support structures of floating offshore wind turbines, which fall outside the scope of the WEC structural model presented here. \fillin{[Note: draft said ``Not addressed.'' Decide which to cite and adjust.]}
+\response We thank the reviewer for these suggestions and note that each of the four the suggested papers shares nearly the same authorship.
+The first suggested citation addresses lifetime extension strategies of offshore wind turbines.
+Although the lifetime extension strategies incorporate structural and economic considerations and are therefore multidisciplinary, the authors feel that the existing references to WEC structural modeling and optimization
+(see p.~\pageref{aor:lne:struct-refs-start}, lines~\ref{aor:lne:struct-refs-start}--\ref{aor:lne:struct-refs-end})
+apply more directly to this manuscript.
+
+The second suggested citation uses FEA to perform structural analysis of a offshore wind turbine tension leg platform.
+While we see this as the most relevant paper of the four suggestions, the tension leg platform is still a fundamentally different geometry than the two-body point absorber WEC considered here.
+We deem it not sufficiently relevant compared to existing references
+\citet{coe_survey_2018,ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022,an_optimal_2024,ambuhl_reliability-based_2014}
+(see p.~\pageref{aor:lne:struct-refs-start}, lines~\ref{aor:lne:struct-refs-start}--\ref{aor:lne:struct-refs-end}) which describe structural analysis of WECs.
+
+The third suggested citation is a conference paper which studies the dynamic response and loads of the same offshore wind turbine using a time-domain simulation approach.
+This is not directly relevant to the frequency-domain WEC simulation approach used in this manuscript.
+
+The fourth suggested citation is a conference paper covering the same topic as the second suggestion, and is therefore not included for the same reasons.
 
 \rcomment{Reviewer 1, Comment 12}{The limitations of the proposed framework and its applicability to other WEC configurations should be discussed in greater detail.}
 \response We thank the reviewer. \fillin{[Write reply. Suggestion: point to the expanded limitations in Section 5.3 and the scope statement in the Abstract and Conclusion; cross-reference Reviewer~4, Major Comment~8.]}
@@ -134,10 +157,15 @@ We thank Reviewer~1 for the detailed review and for noting that the conclusions 
 \end{itemize}
 
 \rcomment{Reviewer 1, Comment 15}{The abstract is too wordy. In the abstract, the manuscript requires some major modifications before it can be considered for publication.}
-\response We thank the reviewer. \fillin{[Write reply. Suggestion: rewrite the abstract to about 200 words (currently about 250), naming the main novel contribution early, labeling calibrated results as calibration, and stating the main limitations. Cross-reference Reviewer~4, Minor Comments~1 and~3.]}
+\response We thank the reviewer.
+The previously 254-word abstract has been shortened to 249 words, within the 250-word journal guideline.
+% \fillin{[Write reply. Suggestion: name the main novel contribution early, label calibrated results as calibration, and state the main limitations. Cross-reference Reviewer~4, Minor Comments~1 and~3.]}
 
 \rcomment{Reviewer 1, Comment 16}{There should be references in the equations.}
-\response We thank the reviewer. Equations taken from prior work are cited where they appear; equations without a citation were derived in this work. \fillin{To make this explicit, we have added the following sentence at the start of Section~3 (p.~X, lines~A-B): ``Equations drawn from prior work are cited where they appear; uncited equations are derived in this work, with full derivations in the appendices.''}
+\response We thank the reviewer. Equations taken from prior work are cited where they appear; equations without a citation were derived in this work.
+To make this explicit, we have added the following sentence at the start of Section~3
+(p.~\pageref{lne:equation-cite-start}, lines~\ref{lne:equation-cite-start}--\ref{lne:equation-cite-end}):
+``Equations drawn from prior work are cited where they appear; uncited equations are derived in this work, with full derivations in the appendices.''
 
 \rcomment{Reviewer 1, Comment 17}{all parameters of equations appearing in the equations need to be clearly defined and explained.}
 \response We thank the reviewer. \fillin{Each symbol is now defined where it first appears in an equation, and all symbols are collected in the notation list (p.~X).} Please see also our response to Comment~3.
@@ -166,20 +194,58 @@ We thank Reviewer~2 for describing the work as interdisciplinary, comprehensive,
 \response We thank the reviewer for raising this important point, and we agree that a constant efficiency cannot capture how losses vary with motion amplitude. In MDOcean, the main amplitude-dependent losses are modeled explicitly rather than through $\eta$. The generator includes a winding impedance (Appendix~C.2.4), so ohmic and inductive effects vary with the current and therefore with the motion amplitude, and power is maximized at the generator's electrical port rather than its mechanical port. The constant efficiency $\eta$ accounts only for the remaining losses, such as those in the electrical drive; its value of 80\% was chosen to match the assumption in the RM3 reference report (Neary et al., 2014b) for the comparisons in Section~4. \fillin{We have clarified this in Section 3.3.6 (p.~X, lines~A-B) and added amplitude-dependent drive losses to the future work in Section 5.3 and Table~11.}
 
 \rcomment{Reviewer 2, Comment 3}{In section 3.3.5, the second part is titled ``Constrained'' and the third part is ``Nonlinear controller''. However, the third part also addresses a specific constraint (force limit). I would suggest clarifying what specific constraints these two parts are intended to handle and using a clearer terminology.}
-\response We thank the reviewer for this suggestion. \fillin{[Write reply. Suggestion: rename the parts to describe the method used for each, e.g., ``Constraints handled by linear impedance mismatch (amplitude and power limits)'' and ``Force limit handled by nonlinear saturated control'', state which constraints each handles, and give the new headings and location.]}
+\response We thank the reviewer for this suggestion.
+We have renamed the two parts as follows:
+the ``Constrained'' part has been renamed to ``Constrained, Linear Controller (M2)''.
+the ``Nonlinear controller'' part has been renamed to ``Constrained, Nonlinear Control (M1.2)''.
+
+Section 3.3.3 adds a section \textit{Method Choice for Each Nonlinearity} (p.~\pageref{sec:mfd-method-choice}) to explain why different constraint-handling methods (M1--M5) are used for different types of constraints.
+The text reads,
+\begin{quote}
+For the control force limit, the corresponding describing function (saturated-sine) is simple to implement, and prior \gls{acr-rm3} optimizations \citep{mccabe_multidisciplinary_2022,gaebele_tpl_2025,mcgilton_optimal_2024} show the constraint to be frequently active and impact results strongly, justifying the use of M1.2 (full \gls{acr-qlps}).
+For amplitude limits in the operational design load case, M1.2 produces the same result as M2 due to the low-pass assumption that makes the constrained quantity a pure sinusoid, so we use the simpler M2 without loss of optimality.
+
+For a power limit, under cases where the power limit is the only constraint, applying M2 is straightforward, and applying M1.2 is possible but more cumbersome:
+assuming that the optimal power signal is a saturated sinusoid implies that the corresponding force signal is the quotient of the truncated power sinusoid and the amplitude sinusoid, which requires deriving an additional describing function.
+When a power limit is applied simultaneously with a force limit, both methods break down.
+M2 would be incompatible with the previous choice of M1.2 for the co-occurring force limit, and M1.2 creates ambiguity about the nonlinear signal shapes,
+since it is not possible for the force and power signals to both be saturated sinusoids while assuming sinusoidal amplitude.
+To avoid this additional complexity, the power limit uses M3, although future work should consider the use of M1.2 or M2 to improve accuracy and optimality.
+
+For slamming amplitude limits in the storm design load case, approach M5 is actually the only option. 
+This is because the device is already in survival mode (preventing method M4), is not producing power (preventing methods M3 and M4), and is not applying a control input (preventing methods M1 and M2).
+\end{quote}
+
+Since the only dynamic nonlinearity handled using method M1.2 is the force limit, the force limit is the only constraint discussed in the ``Constrained, Nonlinear Control (M1.2)'' section.
 
 \rcomment{Reviewer 2, Comment 4}{In section 3.3.5 the ``Constrained'' part, before (18), ``Each metric is written as a quadratic product of the port variable vector with a matrix''. Is this valid for all metrics that may need to be constrained? If a WEC velocity/displacement constraint is to be applied, should the constrained metric be the port variable itself, rather than its quadratic function? This goes back the problem of variable definition.}
-\response \fillin{We thank the reviewer for this question. A limit on the magnitude of a port variable, such as a velocity or displacement limit $|\hat{q}| \le q_{max}$, is equivalent to the quadratic constraint $|\hat{q}|^2 \le q_{max}^2$, which has the form of Eq.~(17) with the matrix given in Table~6. Velocity and displacement limits are implemented in this way. The one exception is peak power, which is fourth-order (Eq.~(18)) and is treated separately in Appendix C.3.1. We have added this clarification to Section 3.3.7 (p.~X, lines~A-B). [Note: suggested text -- check it is correct before using.]}
+\response We thank the reviewer for this question.
+Because the complex form of the port variable is used as the decision variable (e.g. $\hat{q}$), the magnitude of the port variable $|\hat{q}|$ is not a linear expression of the decision variable, it is the square root of the variable multiplied by its complex conjugate:
+\begin{equation}
+ |\hat{q}| = \sqrt{\hat{q}^* \hat{q}}
+\end{equation}
+Squaring both sides, we see that a limit on the magnitude of a port variable, such as a velocity or displacement limit $|\hat{q}| \le q_{max}$, is equivalent to the quadratic constraint $\hat{q}^* \hat{q} \le q_{max}^2$, which has the form of Eq.~(17) with the matrix given in Table~6.
+Any constraint on a linear combination of active power, reactive power, and port variable magnitude can be formulated as a quadratic constraint.
+The only metric that is commonly constrained that cannot be written in quadratic form is peak power, which is fourth-order (Eq.~(18)) and is treated separately in Appendix C.3.1.
+We have added this clarification to \Cref{aor:sec:optimal-control}
+(p.~\pageref{aor:lne:quadratic-metrics-start}, lines~\ref{aor:lne:quadratic-metrics-start}--\ref{aor:lne:quadratic-metrics-end}).
 
 \rcomment{Reviewer 2, Comment 5}{Throughout the derivation in the main text, a clear definition of ``describing function'' is missing, which makes it difficult to follow the content.}
-\response We thank the reviewer for identifying this gap. We have added a new subsection, Section~3.3.1 ``Describing Functions Concept'' (\fillin{p.~X, lines~A-B}), which defines the describing function before it is first used:
+\response We thank the reviewer for identifying this gap.
+We have added a new subsection heading, \Cref{aor:sec:describing-functions} ``Describing Functions'' to make this clearer.
+The \textit{Concept} paragraph (p.~\pageref{aor:lne:df-concept-start}, lines~\ref{aor:lne:df-concept-start}--\ref{aor:lne:df-concept-end}) defines the describing function before it is first used:
 \begin{quote}
 ``MDOcean's dynamics utilize the sinusoidal-input describing function method, which assumes a certain time-domain nonlinear signal shape and then calculates the fundamental amplitude of that signal for use in a typical frequency-domain simulation. Because the fundamental amplitude depends on the response, the frequency-domain simulation is only quasi-linear and must either be iterated numerically or solved analytically.''
 \end{quote}
-The same subsection lists the assumptions behind the method (A1-A6), and Figure~9 illustrates the approximation for the two nonlinearities treated in MDOcean: generator torque saturation and quadratic drag. \fillin{[Note: consider adding a one-line equation defining the describing function, and fix the broken ``??'' references in Section 3.3.1 first.]}
+The same subsection lists the assumptions behind the method (A1-A6), with A5 offering a more precise definition of SIDF (p.~\pageref{aor:lne:sidf-precise-start}, lines~\ref{aor:lne:sidf-precise-start}--\ref{aor:lne:sidf-precise-end}):
+\begin{quote}
+a nonlinearity is approximated simply as an amplitude-dependent gain and phase shift applied to a sinusoidal input.
+\end{quote}
 
 \rcomment{Reviewer 2, Comment 6}{In section 3.3.5 and the corresponding appendix, I did not fully understand how the force saturation is applied. Are you simply scale the force limit by 4/pi and apply it on the force coefficient?}
-\response We thank the reviewer for this question. \fillin{[Write reply. Suggestion: answer the yes/no question directly, then explain in three steps -- saturated torque, its fundamental Fourier component, and the resulting effective control gains $B_l$ and $K_l$ -- stating what the factor $4/\pi$ represents (the ratio of the fundamental to the peak of a square wave, the limiting case of saturation) and where it enters. Say where Appendix C.1 has been expanded.]}
+\response We thank the reviewer for this question. 
+
+\fillin{[Write reply. Suggestion: answer the yes/no question directly, then explain in three steps -- saturated torque, its fundamental Fourier component, and the resulting effective control gains $B_l$ and $K_l$ -- stating what the factor $4/\pi$ represents (the ratio of the fundamental to the peak of a square wave, the limiting case of saturation) and where it enters. Say where Appendix C.1 has been expanded.]}
 
 \rcomment{Reviewer 2, Comment 7}{In section 3.3.6, equation (24), are these coefficients fixed, or do they depend on the motion amplitude?}
 \response We thank the reviewer for this question. The drag coefficients $\mathbf{B}_d$ and $\vec{\gamma}_d$ in this equation (now Eq.~(23) in Section~3.3.8) are not fixed. As shown in Eq.~(98) of Appendix~C.4, they depend on both the amplitude and the phase of the body velocity. Because the coefficients depend on the response they help determine, MDOcean solves for them by fixed-point iteration, which typically converges in five to eight iterations to within 0.01~m and 3$^\circ$ across all sea states (Appendix~C.4.3). \fillin{We have added this clarification to Section 3.3.8 (p.~X, lines~A-B): ``The drag coefficients depend on the amplitude and phase of the body velocity (Eq.~(98)) and are therefore converged by fixed-point iteration, typically within five to eight iterations (Appendix~C.4.3).''}
@@ -242,26 +308,54 @@ We thank Reviewer~4 for the thorough and constructive review, and for noting the
 \response We thank the reviewer for this suggestion. \fillin{[Write reply. Suggestion: list what moved to the appendices and how the main text is now organized around the elements the reviewer lists; cross-reference Reviewer~1, Comments~1 and~13.]}
 
 \rcomment{Reviewer 4, Minor Comment 1}{The abstract should mention the most important limitations more explicitly, especially the regular-wave approximation and the focus on a single WEC archetype.}
-\response We thank the reviewer. \fillin{[Write reply. Quote the new abstract sentence(s) stating the regular-wave approximation and the single archetype.]}
+\response We thank the reviewer.
+The following sentence has been added to the abstract:
+``Limiting assumptions include regular waves and point absorber archetype.''
 
 \rcomment{Reviewer 4, Minor Comment 2}{Please use ``validation'', ``calibration'', ``verification'' and ``benchmarking'' consistently throughout the manuscript.}
 \response We thank the reviewer. \fillin{[Write reply. Point to the definitions given in Section 4 and state that the terms were checked throughout, including figure and table captions -- e.g., Figure~12 currently calls the WEC-Sim comparison ``Verification Runs''. Cross-reference the General Comment.]}
 
 \rcomment{Reviewer 4, Minor Comment 3}{The term ``near-numerical accuracy'' should be used carefully. The model is fast and useful, but some agreement is obtained after calibration.}
-\response We thank the reviewer. \fillin{[Write reply. State that ``near-numerical accuracy'' was removed from the Abstract, and that other accuracy statements (e.g., ``within a few percent'' and ``within 1\% of the reference model report'') now specify whether they refer to validation or calibration; give locations.]}
+\response We thank the reviewer.
+The term ``near-numerical accuracy'' was removed from the Abstract.
+It is now clear whether other accuracy statements refer to validation or calibration due to the reorganization of \Cref{aor:sec:validation-benchmarking}.
 
-\rcomment{Reviewer 4, Minor Comment 4}{The open-source information should be made easier to find, including repository link, version number, documentation status and scripts for reproducing the main validation and benchmarking cases.}
-\response We thank the reviewer for this suggestion. \fillin{We have moved the repository link into the Introduction (Section 1.4, lines~A-B), and the Data Availability Statement now gives the version number and archived DOI of the code release used in this paper, the documentation status, and the scripts that reproduce the validation and benchmarking results. [Note: draft said ``Not addressed.'']}
+\rcomment{Reviewer 4, Minor Comment 4}{The open-source information should be made easier to find, including repository link, version number, documentation status, and scripts for reproducing the main validation and benchmarking cases.}
+\response We thank the reviewer for this suggestion.
+We have added the repository link into the Introduction (Section 1.4, line~\ref{aor:lne:github-link-intro}).
+The Data Availability Statement now gives the version number, documentation status, and where to find the full instructions:
+\begin{quote}
+  The MATLAB code for all simulation, analysis, and visualization to fully reproduce this work is available open-source via the MDOcean project at
+  \url{https://github.com/symbiotic-engineering/MDOcean} \citep{mccabe_mdocean_2024}.
+  The version used in this paper is v1.5.3.
+  Questions and contributions via GitHub issues and pull requests are welcomed.
+  %A Python version using the \texttt{OpenMDAO} package is forthcoming.
+  All computational environments, results, and \LaTeX~artifacts can be reproduced via a data version control pipeline built with the \texttt{Calkit} package
+  and accessed at \url{https://calkit.io/symbiotic-engineering/mdocean}.
+  Sphinx API documentation is available at \url{https://symbiotic-engineering.github.io/MDOcean/}.
+  See the documentation for full instructions for reproducing results and using the MDOcean code.
+\end{quote}
 
 \rcomment{Reviewer 4, Minor Comment 5}{The economic model uses 2012 USD for consistency with RM3. This is acceptable, but it should be clearly stated whenever LCOE or cost values are discussed.}
-\response We thank the reviewer. \fillin{We now state that costs are in 2012 USD wherever LCOE or cost values are reported: Section 3.5, Section 4.X, Section 5.X, Figures 20-21, Table~9, and the Conclusion. [Note: draft said ``Not addressed.'' Currently stated only once, in Section 3.5.]}
+\response We thank the reviewer.
+We now state that costs are in 2012 USD wherever LCOE or cost values are reported:
+the text of line~\ref{aor:lne:2012-prices},
+the caption of \Cref{aor:fig:force-power-limit-sweep},
+the caption of \Cref{aor:tab:econ-model-values},
+and the units column of \Cref{aor:tab:parameters}.
 
 \rcomment{Reviewer 4, Minor Comment 6}{The manuscript should avoid relying too heavily on forthcoming companion papers for essential derivations, implementation details or validation evidence.}
-\response We thank the reviewer and understand this concern. \fillin{The manuscript is self-contained: the complete MEEM formulation used in MDOcean is given in Appendix A, and the derivations needed to reproduce the results are given in the appendices.} The companion papers extend this work (an expanded MEEM implementation and the design optimization of RM3) but are not needed to reproduce the present results, and they are available as preprints. \fillin{We have revised the Conclusion (lines~A-B) to remove the implication that the full MEEM derivation appears only in Bimali et al. (2026). [Note: confirm that Appendix A alone is enough to reproduce the coefficients before claiming this.]}
+\response We thank the reviewer and understand this concern.
+The manuscript is self-contained:
+the complete MEEM formulation used in MDOcean is given in Appendix A, and the derivations needed to reproduce the results are given in the appendices.
+The companion papers extend this work (an expanded MEEM implementation and the design optimization of RM3) but are not needed to reproduce the present results, and they are available as preprints.
+We have revised the Conclusion to remove the implication that the full MEEM derivation appears only in Bimali et al. (2026).
 
 \rcomment{Reviewer 4, Minor Comment 7}{
   Several tables and figures are dense. The validation and benchmarking results would be easier to assess if the key errors and runtime comparisons were summarized in one compact table.}
-\response We thank the reviewer for this suggestion. \fillin{We have added Table~N (Section 4.X, p.~X), which summarizes the key errors and runtime comparisons in one place. Please see also our responses to Reviewer~1, Comment~7 and Reviewer~2, Comment~8. [Note: draft said ``Not addressed.'']}
+\response Several of the accuracy comparisons do not have a corresponding runtime comparison, and each runtime comparison has a different simulation scope to make it comparable to the scope of the corresponding simulation.
+Therefore, the authors have chosen to keep the accuracy and runtime comparisons in separate figures.
+Please see also our responses to Reviewer~1, Comment~7 and Reviewer~2, Comment~8.
 
 \rcomment{Reviewer 4, Minor Comment 8}{
   The conclusion should be shortened and should distinguish demonstrated results from intended future capabilities.}
