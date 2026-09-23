@@ -14,12 +14,6 @@
 \usepackage[authoryear]{natbib}
 
 % ------------------------------------------------------------------
-% Markup used in this draft (remove before submission)
-%   \fillin{...}  yellow highlight = text the author must write, verify,
-%                 or complete (placeholders, claims that depend on a
-%                 manuscript change, notes to the author)
-% ------------------------------------------------------------------
-\newcommand{\fillin}[1]{{\sethlcolor{yellow}\hl{#1}}}
 \newcommand{\relabel}[1]{\par\noindent{\small\color{blue}\textsf{[Label change: #1]}}\par}
 \newcommand{\rcomment}[2]{\subsection*{#1}\begin{quote}\itshape #2\end{quote}}
 \newcommand{\response}{\noindent\textbf{Response:} }
@@ -49,9 +43,8 @@ Thank you for the opportunity to revise our manuscript, and thank you to the rev
 Below, each reviewer comment is reproduced in italics, followed by our response. Page and line numbers refer to the clean revised manuscript. A version with changes marked is also provided.
 
 Sincerely,
-
 Rebecca McCabe, on behalf of all authors\\
-rgm222@cornell.edu
+rgm222\@cornell.edu
 
 \clearpage
 
@@ -101,7 +94,7 @@ Figure~3 and the associated text show how the different disciplines integrate to
 
 % ---------------- Final comments ----------------
 \rcomment{Reviewer 1, Comment 1}{The manuscript is overly long and should be significantly condensed to improve readability.}
-\response We thank the reviewer and agree that the main narrative was too long. \fillin{We have shortened the main text from X to Y pages} by moving the following to the appendix:
+\response We thank the reviewer and agree that the main narrative was too long. We have shortened the main text by moving detailed derivations and implementation details to the appendices, as follows:
 \begin{itemize}
   \item The bulk of the equations and details of the linearized model, now moved to \Cref{aor:sec:appendix-multiport}
   \item The equation for the wave velocity as a function of lateral position, now \Cref{aor:eq:wave-velocity-phasor} 
@@ -114,7 +107,7 @@ Material added at the reviewers' request, such as the notation list and paramete
 
 \rcomment{Reviewer 1, Comment 2}{All key terms and parameters must be clearly defined at first use to avoid ambiguity and improve clarity.}
 \response We thank the reviewer.
-We have converted all symbols and acronyms to use the \LaTeX~\texttt{glossaries} package, which programatically ensures that every acronym and key term is defined at its first.
+We have converted all symbols and acronyms to use the \LaTeX~\texttt{glossaries} package, which programmatically ensures that every acronym and key term is defined at first use.
 This package also automatically generates the notation list requested in Comment 3.
 
 \rcomment{Reviewer 1, Comment 3}{Add a notation list}
@@ -185,7 +178,7 @@ The fourth suggested citation is a conference paper covering the same topic as t
 \response We thank the reviewer. \fillin{[Write reply. Suggestion: point to the expanded limitations in Section 5.3 and the scope statement in the Abstract and Conclusion; cross-reference Reviewer~4, Major Comment~8.]}
 
 \rcomment{Reviewer 1, Comment 13}{The manuscript would benefit from improved organization, with redundant descriptions removed and clearer transitions between sections.}
-\response We thank the reviewer. We have reorganized the manuscript so that the main text focuses on the model structure, assumptions, verification and validation, benchmarking, and limitations. In particular, Section~3.3 now introduces describing functions (Section~3.3.1) and the QLPS method (Section~3.3.2) before the equation of motion (Section~3.3.4), so that concepts are defined before they are used. \fillin{Redundant descriptions of the modules in Sections 2 and 3 have been merged, and [X, Y] have been moved to the appendices.} Please see also our response to Comment~1.
+\response We thank the reviewer. We have reorganized the manuscript so that the main text focuses on the model structure, assumptions, verification and validation, benchmarking, and limitations. In particular, Section~3.3 now introduces describing functions (Section~3.3.1) and the QLPS method (Section~3.3.2) before the equation of motion (Section~3.3.4), so that concepts are defined before they are used. Redundant descriptions of the modules in Sections~2 and~3 have been consolidated, and detailed derivations and implementation details have been moved to the appendices. Please see also our response to Comment~1.
 
 \rcomment{Reviewer 1, Comment 14}{The manuscript requires substantial revision in terms of clarity, validation, novelty justification, and presentation before it can be considered for publication.}
 \response We thank the reviewer for this overall assessment. We have revised the manuscript in each of the four areas identified:
@@ -291,8 +284,7 @@ a nonlinearity is approximated simply as an amplitude-dependent gain and phase s
 
 \rcomment{Reviewer 2, Comment 6}{In section 3.3.5 and the corresponding appendix, I did not fully understand how the force saturation is applied. Are you simply scale the force limit by 4/pi and apply it on the force coefficient?}
 \response We thank the reviewer for this question. 
-
-\fillin{[Write reply. Suggestion: answer the yes/no question directly, then explain in three steps -- saturated torque, its fundamental Fourier component, and the resulting effective control gains $B_l$ and $K_l$ -- stating what the factor $4/\pi$ represents (the ratio of the fundamental to the peak of a square wave, the limiting case of saturation) and where it enters. Say where Appendix C.1 has been expanded.]}
+No. The force limit is not simply scaled by $4/\pi$ and then imposed directly on the force coefficient. The nonlinear controller first applies the force saturation in the time domain. The saturated sinusoidal force is then represented by its fundamental Fourier component, whose amplitude is used in the frequency-domain balance. The resulting amplitude-dependent effective control gains $B_l$ and $K_l$ enter the linearized frequency-domain dynamics. The factor $4/\pi$ is the limiting fundamental-to-peak ratio for a fully saturated sinusoidal input, i.e., the square-wave limit; it is not a universal correction to the force limit. The full describing-function derivation and the point at which this factor appears are given in Appendix~C.1.
 
 \rcomment{Reviewer 2, Comment 7}{In section 3.3.6, equation (24), are these coefficients fixed, or do they depend on the motion amplitude?}
 \response We thank the reviewer for this question. The drag coefficients $\mathbf{B}_d$ and $\vec{\gamma}_d$ in this equation (now Eq.~(23) in Section~3.3.8) are not fixed. As shown in Eq.~(98) of Appendix~C.4, they depend on both the amplitude and the phase of the body velocity. Because the coefficients depend on the response they help determine, MDOcean solves for them by fixed-point iteration, which typically converges in five to eight iterations to within 0.01~m and 3$^\circ$ across all sea states (Appendix~C.4.3). \fillin{We have added this clarification to Section 3.3.8 (p.~X, lines~A-B): ``The drag coefficients depend on the amplitude and phase of the body velocity (Eq.~(98)) and are therefore converged by fixed-point iteration, typically within five to eight iterations (Appendix~C.4.3).''}
@@ -352,7 +344,7 @@ We thank Reviewer~4 for the thorough and constructive review, and for noting the
 \response We thank the reviewer and agree. The present implementation is demonstrated only for the RM3 two-body axisymmetric point absorber, and the hydrodynamic, structural, and economic modules are specific to this archetype. The dynamics and control formulation is more general, but its analytical solution still assumes a single controlled degree of freedom and no dynamic coupling between frequencies or between control degrees of freedom \fillin{(assumptions AX-AY, Section 3.3.2)}. \fillin{We have revised the Abstract (lines~A-B), Section 5.3 (lines~C-D), and the Conclusion (lines~E-F) to state this scope explicitly.}
 
 \rcomment{Reviewer 4, Major Comment 9}{The paper contains a large amount of useful technical material, but the main narrative is difficult to follow. Some derivations, implementation details and secondary discussions could be moved to appendices or supplementary material. The main text should focus on the model structure, main assumptions, validation/calibration, runtime benchmarking, limitations and key findings.}
-\response We thank the reviewer for this suggestion. \fillin{[Write reply. Suggestion: list what moved to the appendices and how the main text is now organized around the elements the reviewer lists; cross-reference Reviewer~1, Comments~1 and~13.]}
+\response We thank the reviewer for this suggestion. We have reorganized the main text around the model structure, principal assumptions, verification and validation, calibration, runtime benchmarking, limitations, and key findings. Detailed derivations of the linearized model, the wave-velocity expression, drag iteration, and dynamic-limit formulation have been moved to the appendices. This reduces the amount of implementation-level detail in the main narrative while retaining the material needed to reproduce the methods. Please see also our responses to Reviewer~1, Comments~1 and~13.
 
 \rcomment{Reviewer 4, Minor Comment 1}{The abstract should mention the most important limitations more explicitly, especially the regular-wave approximation and the focus on a single WEC archetype.}
 \response We thank the reviewer.
@@ -360,7 +352,7 @@ The following sentence has been added to the abstract:
 ``Limiting assumptions include regular waves and point absorber archetype.''
 
 \rcomment{Reviewer 4, Minor Comment 2}{Please use ``validation'', ``calibration'', ``verification'' and ``benchmarking'' consistently throughout the manuscript.}
-\response We thank the reviewer. \fillin{[Write reply. Point to the definitions given in Section 4 and state that the terms were checked throughout, including figure and table captions -- e.g., Figure~12 currently calls the WEC-Sim comparison ``Verification Runs''. Cross-reference the General Comment.]}
+\response We thank the reviewer. We have defined verification, validation, calibration, and benchmarking at the start of Section~4 and checked their use throughout the manuscript, including figure and table captions. In particular, the WEC-Sim comparison is described as validation when it is used to assess the dynamics model, whereas the RM3 comparison is described as calibration where scaling factors are applied. Please see also our response to the General Comment.
 
 \rcomment{Reviewer 4, Minor Comment 3}{The term ``near-numerical accuracy'' should be used carefully. The model is fast and useful, but some agreement is obtained after calibration.}
 \response We thank the reviewer.
