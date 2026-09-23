@@ -505,8 +505,8 @@ This approach accurately evaluates the maximum power that a linear controller co
     the analytical derivation is provided in \Cref{sec:optimal-control}, with additional details in \Cref{sec:appendix-qp-solution}.
 \fi
 
-% --- M3, M4, M5 ---
-\paragraph{M3--M5: Saturate/Zero Violations}
+% --- M3 ---
+\paragraph{M3: Saturate or Zero Violations}
 If neither a numerical nor an analytical implementation is available to identify the optimal constrained linear controller, then the violating portion of the time-domain signals can be saturated or zeroed for the sake of power calculation (M3).
 This approach neglects the corresponding effect of the saturation/zeroing on other quantities in the system, which lowers the accuracy, and the controller does not have the opportunity to even approximately consider the constraint, resulting in a power production potentially much lower than the constrained optimal.
 \ifdefined\DISSERTATION
@@ -517,6 +517,7 @@ This approach neglects the corresponding effect of the saturation/zeroing on oth
     and is the most common \gls{acr-mfd} method in the marine energy field.
 \fi
 
+% ---- M4 -- M5 ---
 \paragraph{M4--M5: Penalize Violations}
 As a last resort, the energy in that sea state can be zeroed (M4),
 essentially assuming that the device enters survival mode in those cases to avoid constraint violation, or the entire design can be marked infeasible with a constraint in the optimization (M5), which \citet{mccabe_constrained_2013} pursues for a radiation limit constraint.
@@ -554,7 +555,8 @@ For slamming amplitude limits in the storm design load case, approach M5 is actu
 This is because the device is already in survival mode (preventing method M4), is not producing power (preventing methods M3 and M4), and is not applying a control input (preventing methods M1 and M2).
 
 %%%%%%%%%%%%%%%
-\subsubsection{Equation of Motion}\label{sec:eom}
+\FloatBarrier
+\subsubsection{Linearized Dynamics}\label{sec:eom}
 \ifdefined\DISSERTATION
     Before applying the \gls{acr-qlps} method described above, we first present the equations of motion for a standard linear \gls{acr-wec} model, starting in the time domain and quickly moving to the frequency domain.
     Specifically, we combine the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
@@ -564,6 +566,7 @@ This is because the device is already in survival mode (preventing method M4), i
     combining the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to express the equations of motion for a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \fi
 
+\paragraph{Multiport Structure}
 The dynamics portion of \Cref{fig:design-scope} represents this system as a multiport circuit, with effort 
 variables $\gls{sym-vec-e}$ and flow variables $\gls{sym-vec-q}$ at each port.
 Ports include the wave input, body mechanical, \gls{acr-pto} mechanical, generator mechanical, and generator electrical.
@@ -583,7 +586,7 @@ The excitation, radiation, and restoring forces are linear; the drag and \gls{ac
 \Cref{sec:appendix-body-dynamics} provides the equations and derivations for the intrinsic body dynamics, which encompasses the body inertia and all external forces except the \gls{acr-pto} forces.
 
 %%%%%%%%%%%%%%%
-\subsubsection{\gls{acr-pto} Model}
+\paragraph{\gls{acr-pto} Model}
 \label{sec:pto-model-overview}
 The \gls{acr-pto} model is a linear multiport effort-flow model that is valid for multiple degree of freedom devices across various energy domains.
 It consists of \gls{acr-pto} kinematics
@@ -596,7 +599,8 @@ The Thévenin equivalent circuit method is used to find the effective intrinsic 
 Details and circuit diagrams are provided in \Cref{sec:appendix-pto-kinematics,sec:appendix-combine-intrinsic-kinematics,sec:appendix-pto-dynamics}.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Power Production}\label{sec:power}
+\paragraph{Power Production}
+\label{sec:power}
 The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $\gls{sym-p}(\gls{sym-t}) = \gls{sym-e-t}~\gls{sym-q-t}$.
 \ifdefined\DISSERTATION
     Substituting $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-F-p},\gls{sym-dot-xi}\}$ yields the floating body mechanical power,
@@ -651,8 +655,10 @@ The full expansion of $\gls{sym-p-avg-elec}$ and $\gls{sym-p-pk-elec}$ in terms 
 
 %%%%%%%%%%%%%%%
 \subsubsection{Optimal Control}\label{sec:optimal-control}
-This subsection presents the unconstrained and constrained optimal-control solutions used in the model.
-\paragraph{Unconstrained}
+This subsection presents the unconstrained and constrained optimal-control solutions used in the model,
+starting with the linearized dynamics of \Cref{sec:eom} and building up in complexity to arrive back at the \gls{acr-qlps} formulation laid out in \Cref{sec:qlps}.
+
+\paragraph{Linearized, Unconstrained}
 In the absence of constraints, maximizing power at a given port requires impedance matching at that port due to the maximum power transfer theorem.
 We apply matching at the generator electrical port, so the electrical load impedance $\gls{sym-Z-l}$ must be the complex conjugate of the Th\'{e}venin equivalent source impedance $\gls{sym-Z-s-th}$ seen from that port.
 This is called reactive control, with subscript $\text{reac}$:
@@ -677,7 +683,8 @@ The power-maximizing \gls{acr-pto} damping $\gls{sym-B-l-damp}$ is then:
     We therefore formulate a control law that handles constraints below.
 \fi
 
-\paragraph{Constrained Impedance Matching}
+\paragraph{Linearized, Constrained}
+Now we incorporate constraints on the linearized system, yielding the method we term ``constrained impedance matching.''
 We first compile expressions for all metrics $\gls{sym-underline-M}$ which must be constrained.
 \ifdefined\DISSERTATION
     For the time being, we keep these expressions generic so they apply to any port.
@@ -811,7 +818,7 @@ $\gls{sym-Gamma-opt}=0$ corresponds to the impedance-matched solution (no active
 \paragraph{Constrained, QLPS with Linear Control (M2)}
 The previous section on constrained impedance matching describes how to achieve optimal power transfer for a linear dynamic system subject to quadratic constraints.
 Our system is quasi-linear, so the linear constrained impedance matching approach is applied iteratively with updated quasi-linear dynamic coefficients and updated constraint limits to approximate the optimal solution.
-\Cref{sec:appendix-dynamic-limits} covers the relationship between quasi-linear constraint limits and time-domain constraint limits for each constraint type.
+\Cref{sec:appendix-dynamic-limit} covers the relationship between quasi-linear constraint limits and time-domain constraint limits for each constraint type.
 Then, we implement an iterative loop around the dynamics and control module to update the quasi-linear coefficients (in the case of linear control, the only nonlinear coefficient is drag) and constraint limits until convergence is achieved.
 
 \paragraph{Constrained, QLPS with Nonlinear Control (M1.2)}
@@ -932,7 +939,7 @@ The annual energy production $\gls{acr-aep}$ in kWh/year for a farm of multiple 
 This study considers two design load cases: (1) cyclic operational loading in sea states where power is produced, and (2) storm loading in sea states where the device enters survival mode, where the \gls{acr-pto} locks and stops producing power.
 See \Cref{sec:appendix-dynamic-limit} for further discussion and derivation.
 
-\paragraph{Peak Forces and Amplitudes as a Function of Fundamental}
+\paragraph{Relating Peak Forces and Amplitudes to Fundamental}
 In the operational load case,
 the peak PTO force is found from the fundamental assuming that the PTO force signal shape is a saturated sine wave and the PTO force constructively interferes with shaft torque (a conservative assumption).
 The peak fluid force and peak displacement are assumed to equal their respective fundamental amplitudes.
@@ -940,6 +947,16 @@ This is a reasonable approximation for the displacements due to the low-pass nat
 
 In the storm case, the peak is assumed to equal the fundamental amplitude for the PTO force, fluid force, and displacements.
 The assumption applies here for the PTO force since the storm regime uses a brake not a generator, so there is no saturation nonlinearity.
+\ifdefined\DISSERTATION
+    Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves,
+    even for the storm condition.
+    This is a questionable assumption,
+    but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
+    \Cref{sec:discussion} will discuss possible future alternatives to this modeling choice.
+\else
+    Both load cases use standard linear wave theory with equivalent regular waves,
+    a questionable approximation whose limitations and possible future alternatives are discussed in \Cref{sec:unmodeled-effects}.
+\fi
 
 \paragraph{Permissible Force and Amplitude Limits}
 Permissible amplitudes must meet the following criteria:
@@ -966,22 +983,15 @@ Permissible amplitudes must meet the following criteria:
     Each free surface constraint can separately act as both an upper and lower limit on the oscillation magnitude.
     These limits depend on the phase of the response, not just the magnitude, so they do not use the quadratic coefficients of \Cref{tab:qp-constraints} but can nonetheless be expressed in a quadratic form compatible with \Cref{eq:opt-problem}.
 \fi
-%
+
 \ifdefined\DISSERTATION
     In early design studies that do not directly compute the hydrodynamic coefficients and associated power production,
     the amplitude limits proposed here could be plugged into Budal's upper bound,
     a common analytical expression that combines an upper bound on the excitation force with the maximum permissible body velocity
     to yield an upper bound on power production \citep{zou_practical_2023}.
-
-    Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves,
-    even for the storm condition.
-    This is a questionable assumption,
-    but it is necessary because optimization-suitable models for nonlinear wave forces do not currently exist.
-    \Cref{sec:discussion} will discuss possible future alternatives to this modeling choice.
-\else
-    Both load cases use standard linear wave theory with equivalent regular waves,
-    a questionable approximation whose limitations and possible future alternatives are discussed in \Cref{sec:unmodeled-effects}.
 \fi
+
+Permissible forces are determined based on structural criteria to be explained in \Cref{sec:structures}.
 
 % Todo: This \creftab:sea-state} is \hl{possibly out of date now:}
 % \begin{table}[htbp]
@@ -1035,6 +1045,7 @@ Further discussion is in \Cref{sec:appendix-narrowband}.
 
 %TC:break Structures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\FloatBarrier
 \subsection{Structures}\label{sec:structures}
 The MDOcean structures module uses forces from the dynamics module as well as area and volume outputs from the geometry module to calculate the factors of safety for various structural failure modes.
 The factors of safety represent the multiplicative increase in force before stress would surpass peak limits for storm loads and the endurance limit under operational loads.
