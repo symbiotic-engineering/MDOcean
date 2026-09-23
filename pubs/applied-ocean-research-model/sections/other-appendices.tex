@@ -89,8 +89,80 @@ See \Cref{sec:appendix-force-sat} for describing functions,
 \subsection{Dynamic Limit Details}
 \label{sec:appendix-dynamic-limit}
 
+The operational and storm loadcases described in \Cref{sec:design-load-cases} correspond roughly with the 1-year and 50-year return periods specified in the wave energy design standard \gls{acr-iec} \gls{acr-ts} 62600-2,
+and with the fatigue limit state (\gls{acr-fls}) and ultimate limit state (\gls{acr-uls}) in offshore wind standards.
+When the \gls{acr-wec} is in survival mode, an external brake locks the \gls{acr-pto}, enforcing the float and spar to move together without loading the generator.
+
+\ifdefined\DISSERTATION
+    This section details the allowable amplitudes and forces in each case.
+    Currently all sea states in the \gls{acr-jpd} with nonzero probability are considered operational, since the generator force and power limit serve to reduce loads in energetic sea states.
+    Future studies could control the transition from operational to survival mode more finely, perhaps with an additional input variable representing an operational incident energy threshold.
+\else
+    All nonzero-probability sea states in the \gls{acr-jpd} are considered operational;
+    the generator force and power limits reduce loads in the most energetic sea states.
+\fi
+
 \subsubsection{Relationship Between Peak and Fundamental Amplitudes}
 \label{sec:appendix-peak-fundamental}
+\Cref{tab:DLCs} summarizes the peak forces and amplitudes based on the assumptions of each design load case.
+
+\begin{table}[htbp]
+    \centering
+    \caption[Forces and amplitudes for each design load case]{Forces, amplitudes, and maximum allowable amplitudes in each design load case}
+\label{tab:DLCs}
+\begin{tabular}{P{0.28\linewidth}P{0.3\linewidth}P{0.33\linewidth}}
+    & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
+    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Peak powertrain force, $\max_{\gls{sym-t}} |\gls{sym-F-p}(\gls{sym-t})|$ \vspace{8pt} }
+        & \parbox[m]{\linewidth}{\centering
+        Given by \Cref{eq:peak-pto-force}}
+        & \parbox[m]{\linewidth}{\centering
+        Solve \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients for $\gls{sym-F-p}$}\\ \hline
+    \parbox[m]{\linewidth}{\centering
+    Peak fluid force, $\max_{\gls{sym-t}} |\gls{sym-m}\gls{sym-ddot-xi}(\gls{sym-t})-\gls{sym-F-p}(\gls{sym-t})|$ }
+        & \parbox[m]{\linewidth}{\centering
+        Given by \Cref{eq:peak-fluid-force} with \Cref{eq:op-hydro-coeffs} coefficients and $\gls{sym-F-p}$ from \Cref{eq:peak-pto-force}}
+        & \parbox[m]{\linewidth}{\centering
+        Given by \Cref{eq:peak-fluid-force} with \Cref{eq:st-hydro-coeffs} coefficients and $\gls{sym-F-p}$ from storm case}\\ \hline
+    \parbox[m]{\linewidth}{\centering
+    Peak float travel, $\max_{\gls{sym-t}} |\gls{sym-xi-f}(\gls{sym-t})|$ }
+        & \parbox[m]{\linewidth}{\centering
+        Given by \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients}
+        & \parbox[m]{\linewidth}{\centering
+        Given by \Cref{eq:eom-freq-domain} with \Cref{eq:st-hydro-coeffs} coefficients and $\gls{sym-F-p}=0$}\\ \hline
+    \parbox[m]{\linewidth}{\centering
+    Peak spar travel, $\max_{\gls{sym-t}} |\gls{sym-xi-s}(\gls{sym-t})|$ }
+        & \parbox[m]{\linewidth}{\centering
+        Given by \Cref{eq:eom-freq-domain} with \Cref{eq:op-hydro-coeffs} coefficients}
+        &Equals $\gls{sym-xi-f}$ due to brake\\ \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable relative amplitude between float and spar, $|\gls{sym-xi-f}-\gls{sym-xi-s}|_{\text{max}}$ \vspace{8pt}}
+        & \shortstack{$\min(\gls{sym-h}_{fs,\text{clear}},\gls{sym-h}_{fs,\text{up}},$\\$\gls{sym-h}_{fs,\text{down}})$}
+        &N/A\\  \hline
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable float amplitude, $|\gls{sym-xi-f}|_{\text{max}}$ \vspace{8pt} }
+        & $\min(\gls{sym-xi-f-lin}, \gls{sym-xi-f-slam})$
+        & N/A \\ \hline %$\gls{sym-X}_{\text{slam}}$\\
+    \parbox[m]{\linewidth}{\centering \vspace{8pt}
+    Maximum allowable spar amplitude, $|\gls{sym-xi-s}|_{\text{max}}$ }
+        & $\min(\gls{sym-xi-s-lin}, \gls{sym-xi-s-slam})$
+        & N/A %$\gls{sym-X}_{\text{slam}}$\\
+\end{tabular}
+\end{table}
+
+The surge force for each component is calculated as \citep{newman_motions_1963}
+\begin{equation}\label{eq:surge-force}
+   \gls{sym-F-surge} = \frac{\gls{sym-H}\gls{sym-rho-w} \gls{sym-omega}^2 \gls{sym-A-w}}{\gls{sym-k-wavenumber}} (\exp(-\gls{sym-k-wavenumber}\gls{sym-z-top})-\exp(-\gls{sym-k-wavenumber}\gls{sym-T-draft}))
+\end{equation}
+using the respective waterplane areas $\gls{sym-A-w}$  and drafts $\gls{sym-T-draft}$ for the float and spar.
+The top vertical height $\gls{sym-z-top}$ is set to zero for the float and $\gls{sym-T-f-2}$ for the spar.
+The design surge force is the maximum surge force over all nonzero-probability sea states.
+Equation~\eqref{eq:surge-force} assumes a slender cylinder with diameter much smaller than the wavelength and may be less accurate for the float due to diffraction effects.
+Incorporating semi-analytical hydrodynamic coefficients for surge is a possible area of future work.
+Maximum acceptable heave %and surge
+forces will be evaluated with structural factors of safety in \Cref{sec:structures}.
+The structures model currently lacks the ability to account for surge forces, so the surge force calculation is not used in the simulation.
 
 \ifdefined\DISSERTATION
     The heave forces in equation \eqref{eq:eom} can be separated into fluid forces, which act on the vertically-oriented wetted surface of the body, the \gls{acr-pto} force, which acts at the connection between the float and the spar, and the inertial force, which for dynamic purposes is assumed to act at the center of mass but for structural purposes actually acts distributed over the material.
@@ -148,6 +220,51 @@ The fundamental amplitudes are also used for the peak float and spar displacemen
 The fundamental is more accurate for displacements than for forces because the second-order plant dynamics filter out high-frequency inputs, attenuating drag-induced harmonics in the displacement response.
 
 A future refinement could explicitly reconstruct the time-domain drag force from the describing function and track its peak directly, at the cost of either time-domain integration or additional Fourier-component bookkeeping in the frequency-domain formulation.
+
+\paragraph{Maximum Permissible Amplitudes}
+The table also indicates the maximum permissible amplitudes.
+In operational sea states, the geometric clearance between the float and spar is enforced to prevent overtravel.
+The permissible heights for upward and downward motion of the float relative to the spar are:
+\begin{equation}\label{eq:h-fs-up-down}
+\begin{aligned}
+    \gls{sym-h-fs-up} &= \gls{sym-h-s} - \gls{sym-T-s} - (\gls{sym-h-f}- \gls{sym-T-f-2}) \\
+    \gls{sym-h-fs-down} &= \gls{sym-T-s} - \gls{sym-T-f-2} - \gls{sym-h-d}
+\end{aligned}
+\end{equation}
+Additionally, a limit of $\gls{sym-h-fs-clear}$ (see definition in \Cref{fig:dims}) is required to ensure clearance of the tubular structure connecting the float and spar.
+
+The conditions for linear wave-body interaction are enforced to maintain compatibility with the linear potential flow theory approach of \Cref{sec:hydro}.
+This maximum amplitude $\gls{sym-xi-lin}$ for the float and spar respectively is
+\begin{equation}
+    \gls{sym-xi-f-lin} = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-f-2}), \quad
+    \gls{sym-xi-s-lin}  = \frac{1}{10} (\gls{sym-h}-\gls{sym-T-s})
+\end{equation}
+\ifdefined\DISSERTATION
+    which is derived by requiring that the height of the water column below the body (the relevant dimension determining the hydrodynamic coefficients in \gls{acr-meem}) does not change by more than 10\% from its equilibrium value when the body is at its peak displacement.
+\else
+    derived by requiring the water column height below the body (relevant for the \gls{acr-meem} hydrodynamic coefficients) to vary by no more than 10\% from equilibrium.
+\fi
+
+In both operational and storm states, the \gls{acr-wec} surface should not transiently pierce the wave free surface, since this causes extremely high loads.
+This includes slamming (the bottom surface rises out of the water and impacts on reentry) and submersion (the top of the \gls{acr-wec} becomes fully submerged).
+The condition to prevent slamming and submersion in regular waves of height $\gls{sym-H}$ is derived in \Cref{sec:appendix-slam}.
+These limits depend on the phase of the response, not just the magnitude, so they do not use the quadratic coefficients of \Cref{tab:qp-constraints} but can nonetheless be expressed in a quadratic form compatible with \Cref{eq:opt-problem}:
+\begin{equation}\label{eq:slam-constraint-quadratic}
+    \gls{sym-hat-xi}^*\gls{sym-hat-xi} 
+    - \gls{sym-H} \Re(
+                    \exp (i\gls{sym-k-wavenumber}\gls{sym-y})
+                    \gls{sym-hat-xi}
+                    )
+    < \gls{sym-dDelta-z-slam}^2
+    -\left(
+            \frac{\gls{sym-H}}{2}
+    \right)^2
+\end{equation}
+for relevant vertical body dimension $\gls{sym-dDelta-z-slam}$ and horizontal coordinate $\gls{sym-y}$.
+The values of $\gls{sym-dDelta-z-slam}$ used for float and spar in operational and storm cases and the rationale
+(avoiding slanted-surface slamming, damping plate surfacing, and related effects)
+are given in \Cref{sec:appendix-slam}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Slamming and Submersion Amplitude}
