@@ -1,7 +1,7 @@
 %DIF 1c1-4
 %DIF LATEXDIFF DIFFERENCE FILE
-%DIF DEL .calkit/local/latex-diff-build/base/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 16:47:56 2026
-%DIF ADD .calkit/local/latex-diff-build/head/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 16:47:56 2026
+%DIF DEL .calkit/local/latex-diff-build/base/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 17:14:47 2026
+%DIF ADD .calkit/local/latex-diff-build/head/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 17:14:47 2026
 %DIF < \documentclass[a4paper,fleqn,colorlinks,unicode,hypertexnames=false]{cas-dc}
 %DIF -------
 \documentclass[a4paper,fleqn,colorlinks,unicode,lineno]{cas-dc} %DIF > 
@@ -869,7 +869,7 @@
 \DeclareFigureOptions{aor:figs/from-matlab/asymptotic_b_vector.pdf}{.5\linewidth}{.6\linewidth} %DIF > 
 \DeclareFigureOptions{aor:figs/from-matlab/assumptions.pdf}{\linewidth}{\linewidth} %DIF > 
 \DeclareFigureOptions{aor:figs/from-matlab/case4_v1_auto_case2_overlay_loglog_khRxRpa2b_fv1.pdf}{.8\linewidth}{\linewidth} %DIF > 
-\DeclareFigureOptions{aor:figs/from-matlab/circuit_intrinsic.pdf}{\linewidth}{.7\linewidth} %DIF > 
+\DeclareFigureOptions{aor:figs/from-matlab/circuit_intrinsic.pdf}{.7\linewidth}{.7\linewidth} %DIF > 
 \DeclareFigureOptions{aor:figs/from-matlab/circuit_kinematics.pdf}{.7\linewidth}{.8\linewidth} %DIF > 
 \DeclareFigureOptions{aor:figs/from-matlab/circuit_pto.pdf}{}{} %DIF > 
 \DeclareFigureOptions{aor:figs/from-matlab/control_analysis_flowcharts.pdf}{1\linewidth}{1\linewidth} %DIF > 
@@ -3676,8 +3676,8 @@ For early-stage \DIFdelbegin \DIFdel{WEC }\DIFdelend \DIFaddbegin \gls{acr-wec} 
 \else
     The directly comparable studies above either use slow numerical models that limit optimization scope (e.g.\ a \DIFdelbegin \DIFdel{BEM-based 4-WEC }\DIFdelend \DIFaddbegin \gls{acr-bem}\DIFadd{-based 4-}\gls{acr-wec} \DIFaddend array optimization that took 36 hours per frequency on a high-end workstation \citep{khanal_multi-objective_2024}) or fast algebraic models that lack accuracy for meaningful design conclusions (e.g.\ \citep{mccabe_multidisciplinary_2022}).
     Semi-analytical models offer a useful intermediate that has not yet been combined with multidisciplinary scope in an open-source WEC tool, which is the gap MDOcean addresses.
-    \DIFaddbegin \hl{Merge this section with the previous one, and just say that I can explain all the stuff in 1.2 by the type of model they use.}
-\DIFaddend \fi
+    %DIF > \hl{Merge this section with the previous one, and just say that I can explain all the stuff in 1.2 by the type of model they use.}
+\fi
 
 \subsection{Paper Contributions and Roadmap}
 \ifdefined\DISSERTATION
@@ -3761,16 +3761,30 @@ Inputs and outputs are organized according to standard MDO conventions \mbox{%DI
 %DIFDELCMD < %%%
 \DIFdelendFL \DIFaddbeginFL \ifdefined\DISSERTATION
     \begin{foldoutpage}
-\fi
-        \begin{figure}
+    \begin{figure}
+\else
+    \begin{figure*}
+\fi   
         \DIFaddendFL \centering
         \DIFdelbeginFL \DIFdelFL{\includegraphics[width=\linewidth]{../../../base/pubs/applied-ocean-research-model/figs/from-matlab/xdsm.pdf}
 }%DIFDELCMD < \caption{%
 {%DIFAUXCMD
 \DIFdelFL{Simplified XDSM diagram}}%DIFAUXCMD
 %DIFDELCMD < \label{fig:n2}
-%DIFDELCMD < \end{figure*}
-%DIFDELCMD < \begin{figure*}[b!]
+%DIFDELCMD < %%%
+\DIFdelendFL \DIFaddbeginFL \DIFaddFL{\includegraphics[width=\textwidth]{figs/from-matlab/two_port_dimension_coeff_chain.pdf}
+        }\caption[Full \gls{acr-wec} design space and scope of MDOcean's analyses]{\DIFaddFL{Flowchart showing the full }\gls{acr-wec} \DIFaddFL{design space and the scope of MDOcean's static, dynamic, and optimal control analyses.
+        For visual clarity, some dependencies are omitted, such as that of the constraint limits on static analyses.
+        These dependencies are included in the }\gls{acr-xdsm} \DIFaddFL{diagram in \mbox{%DIFAUXCMD
+\Cref{fig:n2}}\hskip0pt%DIFAUXCMD
+.}}
+        \label{fig:design-scope}
+\ifdefined\DISSERTATION
+    \end{figure}
+    \end{foldoutpage}
+\else
+    \DIFaddendFL \end{figure*}
+\DIFdelbegin %DIFDELCMD < \begin{figure*}[b!]
 %DIFDELCMD < \centering
 %DIFDELCMD < %%%
 \DIFdelFL{\includegraphics[width=1\linewidth]{figs/from-matlab/control_analysis_flowcharts.pdf}
@@ -3780,19 +3794,21 @@ Inputs and outputs are organized according to standard MDO conventions \mbox{%DI
 %DIFAUXCMD
 %DIFDELCMD < \label{fig:control-arch}
 %DIFDELCMD < \end{figure*}
-%DIFDELCMD < 
-
 %DIFDELCMD < %%%
-\DIFdelend \DIFaddbegin \DIFadd{\includegraphics[width=\textwidth]{figs/two_port_dimension_coeff_chain.pdf}
-        }\caption[Full \gls{acr-wec} design space and scope of MDOcean's analyses]{\DIFadd{Flowchart showing the full }\gls{acr-wec} \DIFadd{design space and the scope of MDOcean's static, dynamic, and optimal control analyses.
-        For visual clarity, some dependencies are omitted, such as that of the constraint limits on static analyses.
-        These dependencies are included in the }\gls{acr-xdsm} \DIFadd{diagram in \mbox{%DIFAUXCMD
+\DIFdelend \DIFaddbegin \fi
+\DIFaddend 
+
+\DIFaddbegin \DIFadd{The }\gls{acr-mdo} \DIFadd{and }\gls{acr-ccd} \DIFadd{literature offers various structures to combine dynamic and static analysis, design optimization, and optimal control.
+After considering eight possible analysis and control architectures, MDOcean adopts the explicit-}\gls{acr-mdf} \DIFadd{formulation, highlighted in \mbox{%DIFAUXCMD
+\Cref{fig:control-arch}}\hskip0pt%DIFAUXCMD
+,
+which is the most computationally efficient given the coupling and computational cost of its various disciplines.
+The analysis architecture determines whether it is a solver or an optimization constraint which converges the dynamic residuals, while the control architecture determines whether control variables are determined via simulation, residual solve, or simultaneous/nested optimization.
+The implementation follows the module structure depicted in \mbox{%DIFAUXCMD
 \Cref{fig:n2}}\hskip0pt%DIFAUXCMD
-.}}
-        \label{fig:design-scope}
-        \end{figure}
-\DIFaddend \ifdefined\DISSERTATION
-    \DIFdelbegin \paragraph{\DIFdel{Absence of Feedback Coupling}}
+.
+}\DIFaddend \ifdefined\DISSERTATION
+\DIFdelbegin \paragraph{\DIFdel{Absence of Feedback Coupling}}
     %DIFAUXCMD
 \addtocounter{paragraph}{-1}%DIFAUXCMD
 \DIFdel{The lack of variables in the lower left portion of the diagram indicates that there is no feedback coupling between modules, so an external solver to enforce consistency is not necessary.
@@ -3804,22 +3820,20 @@ Inputs and outputs are organized according to standard MDO conventions \mbox{%DI
     Most heavily coupled are the bulk dimensions,
 which are input to the geometry, hydrodynamics, and structural modules.
     Thicknesses and generatorratings are each input to two modules, with thicknesses coupling geometry and structures and generator ratings coupling dynamics and economics.
-Moreover, the presence of variables in the upper right of the diagram indicates feed-forward coupling in which the output of one module directly affects subsequent modules.
-    }\DIFdelend \DIFaddbegin \end{foldoutpage}
-\fi
-\DIFaddend 
+Moreover, }\DIFdelend \DIFaddbegin \else
+    \DIFadd{\mbox{%DIFAUXCMD
+\citet{mccabe_dissertation_2026} }\hskip0pt%DIFAUXCMD
+provides more detailed architecture rationale, coupling analysis, }\DIFaddend the \DIFdelbegin \DIFdel{presence of variables in the upper right of the diagram indicates feed-forward coupling in which the output of one module directly affects subsequent modules.
+    }%DIFDELCMD < 
 
-\DIFdelbegin \DIFdel{Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
+%DIFDELCMD <     %%%
+\DIFdel{Analysis of coupling is important because under certain conditions, the optimization can be decomposed into separate problems to be solved in sequence or in parallel without sacrificing performance.
     For example, techniques like block coordinate descent or alternating direction method of multipliers apply if coupling is convex \mbox{%DIFAUXCMD
 \citep{wright_coordinate_2015}}\hskip0pt%DIFAUXCMD
 , and monotonicity-based decomposition and constraint elimination apply if coupling is monotonic \mbox{%DIFAUXCMD
 \citep{azarm_monotonicity-based_1988,papalambros_principles_2017}}\hskip0pt%DIFAUXCMD
 .
-    The present coupling of WEC disciplines}\DIFdelend \DIFaddbegin \DIFadd{The }\gls{acr-mdo} \DIFadd{and }\gls{acr-ccd} \DIFadd{literature offers various structures to combine dynamic and static analysis, design optimization, and optimal control.
-After considering eight possible analysis and control architectures, MDOcean adopts the explicit-}\gls{acr-mdf} \DIFadd{formulation, highlighted in \mbox{%DIFAUXCMD
-\Cref{fig:control-arch}}\hskip0pt%DIFAUXCMD
-,
-which }\DIFaddend is \DIFdelbegin \DIFdel{non-convex }\DIFdelend \DIFaddbegin \DIFadd{the most computationally efficient given the coupling }\DIFaddend and \DIFdelbegin \DIFdel{non-monotonic, so concurrent optimization is required to obtain the system optimal design.
+    The present coupling of WEC disciplinesis non-convex }\DIFdelend \DIFaddbegin \DIFadd{relation to }\gls{acr-mdo} \DIFadd{and }\gls{acr-ccd} \DIFadd{literature, }\DIFaddend and \DIFdelbegin \DIFdel{non-monotonic, so concurrent optimization is required to obtain the system optimal design.
     Non-monotonicity means that perturbing a variable from one module in a certain direction does not necessarily determine the direction of the propagated change in coupling variables , objective, and constraints computed in other modules.
 Non-convexity arises from the presence of both positive and negative curvature in the coupled variable space, leading to multiple local optima.
 With an objective $J$ of LCOE, for example, while an increase in hydrodynamic damping generally increases power production (beneficial to $J$), it also increases structural loading (detrimental to $g$), and the larger bulk dimensions required to achieve that higher damping may produce higher stresses (detrimental to $g$) and increase the required structural material (detrimental to $J$).
@@ -3827,16 +3841,7 @@ With an objective $J$ of LCOE, for example, while an increase in hydrodynamic da
     Furthermore, while even in a unified optimization it may be tempting to calculate the structural thicknesses within the structures module as the minimum required to sustain loads without failure, it is important to keep structural thicknesses as design variables because they also contribute to the hydrostatic constraints computed in the geometry module.
 If active, these constraints would make the system-level optimum material thickness larger than what is structurally necessary.
     Using a single optimizer to drive the design of all modules and consider all constraints addresses this non-monotonic coupling. 
-    }\DIFdelend \DIFaddbegin \DIFadd{computational cost of its various disciplines.
-The analysis architecture determines whether it is a solver or an optimization constraint which converges the dynamic residuals, while the control architecture determines whether control variables are determined via simulation, residual solve, or simultaneous/nested optimization.
-The implementation follows the module structure depicted in \mbox{%DIFAUXCMD
-\Cref{fig:n2}}\hskip0pt%DIFAUXCMD
-.
-}\ifdefined\DISSERTATION
-\else
-    \DIFadd{\mbox{%DIFAUXCMD
-\citet{mccabe_dissertation_2026} }\hskip0pt%DIFAUXCMD
-provides more detailed architecture rationale, coupling analysis, the relation to }\gls{acr-mdo} \DIFadd{and }\gls{acr-ccd} \DIFadd{literature, and describes an earlier version of MDOcean using the implicit-}\gls{acr-mdf} \DIFadd{architecture.
+    }\DIFdelend \DIFaddbegin \DIFadd{describes an earlier version of MDOcean using the implicit-}\gls{acr-mdf} \DIFadd{architecture.
 }\fi
 %DIF >  Point of this section: out of the 8 examples of CCD architecture and \gls{acr-mdo} architectures, I use the one in the box because it's fast.
 %DIF >  I implement it with the module structure of the XDSM diagram.
@@ -6291,16 +6296,16 @@ added mass and damping matrices are positive definite
 );
 potential and radial velocity match at the boundary of adjacent fluid regions
 (see \mbox{%DIFAUXCMD
-\cite[Fig.~\hl{XX}]{mccabe_open-source_2024}}\hskip0pt%DIFAUXCMD
+\cite[Fig.~7]{mccabe_open-source_2024}}\hskip0pt%DIFAUXCMD
 );
 and
 hydrodynamic coefficients have converged with respect to chosen series truncation order
 (see \mbox{%DIFAUXCMD
-\cite[Fig.~\hl{XX}]{mccabe_open-source_2024}}\hskip0pt%DIFAUXCMD
+\cite[Fig.~6]{mccabe_open-source_2024}}\hskip0pt%DIFAUXCMD
 ).
 Additionally, potential and hydrodynamic coefficients match previously published MEEM results for a reference geometry
 (see \mbox{%DIFAUXCMD
-\cite[Fig.~\hl{XX}]{mccabe_open-source_2024}}\hskip0pt%DIFAUXCMD
+\cite[Fig.~4]{mccabe_open-source_2024}}\hskip0pt%DIFAUXCMD
 )}\DIFaddend .
 
 \DIFdelbegin \DIFdel{These errors are deemed acceptable for the purposes of this study, since the goal is to demonstrate the value of simultaneously analyzing multiple disciplines and the ability to quickly evaluate a large number of design options.
