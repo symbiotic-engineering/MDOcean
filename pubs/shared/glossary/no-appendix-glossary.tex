@@ -87,7 +87,7 @@
 
 \newglossarystyle{mystyle}{%
   \setglossarystyle{list}%
-  \setlist[description]{itemsep=0.15ex,parsep=0.15ex}
+  \setlist[description]{itemsep=0.15ex,parsep=0.15ex,topsep=0pt}
 
   \renewcommand*{\glossentry}[2]{%
     \mainmatterglossaryfalse
@@ -99,11 +99,15 @@
       ##2%
     \endgroup
     \ifmainmatterglossary
-      \item
+      \glsxtrifhasfield*{alias}{##1}
+      {}
+      {%
+        \item
         \glsentryitem{##1}%
         \glstarget{##1}{\glossentryname{##1}}%
         \space
         \glossentrydesc{##1}%
+      }
     \fi
   }%
 }
