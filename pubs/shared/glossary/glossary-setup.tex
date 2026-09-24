@@ -262,7 +262,7 @@
 % Glossary entry
 % ============================================================
 
-\newcommand{\newsym}[3]{%
+\newcommand{\newsym}[4]{%
   \ifglsentryexists{sym-#1}{%
     \PackageError{glossary-setup}{Duplicate symbol key `#1' (label `sym-#1') in \string\newsym}{%
       Remove or rename one of the duplicate \string\newsym definitions.\MessageBreak
@@ -270,14 +270,24 @@
     }%
   }{}%
   \edef\newsym@sortkey{\mysortkey{#1}}%
-  \newglossaryentry{sym-#1}{
-    name={\ensuremath{#2}},
-    category={symbol},
-    sort={\newsym@sortkey},
-    type={sym-\mysymgroup{#1}},
-    description={#3}}
+  \ifblank{#4}{%
+    \newglossaryentry{sym-#1}{
+      name={\ensuremath{#2}},
+      category={symbol},
+      sort={\newsym@sortkey},
+      type={sym-\mysymgroup{#1}},
+      description={#3}}
+  }{%
+    \newglossaryentry{sym-#1}{
+      name={\ensuremath{#2}},
+      category={symbol},
+      sort={\newsym@sortkey},
+      type={alias-sym-\mysymgroup{#1}},
+      description={#3},
+      alias={#4}}
+  }%
 }
 \makeatother
 
-\input{glossary/glossary-acronyms.tex}
-\input{glossary/glossary-symbols-shared.tex}
+% \input{glossary/glossary-acronyms.tex}
+% \input{glossary/glossary-symbols-shared.tex}
