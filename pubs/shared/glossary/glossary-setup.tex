@@ -262,7 +262,12 @@
 % Glossary entry
 % ============================================================
 
-\newcommand{\newsym}[4]{%
+% \renewcommand{\glsxtrsetaliasnoindex}{%
+%     \glsxtrindexaliased
+%     \setkeys{glslink}{noindex}%
+% }
+
+\NewDocumentCommand{\newsym}{m m m o}{%
   \ifglsentryexists{sym-#1}{%
     \PackageError{glossary-setup}{Duplicate symbol key `#1' (label `sym-#1') in \string\newsym}{%
       Remove or rename one of the duplicate \string\newsym definitions.\MessageBreak
@@ -270,13 +275,13 @@
     }%
   }{}%
   \edef\newsym@sortkey{\mysortkey{#1}}%
-  \ifblank{#4}{%
+  \IfNoValueTF{#4}{%
     \newglossaryentry{sym-#1}{
       name={\ensuremath{#2}},
       category={symbol},
       sort={\newsym@sortkey},
       type={sym-\mysymgroup{#1}},
-      description={#3}}
+      description={#3}}%
   }{%
     \newglossaryentry{sym-#1}{
       name={\ensuremath{#2}},
@@ -284,7 +289,7 @@
       sort={\newsym@sortkey},
       type={alias-sym-\mysymgroup{#1}},
       description={#3},
-      alias={#4}}
+      alias={#4}}%
   }%
 }
 \makeatother
