@@ -1,4 +1,8 @@
-flowchart TD
+---
+config:
+    layout: elk
+---
+flowchart LR
     A1["A1 - nonlinearities are harmonics"]
     A2["A2 - system low pass"]
     A3["A3 - quasi linearized"]
@@ -8,17 +12,16 @@ flowchart TD
     A7["A7 - constraints fundamental"]
     A8["A8 - quadratic objective"]
     A9["A9 - quadratic constraints"]
-    A10["A10 - passive dynamics convex"]
+    A10["A10 - passive dynamics"]
     A11["A11 - no frequency coupling"]
-    A12["A12 - no degree of freedom coupling"]
+    A12["A12 - no PTO DOF coupling"]
 
-    DFs["Describing functions"]
-    QLPS["Quasi linear pseudo spectral control"]
-    ConvexQLPS["Convex quasi linear pseudo spectral control"]
-    AnalyticalQLPS["Analytical quasi linear pseudo spectral control"]
+    DFs["DFs"]
+    QLPS["QLPS"]
+    ConvexQLPS["Convex QLPS"]
+    QCQP-QLPS["QCQP QLPS"]
+    AnalyticalQLPS["Analytical QLPS"]
 
-    A1 --> DFs
-    A2 --> DFs
     A3 --> DFs
     A4 --> DFs
     A5 --> DFs
@@ -30,8 +33,10 @@ flowchart TD
     A4 --> A7
     A7 --> QLPS
 
-    A8 --> ConvexQLPS
-    A9 --> ConvexQLPS
+    QLPS --> QCQP-QLPS
+    A8 --> QCQP-QLPS
+    A9 --> QCQP-QLPS
+
     A10 --> ConvexQLPS
     QLPS --> ConvexQLPS
 
@@ -41,8 +46,10 @@ flowchart TD
     A12 --> AnalyticalQLPS
     QLPS --> AnalyticalQLPS
 
-    classDef assumptions fill:#ffef99,stroke:#333,stroke-width:2px;
+    classDef assumptionsModel fill:#ffef99,stroke:#333,stroke-width:2px;
+    classDef assumptionsOptim fill:#99ff99,stroke:#333,stroke-width:2px;
     classDef modelchars fill:#bde7ff,stroke:#333,stroke-width:2px;
 
-    class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12 assumptions
-    class DFs,QLPS,ConvexQLPS,AnalyticalQLPS modelchars
+    class A1,A2,A3,A4,A5,A6,A7,A10,A11,A12 assumptionsModel
+    class A8,A9 assumptionsOptim
+    class DFs,QLPS,QCQP-QLPS,ConvexQLPS,AnalyticalQLPS modelchars
