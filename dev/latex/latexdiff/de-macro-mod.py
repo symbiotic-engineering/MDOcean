@@ -1028,7 +1028,7 @@ class Tex_stream(Stream):
 		text_str = source_fp.read()
 		source_fp.close()
 
-		self.smart_tokenize(text_str, handle_inputs=True)
+		self.smart_tokenize(text_str, handle_inputs=self.handle_inputs)
 		if not self.data:
 			raise Error("Empty tokenization result.")
 		self.reset()
@@ -1070,7 +1070,7 @@ class Tex_stream(Stream):
 
 # Main
 
-long_optlist = ["debug","defs="]
+long_optlist = ["debug", "defs=", "no-inputs"]
 options, restargs = getopt_map("x", long_optlist)
 
 debug = False
@@ -1090,6 +1090,7 @@ ts = Tex_stream()
 ts.defs_db = defs_db
 ts.defs_db_file = defs_db_file
 ts.debug = debug
+ts.handle_inputs = "--no-inputs" not in options
 
 ts.restore_defs()
 for root in restargs:

@@ -8,5 +8,5 @@ clean="${tmp%.tex}-clean.tex"
 trap 'rm -f "$tmp" "$clean"' EXIT
 
 cat > "$tmp"
-de-macro "$tmp"
+python "$(dirname "$0")/de-macro-mod.py" --no-inputs "$tmp"
 cat "$clean"
