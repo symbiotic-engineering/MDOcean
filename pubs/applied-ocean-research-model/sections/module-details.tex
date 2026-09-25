@@ -37,7 +37,7 @@ Static pitch stability is enforced by requiring:
 \begin{equation}\label{eq:GM}
     \gls{sym-GM} = \gls{sym-KB} + \gls{sym-BM} - \gls{sym-KG} > 0,
 \end{equation}
-\noindent where $\gls{sym-BM} = \gls{sym-pi} \gls{sym-D-f}^4/(64V_{\text{sub}})$ \citep{newman}.
+\noindent where $\gls{sym-BM} = \gls{sym-pi} \gls{sym-D-f}^4/(64 \gls{sym-V-sub})$ \citep{newman}.
 
 Hydrostatic equilibrium is enforced by matching displaced water mass to total system mass, with any mismatch compensated using ballast with mass $\gls{sym-m-bal}$:
 \begin{equation}
@@ -359,12 +359,15 @@ The drag describing function formula is encoded directly into the simulation (se
 while the control force describing function is implemented indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
 \Cref{fig:assumptions} summarizes how these assumptions connect to DFs and to increasingly specialized QLPS formulations.
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
     \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/assumptions.pdf}]{figs/from-matlab/assumptions.pdf}
-    \caption{Directed graph of assumptions and model characteristics for DFs and QLPS.}
+    \caption{Directed graph of assumptions for DFs and QLPS.
+    Assumptions on system dynamics are yellow, assumptions on the optimal control objectives/constraints are green, and methods for dynamic analysis/control synthesis are blue.
+    A single arrow implies necessity and all arrows imply sufficience.
+    For example, A1 and A2 are each individually necessary but insufficient for A3; A1 and A2 are together sufficient for A3.}
     \label{fig:assumptions}
-\end{figure}
+\end{figure*}
 
 \subsubsection{Quasi-Linear Pseudo-Spectral Optimal Control}
 \label{sec:qlps}
@@ -608,15 +611,15 @@ The instantaneous time-domain power at any port is simply the product of the por
     $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-tau},\gls{sym-Omega}\}$ yields the generator mechanical power,
     and $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-V},\gls{sym-I}\}$ yields the generator electrical power.
 \else
-    The same expression is evaluated at the floating body, \gls{acr-pto}, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{e,\gls{sym-q}\}$.
+    The same expression is evaluated at the floating body, \gls{acr-pto}, generator mechanical, and generator electrical ports by substituting the corresponding effort/flow pair $\{\gls{sym-e},\gls{sym-q}\}$.
 \fi
 
 In the frequency domain assuming sinusoidal waveforms, the active power $\gls{sym-P}$, reactive power $\gls{sym-Q}$, complex power $\gls{sym-S}$, and apparent power $|\gls{sym-S}|$ from electrical engineering \citep{saadat_power_1999} are
 \begin{equation}\label{eq:power-PQS}
 \begin{aligned}
-    \gls{sym-P} &= \tfrac{1}{2}\Re (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re (\gls{sym-Z-term})|\gls{sym-hat-q}|^2,\\
-    \gls{sym-Q} &= \tfrac{1}{2}\Im (\hat{e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im (\gls{sym-Z-term})|\gls{sym-hat-q}|^2, \\
-    \gls{sym-S} &= \gls{sym-P} + iQ = \tfrac{1}{2}\hat{e}\gls{sym-hat-q}^* = \tfrac{1}{2}\gls{sym-Z-term}|\gls{sym-hat-q}|^2, \\
+    \gls{sym-P} &= \tfrac{1}{2}\Re (\gls{sym-hat-e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Re (\gls{sym-Z-term})|\gls{sym-hat-q}|^2,\\
+    \gls{sym-Q} &= \tfrac{1}{2}\Im (\gls{sym-hat-e}\gls{sym-hat-q}^*) = \tfrac{1}{2}\Im (\gls{sym-Z-term})|\gls{sym-hat-q}|^2, \\
+    \gls{sym-S} &= \gls{sym-P} + i\gls{sym-Q} = \tfrac{1}{2}\gls{sym-hat-e}\gls{sym-hat-q}^* = \tfrac{1}{2}\gls{sym-Z-term}|\gls{sym-hat-q}|^2, \\
     |\gls{sym-S}| &= \tfrac{1}{2}|\gls{sym-Z-term}||\gls{sym-hat-q}|^2,
 \end{aligned}
 \end{equation}
@@ -696,11 +699,11 @@ We first compile expressions for all metrics $\gls{sym-underline-M}$ which must 
 \fi
 \begin{equation}\label{eq:metrics}
     \gls{sym-underline-M} = \frac{1}{4} \begin{bmatrix}
-    \hat{e} \\ \gls{sym-hat-q}
+    \gls{sym-hat-e} \\ \gls{sym-hat-q}
     \end{bmatrix}^*
     \gls{sym-mathbf-Q-M}
     \begin{bmatrix}
-    \hat{e} \\ \gls{sym-hat-q}
+    \gls{sym-hat-e} \\ \gls{sym-hat-q}
     \end{bmatrix}
 \end{equation}
 The matrices for various metrics are given in \Cref{tab:power-metrics}.
@@ -743,12 +746,12 @@ Note that the apparent power $|\gls{sym-S}|$, and therefore the peak power from 
 \begin{equation}
     |\gls{sym-S}|^2 = \gls{sym-S} \gls{sym-S}^* 
     = \frac{1}{16}
-    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}^*
+    \begin{bmatrix} \gls{sym-hat-e} \\ \gls{sym-hat-q} \end{bmatrix}^*
     \gls{sym-mathbf-Q-S}
-    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}
-    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}^*
+    \begin{bmatrix} \gls{sym-hat-e} \\ \gls{sym-hat-q} \end{bmatrix}
+    \begin{bmatrix} \gls{sym-hat-e} \\ \gls{sym-hat-q} \end{bmatrix}^*
     \gls{sym-mathbf-Q-S}^{\top}
-    \begin{bmatrix} \hat{e} \\ \gls{sym-hat-q} \end{bmatrix}
+    \begin{bmatrix} \gls{sym-hat-e} \\ \gls{sym-hat-q} \end{bmatrix}
 \end{equation}
 Peak power constraints use a more complicated approach discussed in \Cref{sec:appendix-mag-S-constraints} and are left out of the formulation below for simplicity.
 
@@ -792,8 +795,8 @@ The solution to \Cref{eq:opt-problem} can be written as:
 \begin{aligned}
     \gls{sym-vec-x-opt} &=
     \frac{\gls{sym-hat-V-s-th}}{2\Re (\gls{sym-Z-s-th})}
-        \begin{bmatrix} Z_{s,th}^* (1+\Gamma_{\text{opt}}) \\ 1-\Gamma_{\text{opt}} \end{bmatrix} \\
-    \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re (\gls{sym-Z-s-th})}~ (1 - |\Gamma_{\text{opt}}|^2)
+        \begin{bmatrix} Z_{s,th}^* (1+\gls{sym-Gamma-opt}) \\ 1-\gls{sym-Gamma-opt} \end{bmatrix} \\
+    \gls{sym-p-avg-VI-opt} &= \frac{|\gls{sym-hat-V-s-th}|^2}{8\Re (\gls{sym-Z-s-th})}~ (1 - |\gls{sym-Gamma-opt}|^2)
 \end{aligned}
 \end{equation}
 where $\gls{sym-Gamma-opt}$ is a complex scalar with magnitude typically between 0 and 1 called the optimal reflection coefficient, with formula given in \Cref{eq:gamma-opt-quadratic,eq:candidate-points,eq:circle-intersection} of \Cref{sec:appendix-qp-solution}.
@@ -1181,7 +1184,7 @@ This yields:
 \begin{aligned}
     \gls{sym-C-unit}   &= \gls{sym-C-pto} + \gls{sym-C-struct} + \gls{sym-C-fixed} \\
     \gls{sym-C-pto}    &= \gls{sym-C-pto-constant} + \gls{sym-p-P} \gls{sym-P-max} + \gls{sym-p-F} \gls{sym-F-max} \\
-    \gls{sym-C-struct} &= \gls{sym-p-s} V_{\text{struct}}
+    \gls{sym-C-struct} &= \gls{sym-p-s} \gls{sym-V-struct}
 \end{aligned}
 \end{equation}
 where $\gls{sym-p-P}$, $\gls{sym-p-F}$, and $\gls{sym-p-s}$ are the prices of power, force, and structural material in units of \linelabel{lne:2012-prices}2012\$/kW, 2012\$/N, and 2012\$/m$^3$ respectively.
