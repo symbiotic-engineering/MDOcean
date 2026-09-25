@@ -1,5 +1,5 @@
 \documentclass[11pt]{article}
-
+\usepackage{amsmath}
 \usepackage[margin=1in]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{xcolor}
@@ -141,13 +141,13 @@ Please see also our response to Reviewer~3, Comment~1.
 \response We thank the reviewer and agree that additional reference cases would further demonstrate the robustness of the model.
 Validating other WEC designs requires reference data (hydrodynamic, dynamic, structural, and cost) comparable to those available for RM3, which is beyond the scope of this revision.
 Instead, we have restricted our claims throughout the manuscript to describe the assumed architecture more explicitly.
-For example, \Cref{aor:sec:model-overview} now states (p.~\pageref{aor:lne:scope-start}, lines~\ref{aor:lne:scope-start}--\ref{aor:lne:scope-end}):
+For example, \Cref{aor:sec:model-structure} now states (p.~\pageref{aor:lne:scope-start}, lines~\ref{aor:lne:scope-start}--\ref{aor:lne:scope-end}):
 \begin{quote}
   MDOcean performs static analysis for a single type of floating body (an RM3-like two-body point absorber)
   as well as dynamic analysis and optimal control for the full coupled system,
   assuming that the static properties for other components (e.g. drivetrain, generator) are known or swept inputs.
 \end{quote}
-We also note that the hydrodynamic coefficients have been verified and validated for geometries other than RM3 (see \Cref{aor:sec:hydro-checks}) by overlaying curves published in \citet{aor:chau_hydrodynamic_2012,aor:olaya_hydrodynamic_2015}.
+We also note that the hydrodynamic coefficients have been verified and validated for geometries other than RM3 (see \Cref{aor:sec:hydro-checks}) by overlaying curves published in \citet{aor:chau_inertia_2012,aor:olaya_hydrodynamic_2015}.
 % (Abstract [scope statement], Section~5.3 [limitations], Conclusion
 % [scope statement]) and clarified how thoroughly this archetype has been evaluated.
 % The dynamics module is compared with WEC-Sim across all sea states at the site
@@ -186,7 +186,7 @@ See response to Reviewer~4, Major Comment~3.
 
 \rcomment{Reviewer 1, Comment 10}{The manuscript lacks a comprehensive sensitivity or uncertainty analysis of key design parameters.}
 \response We thank the reviewer. Though we had not used the word sensitivity analysis, the manuscript already includes several local sensitivity analyses that show the effect of modifying the design variables around their nominal RM3 values.
-The one-at-a-time design sweep in Section~5.1.4 (\Cref{aor:fig:doe}) shows the effect of each design variable on LCOE and cost, Figures~20-21 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(89)).
+The one-at-a-time design sweep in Section~5.1.4 (\Cref{aor:fig:experiments}) shows the effect of each design variable on LCOE and cost, Figures~20-21 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(89)).
 We now describe \Cref{aor:sec:design-space-exploration} explicitly as a local sensitivity analysis (line~\ref{aor:lne:local-sens-doe}).
 
 A more comprehensive sensitivity analysis, including the sensitivity to parameters and to design variables around design points other than the nominal, is the subject of another study \citep{aor:mccabe_leveraging_2026}.
@@ -257,11 +257,11 @@ A new section does not start without first displaying all figures from the previ
 \rcomment{Reviewer 1, Comment 19}{what can understand from fig 16? fig 17? it is to messy.}
 \response We thank the reviewer and agree that Figures~16 and~17 were difficult to read. We have added text describing how to read the figures based on the color of the datapoints:
 \begin{quote}
-The most efficient design depends on the frequency-depth regime $\gls{aor:sym-m-0}\gls{aor:sym-h}$.
+The most efficient design depends on the frequency-depth regime $m_0h$.
     The radiation limit is marked with a horizontal dashed line; efficiencies above the limit indicate simulation errors and are disregarded.
-    Low $\gls{aor:sym-m-0}\gls{aor:sym-h}$ (shallow water, slow waves) favors a pure cylinder geometry with small radius ($\gls{aor:sym-a-1}/\gls{aor:sym-a-2} \approx 1$, $\gls{aor:sym-a-2}/\gls{aor:sym-h} \ll 1$, and $\gls{aor:sym-a-3}/\gls{aor:sym-a-1}\approx 1$, shown in blue/green/purple on the left).
-    Moderate $\gls{aor:sym-m-0}\gls{aor:sym-h}$ favors low $\gls{aor:sym-a-1}/\gls{aor:sym-a-2}$ (a small spar relative to the float, green/blue points).
-    High $\gls{aor:sym-m-0}\gls{aor:sym-h}$ (deep water, fast waves) favors qualitatively different geometries (pink/red).
+    Low $m_0h$ (shallow water, slow waves) favors a pure cylinder geometry with small radius ($a_1/a_2 \approx 1$, $a_2/h \ll 1$, and $a_3/a_1\approx 1$, shown in blue/green/purple on the left).
+    Moderate $m_0h$ favors low $a_1/a_2$ (a small spar relative to the float, green/blue points).
+    High $m_0h$ (deep water, fast waves) favors qualitatively different geometries (pink/red).
 \end{quote}
 
 \rcomment{Reviewer 1, Comment 20}{I would not criticize the mathematics itself in Eqs. (1)-(38); instead, I would comment on clarity, notation consistency, assumptions, and reproducibility, as these are the more defensible reviewer observations.}
@@ -282,7 +282,7 @@ We thank Reviewer~2 for describing the work as interdisciplinary, comprehensive,
 \response We thank the reviewer. Yes: $\hat{e}$ and $\hat{q}$ are the complex phasor amplitudes of the effort and flow variables at a port, at a single frequency, following the convention $x(t) = \Re[\hat{X} e^{i\omega t}]$ stated at the start of Section~3.
 We have added a statement that reads,
 \begin{quote}
-Note that \Cref{aor:sec:eom,sec:optimal-control,sec:drag} consider a single monochromatic sea state; \Cref{aor:sec:energy} performs annual aggregation.
+Note that \Cref{aor:sec:eom,aor:sec:optimal-control,aor:sec:drag} consider a single monochromatic sea state; \Cref{aor:sec:energy} performs annual aggregation.
 \end{quote}
 to p.~\pageref{aor:lne:single-freq} line~\ref{aor:lne:single-freq}.
 
@@ -447,7 +447,7 @@ FEA-based validation of the structural module remains future work (Section~5.3 a
 \response We thank the reviewer for this suggestion. The equivalent-regular-wave approximation affects these quantities differently.
 For annual average power, the joint probability distribution still provides a long-term weighting of sea states, but the response within each sea state is represented by an equivalent regular-wave response rather than a full irregular-wave time history.
 For fatigue, this is a more substantial limitation because a single-frequency representation cannot reproduce the full stress-range distribution and associated cycle counting of a broad-banded sea state.
-For controller performance, the approximation likewise does not capture interactions among multiple simultaneously excited frequencies; consequently, the reported controller results should be interpreted within the assumptions of the frequency-domain formulation rather than as a substitute for irregular-wave time-domain control analysis. These limitations are now discussed in Section~3.3.11 (p.~\pageref{aor:section:irregular-waves}) and Section~5.3 (p.~\pageref{aor:section:limitations}).
+For controller performance, the approximation likewise does not capture interactions among multiple simultaneously excited frequencies; consequently, the reported controller results should be interpreted within the assumptions of the frequency-domain formulation rather than as a substitute for irregular-wave time-domain control analysis. These limitations are now discussed in Section~3.3.11 (p.~\pageref{aor:sec:irregular-waves}) and Section~5.3 (p.~\pageref{aor:sec:unmodeled-effects}).
 
 \rcomment{Reviewer 4, Major Comment 6}{The MEEM approach is efficient for the float, but some spar and coupling coefficients are obtained from algebraic approximations, interpolation of precomputed BEM data, and corrections to ensure positive definiteness. The authors should explain how often these corrections are needed and how much they change the dynamic response or power estimates.}
 \response We thank the reviewer for this suggestion. The combined effect of the spar and coupling approximations on power can be seen in Figure~36 (Appendix~C.8), which compares results using the WAMIT coefficients of WEC-Sim (top row) with results using MDOcean's own coefficients (bottom row).
