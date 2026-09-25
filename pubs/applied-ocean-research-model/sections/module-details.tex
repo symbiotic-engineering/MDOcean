@@ -69,7 +69,7 @@ where, under monochromatic forcing,
 Here $\gls{sym-vec-hat-xi}$ is the body displacement phasor vector from the origin at the center of the float at the still waterline.
 The hydrodynamic coefficients $\gls{sym-vec-gamma}$, $\gls{sym-mathbf-A-h}$, $\gls{sym-mathbf-B-h}$, and $\gls{sym-mathbf-K-h}$ are the wave excitation vector, added mass matrix, radiation damping matrix, and hydrostatic stiffness matrix, respectively.
 
-The displacement vector $\gls{sym-vec-hat-xi}$ contains a state for each degree of freedom.
+The displacement vector $\gls{sym-vec-hat-xi}$ contains a state for each \gls{acr-dof}.
 We define separate displacement and excitation vectors for the operational ($op$) and storm ($st$) cases.
 A two-body heaving point absorber that rigidly locks the bodies in a storm following \citet{RM3} has vectors:
 \begin{equation}\label{eq:define-vectors}
@@ -243,7 +243,7 @@ This formulation seeks to preserve the computational advantages and simplicity o
 and (b) constrained spectral optimal control, which solves the optimal control problem as a quadratically-constrained quadratic program (\gls{acr-qcqp}) assuming linear dynamics and spectral-domain constraints.
 \Cref{fig:venn-diagram} positions \gls{acr-qlps} relative to existing methods.
 Augmenting spectral optimal control with describing functions extends its scope to approximate time-domain constraints and nonlinear dynamics.
-Furthermore, because \gls{acr-qlps} assumptions under monochromatic forcing lead to a monochromatic problem, the \gls{acr-qcqp} becomes univariate for systems with a single control degree of freedom.
+Furthermore, because \gls{acr-qlps} assumptions under monochromatic forcing lead to a monochromatic problem, the \gls{acr-qcqp} becomes univariate for systems with a single control \gls{acr-dof}.
 The optimal constrained linear controller can then be found analytically through a geometric interpretation that exploits the low dimensionality.
 Its nonlinear counterpart can be reconstructed semi-analytically with inverse describing functions.
 Avoiding iterative numerical optimization substantially reduces computational cost in large parametric studies and produces insight into the mathematical structure of dynamic tradeoffs to inform \gls{acr-pto} sizing.
@@ -559,11 +559,11 @@ This is because the device is already in survival mode (preventing method M4), i
 \subsubsection{Linearized Dynamics}\label{sec:eom}
 \ifdefined\DISSERTATION
     Before applying the \gls{acr-qlps} method described above, we first present the equations of motion for a standard linear \gls{acr-wec} model, starting in the time domain and quickly moving to the frequency domain.
-    Specifically, we combine the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
+    Specifically, we combine the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-\gls{acr-dof} model of \citet{faedo_principle_2022} to arrive at a formulation suitable for the impedance matching of a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \else
     Before applying the \gls{acr-qlps} method described above,
     we first present the dynamics for a standard linear \gls{acr-wec},
-    combining the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-degree of freedom model of \citet{faedo_principle_2022} to express the equations of motion for a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
+    combining the bi-conjugate network model of \citet{coe_co-design_2025} with the underactuated multi-\gls{acr-dof} model of \citet{faedo_principle_2022} to express the equations of motion for a multibody \gls{acr-wec} subject to wave forcing, powertrain kinematics and dynamics, and drag.
 \fi
 
 \paragraph{Multiport Structure}
@@ -588,9 +588,9 @@ The excitation, radiation, and restoring forces are linear; the drag and \gls{ac
 %%%%%%%%%%%%%%%
 \paragraph{\gls{acr-pto} Model}
 \label{sec:pto-model-overview}
-The \gls{acr-pto} model is a linear multiport effort-flow model that is valid for multiple degree of freedom devices across various energy domains.
+The \gls{acr-pto} model is a linear multiport effort-flow model that is valid for multiple \gls{acr-dof} devices across various energy domains.
 It consists of \gls{acr-pto} kinematics
-(a hybrid matrix relating body degrees of freedom to the \gls{acr-pto} port, accommodating underactuation)
+(a hybrid matrix relating body \glspl{acr-dof} to the \gls{acr-pto} port, accommodating underactuation)
 and \gls{acr-pto} dynamics
 (cascade matrices for a mechanical drivetrain and permanent magnet generator,
 relating the \gls{acr-pto} port to the generator electrical port,
@@ -901,8 +901,8 @@ The analysis thus far either is sea-state agnostic (\Cref{sec:geom}) or applies 
 We now combine the results across sea states to find the long-term energy statistics in a given wave environment.
 
 \ifdefined\DISSERTATION
-    While matrices in \Cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\gls{sym-vec-hat-xi}$) for systems with multiple bodies or degrees of freedom, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\gls{sym-hat-xi-f}$) or the sum across all degrees of freedom (i.e.\ power in systems with multiple actuated degrees of freedom).
-    These scalars are assembled into ``matrices'' (i.e.\ $\gls{sym-boldsymbol-hat-xi-H-T-f}$) indexed by sea state rather than by degree of freedom, indicated by the $\gls{sym-H},\gls{sym-T-period}$ superscript.
+    While matrices in \Cref{sec:hydro,sec:dynamics} represent coupled relationships between vector output variables (i.e.\ $\gls{sym-vec-hat-xi}$) for systems with multiple bodies or \glspl{acr-dof}, in the current section each output element is treated as a scalar, either representing a single element of an output vector (i.e.\ $\gls{sym-hat-xi-f}$) or the sum across all \glspl{acr-dof} (i.e.\ power in systems with multiple actuated \glspl{acr-dof}).
+    These scalars are assembled into ``matrices'' (i.e.\ $\gls{sym-boldsymbol-hat-xi-H-T-f}$) indexed by sea state rather than by \gls{acr-dof}, indicated by the $\gls{sym-H},\gls{sym-T-period}$ superscript.
     Such ``matrices'' are incompatible with matrix multiplication and any matrix operations in this section should be interpreted as elementwise operations across sea states.
     To distinguish from the average and maximum signal values over a wave period denoted with avg and pk subscripts in \Cref{sec:power}, the long-term average across sea states is denoted with an overbar $\overline{(\cdot)}$ and long-term maximum with subscript $\text{max}$.
     This intentionally matches the $\text{max}$ subscript used in \Cref{tab:qp-constraints} for upper limits within each sea state because MDOcean currently applies the same limit value for a given constraint across all sea states, though this need not be the case in general.

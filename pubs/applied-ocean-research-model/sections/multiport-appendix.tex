@@ -1,6 +1,6 @@
 To implement the multiport model of \Cref{sec:dynamics}, we must specify its
 conventions, body dynamics, \gls{acr-pto} kinematics, \gls{acr-pto} dynamics, power relations, and ultimate solution procedure.
-This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of degrees of freedom, as well as specific equations for a common \gls{acr-pto} structure consisting of a mechanical drivetrain and a permanent magnet generator.
+This section provides a general structure in effort-flow form applicable across multiple energy domains for any number of \glspl{acr-dof}, as well as specific equations for a common \gls{acr-pto} structure consisting of a mechanical drivetrain and a permanent magnet generator.
 
 %%%%%%%%%%%%%%%
 \subsubsection{Multiport Circuit Conventions}
@@ -67,7 +67,7 @@ Forces include wave excitation $\gls{sym-vec-F-e}$, hydrodynamic radiation $\gls
 \begin{figure}[htbp]
 \centering
     \includegraphics[\FigureOptions{aor:figs/from-matlab/circuit_intrinsic.pdf}]{figs/from-matlab/circuit_intrinsic.pdf}
-\caption[Multiport circuit for two hydrodynamic degrees of freedom]{Multiport circuit for two hydrodynamic degrees of freedom with intrinsic and powertrain impedances $\gls{sym-mathbf-Z-i}$ and $\gls{sym-mathbf-Z-p}$}
+\caption[Multiport circuit for two hydrodynamic \glspl{acr-dof}]{Multiport circuit for two hydrodynamic \glspl{acr-dof} with intrinsic and powertrain impedances $\gls{sym-mathbf-Z-i}$ and $\gls{sym-mathbf-Z-p}$}
 \label{fig:multiport-circuit-intrinsic}
 \end{figure}
 
@@ -143,7 +143,7 @@ In this section and the next, we turn our attention to the \gls{acr-pto} kinemat
 A \gls{acr-pto} model must capture the dynamics of any elements that transmit, transduce, or condition power between the rigid-body mechanical energy and the end energy product, in this case electricity.
 Relevant dynamics include the inertia, stiffness, static friction, mechanical advantage, losses, and electromagnetic coupling of flywheels, shafts, springs, gears, hydraulic circuits, generators, and power electronics.
 \citet{penalba_review_2016} review \gls{acr-wec} \gls{acr-pto} models and \citet{coe_co-design_2025} synthesize these into a multiport impedance matching network framework to facilitate \gls{acr-ccd}.
-\citet{coe_co-design_2025} present a \gls{acr-pto} model in cascade matrix form for a single degree of freedom system.
+\citet{coe_co-design_2025} present a \gls{acr-pto} model in cascade matrix form for a single \gls{acr-dof} system.
 The \gls{acr-pto} kinematics describe the relationship between \gls{acr-wec} body displacements $\gls{sym-vec-hat-xi}$ to \gls{acr-pto} displacements $\gls{sym-vec-hat-X-PTO}$,
 determined by linkages or similar mechanisms and not including subsequent \gls{acr-pto} elements such as a mechanical drivetrain or generator.
 In general form, the \gls{acr-pto} kinematics can be expressed as:
@@ -158,13 +158,13 @@ the kinematics describe the relationship between not only motions but also force
 \begin{equation}\label{eq:pto-kinematics-force}
 \gls{sym-vec-hat-F-p} = [\gls{sym-mathbf-T-kin}]^\top  \gls{sym-vec-hat-F-PTO}
 \end{equation}
-To avoid confusion, subscript $PTO$ is used for forces in the \gls{acr-pto} degrees of freedom (post-kinematics),
-while subscript $\gls{sym-p}$ denotes forces in the hydrodynamic body degrees of freedom (pre-kinematics).
+To avoid confusion, subscript $PTO$ is used for forces in the \gls{acr-pto} \glspl{acr-dof} (post-kinematics),
+while subscript $\gls{sym-p}$ denotes forces in the hydrodynamic body \glspl{acr-dof} (pre-kinematics).
 \Cref{eq:pto-kinematics-motion,eq:pto-kinematics-force} imply rigid lossless massless linkages,
 and any linkage deflection, dissipation, and inertia would be included in the \gls{acr-pto} dynamics rather than kinematics.
 
 Multibody \glspl{acr-wec} are frequently underactuated,
-meaning that the \gls{acr-pto} has fewer controlled degrees of freedom than the hydrodynamic bodies,
+meaning that the \gls{acr-pto} has fewer controlled \glspl{acr-dof} than the hydrodynamic bodies,
 and $\gls{sym-mathbf-T-kin}$ has more columns than rows.
 Underactuated systems receive considerable attention in robotics \citep{tedrake_underactuated_2024}
 but have only recently been explored in the context of wave energy conversion \citep{faedo_principle_2022}.
@@ -192,16 +192,16 @@ which accurately represents the underactuated system:
     \end{bmatrix}
 \end{equation}
 
-Here, we model two hydrodynamic degrees of freedom (heave of the float and spar respectively) and a single \gls{acr-pto} degree of freedom corresponding to the relative heave motion between the float and spar.
+Here, we model two hydrodynamic \glspl{acr-dof} (heave of the float and spar respectively) and a single \gls{acr-pto} \gls{acr-dof} corresponding to the relative heave motion between the float and spar.
 The kinematics matrix is therefore:
 \begin{equation}
     \label{eq:T-kin-specific}
     \gls{sym-mathbf-T-kin} = \begin{bmatrix}1 & -1\end{bmatrix}
 \end{equation}
 Thus, even absent any mechanism with ``kinematics'' in the traditional sense,
-the kinematics matrix is filled with zeroes, ones, and negative ones to represent which degrees of freedom are controlled.
+the kinematics matrix is filled with zeroes, ones, and negative ones to represent which \glspl{acr-dof} are controlled.
 
-In the circuit representation with two hydrodynamic and one \gls{acr-pto} degree of freedom,
+In the circuit representation with two hydrodynamic and one \gls{acr-pto} \gls{acr-dof},
 the hybrid matrix \Cref{eq:h-matrix-kinematics} can be represented as a three-port element,
 as shown in \Cref{fig:multiport-circuit-kinematics}.
 \begin{figure}[htbp]
@@ -214,7 +214,7 @@ as shown in \Cref{fig:multiport-circuit-kinematics}.
 %%%%%%%%%%%%%%%
 \subsubsection{Combining Intrinsic Dynamics with \gls{acr-pto} Kinematics}
 \label{sec:appendix-combine-intrinsic-kinematics}
-Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at the \gls{acr-pto} port yields a scalar equivalent circuit for each \gls{acr-pto} degree of freedom,
+Taking the Th\'{e}venin equivalent of the intrinsic dynamics and kinematics at the \gls{acr-pto} port yields a scalar equivalent circuit for each \gls{acr-pto} \gls{acr-dof},
 with force sources $\gls{sym-vec-hat-F-th}$ and mechanical impedances $\gls{sym-vec-Z-i-th}$,
 shown in the bottom portion of \Cref{fig:multiport-circuit-kinematics} and computed with the following expressions:
 \begin{equation}
@@ -229,7 +229,7 @@ shown in the bottom portion of \Cref{fig:multiport-circuit-kinematics} and compu
 \end{aligned}
 \end{equation}
 where the vector expressions for the general case are shown first,
-followed by the scalar result for the $\gls{sym-mathbf-T-kin}$ in \Cref{eq:T-kin-specific} with 1 controlled degree of freedom.
+followed by the scalar result for the $\gls{sym-mathbf-T-kin}$ in \Cref{eq:T-kin-specific} with 1 controlled \gls{acr-dof}.
 
 Although, as previously mentioned, a true cascade matrix must have the same number of input and output ports, it is possible to formulate a cascade-like matrix that can transform from the \gls{acr-pto} port to the body ports.
 However, it cannot transform in the other direction due to underactuation.
@@ -261,7 +261,7 @@ to the modified body port $\{\gls{sym-F-p}, \gls{sym-dot-xi-Delta}\}$ is then:
         1 & 0
     \end{bmatrix}
 \end{equation}
-noting that this matrix is non-square ($\in \gls{sym-mathbb-C}^{4\times2}$) since there are more hydrodynamic than \gls{acr-pto} degrees of freedom,
+noting that this matrix is non-square ($\in \gls{sym-mathbb-C}^{4\times2}$) since there are more hydrodynamic than \gls{acr-pto} \glspl{acr-dof},
 and that the matrix label drops the $PTO$ subscripts for compactness.
 \Cref{fig:multiport-circuit-kinematics} represents this in circuit form,
 noting that the excitation source must be duplicated to create $\gls{sym-vec-hat-dot-xi-0}$.
