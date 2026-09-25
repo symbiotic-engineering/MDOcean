@@ -22,7 +22,7 @@ This subsection summarizes insights from variable-sweep analyses before presenti
 \else
     A brute-force sweep of nondimensionalized bulk geometry variables and the nondimensional wavenumber $\gls{sym-m-0}\gls{sym-h}$ identifies design trends.
     MDOcean performs the six-dimensional sweep with \resultsAOR[meemSweepSize] combinations in \resultsAOR[meemSweepTime].
-    We examine three nondimensional outputs: radiation efficiency (proxy for power), capture width ratio (proxy for power per unit cost, normalized by $\sqrt{\gls{sym-A-wet}}$), and nondimensional wetted surface area (proxy for cost).
+    We examine three nondimensional outputs: radiation efficiency (proxy for power), capture width ratio (proxy for power per unit cost, normalized by $\sqrt{\gls{sym-A-wet}}$), and wetted surface area divided by wavelength squared (proxy for cost).
 \fi
 
 \ifdefined\DISSERTATION
@@ -69,9 +69,9 @@ This subsection summarizes insights from variable-sweep analyses before presenti
 \else
     The most efficient design depends on the frequency-depth regime $\gls{sym-m-0}\gls{sym-h}$.
     The radiation limit is marked with a horizontal dashed line; efficiencies above the limit indicate simulation errors and are disregarded.
-    Low $\gls{sym-m-0}\gls{sym-h}$ (shallow water, slow waves) favors a pure cylinder geometry with small radius.
-    Moderate $\gls{sym-m-0}\gls{sym-h}$ favors low $\gls{sym-a-1}/\gls{sym-a-2}$ (a small spar relative to the float).
-    High $\gls{sym-m-0}\gls{sym-h}$ favors qualitatively different geometries.
+    Low $\gls{sym-m-0}\gls{sym-h}$ (shallow water, slow waves) favors a pure cylinder geometry with small radius ($\gls{sym-a-1}/\gls{sym-a-2} \approx 1$, $\gls{sym-a-2}/\gls{sym-h} \ll 1$, and $\gls{sym-a-3}/\gls{sym-a-1}\approx 1$, shown in blue/green/purple on the left).
+    Moderate $\gls{sym-m-0}\gls{sym-h}$ favors low $\gls{sym-a-1}/\gls{sym-a-2}$ (a small spar relative to the float, green/blue points).
+    High $\gls{sym-m-0}\gls{sym-h}$ (deep water, fast waves) favors qualitatively different geometries (pink/red).
 \fi
 
 \paragraph{Design Cost-Power Tradeoffs}
@@ -154,7 +154,7 @@ We next move to a simultaneous sweep of both the force limit and the power limit
 \begin{figure*}[htbp]
 \centering
 \includegraphics[\FigureOptions{aor:figs/manual/pto_sweep_3.pdf}]{figs/manual/pto_sweep_3.pdf}
-\caption[Effect of force and power limits on power and \gls{acr-lcoe}]{Effect of Generator Force Limit and Power Limit on Annual Average Power and \gls{acr-lcoe}}
+\caption[Effect of force and power limits on power and \gls{acr-lcoe}]{Effect of Generator Force Limit and Power Limit on Annual Average Power and \gls{acr-lcoe}. Cost values are in 2012 USD.}
 \label{fig:force-power-limit-sweep}
 \end{figure*}
 Notably, the minimum \gls{acr-lcoe} point occurs at a force limit far below the unsaturated solution because the cost savings from a smaller \gls{acr-pto} outweigh the loss in power.
@@ -171,7 +171,7 @@ This illustrates the importance of including the force-cost tradeoff in an optim
 \fi
 
 %%%%%%%%%%%%%%%%%%%
-\subsubsection{Design Space Exploration}
+\subsubsection{Design Space Exploration}\label{sec:design-space-exploration}
 \ifdefined\DISSERTATION
     The \gls{acr-oat} design sweep, shown in \Cref{fig:experiments}, immediately draws attention to the float diameter $\gls{sym-D-f}$, shown with a red dashed line, as the variable with the strongest effect on the objectives.
     A slight reduction in the diameter from its nominal value causes the cost to decrease close to linearly but the \gls{acr-lcoe} to skyrocket due to a substantial reduction in power generation.
@@ -180,7 +180,8 @@ This illustrates the importance of including the force-cost tradeoff in an optim
     A larger $\sim30\%$ diameter increase restores feasibility of the damping plate and achieves a roughly 15\textcent/kWh reduction in \gls{acr-lcoe}, representing the best design of the \gls{acr-oat} sweep.
     The results also point to the possibility of an even lower \gls{acr-lcoe} design with float diameter perhaps $\sim20\%$ larger than nominal, if the damping plate can be made feasible by increasing $\gls{sym-t-d}$ or $h_{1,\text{stiff},d}$ without a major cost penalty.
 \else
-    The one-at-a-time (\gls{acr-oat}) design sweep (\Cref{fig:experiments}) reveals that float diameter $\gls{sym-D-f}$ has the strongest effect on objectives.
+    The \acrfull{acr-oat} design sweep (\Cref{fig:experiments}) shows the \linelabel{lne:local-sens-doe}local sensitivity of the objectives to changes in design.
+    This analysis reveals that float diameter $\gls{sym-D-f}$ has the strongest effect on objectives.
     The feasible design space is highly fragmented: an ``island'' of low-\gls{acr-lcoe} designs at $1.3 < \gls{sym-D-f}/\gls{sym-D-f-nom} < 2.1$ is separated from the nominal design by the damping plate fatigue constraint.
 \fi
 
@@ -467,7 +468,7 @@ Enhance Trust in Achievable Studies  & Unlock New Studies  \\ \hline
     \paragraph{Different \gls{acr-wec} archetypes}
     Extending the model beyond 2-body heaving point absorbers to other \gls{acr-wec} archetypes such as oscillating water columns, overtopping devices, or surge/pitch devices would allow systematic quantification of the comparative benefits and drawbacks of each \gls{acr-wec} archetype in a consistent way.
     This capability is especially valuable in the early concept design phase to inform architectural decisions and could facilitate design convergence for the field as a whole, which is considered an industry bottleneck \citep{caio_tackling_2019}.
-    Generalizing MDOcean's dynamics/controls and economics modules to other archetypes would require minor adaptations including alternate degrees of freedom and cost fits, but not structural modification of the core models.
+    Generalizing MDOcean's dynamics/controls and economics modules to other archetypes would require minor adaptations including alternate \glspl{acr-dof} and cost fits, but not structural modification of the core models.
     On the other hand, the hydrodynamics and structures models would require significant modification since separate semi-analytical continuum models would need to be implemented for each new geometry.
     Before initiating such an undertaking, it would be important to confirm that numerical alternatives remain too inefficient for optimization.
     Since development of MDOcean began in 2021, new numerical tools have emerged that could potentially reduce the computational cost of mesh-based geometry-agnostic computations.

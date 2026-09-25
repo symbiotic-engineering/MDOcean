@@ -113,6 +113,7 @@ As exceptions, the following files have been adapted from other code and have di
 - `mdocean/plots/util/table2latex.m`: BSD-2-Clause
 - `dev/latex/Paper-Linter/`: MIT License, different copyright holder
 - `pubs/shared/els-cas/` (including `cas-sc.cls` and `cas-dc.cls`): LaTeX Project Public License v1.3c
+- `pubs/shared/glossary/no-appendix-glossary.tex`: CC BY-SA 4.0
 - `pubs/applied-ocean-research-model/stars-cc-by-sa.tex`: CC BY-SA 4.0
 - `pubs/dissertation/wave_images/wave_image.png`: CC BY-NC 4.0
 - `pubs/dissertation/sampleDissertation.pdf`: CC BY-NC-ND 4.0
