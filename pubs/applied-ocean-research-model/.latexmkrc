@@ -30,3 +30,6 @@ $aux_dir = 'aux';
 set_tex_cmds( '--shell-escape %O %S' );
 
 $max_repeat = 10;
+
+# Suppress noisy glossary output
+$makeglossaries = 'makeglossaries -q %O %S';
