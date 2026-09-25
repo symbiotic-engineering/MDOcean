@@ -1,7 +1,7 @@
 %DIF 1c1-4
 %DIF LATEXDIFF DIFFERENCE FILE
-%DIF DEL .calkit/local/latex-diff-build/base/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 17:14:47 2026
-%DIF ADD .calkit/local/latex-diff-build/head/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 17:14:47 2026
+%DIF DEL .calkit/local/latex-diff-build/base/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 20:04:35 2026
+%DIF ADD .calkit/local/latex-diff-build/head/pubs/applied-ocean-research-model/main.tex   Wed Sep 23 20:04:35 2026
 %DIF < \documentclass[a4paper,fleqn,colorlinks,unicode,hypertexnames=false]{cas-dc}
 %DIF -------
 \documentclass[a4paper,fleqn,colorlinks,unicode,lineno]{cas-dc} %DIF > 
@@ -106,10 +106,7 @@
 \usepackage{verbatim}  % word counts
 \usepackage{textcomp}  % cent symbol
 
-%DIF 46-47c78-278
-%DIF < \ifdefined\DISSERTATION
-%DIF <   \usepackage[numbers,square]{natbib}    % citep command
-%DIF -------
+%DIF 46a78-89
 \makeatletter %DIF > 
 \@ifclassloaded{cas-sc}{}{% %DIF > 
   \@ifclassloaded{cas-dc}{}{% %DIF > 
@@ -122,6 +119,156 @@
 % glossary - must come after hyperref %DIF > 
 \usepackage[nopostdot,automake,acronym,abbreviations,symbols,nogroupskip,toc=false,sanitizesort=false,section=subsection]{glossaries-extra} %DIF > 
 \usepackage{morewrites} %DIF > 
+%DIF -------
+\ifdefined\DISSERTATION
+%DIF 47d91
+%DIF <   \usepackage[numbers,square]{natbib}    % citep command
+%DIF -------
+\else
+%DIF 49c92-174
+%DIF <   %\usepackage[numbers]{natbib}             % citep command
+%DIF -------
+  % glossary counter to avoid entries only used in the appendix %DIF > 
+  % This work, "No appendix glossary", is adapted from %DIF > 
+% "Glossary per chapter or section" by Nikola Talbot, %DIF > 
+% used under CC BY 4.0 and available at https://tex.stackexchange.com/a/89501. %DIF > 
+% "No appendix glossary" is licensed under CC BY 4.0 by Rebecca McCabe. %DIF > 
+ %DIF > 
+\newcounter{myglossarycounter} %DIF > 
+\AddToHook{cmd/appendix/before}{\stepcounter{myglossarycounter}} %DIF > 
+\setupglossaries{counter=myglossarycounter} %DIF > 
+ %DIF > 
+\makeatletter %DIF > 
+\def\debugglshypernumber#1{% %DIF > 
+  \typeout{LOCATION ARG: [#1]}% %DIF > 
+  \typeout{FIRST TOKEN: [\@car#1\@nil]}% %DIF > 
+} %DIF > 
+ %DIF > 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %DIF > 
+ %DIF > 
+% \newglossarystyle{debugstyle}{% %DIF > 
+%   \setglossarystyle{list}% %DIF > 
+%   \renewcommand*{\glossentry}[2]{% %DIF > 
+%     \typeout{^^J=== GLOSS ENTRY DEBUG ===}% %DIF > 
+%     \typeout{LABEL: [##1]}% %DIF > 
+%     \begingroup %DIF > 
+%       \let\@xp@glshypernumber\debugglshypernumber %DIF > 
+%       ##2% %DIF > 
+%     \endgroup %DIF > 
+%     \typeout{=== END GLOSS ENTRY DEBUG ===^^J}% %DIF > 
+%   }% %DIF > 
+% } %DIF > 
+ %DIF > 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %DIF > 
+ %DIF > 
+% \newif\ifmainmatterglossary %DIF > 
+ %DIF > 
+% \newcommand*{\checkmainmatterlocations}[1]{% %DIF > 
+%   \edef\mainmatterfirstlocation{\@car#1\@nil}% %DIF > 
+%   \typeout{*** LOCATION ARG = [#1]}% %DIF > 
+%   \typeout{*** FIRST LOCATION = [\mainmatterfirstlocation]}% %DIF > 
+%   \ifx\mainmatterfirstlocation\zerotoken %DIF > 
+%     \global\mainmatterglossarytrue %DIF > 
+%     \typeout{*** DECISION = TRUE (main matter)}% %DIF > 
+%   \else %DIF > 
+%     \global\mainmatterglossaryfalse %DIF > 
+%     \typeout{*** DECISION = FALSE (appendix only)}% %DIF > 
+%   \fi %DIF > 
+% } %DIF > 
+ %DIF > 
+% \def\zerotoken{0} %DIF > 
+ %DIF > 
+% \newglossarystyle{debugstyle}{% %DIF > 
+%   \setglossarystyle{list}% %DIF > 
+ %DIF > 
+%   \renewcommand*{\glossentry}[2]{% %DIF > 
+%     \typeout{^^J=== ENTRY DEBUG ===}% %DIF > 
+%     \typeout{LABEL = [##1]}% %DIF > 
+%     \mainmatterglossaryfalse %DIF > 
+%     \begingroup %DIF > 
+%       \def\debugglshypernumber####1{% %DIF > 
+%         \checkmainmatterlocations{####1}% %DIF > 
+%       }% %DIF > 
+%       \let\@xp@glshypernumber\debugglshypernumber %DIF > 
+%       ##2% %DIF > 
+%     \endgroup %DIF > 
+%     \ifmainmatterglossary %DIF > 
+%       \typeout{*** FINAL DECISION = PRINT ***}% %DIF > 
+%     \else %DIF > 
+%       \typeout{*** FINAL DECISION = OMIT ***}% %DIF > 
+%     \fi %DIF > 
+%     \typeout{=== END ENTRY DEBUG ===^^J}% %DIF > 
+%   }% %DIF > 
+% } %DIF > 
+ %DIF > 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %DIF > 
+ %DIF > 
+\newif\ifmainmatterglossary %DIF > 
+ %DIF > 
+\def\checkmainmatterlocations#1{% %DIF > 
+  \edef\mainmatterfirstlocation{\@car#1\@nil}% %DIF > 
+  \ifx\mainmatterfirstlocation\zerotoken %DIF > 
+    \global\mainmatterglossarytrue %DIF > 
+  \else %DIF > 
+    \global\mainmatterglossaryfalse %DIF > 
+%DIF -------
+  \fi
+%DIF 51-52c176
+%DIF < \usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
+%DIF < \usepackage{cleveref}
+%DIF -------
+} %DIF > 
+%DIF -------
+
+%DIF 54-55c178
+%DIF < \newcommand*\rot{\rotatebox{90}} % for rotated table headers
+%DIF < \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
+%DIF -------
+\def\zerotoken{0} %DIF > 
+%DIF -------
+
+%DIF 57-60c180-200
+%DIF < \newcommand{\summarytexcount}[1]{\textbf{Word Count}
+%DIF <   \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
+%DIF <   \verbatiminput%
+%DIF < {#1.wcsum}%
+%DIF -------
+\newglossarystyle{mystyle}{% %DIF > 
+  \setglossarystyle{list}% %DIF > 
+  \setlist[description]{itemsep=0.15ex,parsep=0.15ex} %DIF > 
+ %DIF > 
+  \renewcommand*{\glossentry}[2]{% %DIF > 
+    \mainmatterglossaryfalse %DIF > 
+    \begingroup %DIF > 
+      \def\debugglshypernumber####1{% %DIF > 
+        \checkmainmatterlocations{####1}% %DIF > 
+      }% %DIF > 
+      \let\@xp@glshypernumber\debugglshypernumber %DIF > 
+      ##2% %DIF > 
+    \endgroup %DIF > 
+    \ifmainmatterglossary %DIF > 
+      \item %DIF > 
+        \glsentryitem{##1}% %DIF > 
+        \glstarget{##1}{\glossentryname{##1}}% %DIF > 
+        \space %DIF > 
+        \glossentrydesc{##1}% %DIF > 
+    \fi %DIF > 
+  }% %DIF > 
+%DIF -------
+}
+
+%DIF 63-66c203-465
+%DIF < \newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
+%DIF <   \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
+%DIF <   \verbatiminput%
+%DIF < {#1.wcdetail}
+%DIF -------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% %DIF > 
+ %DIF > 
+\makeatother %DIF > 
+ %DIF > 
+\setglossarystyle{mystyle} %DIF > 
+\fi %DIF > 
  %DIF > 
 \newglossary{sym-A}{A.sly}{A.sls}{A} %DIF > 
 \newglossary{sym-B}{B.sly}{B.sls}{B} %DIF > 
@@ -311,36 +458,16 @@
 \newcommand{\sym@sortcomponent}[1]{% %DIF > 
   \ifcsname symfmt@#1\endcsname %DIF > 
     % formatting command: ignore it %DIF > 
-%DIF -------
-  \else
-%DIF 49c280-283
-%DIF <   %\usepackage[numbers]{natbib}             % citep command
-%DIF -------
+  \else %DIF > 
     \ifcsname symgreek@#1\endcsname %DIF > 
       \csname symgreek@#1\endcsname %DIF > 
     \else %DIF > 
       00#1% %DIF > 
-%DIF -------
-    \fi
-%DIF 51-52c285-286
-%DIF < \usepackage[unicode,hypertexnames=false,colorlinks=true]{hyperref}
-%DIF < \usepackage{cleveref}
-%DIF -------
+    \fi %DIF > 
   \fi %DIF > 
 } %DIF > 
-%DIF -------
-
-%DIF 54-55d288
-%DIF < \newcommand*\rot{\rotatebox{90}} % for rotated table headers
-%DIF < \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height
-%DIF -------
-
-%DIF 57-60c289-306
-%DIF < \newcommand{\summarytexcount}[1]{\textbf{Word Count}
-%DIF <   \immediate\write18{texcount -nosub -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{title}:\\n   {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n" #1.tex > #1.wcsum }%
-%DIF <   \verbatiminput%
-%DIF < {#1.wcsum}%
-%DIF -------
+ %DIF > 
+ %DIF > 
 % ============================================================ %DIF > 
 % Sort entire key %DIF > 
 % ============================================================ %DIF > 
@@ -359,15 +486,8 @@
   \else %DIF > 
     \sym@sortaux#2\@nil %DIF > 
   \fi %DIF > 
-%DIF -------
-}
-
-%DIF 63-66c309-346
-%DIF < \newcommand{\detailtexcount}[2]{\textbf{Section Breakdown #1}
-%DIF <   \immediate\write18{texcount -sub=#2 -inc -sum=[1,1,1,0,0,0,0] -q -brief -template="{SUB?{title}:\\n {sum} words, {float} figs/tables, {dsmath} full equations, {inline} inline equations.\\n?SUB}\\n" #1.tex > #1.wcdetail }%
-%DIF <   \verbatiminput%
-%DIF < {#1.wcdetail}
-%DIF -------
+} %DIF > 
+ %DIF > 
 \newcommand{\mysortkey}[1]{% %DIF > 
   \sym@sortaux#1-\@nil %DIF > 
 } %DIF > 
@@ -408,7 +528,7 @@
       The symbol label `sym-#1' has already been defined. %DIF > 
 %DIF -------
     }%
-%DIF 68a348-357
+%DIF 68a467-476
   }{}% %DIF > 
   \edef\newsym@sortkey{\mysortkey{#1}}% %DIF > 
   \newglossaryentry{sym-#1}{ %DIF > 
@@ -421,7 +541,7 @@
 \makeatother %DIF > 
 %DIF -------
 
-%DIF 69a359-653
+%DIF 69a478-773
 \newglossary[alg]{journal-acronyms}{acn}{acm}{Acronyms} %DIF > 
  %DIF > 
 \newglossary[clg]{control}{cld}{cln}{Control Acronyms} %DIF > 
@@ -714,6 +834,7 @@
 \newsym{J-wave}{J_\mathrm{wave}}{Incident wave energy flux at a location} %DIF > 
  %DIF > 
  %DIF > 
+ %DIF > 
 \newcommand*\rot{\rotatebox{90}} % for rotated table headers %DIF > 
 \newcommand{\phant}{\vphantom{\frac{-1}{\rho_M/\rho_w - 1}}} % to make inequality stacks the right height %DIF > 
  %DIF > 
@@ -790,7 +911,7 @@
 % \fi
 % \fi
 % }
-%DIF 141-147d726
+%DIF 141-147d846
 %DIF < 
 %DIF < \AddToHook{cmd/appendices/before}{%
 %DIF <   \crefalias{section}{appendix}%
@@ -801,7 +922,7 @@
 %DIF -------
 \makeatother
 
-%DIF 150a728-743
+%DIF 150a848-863
 % references to appendix sections should be called "appendix" instead of "section" %DIF > 
 % \AddToHook{cmd/appendices/before}{% %DIF > 
 %   \crefalias{section}{suppsec}% %DIF > 
@@ -821,7 +942,7 @@
 %DIF -------
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-%DIF 152a746-748
+%DIF 152a866-868
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}} %DIF > 
 \newcolumntype{?}{!{\vrule width 1.5pt}} %DIF > 
  %DIF > 
@@ -833,12 +954,12 @@
 \usepackage{microtype}
 \usepackage{subcaption} % for subfigures
 \usepackage{tikz}
-%DIF 159a756
+%DIF 159a876
 \usepackage{fmtcount} % for \ordinalstringnum command in discussion.tex (imported from results) %DIF > 
 %DIF -------
 %\usepackage[section]{placeins} % prevent figs from going in wrong section
 
-%DIF 161a759-771
+%DIF 161a879-891
 \makeatletter %DIF > 
 \def\DeclareFigureOptions#1#2#3{% %DIF > 
     \if\relax\detokenize{#2}\relax %DIF > 
@@ -854,7 +975,7 @@
 } %DIF > 
 %DIF -------
 
-%DIF 162c773-839
+%DIF 162c893-959
 %DIF < \newcommand{\journal}{Applied Ocean Research}
 %DIF -------
 \ifdefined\JOURNALTWOCOLUMN %DIF > 
@@ -926,7 +1047,7 @@
 \DeclareFigureOptions{aor:figs/manual/pto_sweep_3.pdf}{\linewidth}{\linewidth} %DIF > 
 %DIF -------
 
-%DIF 164a841-1704
+%DIF 164a961-1824
 \DeclareFigureOptions{re:figs/from-matlab/RM3_image.pdf}{1\linewidth}{.6\linewidth} %DIF > 
 \DeclareFigureOptions{re:figs/from-matlab/control_analysis_flowcharts.pdf}{1.1\linewidth}{1.1\linewidth} %DIF > 
 \DeclareFigureOptions{re:figs/from-matlab/delta_x.pdf}{\linewidth}{.7\linewidth} %DIF > 
@@ -1807,7 +1928,7 @@
     }
     \end{tikzpicture}
 }
-%DIF 179a1720-1724
+%DIF 179a1840-1844
  %DIF > 
  %DIF > 
 \newcommand{\assumption}[1]{\refstepcounter{asmpnumber}\label{aor:asmp:#1}A\arabic{asmpnumber}} %DIF > 
@@ -1831,13 +1952,13 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@out{%
     \{%
-%DIF 196a1742
+%DIF 196a1862
       "simRuntimeOldSeconds": 0.04, % %DIF > 
 %DIF -------
       "forceScaleFactor": "0.28", %
       "powerScaleFactor": "0.49", %
       "massScaleFactor": "1.12", %
-%DIF 199-200c1746-1747
+%DIF 199-200c1866-1867
 %DIF <       "postpro\_time": 289.096547, %
 %DIF <       "analysis\_time": 2125.897354, %
 %DIF -------
@@ -1847,7 +1968,7 @@
       "nominalLCOE": "0.89 \$/kWh", %
       "surgeForceFloatNominal": "10 MN", %
       "surgeForceSparNominal": "3 MN", %
-%DIF 204-210c1751-1758
+%DIF 204-210c1871-1878
 %DIF <       "capexDesignNominal": 2190114.3223833465, %
 %DIF <       "powerAvgNominal": 72822.42633091437, %
 %DIF <       "simRuntime": "151 ms", %
@@ -1866,7 +1987,7 @@
       "percent\_nans": 18.0288, % %DIF > 
 %DIF -------
       "n\_combos": 93750, %
-%DIF 212c1760
+%DIF 212c1880
 %DIF <       "geom\_sweep\_analysis\_time": 1446.594815, %
 %DIF -------
       "geom\_sweep\_analysis\_time": 2030.303147, % %DIF > 
@@ -1880,14 +2001,14 @@
         \{%
           "pct\_error\_baseline": {[}%
             36.46449630326281, %
-%DIF 222c1770
+%DIF 222c1890
 %DIF <             38.53447655036626%
 %DIF -------
             38.53447655036638% %DIF > 
 %DIF -------
           {]}, %
           "pct\_error\_drag": {[}%
-%DIF 225c1773
+%DIF 225c1893
 %DIF <             10.790884267350611, %
 %DIF -------
             10.790884267350643, % %DIF > 
@@ -1895,7 +2016,7 @@
             5.002294575560603%
           {]}, %
           "pct\_error\_meem": {[}%
-%DIF 229-230c1777-1778
+%DIF 229-230c1897-1898
 %DIF <             16.86150791429175, %
 %DIF <             66.75213581378641%
 %DIF -------
@@ -1904,7 +2025,7 @@
 %DIF -------
           {]}, %
           "pct\_error\_total": {[}%
-%DIF 233-234c1781-1782
+%DIF 233-234c1901-1902
 %DIF <             {-}12.715966046141702, %
 %DIF <             5.090339861457585%
 %DIF -------
@@ -1933,7 +2054,7 @@
         \}, %
         \{%
           "pct\_error\_baseline": {[}%
-%DIF 257c1805
+%DIF 257c1925
 %DIF <             36.49457444223329, %
 %DIF -------
             36.494574442233315, % %DIF > 
@@ -1943,7 +2064,7 @@
             null%
           {]}, %
           "pct\_error\_drag": {[}%
-%DIF 263-264c1811-1812
+%DIF 263-264c1931-1932
 %DIF <             65.47109436867538, %
 %DIF <             {-}11.439039626615637, %
 %DIF -------
@@ -1954,7 +2075,7 @@
             null%
           {]}, %
           "pct\_error\_meem": {[}%
-%DIF 269c1817
+%DIF 269c1937
 %DIF <             36.49457444223329, %
 %DIF -------
             36.494574442233315, % %DIF > 
@@ -1964,7 +2085,7 @@
             null%
           {]}, %
           "pct\_error\_total": {[}%
-%DIF 275-276c1823-1824
+%DIF 275-276c1943-1944
 %DIF <             65.47109436867538, %
 %DIF <             {-}10.810656387995564, %
 %DIF -------
@@ -1978,7 +2099,7 @@
       {]}, %
       "wecsimAvgPowerErrorBestCase": "0.16\%", %
       "wecsimAvgPowerErrorWorstCase": "12.72\%", %
-%DIF 284-286c1832-1837
+%DIF 284-286c1952-1957
 %DIF <       "MEEMRuntime": "105 ms", %
 %DIF <       "meemSweepTime": "24 minutes", %
 %DIF <       "meemSweepSize": "93750"%
@@ -1992,7 +2113,7 @@
 %DIF -------
     \}}%
   \else%
-%DIF 289a1840-1843
+%DIF 289a1960-1963
     \ifnum\pdfstrcmp{#1}{simRuntimeOldSeconds}=0% %DIF > 
       \def\resultsAOR@out{% %DIF > 
     0.04}% %DIF > 
@@ -2012,7 +2133,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{postpro_time}=0%
       \def\resultsAOR@out{%
-%DIF 303c1858
+%DIF 303c1978
 %DIF <     289.096547}%
 %DIF -------
     424.790568}% %DIF > 
@@ -2020,7 +2141,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{analysis_time}=0%
       \def\resultsAOR@out{%
-%DIF 307c1862
+%DIF 307c1982
 %DIF <     2125.897354}%
 %DIF -------
     2302.972065}% %DIF > 
@@ -2038,7 +2159,7 @@
       \def\resultsAOR@out{%
     3 MN}%
     \else%
-%DIF 321a1876-1879
+%DIF 321a1996-1999
       \ifnum\pdfstrcmp{#1}{heaveForceNominal}=0% %DIF > 
       \def\resultsAOR@out{% %DIF > 
     9 MN}% %DIF > 
@@ -2046,7 +2167,7 @@
 %DIF -------
       \ifnum\pdfstrcmp{#1}{capexDesignNominal}=0%
       \def\resultsAOR@out{%
-%DIF 323c1882
+%DIF 323c2002
 %DIF <     2190114.3223833465}%
 %DIF -------
     2190114.3223833675}% %DIF > 
@@ -2054,7 +2175,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{powerAvgNominal}=0%
       \def\resultsAOR@out{%
-%DIF 327c1886
+%DIF 327c2006
 %DIF <     72822.42633091437}%
 %DIF -------
     72822.42633091439}% %DIF > 
@@ -2062,7 +2183,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{simRuntime}=0%
       \def\resultsAOR@out{%
-%DIF 331c1890
+%DIF 331c2010
 %DIF <     151 ms}%
 %DIF -------
     149 ms}% %DIF > 
@@ -2070,7 +2191,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{pctRuntimeDynamics}=0%
       \def\resultsAOR@out{%
-%DIF 335c1894
+%DIF 335c2014
 %DIF <     23\%}%
 %DIF -------
     20\%}% %DIF > 
@@ -2078,7 +2199,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{pctRuntimeMEEM}=0%
       \def\resultsAOR@out{%
-%DIF 339c1898
+%DIF 339c2018
 %DIF <     70\%}%
 %DIF -------
     72\%}% %DIF > 
@@ -2086,7 +2207,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{pctRuntimeOther}=0%
       \def\resultsAOR@out{%
-%DIF 343c1902
+%DIF 343c2022
 %DIF <     8\%}%
 %DIF -------
     7\%}% %DIF > 
@@ -2094,7 +2215,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{percent_nans}=0%
       \def\resultsAOR@out{%
-%DIF 347c1906
+%DIF 347c2026
 %DIF <     18.029866666666667}%
 %DIF -------
     18.0288}% %DIF > 
@@ -2106,7 +2227,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{geom_sweep_analysis_time}=0%
       \def\resultsAOR@out{%
-%DIF 355c1914
+%DIF 355c2034
 %DIF <     1446.594815}%
 %DIF -------
     2030.303147}% %DIF > 
@@ -2145,7 +2266,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{MEEMRuntime}=0%
       \def\resultsAOR@out{%
-%DIF 390c1949
+%DIF 390c2069
 %DIF <     105 ms}%
 %DIF -------
     108 ms}% %DIF > 
@@ -2153,13 +2274,13 @@
     \else%
       \ifnum\pdfstrcmp{#1}{meemSweepTime}=0%
       \def\resultsAOR@out{%
-%DIF 394c1953
+%DIF 394c2073
 %DIF <     24 minutes}%
 %DIF -------
     34 minutes}% %DIF > 
 %DIF -------
     \else%
-%DIF 396a1955-1966
+%DIF 396a2075-2086
       \ifnum\pdfstrcmp{#1}{meemSweepTimePerCombo}=0% %DIF > 
       \def\resultsAOR@out{% %DIF > 
     22 ms}% %DIF > 
@@ -2175,7 +2296,7 @@
 %DIF -------
       \ifnum\pdfstrcmp{#1}{meemSweepSize}=0%
       \def\resultsAOR@out{%
-%DIF 398c1969
+%DIF 398c2089
 %DIF <     93750}%
 %DIF -------
     93,750}% %DIF > 
@@ -2183,7 +2304,7 @@
     \else%
       \def\resultsAOR@out{%
     ??}%
-%DIF 402c1973
+%DIF 402c2093
 %DIF <     \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
 %DIF -------
     \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi %DIF > 
@@ -2197,14 +2318,14 @@
       \{%
         "pct\_error\_baseline": {[}%
           36.46449630326281, %
-%DIF 412c1983
+%DIF 412c2103
 %DIF <           38.53447655036626%
 %DIF -------
           38.53447655036638% %DIF > 
 %DIF -------
         {]}, %
         "pct\_error\_drag": {[}%
-%DIF 415c1986
+%DIF 415c2106
 %DIF <           10.790884267350611, %
 %DIF -------
           10.790884267350643, % %DIF > 
@@ -2212,7 +2333,7 @@
           5.002294575560603%
         {]}, %
         "pct\_error\_meem": {[}%
-%DIF 419-420c1990-1991
+%DIF 419-420c2110-2111
 %DIF <           16.86150791429175, %
 %DIF <           66.75213581378641%
 %DIF -------
@@ -2221,7 +2342,7 @@
 %DIF -------
         {]}, %
         "pct\_error\_total": {[}%
-%DIF 423-424c1994-1995
+%DIF 423-424c2114-2115
 %DIF <           {-}12.715966046141702, %
 %DIF <           5.090339861457585%
 %DIF -------
@@ -2250,7 +2371,7 @@
       \}, %
       \{%
         "pct\_error\_baseline": {[}%
-%DIF 447c2018
+%DIF 447c2138
 %DIF <           36.49457444223329, %
 %DIF -------
           36.494574442233315, % %DIF > 
@@ -2260,7 +2381,7 @@
           null%
         {]}, %
         "pct\_error\_drag": {[}%
-%DIF 453-454c2024-2025
+%DIF 453-454c2144-2145
 %DIF <           65.47109436867538, %
 %DIF <           {-}11.439039626615637, %
 %DIF -------
@@ -2271,7 +2392,7 @@
           null%
         {]}, %
         "pct\_error\_meem": {[}%
-%DIF 459c2030
+%DIF 459c2150
 %DIF <           36.49457444223329, %
 %DIF -------
           36.494574442233315, % %DIF > 
@@ -2281,7 +2402,7 @@
           null%
         {]}, %
         "pct\_error\_total": {[}%
-%DIF 465-466c2036-2037
+%DIF 465-466c2156-2157
 %DIF <           65.47109436867538, %
 %DIF <           {-}10.810656387995564, %
 %DIF -------
@@ -2314,14 +2435,14 @@
     \{%
       "pct\_error\_baseline": {[}%
         36.46449630326281, %
-%DIF 493c2064
+%DIF 493c2184
 %DIF <         38.53447655036626%
 %DIF -------
         38.53447655036638% %DIF > 
 %DIF -------
       {]}, %
       "pct\_error\_drag": {[}%
-%DIF 496c2067
+%DIF 496c2187
 %DIF <         10.790884267350611, %
 %DIF -------
         10.790884267350643, % %DIF > 
@@ -2329,7 +2450,7 @@
         5.002294575560603%
       {]}, %
       "pct\_error\_meem": {[}%
-%DIF 500-501c2071-2072
+%DIF 500-501c2191-2192
 %DIF <         16.86150791429175, %
 %DIF <         66.75213581378641%
 %DIF -------
@@ -2338,7 +2459,7 @@
 %DIF -------
       {]}, %
       "pct\_error\_total": {[}%
-%DIF 504-505c2075-2076
+%DIF 504-505c2195-2196
 %DIF <         {-}12.715966046141702, %
 %DIF <         5.090339861457585%
 %DIF -------
@@ -2409,7 +2530,7 @@
     \def\resultsAOR@IV@out{%
     \{%
       "pct\_error\_baseline": {[}%
-%DIF 570c2141
+%DIF 570c2261
 %DIF <         36.49457444223329, %
 %DIF -------
         36.494574442233315, % %DIF > 
@@ -2419,7 +2540,7 @@
         null%
       {]}, %
       "pct\_error\_drag": {[}%
-%DIF 576-577c2147-2148
+%DIF 576-577c2267-2268
 %DIF <         65.47109436867538, %
 %DIF <         {-}11.439039626615637, %
 %DIF -------
@@ -2430,7 +2551,7 @@
         null%
       {]}, %
       "pct\_error\_meem": {[}%
-%DIF 582c2153
+%DIF 582c2273
 %DIF <         36.49457444223329, %
 %DIF -------
         36.494574442233315, % %DIF > 
@@ -2440,7 +2561,7 @@
         null%
       {]}, %
       "pct\_error\_total": {[}%
-%DIF 588-589c2159-2160
+%DIF 588-589c2279-2280
 %DIF <         65.47109436867538, %
 %DIF <         {-}10.810656387995564, %
 %DIF -------
@@ -2474,7 +2595,7 @@
     \def\resultsAOR@V@out{%
     {[}%
       36.46449630326281, %
-%DIF 617c2188
+%DIF 617c2308
 %DIF <       38.53447655036626%
 %DIF -------
       38.53447655036638% %DIF > 
@@ -2487,7 +2608,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@V@out{%
-%DIF 626c2197
+%DIF 626c2317
 %DIF <     38.53447655036626}%
 %DIF -------
     38.53447655036638}% %DIF > 
@@ -2502,7 +2623,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@VI@out{%
     {[}%
-%DIF 637c2208
+%DIF 637c2328
 %DIF <       10.790884267350611, %
 %DIF -------
       10.790884267350643, % %DIF > 
@@ -2512,7 +2633,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@VI@out{%
-%DIF 643c2214
+%DIF 643c2334
 %DIF <     10.790884267350611}%
 %DIF -------
     10.790884267350643}% %DIF > 
@@ -2531,7 +2652,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@VII@out{%
     {[}%
-%DIF 658-659c2229-2230
+%DIF 658-659c2349-2350
 %DIF <       16.86150791429175, %
 %DIF <       66.75213581378641%
 %DIF -------
@@ -2542,7 +2663,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@VII@out{%
-%DIF 664c2235
+%DIF 664c2355
 %DIF <     16.86150791429175}%
 %DIF -------
     16.861507914291764}% %DIF > 
@@ -2550,7 +2671,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@VII@out{%
-%DIF 668c2239
+%DIF 668c2359
 %DIF <     66.75213581378641}%
 %DIF -------
     66.75213581378652}% %DIF > 
@@ -2565,7 +2686,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@VIII@out{%
     {[}%
-%DIF 679-680c2250-2251
+%DIF 679-680c2370-2371
 %DIF <       {-}12.715966046141702, %
 %DIF <       5.090339861457585%
 %DIF -------
@@ -2576,7 +2697,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@VIII@out{%
-%DIF 685c2256
+%DIF 685c2376
 %DIF <     {-}12.715966046141702}%
 %DIF -------
     {-}12.715966046141624}% %DIF > 
@@ -2584,7 +2705,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@VIII@out{%
-%DIF 689c2260
+%DIF 689c2380
 %DIF <     5.090339861457585}%
 %DIF -------
     5.090339861457517}% %DIF > 
@@ -2683,7 +2804,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XIII@out{%
     {[}%
-%DIF 784c2355
+%DIF 784c2475
 %DIF <       36.49457444223329, %
 %DIF -------
       36.494574442233315, % %DIF > 
@@ -2695,7 +2816,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XIII@out{%
-%DIF 792c2363
+%DIF 792c2483
 %DIF <     36.49457444223329}%
 %DIF -------
     36.494574442233315}% %DIF > 
@@ -2722,7 +2843,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XIV@out{%
     {[}%
-%DIF 815-816c2386-2387
+%DIF 815-816c2506-2507
 %DIF <       65.47109436867538, %
 %DIF <       {-}11.439039626615637, %
 %DIF -------
@@ -2735,7 +2856,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XIV@out{%
-%DIF 823c2394
+%DIF 823c2514
 %DIF <     65.47109436867538}%
 %DIF -------
     65.47109436867527}% %DIF > 
@@ -2743,7 +2864,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@XIV@out{%
-%DIF 827c2398
+%DIF 827c2518
 %DIF <     {-}11.439039626615637}%
 %DIF -------
     {-}11.439039626615426}% %DIF > 
@@ -2766,7 +2887,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XV@out{%
     {[}%
-%DIF 846c2417
+%DIF 846c2537
 %DIF <       36.49457444223329, %
 %DIF -------
       36.494574442233315, % %DIF > 
@@ -2778,7 +2899,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XV@out{%
-%DIF 854c2425
+%DIF 854c2545
 %DIF <     36.49457444223329}%
 %DIF -------
     36.494574442233315}% %DIF > 
@@ -2805,7 +2926,7 @@
   \ifnum\pdfstrcmp{#1}{all}=0%
     \def\resultsAOR@XVI@out{%
     {[}%
-%DIF 877-878c2448-2449
+%DIF 877-878c2568-2569
 %DIF <       65.47109436867538, %
 %DIF <       {-}10.810656387995564, %
 %DIF -------
@@ -2818,7 +2939,7 @@
   \else%
     \ifnum\pdfstrcmp{#1}{0}=0%
       \def\resultsAOR@XVI@out{%
-%DIF 885c2456
+%DIF 885c2576
 %DIF <     65.47109436867538}%
 %DIF -------
     65.47109436867527}% %DIF > 
@@ -2826,7 +2947,7 @@
     \else%
       \ifnum\pdfstrcmp{#1}{1}=0%
       \def\resultsAOR@XVI@out{%
-%DIF 889c2460
+%DIF 889c2580
 %DIF <     {-}10.810656387995564}%
 %DIF -------
     {-}10.810656387995223}% %DIF > 
@@ -2849,7 +2970,7 @@
 \makeatother%
 
 \usepackage[authoryear]{natbib}
-%DIF 908a2479-2482
+%DIF 908a2599-2602
 \tracinglostchars=1 % get rid of nullfont warnings %DIF > 
 \usepackage{lineno} %DIF > 
 \linenumbers %DIF > 
@@ -3101,7 +3222,7 @@ computational benchmarking
 \DIFaddbegin \printglossary[type=journal-acronyms]
 
 %DIF >  glossary: symbols
-\printglossary[type=sym,title={General Symbols}]
+%DIF >  \printglossary[type=sym,title={General Symbols}]
 \printglossary[type=sym-A]
 \printglossary[type=sym-a]
 \printglossary[type=sym-B]
@@ -3110,10 +3231,10 @@ computational benchmarking
 \printglossary[type=sym-c]
 \printglossary[type=sym-D]
 \printglossary[type=sym-d]
-\printglossary[type=sym-E]
+%DIF >  \printglossary[type=sym-E]
 \printglossary[type=sym-e]
 \printglossary[type=sym-F]
-\printglossary[type=sym-f]
+%DIF >  \printglossary[type=sym-f]
 \printglossary[type=sym-G]
 \printglossary[type=sym-g]
 \printglossary[type=sym-H]
@@ -3121,15 +3242,15 @@ computational benchmarking
 \printglossary[type=sym-I]
 \printglossary[type=sym-i]
 \printglossary[type=sym-J]
-\printglossary[type=sym-j]
+%DIF >  \printglossary[type=sym-j]
 \printglossary[type=sym-K]
 \printglossary[type=sym-k]
-\printglossary[type=sym-L]
+%DIF >  \printglossary[type=sym-L]
 \printglossary[type=sym-l]
 \printglossary[type=sym-M]
 \printglossary[type=sym-m]
 \printglossary[type=sym-N]
-\printglossary[type=sym-n]
+%DIF >  \printglossary[type=sym-n]
 \printglossary[type=sym-O]
 \printglossary[type=sym-o]
 \printglossary[type=sym-P]
@@ -3137,7 +3258,7 @@ computational benchmarking
 \printglossary[type=sym-Q]
 \printglossary[type=sym-q]
 \printglossary[type=sym-R]
-\printglossary[type=sym-r]
+%DIF >  \printglossary[type=sym-r]
 \printglossary[type=sym-S]
 \printglossary[type=sym-s]
 \printglossary[type=sym-T]
@@ -3146,37 +3267,37 @@ computational benchmarking
 \printglossary[type=sym-u]
 \printglossary[type=sym-V]
 \printglossary[type=sym-v]
-\printglossary[type=sym-W]
+%DIF >  \printglossary[type=sym-W]
 \printglossary[type=sym-w]
 \printglossary[type=sym-X]
 \printglossary[type=sym-x]
-\printglossary[type=sym-Y]
+%DIF >  \printglossary[type=sym-Y]
 \printglossary[type=sym-y]
 \printglossary[type=sym-Z]
-\printglossary[type=sym-z]
+%DIF >  \printglossary[type=sym-z]
 
 %DIF > \printglossary[type=sym-Alpha]
-\printglossary[type=sym-alpha]
+%DIF >  \printglossary[type=sym-alpha]
 %DIF > \printglossary[type=sym-Beta]
 \printglossary[type=sym-beta]
 \printglossary[type=sym-Gamma]
 \printglossary[type=sym-gamma]
 \printglossary[type=sym-Delta]
-\printglossary[type=sym-delta]
+%DIF >  \printglossary[type=sym-delta]
 %DIF > \printglossary[type=sym-Epsilon]
-\printglossary[type=sym-epsilon]
+%DIF >  \printglossary[type=sym-epsilon]
 %DIF > \printglossary[type=sym-Zeta]
 \printglossary[type=sym-zeta]
 %DIF > \printglossary[type=sym-Eta]
 \printglossary[type=sym-eta]
 \printglossary[type=sym-Theta]
-\printglossary[type=sym-theta]
+%DIF >  \printglossary[type=sym-theta]
 %DIF > \printglossary[type=sym-Iota]
 \printglossary[type=sym-iota]
 %DIF > \printglossary[type=sym-Kappa]
-\printglossary[type=sym-kappa]
-\printglossary[type=sym-Lambda]
-\printglossary[type=sym-lambda]
+%DIF >  \printglossary[type=sym-kappa]
+%DIF >  \printglossary[type=sym-Lambda]
+%DIF >  \printglossary[type=sym-lambda]
 %DIF > \printglossary[type=sym-Mu]
 \printglossary[type=sym-mu]
 %DIF > \printglossary[type=sym-Nu]
@@ -3190,18 +3311,18 @@ computational benchmarking
 %DIF > \printglossary[type=sym-Rho]
 \printglossary[type=sym-rho]
 \printglossary[type=sym-Sigma]
-\printglossary[type=sym-sigma]
+%DIF >  \printglossary[type=sym-sigma]
 \printglossary[type=sym-Tau]
 \printglossary[type=sym-tau]
-\printglossary[type=sym-Upsilon]
+%DIF >  \printglossary[type=sym-Upsilon]
 \printglossary[type=sym-upsilon]
 \printglossary[type=sym-Phi]
-\printglossary[type=sym-phi]
+%DIF >  \printglossary[type=sym-phi]
 %DIF > \printglossary[type=sym-Chi]
-\printglossary[type=sym-chi]
+%DIF >  \printglossary[type=sym-chi]
 \printglossary[type=sym-Psi]
-\printglossary[type=sym-psi]
-\printglossary[type=sym-Omega]
+%DIF >  \printglossary[type=sym-psi]
+%DIF >  \printglossary[type=sym-Omega]
 \printglossary[type=sym-omega]
 
  \DIFaddend \newpage \section{Introduction}
@@ -13734,11 +13855,11 @@ $F_{\text{heave},\text{mult}}$ & Heave force multiplier & 1.65 & - \\
 }
  \end{table}
 
-\Cref{aor:tab:hyperparams} documents the hyper-parameters used to control convergence and other numerical aspects of the simulation.
+\Cref{tab:hyperparams} documents the hyper-parameters used to control convergence and other numerical aspects of the simulation.
 \begin{table}[htbp]
     \centering
     \caption{Hyper-parameters used to control numerics}
-    \label{aor:tab:hyperparams}
+    \label{tab:hyperparams}
     \begin{tabular}{ccc} \toprule
           Variable&  Value& Unit\\ \midrule
           $\gls{sym-xi-tol}$&  0.01 & m \\
