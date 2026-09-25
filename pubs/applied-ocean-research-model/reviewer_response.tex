@@ -34,9 +34,11 @@ Dear Dr.\ Lin and Reviewers,
 Thank you for the opportunity to revise our manuscript, and thank you to the reviewers for their careful reading and constructive feedback. We have considered every comment and revised the manuscript accordingly. The main changes are:
 
 \begin{itemize}
-  \item Section 4 restructured to distinguish verification, validation, calibration, and benchmarking, with errors reported before and after calibration.
-  \item Section 3.3 reorganized to define describing functions and the QLPS method before they are used, with the modeling assumptions numbered (A1--A12) and emphasized.
   \item Abstract, Introduction, and Conclusion revised to state the objectives and novel contributions explicitly and to state the scope and main limitations.
+  \item Section 3.3 (dynamics and control) rewritten to focus on modeling assumptions rather than implementation details.
+  The section now defines describing functions and the QLPS method before they are used, explicitly numbers modeling assumptions (A1--A12),
+  and more clearly distinguishes conceptual variants of the method under different assumptions.
+  \item Section 4 restructured to distinguish verification, validation, calibration, and benchmarking.
   \item Main text shortened by moving several equations and their discussion to the appendices.
   \item Notation list added.
 \end{itemize}
@@ -65,7 +67,7 @@ that states the objectives of the study explicitly.
 It reads: ``In summary, this study aims to develop a model that has sufficient speed and scope to support early-stage multidisciplinary design optimization and tradeoff analysis of wave energy converters.''
 
 \rcomment{Reviewer 1, Question 2}{Please provide more implementation details, including key model parameters and default settings.}
-\response We thank the reviewer for this suggestion. Key model parameters are listed in Table~20 (Appendix~F, p.\pageref{aor:tab:parameters}).
+\response We thank the reviewer for this suggestion. Key model parameters are listed in \Cref{aor:tab:parameters} (Appendix~F, p.\pageref{aor:tab:parameters}).
 We have also added \Cref{aor:tab:hyperparams} to this Appendix to document the solver hyperparameters such as MEEM truncation order and fixed-point iteration tolerance.
 We now refer to this Appendix in Section 3 (p.~\pageref{aor:lne:appendix-parameters}, line~\ref{aor:lne:appendix-parameters}).
 %and the default values of all design variables.}
@@ -74,20 +76,27 @@ For more minute implementation details, the code and scripts used to produce all
 \rcomment{Reviewer 1, Question 4}{Add a workflow diagram summarizing the complete MDOcean framework.}
 \response We thank the reviewer for this suggestion.
 The complete MDOcean workflow is shown in the XDSM diagram in \Cref{aor:fig:n2} (Section~2), which traces how the design variables pass through the geometry, hydrodynamics, dynamics and control, structures, and economics modules to the objective and constraints.
-We recognize that XDSM notation may be unfamiliar to readers outside the design optimization community, so we have revised the caption to explain how to read the diagram.
+We recognize that XDSM notation may be unfamiliar to readers outside the design optimization community, so we have revised the caption to explain how to read the diagram:
+\begin{quote}
+Modules are shown along the diagonal. Inputs come from the top and left sides, and outputs
+go out the bottom and right sides.
+\end{quote}
 We have also added a new scope diagram (\Cref{aor:fig:design-scope}) that places this workflow in the broader context of WEC modeling.
+If these diagrams do not provide the desired information, we kindly request more elaboration about what the reviewer would like to see in a workflow diagram that the current diagrams lack.
 
 \rcomment{Reviewer 1, Question 6}{Better highlight the open-source availability and multidisciplinary integration.}
 \response We thank the reviewer for this suggestion.
-We have added the words ``open-source'' to the first contributions bullet (p.~\pageref{aor:lne:open-source}, line~\ref{aor:lne:open-source}).
-The final sentence of the conclusion (line~\ref{aor:lne:open-source-conclusion}) also notes the open-source availability.
-The paper emphasizes the multidisciplinary nature in Section 1, Section 5.2, and the title.
-Figure~3 and the associated text show how the different disciplines integrate together.
-% The repository link and code version are now given in the Introduction and Data Availability
-% Statement; add an Abstract location here only if the revised Abstract actually contains them.
-% Outline for multidisciplinary-integration response: emphasize that integration produces
-% decision-relevant findings, not merely a software feature. Point to Eq.~(35), the
-% simultaneous activation of constraints at the LCOE optimum, and the fragmentation of
+\begin{itemize}
+  \item \textbf{Open source:}
+  We have added the words ``open-source'' to the first contributions bullet (p.~\pageref{aor:lne:open-source}, line~\ref{aor:lne:open-source}).
+  The final sentence of the conclusion (p.~\pageref{aor:lne:open-source-conclusion}, line~\ref{aor:lne:open-source-conclusion}) also notes the open-source availability.
+  We have also added more details about how to access the repository and reproduce the results in the introduction and Data availability statement; see response to reviewer 4, minor comment 4.
+  \item \textbf{Multidisciplinarity:} 
+  The paper emphasizes the multidisciplinary nature in Section 1, Section 5.2, and the title.
+  \Cref{aor:fig:design-scope,aor:fig:n2} and the associated text show how the different disciplines integrate together.
+\end{itemize}
+
+% Point to Eq.~(35), and the fragmentation of
 % feasible design space by the fatigue constraint (Fig.~21), and insert the corresponding
 % revised-manuscript locations once verified.
 
@@ -99,7 +108,8 @@ Figure~3 and the associated text show how the different disciplines integrate to
 
 % ---------------- Final comments ----------------
 \rcomment{Reviewer 1, Comment 1}{The manuscript is overly long and should be significantly condensed to improve readability.}
-\response We thank the reviewer and agree that the main narrative was too long. We have shortened the main text by moving detailed derivations and implementation details to the appendices, as follows:
+\response We thank the reviewer and agree that the main narrative was too long.
+We have shortened the main text by moving detailed derivations and implementation details to the appendices, as follows:
 \begin{itemize}
   \item The bulk of the equations and details of the linearized model, now moved to \Cref{aor:sec:appendix-multiport}
   \item The equation for the wave velocity as a function of lateral position, now \Cref{aor:eq:wave-velocity-phasor} 
@@ -108,7 +118,7 @@ Figure~3 and the associated text show how the different disciplines integrate to
 \end{itemize}
 
 %[the discussion of MDO architectures in Section 2, the classification of modified frequency-domain methods in Section 3.3.3, and Figures 16-17] to the appendices.}
-Material added at the reviewers' request, such as the notation list and parameter tables, has been placed in the front matter and appendices when possible to avoid lengthening the main narrative.
+Material added at the reviewers' request, such as \Cref{aor:tab:hyperparams}, has been placed in the appendices when possible to avoid lengthening the main narrative.
 
 \rcomment{Reviewer 1, Comment 2}{All key terms and parameters must be clearly defined at first use to avoid ambiguity and improve clarity.}
 \response We thank the reviewer.
@@ -117,16 +127,28 @@ This package also automatically generates the notation list requested in Comment
 
 \rcomment{Reviewer 1, Comment 3}{Add a notation list}
 \response We thank the reviewer for this suggestion.
-We have added a notation list at the beginning of the paper that collects all acronyms and symbols.
+We have added a notation list at the beginning of the paper that collects all symbols.
 
 \rcomment{Reviewer 1, Comment 4}{The novelty of MDOcean compared with existing WEC simulation frameworks is not sufficiently highlighted.}
-\response We thank the reviewer. MDOcean differs from existing WEC simulation and optimization frameworks in the combination of multidisciplinary scope, computational speed, and analytical treatment of constrained control. In particular, the framework couples hydrodynamics, dynamics and control, structural screening, and economics within a workflow intended for large early-stage design-space studies. The revised Abstract and Section 1.4 now state these contributions explicitly, and Table~1 places MDOcean in context with existing WEC frameworks. Please see also our response to Reviewer~3, Comment~1.
+\response We thank the reviewer.
+MDOcean differs from existing WEC simulation and optimization frameworks in the combination of multidisciplinary scope, computational speed, and analytical treatment of constrained control.
+In particular, the framework couples hydrodynamics, dynamics and control, structural screening, and economics within a workflow intended for large early-stage design-space studies.
+The revised Abstract and Section 1.4 now state these contributions explicitly,
+and Table~1 places MDOcean in context with existing WEC frameworks.
+Please see also our response to Reviewer~3, Comment~1.
 
 \rcomment{Reviewer 1, Comment 5}{Validation is limited to a single reference case; additional case studies are needed to demonstrate model robustness.}
 \response We thank the reviewer and agree that additional reference cases would further demonstrate the robustness of the model.
-Validating other WEC designs requires reference data (hydrodynamic, structural, and cost) comparable to those available for RM3, which is beyond the scope of this revision.
-% Instead, we have restricted our claims throughout the manuscript to two-body axisymmetric
-% point absorbers (Abstract [scope statement], Section~5.3 [limitations], Conclusion
+Validating other WEC designs requires reference data (hydrodynamic, dynamic, structural, and cost) comparable to those available for RM3, which is beyond the scope of this revision.
+Instead, we have restricted our claims throughout the manuscript to describe the assumed architecture more explicitly.
+For example, \Cref{aor:sec:model-overview} now states (p.~\pageref{aor:lne:scope-start}, lines~\ref{aor:lne:scope-start}--\ref{aor:lne:scope-end}):
+\begin{quote}
+  MDOcean performs static analysis for a single type of floating body (an RM3-like two-body point absorber)
+  as well as dynamic analysis and optimal control for the full coupled system,
+  assuming that the static properties for other components (e.g. drivetrain, generator) are known or swept inputs.
+\end{quote}
+We also note that the hydrodynamic coefficients have been verified and validated for geometries other than RM3 (see \Cref{aor:sec:hydro-checks}) by overlaying curves published in \citet{aor:chau_hydrodynamic_2012,aor:olaya_hydrodynamic_2015}.
+% (Abstract [scope statement], Section~5.3 [limitations], Conclusion
 % [scope statement]) and clarified how thoroughly this archetype has been evaluated.
 % The dynamics module is compared with WEC-Sim across all sea states at the site
 % (Section~4, Figure~12),
@@ -137,33 +159,38 @@ Validating other WEC designs requires reference data (hydrodynamic, structural, 
 % ([scope/limitation statement: page/line reference]).
 
 \rcomment{Reviewer 1, Comment 6}{The assumptions behind the semi-analytical approach and their impact on accuracy require deeper discussion.}
-\response We thank the reviewer. The assumptions underlying the dynamics formulation are now numbered (A1-A12) and stated explicitly where they are introduced (Sections 3.3.1-3.3.2, lines~\ref{aor:lne:A1-start}-\ref{aor:lne:A6-end} and lines~\ref{aor:lne:A7-start}-\ref{aor:lne:A12-end}).
+\response We thank the reviewer. The assumptions underlying the dynamics formulation are now numbered (A1-A12) and discussed more deeply when they are introduced (Sections 3.3.1-3.3.2, lines~\ref{aor:lne:A1-start}-\ref{aor:lne:A6-end} and lines~\ref{aor:lne:A7-start}-\ref{aor:lne:A12-end}).
 The same numbering system is used in the validation section to show which assumptions are validated and their accuracy.
+We also added \Cref{aor:fig:assumptions} to map the assumptions to their corresponding methodologies.
+This demonstrates that even if some of the assumptions here are abandoned (i.e. A11, the narrow-band wave assumption required for analytical QLPS), the broader QLPS and MFD family of approaches still apply (i.e. as a numerical QCQP), and these should be studied more as alternatives to time-domain solvers.
 % \fillin{[Complete reply. Suggestion: point to the new table in Section 4 that lists each assumption, how it was verified or validated, and its effect on accuracy -- the same table answers Reviewer~2, Comment~8 and Reviewer~4, Minor Comment~7.]}
 
 \rcomment{Reviewer 1, Comment 7}{The benchmarking focuses mainly on computational speed, while accuracy comparisons should be expanded.}
-\response We thank the reviewer for this suggestion. We have expanded the presentation of the validation results so that accuracy is reported separately from computational speed and is distinguished from calibration against the RM3 reference data. Table~9 reports the principal errors before and after calibration, while the WEC-Sim comparisons provide an independent comparison of the dynamics under matched modeling assumptions. Runtime comparisons are reported separately because the compared simulations do not all have the same scope. Please see also our response to Reviewer~4, Minor Comment~7.
+\response We thank the reviewer for this suggestion. We have expanded the presentation of the validation results so that accuracy is examined more systematically, separating verification, calibration, and validation and referring back to the assumptions to assess the accuracy of each one.
+Table~8 reports the accuracy of major system outputs, while the WEC-Sim comparison summary in Fig.~13 assesses the accuracy of the dynamics module under both matched and different modeling assumptions.
+These comparisons are expanded in \Cref{aor:sec:appendix-dynamic-validation}.
+Please see also our response to Reviewer~4, Minor Comment~7.
 
 \rcomment{Reviewer 1, Comment 8}{Several mathematical derivations are difficult to follow and require clearer explanations or simplification.}
 \response We thank the reviewer.
-We hope that the reorganization of Section 3.3, the numbered assumptions, and the notation list have made the mathematics easier to follow.
+We hope that the reorganization of Section 3.3, moving many equations to the appendix, the numbered assumptions, and the notation list have made the mathematics easier to follow.
 If this is not the case, we welcome specific feedback on which derivations remain difficult to follow and which steps are unclear so that we can further improve the clarity of the manuscript.
 
 \rcomment{Reviewer 1, Comment 9}{The structural and economic models are relatively simplified and need stronger justification for their applicability.}
 \response We thank the reviewer.
 MDOcean's purpose is not to perform detailed sizing or late-stage design refinement but to facilitate rapid ranking, screening, and trend analysis of early-stage designs and to guide intuition about how subsystem design changes affect system performance via multidisciplinary coupling.
-The economic model has appropriately low error  (1.4-1.8\% average error in CAPEX, OPEX, and LCOE across 1-100 devices, see Table~9 and Figure~41),
-and the structural model has been tuned as needed to match higher-fidelity models while preserving known analytical scaling behavior.
-Therefore, the models are applicable.
+The economic model has appropriately low error (1.4-1.8\% average error in CAPEX, OPEX, and LCOE across 1-100 devices, see Table~8 and \Cref{aor:fig:econ-nwec-validate}),
+and the structural model has been tuned as needed to match higher-fidelity models within 1\% while preserving known analytical scaling behavior.
+Therefore, the models are applicable for the stated purpose.
 See response to Reviewer~4, Major Comment~3.
 
 \rcomment{Reviewer 1, Comment 10}{The manuscript lacks a comprehensive sensitivity or uncertainty analysis of key design parameters.}
-\response We thank the reviewer. The manuscript includes several local sensitivity analyses that show the effect of modifying the design variables around their nominal RM3 values.
-The one-at-a-time design sweep in Section~5.1.4 (Figure~21) shows the effect of each design variable on LCOE and cost, Figures~19-20 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(35)).
+\response We thank the reviewer. Though we had not used the word sensitivity analysis, the manuscript already includes several local sensitivity analyses that show the effect of modifying the design variables around their nominal RM3 values.
+The one-at-a-time design sweep in Section~5.1.4 (\Cref{aor:fig:doe}) shows the effect of each design variable on LCOE and cost, Figures~20-21 show the effect of the PTO force and power limits, and Appendix~C.3.2 derives a closed-form expression for the sensitivity of annual average power to each constraint limit (Eq.~(89)).
 We now describe \Cref{aor:sec:design-space-exploration} explicitly as a local sensitivity analysis (line~\ref{aor:lne:local-sens-doe}).
 
-A more comprehensive sensitivity analysis, including the sensitivity to parameters and to design variables around design points other than the nominal, is the subject of a separate study \citep{aor:mccabe_leveraging_2026}.
-This allows the present manuscript to focus on the development and validation of the model.
+A more comprehensive sensitivity analysis, including the sensitivity to parameters and to design variables around design points other than the nominal, is the subject of another study \citep{aor:mccabe_leveraging_2026}.
+This separation allows the present manuscript to focus on the development and validation of the model.
 % Add the Section~5.3 limitation location after verifying the exact revised-manuscript label.
 
 \rcomment{Reviewer 1, Comment 11}{The relevant paper should be reviewed and cited. [Four papers listed.]}
@@ -228,10 +255,17 @@ We have revised the figure placement so that each figure appears close to where 
 A new section does not start without first displaying all figures from the previous section.
 
 \rcomment{Reviewer 1, Comment 19}{what can understand from fig 16? fig 17? it is to messy.}
-\response We thank the reviewer and agree that Figures~16 and~17 were difficult to read. We have added a paragraph (Section~5.1.1, [page/line reference: relevant revised-manuscript passage]) explaining how the six design variables are shown by marker size, marker shape, and color. We have also [state the actual figure treatment here: moved the figures to an appendix / simplified the figures to show only the trends discussed in the text].
+\response We thank the reviewer and agree that Figures~16 and~17 were difficult to read. We have added text describing how to read the figures based on the color of the datapoints:
+\begin{quote}
+The most efficient design depends on the frequency-depth regime $\gls{aor:sym-m-0}\gls{aor:sym-h}$.
+    The radiation limit is marked with a horizontal dashed line; efficiencies above the limit indicate simulation errors and are disregarded.
+    Low $\gls{aor:sym-m-0}\gls{aor:sym-h}$ (shallow water, slow waves) favors a pure cylinder geometry with small radius ($\gls{aor:sym-a-1}/\gls{aor:sym-a-2} \approx 1$, $\gls{aor:sym-a-2}/\gls{aor:sym-h} \ll 1$, and $\gls{aor:sym-a-3}/\gls{aor:sym-a-1}\approx 1$, shown in blue/green/purple on the left).
+    Moderate $\gls{aor:sym-m-0}\gls{aor:sym-h}$ favors low $\gls{aor:sym-a-1}/\gls{aor:sym-a-2}$ (a small spar relative to the float, green/blue points).
+    High $\gls{aor:sym-m-0}\gls{aor:sym-h}$ (deep water, fast waves) favors qualitatively different geometries (pink/red).
+\end{quote}
 
 \rcomment{Reviewer 1, Comment 20}{I would not criticize the mathematics itself in Eqs. (1)-(38); instead, I would comment on clarity, notation consistency, assumptions, and reproducibility, as these are the more defensible reviewer observations.}
-\response We thank the reviewer. To improve clarity and make the assumptions explicit, the assumptions underlying the dynamics formulation are now numbered (A1-A12) and stated where they are introduced (Sections~3.3.1--3.3.2, [page/line reference: relevant revised-manuscript passage]).
+\response We thank the reviewer. To improve clarity and make the assumptions explicit, the assumptions underlying the dynamics formulation are now numbered (A1-A12) and stated where they are introduced (Sections~3.3.1--3.3.2).
 Notation has been made consistent throughout and collected in the notation list (p.~1-2). For reproducibility, the key parameters and default settings are listed in \Cref{aor:tab:parameters,aor:tab:hyperparams},
 and the code version used for this paper is listed explicitly along with a reproducible computational pipeline.
 (Please see our responses to Questions~2 and~6).
@@ -246,21 +280,30 @@ We thank Reviewer~2 for describing the work as interdisciplinary, comprehensive,
 
 \rcomment{Reviewer 2, Comment 1}{In section 3.3.4, please clearly define $\hat{e}$ and $\hat{q}$ in the main text. Are they complex frequency-domain coefficients? It would also be helpful to explicitly state here that the derivation focuses on a single frequency.}
 \response We thank the reviewer. Yes: $\hat{e}$ and $\hat{q}$ are the complex phasor amplitudes of the effort and flow variables at a port, at a single frequency, following the convention $x(t) = \Re[\hat{X} e^{i\omega t}]$ stated at the start of Section~3.
-%\fillin{We have added this definition, and an explicit statement that the derivation applies at a single frequency, to Section 3.3.4 (p.~X, lines~A-B).}
+We have added a statement that reads,
+\begin{quote}
+Note that \Cref{aor:sec:eom,sec:optimal-control,sec:drag} consider a single monochromatic sea state; \Cref{aor:sec:energy} performs annual aggregation.
+\end{quote}
+to p.~\pageref{aor:lne:single-freq} line~\ref{aor:lne:single-freq}.
 
 \rcomment{Reviewer 2, Comment 2}{In section 3.3.4, a constant efficiency $\eta$ is used to compute average electrical power from average mechanical power. This appears to be a main limitation, as it is highlighted in a number of studies on loss-aware control of WECs that a constant efficiency may not be accurate for either power evaluation or control, given the oscillating operation of WECs. While an $\eta$ is selected to match a specific operating condition, the efficiency may change when the motion amplitude changes.}
 \response We thank the reviewer for raising this important point, and we agree that a constant efficiency cannot capture how losses vary with motion amplitude.
-In MDOcean, the main amplitude-dependent losses are modeled explicitly rather than through $\eta$.
-The generator includes a winding impedance (Appendix~C.2.4), so ohmic and inductive effects vary with the current and therefore with the motion amplitude, and power is maximized at the generator's electrical port rather than its mechanical port.
+In MDOcean, amplitude-dependent losses are modeled dynamically, and $\eta$ is only intended as a supplemental static factor.
+The generator includes a winding impedance (Appendix~C.2.4), so ohmic and inductive effects vary with the current and therefore with the motion amplitude.
+The equations presented also incorporate a drivetrain impedance, although the version implemented sets the drivetrain damping to zero.
+The optimal control procedure appropriately maximizes power at the generator's electrical port rather than its mechanical port.
 The constant efficiency $\eta$ accounts only for the remaining static losses, such as those in the electrical drive;
-its value of 80\% was chosen to match the assumption in the RM3 reference report (Neary et al., 2014b) for the comparisons in Section~4.
+its value of 80\% was chosen to match the assumption in the RM3 reference report (Neary et al., 2014b) for the comparisons in Section~4, since the RM3 report did not model dynamic PTO losses.
 %\fillin{We have clarified this in Section 3.3.6 (p.~X, lines~A-B) and added amplitude-dependent drive losses to the future work in Section 5.3 and Table~11.}
 
 \rcomment{Reviewer 2, Comment 3}{In section 3.3.5, the second part is titled ``Constrained'' and the third part is ``Nonlinear controller''. However, the third part also addresses a specific constraint (force limit). I would suggest clarifying what specific constraints these two parts are intended to handle and using a clearer terminology.}
 \response We thank the reviewer for this suggestion.
-We have renamed the two parts as follows:
-the ``Constrained'' part has been renamed to ``Constrained, Linear Controller (M2)''.
-the ``Nonlinear controller'' part has been renamed to ``Constrained, Nonlinear Control (M1.2)''.
+We have reorganized section 3.3.5 (Optimal Control) to emphasize where different assumptions are used. 
+We have renamed the subsections as follows:
+the ``Unconstrained'' part has been renamed to ``Linearized, Unconstrained,''
+the ``Constrained'' part has been split into two and renamed to ``Linearized, Constrained'' and ``Constrained, QLPS with Linear Control (M2),''
+and
+the ``Nonlinear controller'' part has been renamed to ``Constrained, QLPS with Nonlinear Control (M1.2)''.
 
 Section 3.3.3 adds a section \textit{Method Choice for Each Nonlinearity} (p.~\pageref{aor:sec:mfd-method-choice}) to explain why different constraint-handling methods (M1--M5) are used for different types of constraints.
 The text reads,
@@ -287,9 +330,9 @@ Because the complex form of the port variable is used as the decision variable (
 \begin{equation}
  |\hat{q}| = \sqrt{\hat{q}^* \hat{q}}
 \end{equation}
-Squaring both sides, we see that a limit on the magnitude of a port variable, such as a velocity or displacement limit $|\hat{q}| \le q_{max}$, is equivalent to the quadratic constraint $\hat{q}^* \hat{q} \le q_{max}^2$, which has the form of Eq.~(17) with the matrix given in Table~6.
+Squaring both sides, we see that a limit on the magnitude of a port variable, such as a velocity or displacement limit $|\hat{q}| \le q_{max}$, is equivalent to the quadratic constraint $\hat{q}^* \hat{q} \le q_{max}^2$, which has the form of Eq.~(13) with the matrix given in Table~6.
 Any constraint on a linear combination of active power, reactive power, and port variable magnitude can be formulated as a quadratic constraint.
-The only metric that is commonly constrained that cannot be written in quadratic form is peak power, which is fourth-order (Eq.~(18)) and is treated separately in Appendix C.3.1.
+The only metric that is commonly constrained that cannot be written in quadratic form is peak power, which is fourth-order (Eq.~(14)) and is treated separately in Appendix C.3.1.
 We have added this clarification to \Cref{aor:sec:optimal-control}
 (p.~\pageref{aor:lne:quadratic-metrics-start}, lines~\ref{aor:lne:quadratic-metrics-start}--\ref{aor:lne:quadratic-metrics-end}).
 
@@ -307,18 +350,35 @@ a nonlinearity is approximated simply as an amplitude-dependent gain and phase s
 
 \rcomment{Reviewer 2, Comment 6}{In section 3.3.5 and the corresponding appendix, I did not fully understand how the force saturation is applied. Are you simply scale the force limit by 4/pi and apply it on the force coefficient?}
 \response We thank the reviewer for this question. 
-No. The force limit is not simply scaled by $4/\pi$ and then imposed directly on the force coefficient. The nonlinear controller first applies the force saturation in the time domain. The saturated sinusoidal force is then represented by its fundamental Fourier component, whose amplitude is used in the frequency-domain balance. The resulting amplitude-dependent effective control gains $B_l$ and $K_l$ enter the linearized frequency-domain dynamics. The factor $4/\pi$ is the limiting fundamental-to-peak ratio for a fully saturated sinusoidal input, i.e., the square-wave limit; it is not a universal correction to the force limit. The full describing-function derivation and the point at which this factor appears are given in Appendix~C.1.
+No. The force limit is not simply scaled by $4/\pi$ and then imposed directly on the control gains.
+See the workflow in Figure 10(c).
+The force limit multiplied by $4/\pi$ is the equivalent frequency domain constraint that is input to the frequency domain constrained optimal controller.
+This value is called $b_\mu$ in equation 15.
+The constrained optimal controller decides how much it must scale the control gains in order to meet the constraint.
+The constrained optimal controller equation outputs $\Gamma$ (see equations 73 to 75).
+To find the control gains that correspond with this $\Gamma$, we multiply the unconstrained (impedance-matched) gains by a factor $z$ to obtain the new control gains.
+$z$ is found according to the following equation:
+\begin{equation}
+  z = \frac{1+\Gamma}{1-\Gamma}
+\end{equation}
+This is a standard result of impedance matching and is detailed in the authors' previously published work \citet{aor:mccabe_force-limited_2024} which is cited numerous times within the paper.
+The control gains are not directly necessary as an output of the simualation compared to other responses like power, which can be computed directly from $\Gamma$.
+This is why the paper currently does not repeat the equation for $z$ above.
 
 \rcomment{Reviewer 2, Comment 7}{In section 3.3.6, equation (24), are these coefficients fixed, or do they depend on the motion amplitude?}
 \response We thank the reviewer for this question.
 The drag coefficients $\mathbf{B}_d$ and $\vec{\gamma}_d$ in this equation (now Eq.~(23) in Section~3.3.8) are not fixed.
 As shown in Eq.~(98) of Appendix~C.4, they depend on both the amplitude and the phase of the body velocity.
-Because the coefficients depend on the response they help determine, MDOcean solves for them by fixed-point iteration, which typically converges in five to eight iterations to within 0.01~m and 3$^\circ$ across all sea states (Appendix~C.4.3).
+Because the coefficients depend on the response they help determine, MDOcean solves for them by fixed-point iteration, which typically converges in five to eight iterations to within 0.01~m and 3$^\circ$ across all sea states (see Appendix~C.4.3).
+This iterative dependence is also evident from the orange solver box in \Cref{aor:fig:n2}.
 % \fillin{We have added this clarification to Section 3.3.8 (p.~X, lines~A-B): ``The drag coefficients depend on the amplitude and phase of the body velocity (Eq.~(98)) and are therefore converged by fixed-point iteration, typically within five to eight iterations (Appendix~C.4.3).''}
 
 \rcomment{Reviewer 2, Comment 8}{Finally, in section 4, while you have presented validation results on the dynamic model against WEC-Sim, please can you discuss more on the validation of the optimal control solution against an ideal benchmark such as MPC? Given that the proposed framework has a number of approximate treatments in constraint handling, nonlinearities handling, as well as the monochromatic simplification of irregular waves, the accuracy of each assumption, as well as how much they affect the final evaluation result, remains unclear.}
-\response We thank the reviewer for this suggestion. We agree that comparison with an ideal benchmark such as model predictive control would be valuable for assessing the combined effect of the approximations. This comparison is beyond the scope of the present study, and we have noted it as future work in Section~5.3 ([future-work statement: page/line reference]).
-For the regular-wave approximation specifically, Coe et al.\ (2021b) found that a PI controller in irregular waves captures about 92\\% of the power of perfectly impedance-matched control, which we consider acceptable for early-stage design (Appendix~C.7). To address the broader question of the accuracy of each assumption, we have clarified which approximations are assessed by the existing WEC-Sim comparisons and which remain limitations or future work. The WEC-Sim comparisons in Figure~12 and Appendix~C.8 provide evidence for the dynamics formulation under the stated matched assumptions, but they do not constitute a comprehensive validation of every approximation in the complete optimization workflow.
+\response We thank the reviewer for this suggestion. We agree that comparison with an ideal benchmark such as model predictive control would be valuable for assessing the combined effect of the approximations.
+This comparison is beyond the scope of the present study.
+For the regular-wave approximation specifically, Coe et al.\ (2021b) found that a PI controller in irregular waves captures about 92\% of the power of perfectly impedance-matched control, which we consider acceptable for early-stage design (Appendix~C.7).
+To address the broader question of the accuracy of each assumption, we have clarified which approximations are assessed by the existing WEC-Sim comparisons and which remain limitations or future work.
+The WEC-Sim comparisons in Figure~12 and Appendix~C.8 provide evidence for the dynamics formulation under the stated matched assumptions, but they do not constitute a comprehensive validation of every approximation in the complete optimization workflow.
 
 \clearpage
 % ==================================================================
@@ -329,12 +389,13 @@ For the regular-wave approximation specifically, Coe et al.\ (2021b) found that 
 \rcomment{Reviewer 3, Comment 1}{I believe the proposed framework will be useful from the practical viewpoint, but, on the other hand, from the viewpoint of a research journal paper, I cannot find any innovative new findings or developments worth being published as a journal paper.}
 \response We thank the reviewer for this assessment and for recognizing the practical value of the framework.
 % We agree that the original manuscript did not make its novel contributions clear enough, and \fillin{we have revised the Abstract (lines~A-B), the contributions in Section 1.4 (lines~C--D), and the Introduction (new objectives paragraph, lines~E-F)} to state them explicitly.
-Beyond integrating the models, the work contributes:
+While we continue to emphasize the primary message of the paper as the integration of the disciplinary models and their comparison for time and accuracy against other simulation codes, the work additionally makes the following novel technical contributions:
 \begin{enumerate}[nosep]
   \item The quasi-linear pseudo-spectral (QLPS) formulation, which extends frequency-domain constraint handling to include nonlinear dynamics. To our knowledge, it is the first use of describing functions for both controller synthesis and evaluation in wave energy (Section~3.3.2).
   \item A closed-form solution of the constrained optimal control problem, posed as a univariate quadratically-constrained quadratic program with a geometric interpretation on the complex reflection-coefficient plane. This problem previously required numerical optimization (Section~3.3.7, Appendix~C.3.1).
   \item An analytical scaling law for annual average power as a function of the constraint limits, with conditions for its convexity (Eq.~(35), Appendix~C.3.2).
-  \item Findings that are only visible because the disciplines are coupled: at the LCOE optimum, every constraint is active in at least one sea state; the minimum-LCOE force limit lies far below the unsaturated solution (Figure~20); and the damping-plate fatigue constraint splits the feasible design space into separate regions (Figure~21).
+  \item Trends that are only visible because the disciplines are coupled (see results in Section 5).
+  %: at the LCOE optimum, every constraint is active in at least one sea state; the minimum-LCOE force limit lies far below the unsaturated solution (Figure~20); and the damping-plate fatigue constraint splits the feasible design space into separate regions (Figure~21).
 \end{enumerate}
 We hope these revisions make the scientific contribution of the work clearer.
 
@@ -347,28 +408,50 @@ We hope these revisions make the scientific contribution of the work clearer.
 We thank Reviewer~4 for the thorough and constructive review, and for noting the relevance of the work, the usefulness of the integrated framework, the interest of the quasi-linearized pseudo-spectral formulation, and the value of its computational speed for design-space exploration.
 
 \rcomment{Reviewer 4, General Comment}{My main concern is not the general value of the framework, but the way its accuracy and validation are presented. Some results appear to be calibrated to the RM3 reference data using scaling factors, while other parts are compared against WEC-Sim under matched modelling assumptions. These are both useful exercises, but they should not be presented in the same way as independent validation. The authors should more clearly distinguish validation, calibration, verification and benchmarking, and should moderate the claims about model accuracy and applicability.}
-\response We thank the reviewer for this careful comment, and we agree. We have revised Section~4 to use these terms consistently. \textit{Verification} refers to checks of the numerical implementation, including MEEM convergence and comparison of hydrodynamic coefficients with WAMIT results. \textit{Validation} refers to the comparison of the dynamics module with WEC-Sim under matched modeling assumptions and without tuning to the WEC-Sim results. \textit{Calibration} refers specifically to the force, power, and structural-mass scaling factors used to reproduce the RM3 reference data. \textit{Benchmarking} refers to the runtime comparisons with other computational approaches. We have also renamed and reorganized the relevant subsection(s) in Section~4 ([revised Section~4 subsection titles: page/line reference]) and moderated accuracy and applicability claims in the Abstract ([abstract accuracy/scope statement: page/line reference]), Section~4 ([validation/calibration claims: page/line reference]), and Conclusion ([conclusion scope statement: page/line reference]).
+\response We thank the reviewer for this careful comment, and we agree. We have revised Section~4 to use these terms consistently. \textit{Verification} refers to checks of the numerical implementation, including MEEM convergence and comparison of hydrodynamic coefficients with WAMIT results. \textit{Validation} refers to the comparison of the dynamics module with WEC-Sim under matched modeling assumptions and without tuning to the WEC-Sim results. \textit{Calibration} refers specifically to the force, power, and structural-mass scaling factors used to reproduce the RM3 reference data. \textit{Benchmarking} refers to the runtime comparisons with other computational approaches. We have also renamed and reorganized the relevant subsection(s) in Section~4 and moderated accuracy and applicability claims accordingly.
+% ([revised Section~4 subsection titles: page/line reference]) and moderated accuracy and applicability claims in the Abstract ([abstract accuracy/scope statement: page/line reference]), Section~4 ([validation/calibration claims: page/line reference]), and Conclusion ([conclusion scope statement: page/line reference]).
 
 \rcomment{Reviewer 4, Major Comment 1}{The comparison with WEC-Sim is useful for assessing the dynamics module under matched assumptions. However, the agreement with the RM3 reference model partly relies on scaling factors for force, power and structural mass. This should be described as calibration rather than independent validation. The authors should clearly state which quantities are predicted without tuning and which quantities are matched after applying scaling factors.}
-\response We thank the reviewer and agree. We have renamed the RM3 comparison as calibration and now distinguish calibrated quantities from quantities predicted without tuning. Table~9 reports the errors before and after application of the scaling factors, making clear which agreement results from calibration. The WEC-Sim comparison remains the primary independent validation of the dynamics module under matched assumptions. Please see also our response to the General Comment.
+\response We thank the reviewer.
+We have renamed the RM3 report dynamic comparison as calibration and now distinguish calibrated quantities from quantities predicted without tuning.
+% Table~9 reports the errors before and after application of the scaling factors, making clear which agreement results from calibration.
+
+Additionally, we wish to emphasize two aspects of the verification/calibration/validation process to ensure clarity.
+First, both the reference model report comparison and the WEC-Sim comparison utilize the RM3 geometry.
+This may have caused some confusion as to which comparison we refer to when we say ``RM3 validation.''
+The new organization of the validation section seeks to address this by making the distinction more apparent.
+Second, in addition to matched assumptions (suitable for verification and calibration), we also compare to the WEC-Sim RM3 under non-matched assumptions in order to assess the assumptions' quality (suitable for validation).
+
+Please see also our response to the General Comment.
 
 \rcomment{Reviewer 4, Major Comment 2}{The manuscript applies scaling factors to bring storm force, average power and structural mass into agreement with the reference model. This is reasonable for reproducing RM3, but it raises an important question: how would these factors be selected for a new WEC design without reference data? The authors should discuss this point and, if possible, show the main validation errors before and after applying the scaling factors.}
-\response We thank the reviewer for this question. Table~9 now reports the principal errors before and after applying the RM3 scaling factors. These factors are calibration parameters, not universal constants that can be transferred to an arbitrary new WEC design. For a new design, their use would require an appropriate higher-fidelity or experimental reference for the corresponding quantity; without such reference data, the uncalibrated model should be treated as a screening model rather than as a calibrated prediction. We have clarified this distinction and moderated the associated accuracy claims.
+\response We thank the reviewer for this question. %Table~9 now reports the principal errors before and after applying the RM3 scaling factors.
+The scaling factors are calibration parameters, not universal constants that can be transferred to an arbitrary new WEC design.
+For a new design, their use would require an appropriate higher-fidelity or experimental reference for the corresponding quantity; without such reference data, the uncalibrated model should be treated as a screening model rather than as a calibrated prediction.
+In particular, the primary multidisciplinary screening takeaways from the model, such as the effect of PTO sizing on the power-cost tradeoff, are minimally sensitive to the calibration constants.
+We have clarified this distinction and moderated the associated accuracy claims.
 
 \rcomment{Reviewer 4, Major Comment 3}{Including structural checks is an important strength of the framework. However, the structural module is semi-analytical, and FEA-based validation is still listed as future work. The manuscript should avoid giving the impression that the structural model is already suitable for detailed structural design or certification. It is better presented as an early-stage screening tool.}
-\response We thank the reviewer and agree. MDOcean is intended as an early-stage screening tool for exploring large design spaces, not for detailed structural design or certification.
+\response We thank the reviewer and agree.
+MDOcean is intended as an early-stage screening tool for exploring multidisciplinary tradeoffs in large design spaces,
+not for detailed structural design or certification.
 We have stated this explicitly in Section 3.4, Section 5.3, and the Conclusion.
 %, and revised the Conclusion's description of the structures module accordingly.
 FEA-based validation of the structural module remains future work (Section~5.3 and Table~11).
 
 \rcomment{Reviewer 4, Major Comment 4}{The use of equivalent regular waves and linear wave theory for storm cases is a major approximation. This can miss nonlinear wave effects and transient load peaks. The authors acknowledge this limitation, but the main text and conclusions should make it clearer that storm-load and survivability predictions are preliminary and should not replace higher-fidelity analyses.}
-\response We thank the reviewer and agree. We have clarified that the storm-load and survivability calculations are preliminary screening estimates based on the stated regular-wave and linear-wave assumptions and are not substitutes for higher-fidelity analysis of nonlinear wave loading, transient peaks, or certification. This qualification is now stated in Section~3.3.10 ([storm-load limitation: page/line reference]), Section~5.3 ([limitation/future-work statement: page/line reference]), and the Conclusion ([storm-load scope statement: page/line reference]).
+\response We thank the reviewer and agree. We have clarified that the storm-load and survivability calculations are preliminary screening estimates based on the stated regular-wave and linear-wave assumptions and are not substitutes for higher-fidelity analysis of nonlinear wave loading, transient peaks, or certification.
+%This qualification is now stated in Section~3.3.10 ([storm-load limitation: page/line reference]), Section~5.3 ([limitation/future-work statement: page/line reference]), and the Conclusion ([storm-load scope statement: page/line reference]).
 
 \rcomment{Reviewer 4, Major Comment 5}{The use of a JPD is useful for long-term performance estimates, but the dynamics are still based on equivalent regular-wave approximations. The authors should discuss how this affects annual average power, fatigue-related quantities and controller performance, especially for broad-banded sea states.}
-\response We thank the reviewer for this suggestion. The equivalent-regular-wave approximation affects these quantities differently. For annual average power, the joint probability distribution still provides a long-term weighting of sea states, but the response within each sea state is represented by an equivalent regular-wave response rather than a full irregular-wave time history. For fatigue, this is a more substantial limitation because a single-frequency representation cannot reproduce the full stress-range distribution and associated cycle counting of a broad-banded sea state. For controller performance, the approximation likewise does not capture interactions among multiple simultaneously excited frequencies; consequently, the reported controller results should be interpreted within the assumptions of the frequency-domain formulation rather than as a substitute for irregular-wave time-domain control analysis. These limitations are now discussed in Section~3.3.11 ([regular-wave/JPD discussion: page/line reference]) and Section~5.3 ([limitations: page/line reference]).
+\response We thank the reviewer for this suggestion. The equivalent-regular-wave approximation affects these quantities differently.
+For annual average power, the joint probability distribution still provides a long-term weighting of sea states, but the response within each sea state is represented by an equivalent regular-wave response rather than a full irregular-wave time history.
+For fatigue, this is a more substantial limitation because a single-frequency representation cannot reproduce the full stress-range distribution and associated cycle counting of a broad-banded sea state.
+For controller performance, the approximation likewise does not capture interactions among multiple simultaneously excited frequencies; consequently, the reported controller results should be interpreted within the assumptions of the frequency-domain formulation rather than as a substitute for irregular-wave time-domain control analysis. These limitations are now discussed in Section~3.3.11 (p.~\pageref{aor:section:irregular-waves}) and Section~5.3 (p.~\pageref{aor:section:limitations}).
 
 \rcomment{Reviewer 4, Major Comment 6}{The MEEM approach is efficient for the float, but some spar and coupling coefficients are obtained from algebraic approximations, interpolation of precomputed BEM data, and corrections to ensure positive definiteness. The authors should explain how often these corrections are needed and how much they change the dynamic response or power estimates.}
-\response We thank the reviewer for this suggestion. The combined effect of the spar and coupling approximations on power can be seen in Figure~36 (Appendix~C.8), which compares results using the WAMIT coefficients of WEC-Sim (top row) with results using MDOcean's own coefficients (bottom row). The remaining quantitative question is how frequently the positive-definiteness correction is activated and how much it changes the reported response. Figure~36 demonstrates the combined effect of the spar and coupling approximations, but does not isolate that correction. [TODO: insert the measured correction frequency and change in average power, and cite the corresponding Appendix~B.2 and Section~3.2.2 locations.]
+\response We thank the reviewer for this suggestion. The combined effect of the spar and coupling approximations on power can be seen in Figure~36 (Appendix~C.8), which compares results using the WAMIT coefficients of WEC-Sim (top row) with results using MDOcean's own coefficients (bottom row).
+We have added statistics on how often various hydrodynamic corrections are applied in Section 4.1.1. (p.~26).
 
 \rcomment{Reviewer 4, Major Comment 7}{The reported runtime of 151 ms is a strong result. However, it should be made clear what is included in this runtime: a single sea state or full JPD evaluation, one design evaluation or only one module call, with or without hydrodynamic precomputation, data loading and setup costs. This is important for readers who may want to compare MDOcean with BEM, WEC-Sim or other optimization workflows.}
 \response We thank the reviewer for this suggestion.
@@ -383,8 +466,8 @@ so the runtime includes the hydrodynamic solution for every design.
 \rcomment{Reviewer 4, Major Comment 8}{The present implementation is mainly demonstrated for the RM3 two-body axisymmetric point absorber. The authors should avoid implying that the framework is already generally applicable to all WEC archetypes. The current tool is valuable, but its applicability is still tied to the assumptions of the hydrodynamic, structural and economic modules.}
 \response We thank the reviewer and agree.
 The present implementation is demonstrated only for the RM3 two-body axisymmetric point absorber, and the hydrodynamic, structural, and economic modules are specific to this archetype.
-The dynamics and control formulation is more general,
-but its analytical solution still assumes a single controlled degree of freedom and no dynamic coupling between frequencies or between control degrees of freedom.% \fillin{(assumptions AX-AY, Section 3.3.2)}. \fillin{We have revised the Abstract (lines~A-B), Section 5.3 (lines~C-D), and the Conclusion (lines~E-F) to state this scope explicitly.}
+The dynamics and control formulation is more general.
+The QLPS technique applies to any archetype, and the main limiting assumption of this module is that the analytical solution assumes a single controlled degree of freedom and no dynamic coupling between frequencies or between control degrees of freedom.% \fillin{(assumptions AX-AY, Section 3.3.2)}. \fillin{We have revised the Abstract (lines~A-B), Section 5.3 (lines~C-D), and the Conclusion (lines~E-F) to state this scope explicitly.}
 
 \rcomment{Reviewer 4, Major Comment 9}{The paper contains a large amount of useful technical material, but the main narrative is difficult to follow. Some derivations, implementation details and secondary discussions could be moved to appendices or supplementary material. The main text should focus on the model structure, main assumptions, validation/calibration, runtime benchmarking, limitations and key findings.}
 \response We thank the reviewer for this suggestion. We have reorganized the main text around the model structure, principal assumptions, verification and validation, calibration, runtime benchmarking, limitations, and key findings. Detailed derivations of the linearized model, the wave-velocity expression, drag iteration, and dynamic-limit formulation have been moved to the appendices. This reduces the amount of implementation-level detail in the main narrative while retaining the material needed to reproduce the methods. Please see also our responses to Reviewer~1, Comments~1 and~13.
@@ -429,13 +512,13 @@ and the units column of \Cref{aor:tab:parameters}.
 \rcomment{Reviewer 4, Minor Comment 6}{The manuscript should avoid relying too heavily on forthcoming companion papers for essential derivations, implementation details or validation evidence.}
 \response We thank the reviewer and understand this concern.
 The manuscript is self-contained:
-the complete MEEM formulation used in MDOcean is given in Appendix A, and the derivations needed to reproduce the results are given in the appendices.
+the complete MEEM formulation used in MDOcean is given in Appendix A, and the derivations needed to reproduce other results are given in the appendices.
 The companion papers extend this work (an expanded MEEM implementation and the design optimization of RM3) but are not needed to reproduce the present results, and they are available as preprints.
 We have revised the Conclusion to remove the implication that the full MEEM derivation appears only in Bimali et al. (2026).
 
 \rcomment{Reviewer 4, Minor Comment 7}{
   Several tables and figures are dense. The validation and benchmarking results would be easier to assess if the key errors and runtime comparisons were summarized in one compact table.}
-\response Several of the accuracy comparisons do not have a corresponding runtime comparison, and each runtime comparison has a different simulation scope to make it comparable to the scope of the corresponding simulation.
+\response Several of the accuracy comparisons do not have a corresponding runtime comparison, and each runtime comparison has a different simulation scope to make it comparable to the scope of the corresponding reference simulation.
 Therefore, the authors have chosen to keep the accuracy and runtime comparisons in separate figures.
 Please see also our responses to Reviewer~1, Comment~7 and Reviewer~2, Comment~8.
 
