@@ -105,12 +105,12 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     \citet{edwards_optimisation_2022} is a point absorber shape optimization study that minimizes surface area as a cost proxy, accounts for stability constraints, and considers only geometries with power extraction equal to theoretical radiation, amplitude, and steepness limits.
     \citet{garcia-teruel_reliability-based_2021}, along with the smaller scale study \citep{garcia-teruel_design_2022} by the same authors, apply multi-objective optimization to trade off power with fatigue load and device volume, respectively.
     \citet{cotten_multi-objective_2022} similarly optimizes fatigue load for an attenuator-style \gls{acr-wec} with many more \glspl{acr-dof} but fewer (8) design variables.
-    A different shape optimization \citep{abdulkadir_control_2024} notably calculates hydrodynamic coefficients via the semi-analytical matched eigenfunction expansion method (\gls{acr-meem}), rather than from boundary element method as is typical, but does not include disciplines beyond hydrodynamics and dynamics/controls.
+    A different shape optimization \citep{abdulkadir_control_2024} notably calculates hydrodynamic coefficients via the semi-analytical \gls{acr-meem}, rather than from boundary element method as is typical, but does not include disciplines beyond hydrodynamics and dynamics/controls.
     A team at \gls{acr-nrel} attempted local optimization for a terminator shape study but found they could only reasonably optimize 3 of the intended 13 design variables at a time due to the high computational cost of their time-domain simulation \citep{housner_numerical_2024}.
     The previous studies \citet{garcia-teruel_reliability-based_2021,garcia-teruel_design_2022,cotten_multi-objective_2022} avoided this issue by simulating primarily in the frequency domain and using the time domain only to address \gls{acr-pto} constraints.
 
     \paragraph{Structural modeling and optimization}
-    Structural optimization of \glspl{acr-wec} faces a similar challenge in the high compute time of finite element analysis (\gls{acr-fea}).
+    Structural optimization of \glspl{acr-wec} faces a similar challenge in the high compute time of \gls{acr-fea}.
     References \citep{coe_survey_2018, ove_arup__partners_ltd_structural_2016,paduano_towards_2024,giannini_wave_2022} provide guidelines for \gls{acr-wec} survivability modeling and design, including the prediction of both extreme loads and structural failure.
     Fatigue modeling methods include spectral analysis, rainflow counting, damage equivalent loads, and Miner's law, augmented with standard stress concentration factors or \gls{acr-fea} for local hotspots \citep{ove_arup__partners_ltd_structural_2016}.
     Strength modeling methods consist primarily of various fidelities of \gls{acr-fea}, although hand and spreadsheet calculations permit sizing to a specified stress early in the design process \citep{ove_arup__partners_ltd_structural_2016}.
@@ -133,7 +133,7 @@ and \Cref{tab:lit} compares the most relevant studies along this taxonomy.
     \citet{mccabe_multidisciplinary_2022} also optimized power variation, although that study's use of regular waves makes the variation formulation less useful.
     Meanwhile, one point absorber \gls{acr-pto} optimization \citep{son_performance_2016} is additionally notable for its use of the \gls{acr-meem} method.
     \citet{gaebele_tpl_2025} is relevant because it optimizes the dimensional scale and \gls{acr-pto} of the \gls{acr-rm3} \gls{acr-wec} directly using a \gls{acr-ccd} approach.
-    It also efficiently incorporates many time-domain constraints (maximum force, speed, average power, \gls{acr-rms} torque, and stroke) while maintaining frequency-domain hydrodynamics via the pseudo-spectral (\gls{acr-ps}) modeling method, which \citep{devin_high-dimensional_2024,grasberger_control_2024} also use.
+    It also efficiently incorporates many time-domain constraints (maximum force, speed, average power, \gls{acr-rms} torque, and stroke) while maintaining frequency-domain hydrodynamics via the \gls{acr-ps} modeling method, which \citep{devin_high-dimensional_2024,grasberger_control_2024} also use.
 
     Other \gls{acr-ccd} papers optimize \gls{acr-wec} dimensions without modeling the \gls{acr-pto}.
     \citet{herber_dynamic_2014} performs a direct transcription co-optimization of cylinder draft and radius with control.
@@ -319,7 +319,7 @@ For early-stage \gls{acr-wec} design optimization, where the model must be run m
     \begin{itemize}[leftmargin=*]
         \item \textbf{Integrates semi-analytical models} from hydrodynamics, dynamics, control, structures, and economics in a single \linelabel{lne:open-source}open-source framework suitable for optimization
         \item Formulates an underactuated optimal control problem with coupled nonlinear multi-port dynamics, and introduces the \textbf{\acrfull{acr-qlps} method} to approximate time-domain constraints and nonlinearities
-        \item \textbf{Analytically solves} the \gls{acr-qlps} optimal control problem as a univariate quadratically-constrained quadratic program (\gls{acr-qcqp}) with a geometric interpretation on the complex reflection coefficient plane
+        \item \textbf{Analytically solves} the \gls{acr-qlps} optimal control problem as a univariate \gls{acr-qcqp} with a geometric interpretation on the complex reflection coefficient plane
         \item \textbf{Validates} against WEC-Sim and the \gls{acr-rm3} reference design across power, structural, and economic outputs
         \item Demonstrates \textbf{computational performance} (\resultsAOR[simRuntime] simulation runtime) enabling optimization studies that are otherwise infeasible
         \item Illustrates the \textbf{mathematical structure and effect magnitude} of subsystem interactions and techno-economic scaling relationships, providing intuition to facilitate early-stage design tradeoffs

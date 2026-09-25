@@ -15,16 +15,16 @@ This paper develops MDOcean, an open-source semi-analytical modeling framework f
 % Model
 \ifdefined\DISSERTATION
     The geometry module calculates volumes, areas, and the pitch stability margin with simple algebraic relations, and the economics module calculates design-dependent cost from structural material volume and powertrain force and power ratings.
-    The hydrodynamics module implements the matched eigenfunction expansion method (\gls{acr-meem}) for a dual concentric cylinder geometry to obtain the float radiation coefficients, and interpolates existing \gls{acr-bem} solutions to obtain the spar radiation coefficients due to the lack of a damping plate in the current \gls{acr-meem} model.
+    The hydrodynamics module implements the \gls{acr-meem} for a dual concentric cylinder geometry to obtain the float radiation coefficients, and interpolates existing \gls{acr-bem} solutions to obtain the spar radiation coefficients due to the lack of a damping plate in the current \gls{acr-meem} model.
     This achieves an order of magnitude speedup compared to the popular \gls{acr-bem} solver Capytaine.
-    The dynamics module employs describing functions to extend the typical frequency-domain formulation to capture nonlinearities and dynamic constraints, including viscous drag and generator force saturation, and includes a novel analytical quadratically-constrained quadratic program (\gls{acr-qcqp}) for the constrained linear controller.
+    The dynamics module employs describing functions to extend the typical frequency-domain formulation to capture nonlinearities and dynamic constraints, including viscous drag and generator force saturation, and includes a novel analytical \gls{acr-qcqp} for the constrained linear controller.
     This achieves a three-order-of-magnitude computational speedup over the common time-domain solver WEC-Sim.
     The structures module uses an equivalent-thickness model of stiffened plates and a library of canonical solutions to structural boundary-value problems to assess the factor of safety of the float bottom plate, spar shell, and damping plate in cyclic fatigue and storm load cases.
     This represents, to the authors' knowledge, the only public \gls{acr-wec} structural simulation regardless of modeling technique.
     Finally, the economics module calculates the design-dependent cost based on structural material volume and powertrain force and power rating, performing a straightforward \gls{acr-lcoe} calculation.
 \else
     The geometry module handles hydrostatics.
-    The hydrodynamics module uses the matched eigenfunction expansion method (\gls{acr-meem}) for the float, achieving an order-of-magnitude speedup over \gls{acr-bem}.
+    The hydrodynamics module uses \gls{acr-meem} for the float, achieving an order-of-magnitude speedup over \gls{acr-bem}.
     The dynamics module employs describing functions and a \gls{acr-qcqp} for constrained linear control,
     which we demonstrate can be solved analytically to achieve a three-order-of-magnitude speedup over time-domain solvers.
     This module represents a relevant methodological contribution to the broader \gls{acr-wec} modeling community,
