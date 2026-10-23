@@ -6432,12 +6432,12 @@ stages:
       addpath('tests'); run_tests('AOR')\""
     deps:
       - tests/
-      - mdocean/SAFE/
       - mdocean/__version__.py
       - mdocean/analysis/
       - mdocean/inputs/
       - mdocean/optimization/
       - mdocean/plots/
+      - mdocean/SAFE/
       - mdocean/simulation/modules/dynamics/
       - mdocean/simulation/modules/econ/
       - mdocean/simulation/modules/enviro.m
@@ -6518,12 +6518,12 @@ stages:
       addpath('tests'); run_tests('RE')\""
     deps:
       - tests/
-      - mdocean/SAFE/
       - mdocean/__version__.py
       - mdocean/analysis/
       - mdocean/inputs/
       - mdocean/optimization/
       - mdocean/plots/
+      - mdocean/SAFE/
       - mdocean/simulation/modules/dynamics/
       - mdocean/simulation/modules/econ/
       - mdocean/simulation/modules/enviro.m
@@ -7960,36 +7960,14 @@ stages:
       "pubs/shared/glossary/glossary-setup.tex->mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-setup.tex"
     deps:
       - pubs/shared/references.bib
-      - pubs/shared/references.bib
-      - pubs/shared/references.bib
-      - pubs/shared/references.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - pubs/shared/elsarticle-num-names.bst
-      - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/shared-pkg.tex
-      - pubs/shared/shared-pkg.tex
-      - pubs/shared/els-cas/cas-dc.cls
       - pubs/shared/els-cas/cas-dc.cls
       - pubs/shared/els-cas/cas-sc.cls
       - pubs/shared/els-cas/cas-common.sty
-      - pubs/shared/els-cas/cas-common.sty
-      - pubs/shared/glossary/glossary-symbols-shared.tex
-      - pubs/shared/glossary/glossary-symbols-shared.tex
-      - pubs/shared/glossary/glossary-symbols-shared.tex
-      - pubs/shared/glossary/glossary-symbols-shared.tex
       - pubs/shared/glossary/glossary-symbols-shared.tex
       - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
       - pubs/shared/glossary/glossary-setup.tex
     outs:
       - pubs/applied-ocean-research-model/references.bib:
@@ -8234,7 +8212,6 @@ stages:
       - pubs/applied-ocean-research-model/figs/manual/
       - pubs/applied-ocean-research-model/figs/tikz/
       - pubs/applied-ocean-research-model/tables/
-      - pubs/applied-ocean-research-model/main.tex
       - pubs/applied-ocean-research-model/numeric-results.tex
       - pubs/applied-ocean-research-model/elsarticle-num-names.bst
       - pubs/applied-ocean-research-model/references.bib
@@ -8309,7 +8286,6 @@ stages:
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - .calkit/env-locks/tex
-      - pubs/dissertation/.latexmkrc
     outs:
       - pubs/dissertation/sampleThesis.pdf
       - pubs/dissertation/aux/:
@@ -8464,16 +8440,16 @@ stages:
     desc: Automatically generated from the 'render-quarto-pdf' stage in
       calkit.yaml. Changes made here will be overwritten.
   merge-ours:
-    cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge
-      origin/$UPSTREAM <<< \"o\""
-    deps: []
+    cmd: bash --noprofile --norc .calkit/stage-commands/merge-ours.sh
+    deps:
+      - .calkit/stage-commands/merge-ours.sh
     outs: []
     desc: Automatically generated from the 'merge-ours' stage in calkit.yaml.
       Changes made here will be overwritten.
   merge-theirs:
-    cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge
-      origin/$UPSTREAM <<< \"t\""
-    deps: []
+    cmd: bash --noprofile --norc .calkit/stage-commands/merge-theirs.sh
+    deps:
+      - .calkit/stage-commands/merge-theirs.sh
     outs: []
     desc: Automatically generated from the 'merge-theirs' stage in calkit.yaml.
       Changes made here will be overwritten.
