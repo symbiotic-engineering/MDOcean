@@ -4,14 +4,20 @@
 ## [v1.5.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.3) - 2026-9-18
 ### Added
 - Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
+- Paper: create response to peer reviewers with line references
+- Figure: create figure comparing MDF vs SAND runtime in various scenarios
+- Figure: create figure of assumptions flowchart
 ### Changed
+- Paper: address AOR peer review comments: reorganize using assumptions, emphasize validation vs verification vs tuning, move equations to appendices
+- Validation: lengthen wecsim runtime for no-drag scenarios to ensure transients have died
 - Pipeline: update `paperlint-aor` to ignore `pubs/applied-ocean-research-model/numeric-results.tex`.
 - Paper: use glossary symbol references for the AOR spar interpolation term in `module-details.tex`.
-- Paper: add glossary to AOR (currently commented out)
+- Paper: add glossary to AOR with parent entries and excluding appendix-only symbols
 ### Fixed
 - Glossary: fixed mixup of slenderness factor with load distribution factor
 - Glossary: add shared glossary support for `\underline{}` symbol formatting in glossary sorting.
 - Glossary: use journal-specific `N_0` and `\phi` glossary wording for Applied Ocean Research.
+- Glossary: use glsxtrshort in definitions and glsfmttext in captions/titles
 
 ## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-16
 - CI/pipeline: Created workflow and pipeline stages for executing a dvc merge of upstream branch
