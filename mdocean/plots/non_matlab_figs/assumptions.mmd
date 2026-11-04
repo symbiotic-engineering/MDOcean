@@ -1,0 +1,55 @@
+---
+config:
+    layout: elk
+---
+flowchart LR
+    A1["A1 - nonlinearities are harmonics"]
+    A2["A2 - system low pass"]
+    A3["A3 - quasi linearized"]
+    A4["A4 - stationary ergodic"]
+    A5["A5 - waves narrow band"]
+    A6["A6 - signal shape known"]
+    A7["A7 - constraints fundamental"]
+    A8["A8 - quadratic objective"]
+    A9["A9 - quadratic constraints"]
+    A10["A10 - passive dynamics"]
+    A11["A11 - no frequency coupling"]
+    A12["A12 - no PTO DOF coupling"]
+
+    DFs["DFs"]
+    QLPS["QLPS"]
+    ConvexQLPS["Convex QLPS"]
+    QCQP-QLPS["QCQP QLPS"]
+    AnalyticalQLPS["Analytical QLPS"]
+
+    A3 --> DFs
+    A4 --> DFs
+    A5 --> DFs
+    A6 --> DFs
+
+    A1 --> A3
+    A2 --> A3
+    A3 --> A7
+    A4 --> A7
+    A7 --> QLPS
+
+    QLPS --> QCQP-QLPS
+    A8 --> QCQP-QLPS
+    A9 --> QCQP-QLPS
+
+    A10 --> ConvexQLPS
+    QLPS --> ConvexQLPS
+
+    A2 --> A11
+    A5 --> A11
+    A11 --> AnalyticalQLPS
+    A12 --> AnalyticalQLPS
+    QLPS --> AnalyticalQLPS
+
+    classDef assumptionsModel fill:#ffef99,stroke:#333,stroke-width:2px;
+    classDef assumptionsOptim fill:#99ff99,stroke:#333,stroke-width:2px;
+    classDef modelchars fill:#bde7ff,stroke:#333,stroke-width:2px;
+
+    class A1,A2,A3,A4,A5,A6,A7,A10,A11,A12 assumptionsModel
+    class A8,A9 assumptionsOptim
+    class DFs,QLPS,QCQP-QLPS,ConvexQLPS,AnalyticalQLPS modelchars

@@ -3,7 +3,7 @@ classdef Constraints < GenericAnalysis
     %   Generates constraints information table
 
     properties
-        fig_names = {};
+        fig_names = {'MDF_vs_SAND'};
         tab_names = {'constraints'};
     end
 
