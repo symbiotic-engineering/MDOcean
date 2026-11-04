@@ -1,7 +1,7 @@
 # Changelog
 ## Unreleased
 
-## [v1.5.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.3) - 2026-9-18
+## [v1.5.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.3) - 2026-11-4
 ### Added
 - Pipeline: create a marked change version of the AOR paper using latexdiff and DVC dependencies
 - Paper: create response to peer reviewers with line references
