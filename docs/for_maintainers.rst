@@ -111,5 +111,56 @@ and you want the most updated version on Overleaf, use the following commands:
 CI
 **
 
-MDOcean uses six self-hosted runners on the lab computer for CI.
-To create additional runners, follow these instructions (todo).
+**How to create a self-hosted runner:**
+
+1. Follow the `linked <https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners/>`_
+   GitHub instructions to add a self-hosted runner to the MDOcean repo.
+
+2. Follow the `linked <https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/configure-the-application/>`_
+   GitHub instructions to configure the self-hosted runner as a service,
+   which means it will automatically start the runner every time the computer is restarted
+   so you don't have to worry about doing that manually.
+   You will need to be careful about sudo and non-sudo users.
+   To run the commands, you need to be logged into an account with ``sudo`` privileges,
+   but you want to install the service using the ``user`` argument
+   corresponding to whichever user you use for development (typically non-sudo).
+   On the Cornell lab computer, this meant doing ``su - cornell`` to switch to a user with sudo
+   before running the commands in the instructions,
+   and using ``becca`` as the ``USERNAME`` argument in instruction number 3 of the "Installing the Service" section of the link.
+
+3. Make sure all the needed MATLAB dependencies are installed.
+   These are listed in the ``README.md`` and can be confirmed by running ``tests/dep_check.m``.
+
+4. Make sure MATLAB is on the PATH. On the Cornell lab computer,
+   this meant adding the following line to ``.github/workflows/calkit-run.yml``:
+   ``echo "/usr/local/MATLAB/R2025a/bin" >> $GITHUB_PATH``.
+
+5. Check if it works: Create a new branch and make an arbitrary change --
+   a good example that shouldn't take too long to run would be to change the formatting of the plot in
+   ``mdocean/plots/matlab_figs/module_demos/spar_hydro_plot.m``.
+   Push the branch and open a PR into ``main``. Go to `GitHub Actions
+   <https://github.com/symbiotic-engineering/MDOcean/actions/workflows/calkit-run.yml>`_
+   and confirm that the workflow ran and did not encounter any errors.
+   After it finishes running, you should see a commit automatically made to your branch by the actions bot.
+   The commit should include an update to the Jupyter Notebook showing your plot update, as well as a log and a change to ``dvc.lock``.
+   The notebook changes can be easily confirmed visually with
+   `ReviewNB <https://app.reviewnb.com/symbiotic-engineering/MDOcean/>`_.
+
+6. Repeat the above steps multiple times to create several runners to allow CI to run on multiple branches at a time.
+   For example, on the Cornell lab computer, I set up 6 runners,
+   in folders named ``actions-runner``, ``actions-runner-2``, ..., ``actions-runner-6``.
+
+
+**How to restart the self-hosted runner (can be necessary if all CI is timing out):**
+
+1. log into ssh as ``becca`` user (as normal)
+
+2. ``su - cornell`` to switch to user with sudo
+
+3. ``cd /home/becca/Documents/git/actions-runner`` to change back to req'd directory
+
+4. ``sudo ./svc.sh status`` to show status if desired
+
+5. ``sudo ./svc.sh stop && sudo ./svc.sh start`` to restart.
+   Note that you may need to modify the stop script to add the line
+   ``pkill -u becca -f matlab`` to get rid of any leftover MATLAB processes under your user.
