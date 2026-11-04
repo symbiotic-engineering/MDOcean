@@ -151,7 +151,7 @@ CI
    in folders named ``actions-runner``, ``actions-runner-2``, ..., ``actions-runner-6``.
 
 
-**How to restart the self-hosted runner (can be necessary if all CI is timing out):**
+**How to restart the self-hosted runner (a troubleshooting step that is occasionally necessary if all CI is timing out):**
 
 1. log into ssh as ``becca`` user (as normal)
 
