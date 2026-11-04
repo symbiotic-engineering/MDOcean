@@ -79,7 +79,18 @@ jobs:
           python-version: '3.x'
       - name: Install python dependencies
         run: pip install ruamel.yaml
-      - name: Setup matlab
+
+        # Local matlab setup, if available
+      - name: Add MATLAB to PATH
+        run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
+      - name: test matlab can run
+        id: test_matlab_runs
+        run: matlab -batch "disp('Matlab is working')"
+        continue-on-error: true
+
+        # Auto-licensed matlab setup, if local matlab is not available
+      - if: steps.test_matlab_runs.outcome == 'failed'
+        name: Setup matlab
         uses: matlab-actions/setup-matlab@v2
         with:
           cache: true
@@ -96,16 +107,14 @@ jobs:
             Curve_Fitting_Toolbox
             Image_Processing_Toolbox
             MATLAB_Report_Generator
-      # - name: Add MATLAB to PATH
-      #   run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
+
       - name: Load run-matlab-command script (auto-licensed since public repo)
         uses: matlab-actions/run-command@v2
-        if: always()
+        if: always() && steps.test_matlab_runs.outcome == 'failed'
         with:
           command: disp("Hello world")
           # Do not delete the above hello world step, loading the run-command action is required for auto-licensing to work
-      # - name: test matlab can run
-      #   run: matlab -batch "disp('Matlab is working')"
+
       # - name: test matlab license server
       #   run: | # Mask the license server IP address in logs
       #     echo "::add-mask::$(dig +short ${{ secrets.MATLAB_LICENSE_FILE }} | tail -n 1)" 
