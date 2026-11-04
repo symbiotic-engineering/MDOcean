@@ -2,9 +2,16 @@
 set -euo pipefail
 
 if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
-# if running on github actions, use the auto-licensed matlab
-    exec ../../_actions/matlab-actions/run-command/v2/dist/bin/glnxa64/run-matlab-command "$1"
+# if running on github actions, first try a local matlab. if that fails, use the auto-licensed matlab.
+    if matlab -batch "disp('Hello world')"; then
+        echo "Using runner's local matlab on GitHub actions run."
+        exec matlab -batch "$1"
+    else
+        echo "Using auto-licensed action matlab on GitHub actions run."
+        exec ../../_actions/matlab-actions/run-command/v2/dist/bin/glnxa64/run-matlab-command "$1"
+    fi
 else
 # if running locally, use the local matlab installation (requires its own license)
+    echo "Using local matlab on local run."
     exec matlab -batch "$1"
 fi
