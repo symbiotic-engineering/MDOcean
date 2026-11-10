@@ -30,6 +30,7 @@ stages:
       - pubs/JFM/glossary/glossary-setup.tex
       - pubs/JFM/glossary/glossary-symbols-jfm.tex
       - pubs/JFM/glossary/glossary-symbols-shared.tex
+      - pubs/JFM/glossary/no-appendix-glossary.tex
       - pubs/JFM/jfm-appendix.tex
       - pubs/JFM/jfm.bib
       - pubs/JFM/jfm.bst
@@ -7970,40 +7971,15 @@ stages:
       "pubs/shared/glossary/no-appendix-glossary.tex->mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/no-appendix-glossary.tex"
     deps:
       - pubs/shared/references.bib
-      - pubs/shared/references.bib
-      - pubs/shared/references.bib
-      - pubs/shared/references.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - pubs/shared/elsarticle-num-names.bst
-      - pubs/shared/elsarticle-num-names.bst
       - pubs/shared/shared-pkg.tex
-      - pubs/shared/shared-pkg.tex
-      - pubs/shared/els-cas/cas-dc.cls
       - pubs/shared/els-cas/cas-dc.cls
       - pubs/shared/els-cas/cas-sc.cls
       - pubs/shared/els-cas/cas-common.sty
-      - pubs/shared/els-cas/cas-common.sty
-      - pubs/shared/glossary/glossary-symbols-shared.tex
-      - pubs/shared/glossary/glossary-symbols-shared.tex
-      - pubs/shared/glossary/glossary-symbols-shared.tex
-      - pubs/shared/glossary/glossary-symbols-shared.tex
       - pubs/shared/glossary/glossary-symbols-shared.tex
       - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
-      - pubs/shared/glossary/glossary-acronyms.tex
       - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/glossary-setup.tex
-      - pubs/shared/glossary/no-appendix-glossary.tex
-      - pubs/shared/glossary/no-appendix-glossary.tex
-      - pubs/shared/glossary/no-appendix-glossary.tex
       - pubs/shared/glossary/no-appendix-glossary.tex
     outs:
       - pubs/applied-ocean-research-model/references.bib:
@@ -8242,6 +8218,10 @@ stages:
       - pubs/renewable-energy-mdo/glossary/
       - pubs/renewable-energy-mdo/cas-common.sty
       - .calkit/env-locks/tex
+      - pubs/renewable-energy-mdo/cas-model2-names.bst
+      - pubs/renewable-energy-mdo/figs/methodology_flowchart_dissertation.pdf
+      - pubs/shared/figure-widths.tex
+      - pubs/shared/table-column-specs.tex
       - pubs/renewable-energy-mdo/.latexmkrc
     outs:
       - pubs/renewable-energy-mdo/mdocean.pdf
@@ -8283,6 +8263,10 @@ stages:
       - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/appendices.tex
+      - pubs/applied-ocean-research-model/content.tex
+      - pubs/shared/figure-widths.tex
+      - pubs/shared/table-column-specs.tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
       - pubs/applied-ocean-research-model/main.pdf
@@ -8292,9 +8276,8 @@ stages:
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
   build-AOR-paper-diff-aor-submitted:
-    cmd: calkit latex diff -e tex --no-check --from aor-submitted --to HEAD
-      --revision-key ecd622a0fa34..7d0731948051 -r
-      pubs/applied-ocean-research-model/.latexmkrc --input
+    cmd: calkit latex diff -e tex --no-check --from aor-submitted --revision-key
+      3196d3124d09 -r pubs/applied-ocean-research-model/.latexmkrc --input
       pubs/applied-ocean-research-model/sections/ --input
       pubs/applied-ocean-research-model/figs/from-matlab/ --input
       pubs/applied-ocean-research-model/figs/manual/ --input
@@ -8309,8 +8292,11 @@ stages:
       pubs/applied-ocean-research-model/cas-dc.cls --input
       pubs/applied-ocean-research-model/cas-common.sty --input
       pubs/applied-ocean-research-model/stars-cc-by-sa.tex --input
-      pubs/applied-ocean-research-model/glossary/ --output-dir
-      .calkit/latex-diffs/aor-submitted
+      pubs/applied-ocean-research-model/glossary/ --input
+      pubs/applied-ocean-research-model/appendices.tex --input
+      pubs/applied-ocean-research-model/content.tex --input
+      pubs/shared/figure-widths.tex --input pubs/shared/table-column-specs.tex
+      --output-dir .calkit/latex-diffs/aor-submitted
       pubs/applied-ocean-research-model/main.tex
     deps:
       - pubs/applied-ocean-research-model/main.tex
@@ -8330,9 +8316,42 @@ stages:
       - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
       - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/appendices.tex
+      - pubs/applied-ocean-research-model/content.tex
+      - pubs/shared/figure-widths.tex
+      - pubs/shared/table-column-specs.tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
       - .calkit/latex-diffs/aor-submitted/pubs/applied-ocean-research-model/main.pdf
+    desc: Automatically generated from the 'build-AOR-paper' stage in
+      calkit.yaml. Changes made here will be overwritten.
+  build-AOR-paper_to_arxiv:
+    cmd: calkit latex to-arxiv pubs/applied-ocean-research-model main
+    deps:
+      - pubs/applied-ocean-research-model/main.tex
+      - pubs/applied-ocean-research-model/sections/
+      - pubs/applied-ocean-research-model/figs/from-matlab/
+      - pubs/applied-ocean-research-model/figs/manual/
+      - pubs/applied-ocean-research-model/figs/tikz/
+      - pubs/applied-ocean-research-model/tables/
+      - pubs/applied-ocean-research-model/numeric-results.tex
+      - pubs/applied-ocean-research-model/elsarticle-num-names.bst
+      - pubs/applied-ocean-research-model/references.bib
+      - pubs/applied-ocean-research-model/zotero-meem-refs.bib
+      - pubs/applied-ocean-research-model/commands-aor.tex
+      - pubs/applied-ocean-research-model/shared-pkg.tex
+      - pubs/applied-ocean-research-model/cas-dc.cls
+      - pubs/applied-ocean-research-model/cas-common.sty
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+      - pubs/applied-ocean-research-model/glossary/
+      - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/appendices.tex
+      - pubs/applied-ocean-research-model/content.tex
+      - pubs/shared/figure-widths.tex
+      - pubs/shared/table-column-specs.tex
+      - pubs/applied-ocean-research-model/.latexmkrc
+    outs:
+      - pubs/applied-ocean-research-model/main_arxiv.zip
     desc: Automatically generated from the 'build-AOR-paper' stage in
       calkit.yaml. Changes made here will be overwritten.
   make-AOR-diff-manual:
@@ -8447,7 +8466,7 @@ stages:
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - .calkit/env-locks/tex
-      - pubs/dissertation/.latexmkrc
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-jfm.tex
     outs:
       - pubs/dissertation/sampleThesis.pdf
       - pubs/dissertation/aux/:
@@ -8637,30 +8656,17 @@ stages:
       - pubs/defense/quarto/slides_files/
     desc: Automatically generated from the 'render-quarto-html' stage in
       calkit.yaml. Changes made here will be overwritten.
-  render-quarto-pdf:
-    cmd: calkit xenv -n playwright --no-check -- bash --noprofile --norc -c
-      "python pubs/defense/quarto/html_to_pdf.py"
-    deps:
-      - pubs/defense/quarto/slides.html
-      - pubs/defense/quarto/html_to_pdf.py
-      - .calkit/env-locks/playwright
-    outs:
-      - pubs/defense/quarto/slides.pdf:
-          cache: true
-          persist: false
-    desc: Automatically generated from the 'render-quarto-pdf' stage in
-      calkit.yaml. Changes made here will be overwritten.
   merge-ours:
-    cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge
-      origin/$UPSTREAM <<< \"o\""
-    deps: []
+    cmd: bash --noprofile --norc .calkit/stage-commands/merge-ours.sh
+    deps:
+      - .calkit/stage-commands/merge-ours.sh
     outs: []
     desc: Automatically generated from the 'merge-ours' stage in calkit.yaml.
       Changes made here will be overwritten.
   merge-theirs:
-    cmd: bash --noprofile --norc -c "git fetch origin $UPSTREAM && git merge
-      origin/$UPSTREAM <<< \"t\""
-    deps: []
+    cmd: bash --noprofile --norc .calkit/stage-commands/merge-theirs.sh
+    deps:
+      - .calkit/stage-commands/merge-theirs.sh
     outs: []
     desc: Automatically generated from the 'merge-theirs' stage in calkit.yaml.
       Changes made here will be overwritten.
