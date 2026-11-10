@@ -18,7 +18,7 @@ math_text_mix_strings = set()
 current_file_equation_symbols = set()
 GLOSSARY_DIR = None
 GLOSSARY_USAGE_ROOTS = []
-ACRONYM_GLOSSARY_FILE = None
+ACRONYM_GLOSSARY_FILES = []
 PREFIX_CHECK_CONFIGS = {}
 unused_glossary_entries = []
 missing_description_entries = []
@@ -169,14 +169,14 @@ def check_mathmode_subscripts():
     return warns
 
 
-def check_glossary_refs():
+def _check_glossary_replacements(replace_symbols, replace_acronyms):
     global current_file_equation_symbols
     warns = []
     current_file_equation_symbols = set(collect_equation_symbol_first_use().keys())
-    if GLOSSARY_DIR is None and ACRONYM_GLOSSARY_FILE is None:
+    if (not replace_symbols or not GLOSSARY_DIR) and (not replace_acronyms or not ACRONYM_GLOSSARY_FILES):
         return warns
-    replacements = gs.read_glossary_replacements(GLOSSARY_DIR) if GLOSSARY_DIR else {}
-    acronym_replacements = gs.read_acronym_replacements(ACRONYM_GLOSSARY_FILE)
+    replacements = gs.read_glossary_replacements(GLOSSARY_DIR) if replace_symbols else {}
+    acronym_replacements = gs.read_acronym_replacements(ACRONYM_GLOSSARY_FILES) if replace_acronyms else []
     if not replacements and not acronym_replacements:
         return warns
     for i, line in enumerate(ts.tex_lines_clean):
@@ -187,15 +187,28 @@ def check_glossary_refs():
             equation_line=ts.in_equation(i),
         )
         if count > 0:
-            warns.append((i, "Glossary terms should use glossary references where available", (0, len(line))))
+            check_name = "symbol" if replace_symbols and not replace_acronyms else "acronym" if replace_acronyms and not replace_symbols else "glossary"
+            warns.append((i, "%s terms should use glossary references where available" % check_name.capitalize(), (0, len(line))))
             break
     return warns
+
+
+def check_glossary_symbol_refs():
+    return _check_glossary_replacements(True, False)
+
+
+def check_glossary_acronym_refs():
+    return _check_glossary_replacements(False, True)
+
+
+def check_glossary_refs():
+    return _check_glossary_replacements(True, True)
 
 
 def check_glossary_unused():
     global unused_glossary_entries
     warns = []
-    if GLOSSARY_DIR is None:
+    if not GLOSSARY_DIR:
         return warns
     unused_glossary_entries = gs.find_unused_glossary_entries(GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
     for path, key, symbol in unused_glossary_entries:
@@ -206,7 +219,7 @@ def check_glossary_unused():
 def check_glossary_missing_description():
     global missing_description_entries
     warns = []
-    if GLOSSARY_DIR is None:
+    if not GLOSSARY_DIR:
         return warns
     missing_description_entries = gs.find_missing_description_entries(GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
     for path, key, symbol in missing_description_entries:
@@ -217,7 +230,7 @@ def check_glossary_missing_description():
 def check_glossary_symbol_duplicate():
     global duplicate_symbol_groups
     warns = []
-    if GLOSSARY_DIR is None:
+    if not GLOSSARY_DIR:
         return warns
     duplicate_symbol_groups = gs.find_duplicate_symbol_groups(GLOSSARY_DIR)
     for symbol, entries in duplicate_symbol_groups:
@@ -1211,7 +1224,8 @@ CATEGORY_REFERENCE = 16
 checks = [
     (check_prefix,                      CATEGORY_REFERENCE,  "prefix", actions.fix_prefix),
     (check_mathmode_subscripts,         CATEGORY_TYPOGRAPHY, "mathmode-subscripts", actions.fix_mathmode_subscripts_in_file),
-    (check_glossary_refs,               CATEGORY_REFERENCE,  "glossary-refs", actions.fix_glossary_refs_in_file),
+    (check_glossary_symbol_refs,        CATEGORY_REFERENCE,  "glossary-symbol-refs", actions.fix_symbol_glossary_refs_in_file),
+    (check_glossary_acronym_refs,       CATEGORY_REFERENCE,  "glossary-acronym-refs", actions.fix_acronym_glossary_refs_in_file),
     (check_glossary_unused,             CATEGORY_REFERENCE,  "glossary-unused", actions.fix_glossary_unused),
     (check_glossary_missing_description, CATEGORY_REFERENCE, "glossary-missing-description"),
     (check_glossary_symbol_duplicate,   CATEGORY_REFERENCE,  "glossary-symbol-duplicate", actions.fix_glossary_symbol_duplicate),
