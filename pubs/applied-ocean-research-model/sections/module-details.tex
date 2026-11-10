@@ -357,7 +357,7 @@ Describing functions make the following assumptions:
 \paragraph{Implementation}
 The drag describing function formula is encoded directly into the simulation (see derivation in \Cref{sec:drag}),
 while the control force describing function is implemented indirectly using knowledge of the limit cases of describing functions for multiple nonlinear control laws (see discussion in \Cref{sec:appendix-force-sat}).
-\Cref{fig:assumptions} summarizes how these assumptions connect to DFs and to increasingly specialized QLPS formulations.
+\Cref{fig:assumptions} summarizes how these assumptions connect to DFs and to increasingly specialized \gls{acr-qlps} formulations.
 
 \begin{figure*}[htbp]
     \centering
@@ -396,20 +396,20 @@ This alone is not a significant computational benefit over the general pseudo-sp
 The computational benefits come when we introduce assumptions \assumption{quadratic-objective} and \assumption{quadratic-constraints},
 which respectively state that \textbf{the objectives and constraints can be written as a quadratic function of the state variables}.
 This is an easy requirement for wave energy, since quadratic metrics of a linear multiport effort-flow model include many quantities of interest: effort magnitude, flow magnitude, average power, reactive power, and linear combinations thereof.
-Under this condition, the NLP becomes a QCQP (quadratically constrained quadratic program).
-The original WEC pseudo-spectral formulation by \citet{bacelli_numerical_2015} conforms to this assumption and shows that under the additional assumption \assumption{passive-dynamics-convex} of \textbf{passive dynamics}, the QCQP is convex.
+Under this condition, the \gls{acr-nlp} becomes a \gls{acr-qcqp}.
+The original \gls{acr-wec} pseudo-spectral formulation by \citet{bacelli_numerical_2015} conforms to this assumption and shows that under the additional assumption \assumption{passive-dynamics-convex} of \textbf{passive dynamics}, the \gls{acr-qcqp} is convex.
 
 Even more computational benefits, and the novel aspect of the \gls{acr-qlps} approach, appear when two more assumptions are enforced.
-\assumption{no-freq-coupling} and \assumption{no-dof-coupling} require that the system has \textbf{no dynamic coupling between different frequencies and different control DOFs} respectively.
+\assumption{no-freq-coupling} and \assumption{no-dof-coupling} require that the system has \textbf{no dynamic coupling between different frequencies and different control \glspl{acr-dof}} respectively.
 \asmpref{no-freq-coupling} is satisfied as a result of \asmpref{waves-narrow-band} (narrow-band waves) and \asmpref{system-low-pass} (low-pass WEC dynamics).
-\asmpref{no-dof-coupling} is satisfied because the RM3 contains only a single controlled DOF.
-\asmpref{no-dof-coupling} permits coupling between the body DOFs as long as there is a single controlled DOF as is present here,
-or it permits multiple controlled DOFs only if they are uncoupled when viewed from each control load port at which power is to be optimized
-(i.e. an array of non-interacting multi-DOF WECs for which off-diagonal terms of the intrinsic impedance matrix are negligible).
+\asmpref{no-dof-coupling} is satisfied because the \gls{acr-rm3} contains only a single controlled \gls{acr-dof}.
+\asmpref{no-dof-coupling} permits coupling between the body \glspl{acr-dof} as long as there is a single controlled \gls{acr-dof} as is present here,
+or it permits multiple controlled \glspl{acr-dof} only if they are uncoupled when viewed from each control load port at which power is to be optimized
+(i.e. an array of non-interacting multi-\gls{acr-dof} \glspl{acr-wec} for which off-diagonal terms of the intrinsic impedance matrix are negligible).
 \linelabel{lne:A12-end}
 
-Under \asmpref{no-freq-coupling} and \asmpref{no-dof-coupling}, the QCQP for all frequencies and DOFs can be separated into a set of single-order QCQPs,
-one for each frequency and DOF,
+Under \asmpref{no-freq-coupling} and \asmpref{no-dof-coupling}, the \gls{acr-qcqp} for all frequencies and \glspl{acr-dof} can be separated into a set of single-order \glspl{acr-qcqp},
+one for each frequency and \gls{acr-dof},
 which can be solved semi-analytically using the geometric properties of circles.
 In fact, this order reduction enables a semi-analytical solution even in the presence of certain nonlinear constraints or nonconvexities,
 in violation of \asmpref{quadratic-constraints} and \asmpref{passive-dynamics-convex}.
@@ -441,9 +441,9 @@ MDOcean uses \gls{acr-qlps} for both control synthesis and evaluation.
 \end{subfigure}
 \end{figure*}
 
-\Cref{sec:optimal-control} derives the overall optimal control problem, and \Cref{sec:appendix-qp-solution} derives the semi-analytical solution for the single-order QCQP.
+\Cref{sec:optimal-control} derives the overall optimal control problem, and \Cref{sec:appendix-qp-solution} derives the semi-analytical solution for the single-order \gls{acr-qcqp}.
 
-\subsubsection{Approximate \gls{acr-qlps}: Modified Frequency-Domain Methods}
+\subsubsection{Approximate \glsxtrshort{acr-qlps}: Modified Frequency-Domain Methods}
 \label{sec:mod-freq-domain}
 \paragraph{Motivation}
 Viewing DFs (\Cref{sec:describing-functions}) and \gls{acr-qlps} (\Cref{sec:qlps}) as part of the broader family of \acrfull{acr-mfd} methods provides greater context and facilitates comparison to other work.
@@ -467,7 +467,7 @@ However, in the special case where the only time-domain constraint is on the con
 
 \begin{table}[htbp]
 \centering
-\caption[Constraint satisfaction approaches for \acrlong{acr-mfd} methods]{Constraint satisfaction approaches for \gls{acr-mfd} methods. Filled stars indicate better performance.}
+\caption[Constraint satisfaction approaches for \glsxtrlong{acr-mfd} methods]{Constraint satisfaction approaches for \glsxtrlong{acr-mfd} methods. Filled stars indicate better performance.}
 \label{tab:constraint-approaches}
 \begin{tabular}{M{.03\linewidth} >{\raggedright\arraybackslash}m{0.45\linewidth}l l}
 &\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \toprule
@@ -574,8 +574,8 @@ This is because the device is already in survival mode (preventing method M4), i
 The dynamics portion of \Cref{fig:design-scope} represents this system as a multiport circuit, with effort 
 variables $\gls{sym-vec-e}$ and flow variables $\gls{sym-vec-q}$ at each port.
 Ports include the wave input, body mechanical, \gls{acr-pto} mechanical, generator mechanical, and generator electrical.
-Between each set of ports are the intrinsic body dynamics, PTO kinematics, drivetrain dynamics, and generator dynamics respectively.
-The overall relationship between the \gls{acr-pto} mechanical port and generator electrical port is collectively referred to as the PTO dynamics.
+Between each set of ports are the intrinsic body dynamics, \gls{acr-pto} kinematics, drivetrain dynamics, and generator dynamics respectively.
+The overall relationship between the \gls{acr-pto} mechanical port and generator electrical port is collectively referred to as the \gls{acr-pto} dynamics.
 
 \Cref{sec:appendix-multiport} derives three matrix forms to describe various aspects of the port relationships:
 impedance ($\gls{sym-mathbf-Z}$) groups all ports together and is used for the intrinsic body dynamics;
@@ -590,7 +590,7 @@ The excitation, radiation, and restoring forces are linear; the drag and \gls{ac
 \Cref{sec:appendix-body-dynamics} provides the equations and derivations for the intrinsic body dynamics, which encompasses the body inertia and all external forces except the \gls{acr-pto} forces.
 
 %%%%%%%%%%%%%%%
-\paragraph{\gls{acr-pto} Model}
+\paragraph{\glsxtrshort{acr-pto} Model}
 \label{sec:pto-model-overview}
 The \gls{acr-pto} model is a linear multiport effort-flow model that is valid for multiple \gls{acr-dof} devices across various energy domains.
 It consists of \gls{acr-pto} kinematics
@@ -834,7 +834,7 @@ Then, we implement an iterative loop around the dynamics and control module to u
     Furthermore, because the plant is a second order oscillator and filters out high frequency inputs, harmonics other than the fundamental contain very little energy and can be safely neglected.
     \Cref{fig:desc-fcns}(a) shows this approximation graphically for a saturated-sine force signal.
 \else
-    To extend to a nonlinear controller, the nonlinear coefficients now include both drag and the PTO coefficients, and there is an additional relationship needed between the quasi-linear torque limit and the time-domain torque limit.
+    To extend to a nonlinear controller, the nonlinear coefficients now include both drag and the \gls{acr-pto} coefficients, and there is an additional relationship needed between the quasi-linear torque limit and the time-domain torque limit.
 \fi
 
 Details of the calculation are provided in \Cref{sec:appendix-force-sat}.
@@ -946,12 +946,12 @@ See \Cref{sec:appendix-dynamic-limit} for further discussion and derivation.
 
 \paragraph{Relating Peak Forces and Amplitudes to Fundamental}
 In the operational load case,
-the peak PTO force is found from the fundamental assuming that the PTO force signal shape is a saturated sine wave and the PTO force constructively interferes with shaft torque (a conservative assumption).
+the peak \gls{acr-pto} force is found from the fundamental assuming that the \gls{acr-pto} force signal shape is a saturated sine wave and the \gls{acr-pto} force constructively interferes with shaft torque (a conservative assumption).
 The peak fluid force and peak displacement are assumed to equal their respective fundamental amplitudes.
 This is a reasonable approximation for the displacements due to the low-pass nature of the system, and could be an under- or over-estimate for the fluid force.
 
-In the storm case, the peak is assumed to equal the fundamental amplitude for the PTO force, fluid force, and displacements.
-The assumption applies here for the PTO force since the storm regime uses a brake not a generator, so there is no saturation nonlinearity.
+In the storm case, the peak is assumed to equal the fundamental amplitude for the \gls{acr-pto} force, fluid force, and displacements.
+The assumption applies here for the \gls{acr-pto} force since the storm regime uses a brake not a generator, so there is no saturation nonlinearity.
 \ifdefined\DISSERTATION
     Note that the analysis of this section continues to use standard linear wave theory with equivalent regular waves,
     even for the storm condition.
