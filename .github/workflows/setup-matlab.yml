@@ -1,0 +1,105 @@
+name: Setup MATLAB
+
+on:
+  workflow_dispatch:
+# env:
+  # MLM_LICENSE_TOKEN: ${{ secrets.MatlabBatchToken }}
+  # MLM_LICENSE_FILE: ${{ secrets.MATLAB_LICENSE_FILE }}:27000
+permissions:
+  contents: write
+  checks: write
+  id-token: write
+
+jobs:
+  main:
+    name: Run
+    runs-on: self-hosted
+    timeout-minutes: 1440 # 24 hours
+    steps:
+      - name: Setup temp environment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export TMPDIR="${RUNNER_TEMP}/matlab-${GITHUB_RUN_ID}"
+          mkdir -p "$TMPDIR"
+          echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV
+      - name: Clear stale submodule caches
+        run: |
+          # Deinit any previously-initialized submodules first (while their gitdirs
+          # still exist) so that actions/checkout's auth-setup foreach won't try to
+          # traverse into stale submodule directories and fail.
+          git submodule deinit --all --force 2>/dev/null || true
+          # Now remove the entire gitdir module cache so the next manual init starts clean.
+          rm -rf .git/modules 2>/dev/null || true
+      - uses: actions/checkout@v6
+        with:
+          # For PRs, checkout the head ref to avoid detached HEAD
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use submodules: false so actions/checkout does NOT run
+          # `git submodule update --init --recursive` (which would register
+          # OpenFLASH's nested sea-lab-utils submodule) and does NOT run
+          # `git submodule foreach --recursive` for auth removal (which would
+          # then fail with "No url found" for that nested submodule).
+          submodules: false
+          persist-credentials: false
+      - name: Init submodules
+        run: git submodule update --init --recursive
+      - name: Configure Git credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote set-url origin https://github-actions[bot]:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git config merge.dvclock.driver "python dev/dvc_lock_merge.py %O %A %B"
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install node.js (required for uv builds of calkit)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Calkit
+        run: uv tool install git+https://github.com/calkit/calkit.git@rmccabe-subproject-login-utf8
+        #run: uv tool install --upgrade calkit-python
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v3
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Install python dependencies
+        run: pip install ruamel.yaml
+      - name: Setup matlab
+        uses: matlab-actions/setup-matlab@v2
+        with:
+          cache: true
+          release: R2024b
+          products: >
+            Parallel_Computing_Toolbox
+            Global_Optimization_Toolbox
+            Optimization_Toolbox
+            Statistics_and_Machine_Learning_Toolbox
+            MATLAB_Report_Generator
+            Simulink
+            Simscape
+            Simscape_Multibody
+            Curve_Fitting_Toolbox
+            Image_Processing_Toolbox
+            MATLAB_Report_Generator
+      # - name: Add MATLAB to PATH
+      #   run: echo "/usr/local/MATLAB/R2024b/bin" >> $GITHUB_PATH
+      - name: Load run-matlab-command script (auto-licensed since public repo)
+        uses: matlab-actions/run-command@v2
+        if: always()
+        with:
+          command: disp("Hello world")
+          # Do not delete the above hello world step, loading the run-command action is required for auto-licensing to work
+      - name: Wait period
+        run: sleep 36000 # 10 hours (simulating long-running matlab process)
+
+      - name: Clean up temp environment
+        if: always()
+        shell: bash
+        run: |
+          echo "Cleaning up temp environment..."
+          rm -rf "$TMPDIR" || true

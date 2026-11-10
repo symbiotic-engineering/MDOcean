@@ -1,0 +1,126 @@
+\subsubsection{WEC-Sim}
+The drag describing function and \gls{acr-meem} hydrodynamic coefficients have a minor effect assuming a 1-\gls{acr-dof} system (9.7\% and 2.7\% error on the average power and maximum amplitude respectively) but a major effect on the 2-\gls{acr-dof} system (38.2\% and 28.6\% respectively).
+Meanwhile, the error is extremely low in the 2-\gls{acr-dof} system enforcing the same hydrodynamic coefficients as WEC-Sim and with zero drag (0.2\% and 1.9\% in power and amplitude respectively).
+This indicates that the larger error in the 2-\gls{acr-dof}-drag-\gls{acr-meem} case is not an error in the 2-\gls{acr-dof} dynamic model itself, but in the way that a 2-\gls{acr-dof} model amplifies errors in drag and hydrodynamic coefficients due to the importance of the phase of motion between each \gls{acr-dof}.
+The remainder of this subsection details the four-quadrant breakdown across drag-on/drag-off and identical/different hydrodynamic coefficient configurations.
+
+A WEC-Sim parallel multiple condition run is performed in accelerator mode for 200s with a 100s ramp time using the ode4 solver and a 10~ms timestep, with the default mass properties and body geometry of the WEC-Sim \gls{acr-rm3} tutorial.\footnote{This geometry is not identical to the nominal float design used in the Reference Model Report \citep{RM3} and the rest of this paper, with a shorter spar draft, thicker damping plate, wider float frustum diameter, and assumed deep-water depth regime.
+For consistency, MDOcean also uses this alternate geometry for WEC-Sim comparisons only.}
+Each of the 210 sea states are simulated individually as the equivalent regular wave.
+Body to body interactions (nonzero off-diagonal hydrodynamic coefficients) and state-space computations are turned on.
+%\Cref{tab:dynamic-validation} and
+\Cref{fig:dynamic-validation} compares the results.
+The $\gls{sym-C-d}=0$ simulation with identical hydrodynamic coefficients (top left of \Cref{fig:dynamic-validation}) is conducted to verify correct implementation of the linear dynamics and consistency of sign conventions.
+The validation obtains an error of less than $0.2\%$ for wave periods below 12 seconds.
+This aligns with the perfect matching that is expected in the absence of drag non-linearities, and we attribute the tiny error that remains to the discrete-time nature of WEC-Sim's numerical integration and post-processing.
+For wave periods above 12 seconds, MDOcean significantly overpredicts the mechanical power.
+An additional validation for this case with the spar held fixed (not shown) maintained the excellent $<0.2\%$ accuracy even for $\gls{sym-T-period}>12 \gls{sym-s}$, so we attribute the error to resonant instabilities that occur in the multi-body hydrodynamic interactions in the highly underdamped drag-free dynamics.
+Turning on drag ($\gls{sym-C-d}=1$, top right of \Cref{fig:dynamic-validation}) substantially resolves this inaccuracy, with power errors of $<5\%$ for the most common moderate sea states and error exceeding $40\%$ at the most energetic sea states.
+While determining the exact source of the error requires further investigation, it is deemed low-impact enough to justify the model's use in an early-stage design setting.
+
+Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's \gls{acr-meem} hydrodynamic coefficients on its dynamic power production.
+The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the \gls{acr-meem} hydro coefficients has minimal effect on the overall dynamic response.
+Finally, the bottom right corner of \Cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
+Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \Cref{sec:dynamic-validation}.
+Meanwhile, MDOcean underpredicts the peak power by around 25\%.
+Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
+
+% \begin{table}[htbp]
+%     \centering
+%     \begin{tabular}{|c|c|c|} \hline
+%          Power Percent Error: Average, Maximum&  $\gls{sym-C-d}=0$& $\gls{sym-C-d}=1$\\ \hline
+%          WAMIT&  1.90\%, 1.96\%& 5.21\%, -70\%\\ \hline
+%          MEEM&  -6.30\%, -14\%& -2.79\%, -80\%\\ \hline
+%     \end{tabular}
+%     \caption{Dynamic validation showing error in a variety of modeling assumptions}
+%     \label{tab:dynamic-validation}
+% \end{table}
+\begin{landscape}
+\begingroup
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{c m{1em} | M{.47\linewidth} | M{.47\linewidth} }
+  && \multicolumn{2}{c}{Drag Coefficient}\\
+         && $\gls{sym-C-d}=0$& $\gls{sym-C-d}=1$\\ \hline
+    \multirow{2}{*}[-3em]{\rot{Hydro Coeffs}} &\rot{Identical}&
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_off__power_mech_unsat.pdf}
+  & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__power_mech_unsat.pdf}
+\\ &\rot{Different} &
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_off_meem_on__power_mech_unsat.pdf}
+  & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_on__power_mech_unsat.pdf} \\
+\end{tabular}
+\caption[Dynamic validation error in unsaturated mechanical power]{Dynamic validation showing error in unsaturated mechanical power generation for a variety of modeling assumptions}
+\label{fig:dynamic-validation}
+\fillandplacepagenumber
+\end{figure}
+\endgroup
+\end{landscape}
+
+Besides mechanical power, a variety of other signals including amplitudes, phases, and forces are compared between the models.
+While most signals show good agreement between the models, interestingly, large errors are observed in the drag forces, although these errors do not cause significant deviations in the overall system response.
+\Cref{fig:drag-validation} compares the drag force on the float and spar in each model using identical hydro coefficients and $\gls{sym-C-d}=1$.
+
+\begin{landscape}
+\begingroup
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{c m{1em} | M{.47\linewidth} | M{.47\linewidth} }
+  && \multicolumn{2}{c}{Drag Force}\\
+         && Magnitude& Phase\\ \hline
+    \multirow{2}{*}[-3em]{\rot{Body}} &\rot{Float}&
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_fund.pdf}
+  & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__float_drag_force_phase.pdf}
+\\ &\rot{Spar} &
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_fund.pdf}
+  & \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf}]{figs/from-matlab/wecsim_wcsm_multi_drag_on_meem_off__spar_drag_force_phase.pdf} \\
+\end{tabular}
+\caption[Drag force comparison across modeling assumptions]{Drag force comparison showing large errors in drag force, despite low errors in amplitude and power}
+\label{fig:drag-validation}
+\fillandplacepagenumber
+\end{figure}
+\endgroup
+\end{landscape}
+The reason for this discrepancy remains unclear, since the expected error of the describing function approximation due to higher harmonics would increase with frequency, whereas the observed error is worse at mid-range frequencies.
+Evidently, amplitude and power results are quite sensitive to the presence of drag, but not very sensitive to the exact magnitude and phase of the drag force.
+The WEC-Sim simulation uses drag-only Morison elements with a maximum width of one tenth the incident wavelength to ensure accuracy of strip theory, and uses a Fourier transform to extract the fundamental amplitude and phase of the nonlinear drag waveform.
+Future work should investigate the source of this error and whether it can be reduced by adjusting the drag model.
+
+We also validate the describing function approximation for the drag force.
+The general application of the describing function technique requires that the fundamental frequency $\gls{sym-omega}$ contains the vast majority of the energy, resulting in body displacements of the form $\gls{sym-xi}(\gls{sym-t}) \sim \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
+\Cref{fig:wecsim-thd} shows the total harmonic distortion of the float displacement for each sea state in the $\gls{sym-C-d}=1$ case, which peaks at 1\% in the worst-case sea state and is below 0.5\% for the majority of sea states.
+This confirms that higher harmonics have a negligible impact on the system and that the describing function method is a valid approach for modeling drag in this context.
+The particular describing function relation used for drag assumes that the drag force has the form
+$\gls{sym-F-d-t} \sim |\cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})|
+                       \cos(\gls{sym-omega} \gls{sym-t}+\gls{sym-phi})$.
+\Cref{fig:wecsim-drag-waveform} shows the assumed and actual drag force waveform for four representative sea states corresponding to the four corners of the \gls{acr-jpd}.
+The match is excellent in all four cases, confirming that the drag force is indeed well approximated by this form, even in high-amplitude, high-frequency conditions where the nonlinearity is expected to be strongest.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/position_THD_contour.pdf}]{figs/from-matlab/position_THD_contour.pdf}
+    \caption[Total harmonic distortion of float displacement with drag]{Total Harmonic Distortion of Float Displacement in WEC-Sim Simulations with Drag}
+    \label{fig:wecsim-thd}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_force_desc_fcn.pdf}]{figs/from-matlab/drag_force_desc_fcn.pdf}
+    \caption{Comparison of Assumed and Actual Drag Force Signal Shape}
+    \label{fig:wecsim-drag-waveform}
+\end{figure}
+
+\subsubsection{Reference Model Report}
+While the original reference model report \citep{RM3} does not document the intermediate values used in dynamics calculations such as response amplitude or hydrodynamic coefficients,
+it does record the mechanical power for each sea state.
+\Cref{fig:report-power-validation} compares these values against those predicted by WEC-Sim and MDOcean.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}]{figs/from-matlab/wecsim_rpt_multi_drag_on_meem_on__power_mech_unsat.pdf}
+    \caption{Comparison of mechanical power for \gls{acr-rm3} report \cite{RM3} and MDOcean}
+    \label{fig:report-power-validation}
+\end{figure}
+Note that the data is independent of \Cref{fig:dynamic-validation} due to the disparate geometry between the reference model report and provided WEC-Sim hydrodynamic coefficients,
+and that the power multiplier mentioned in \Cref{sec:dynamic-validation} has not been applied in the figure.
+We observe a rather poor match, with MDOcean underestimating power in the low-period sea states and overestimating in the high-period sea states.
+The discrepancy is of minimal concern for the reasons described in \Cref{sec:dynamic-validation}.
+Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.

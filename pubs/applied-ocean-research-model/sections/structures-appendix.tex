@@ -1,0 +1,300 @@
+Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
+It outputs a factor of safety for each limit case.
+First, it obtains equivalent section properties based on the plate and stiffener dimensions.
+Second, it relates applied loads to stresses and deflection using analytical solutions to structural boundary value problems obtained from the well-known Roark's handbook \citep{young_roarks_2001} and the references therein.
+Finally, it utilizes design standards from organizations like Det Norske Veritas, the American Bureau of Shipping, and the American Iron and Steel Institute to develop limit-state expressions for each possible failure mode of each major structural element under each design load case.
+For consistency with the reference model report \citep{RM3}, all structural elements are assumed to be welded, although future work should consider the use of pinned joints for certain interfaces to reduce reaction moments and enhance structural efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equivalent Section Properties for Stiffened Plates}
+\label{sec:appendix-equivalent-thickness}
+Stiffeners are structural elements, frequently with I or T profiles, that can be welded or riveted to flat plates to provide additional load-carrying capacity and prevent buckling.
+Stiffened plates are common in marine and aerospace structural design because they are an efficient way to carry spatially distributed fluid loads.
+To analyze these compound sections, equivalent properties can be established that describe the overall bending stiffness of the combined section as if it were a simple uniform section, while still utilizing the maximum distance from the neutral axis of the irregular section to accurately determine stress.
+\Cref{fig:stiffened-plate} illustrates the concept of equivalent thickness for a stiffened plate.
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/equivalent_stiffness.pdf}]{figs/from-matlab/equivalent_stiffness.pdf}
+    \caption{Equivalent thickness for a stiffened plate}
+    \label{fig:stiffened-plate}
+\end{figure}
+
+Specifically, the equivalent thickness of the plate $\gls{sym-t-eq}$ is derived by equating the stiffened section's second moment of area per unit width with that of a uniform section:
+\begin{equation}
+    \int \gls{sym-z}^2dz = \frac{\gls{sym-t-eq}^3}{12}
+\end{equation}
+Next, deflection of the stiffened plate is equal to the deflection of the equivalent unstiffened plate with flexural rigidity $\gls{sym-D-eq}$:
+\begin{equation}
+    \gls{sym-D-eq} = \frac{\gls{sym-E}~  \gls{sym-t-eq}^3}{12(1-\gls{sym-nu-poisson}^2)}
+\end{equation}
+
+The maximum stress $\gls{sym-sigma}$ of the stiffened plate is then:
+\begin{equation}\label{eq:plate-stress}
+    \gls{sym-sigma}= 12\gls{sym-M} \gls{sym-z-max}/\gls{sym-t-eq}^3
+\end{equation}
+where $\gls{sym-M}$ is the maximum moment per unit length and $z_{\text{max}}$ is the maximum distance from the neutral axis of the stiffened section.
+This parallels the stress for an unstiffened plate of thickness $\gls{sym-t}$, which is $\gls{sym-sigma}=6\gls{sym-M}/\gls{sym-t}^2 = 12 \gls{sym-M}(\gls{sym-t}/2)/\gls{sym-t}^3$.
+
+Note that this equivalent-thickness method of accounting for stiffeners assumes that as a whole, the stiffener-plate system deflects like a single plate element, rather than as a set of multiple plate elements separated by stiffeners.
+This is a reasonable assumption when the stiffeners are small and densely spaced with respect to the plate, but breaks down if the stiffeners come to dominate the system.
+The so-called effective breadth ratio $\gls{sym-rho}$ is used to quantify the validity of this assumption, where the equivalent-thickness method requires $\gls{sym-rho}=1$:
+\begin{equation}
+   \gls{sym-rho} = \gls{sym-rho-epsilon} \gls{sym-rho-psi}
+\quad
+\gls{sym-rho-epsilon} = \begin{cases}
+        1, & \gls{sym-epsilon-slenderness}\leq 0.673 \\
+        \frac{1-0.22/\gls{sym-epsilon-slenderness}}{\gls{sym-epsilon-slenderness}}, & \gls{sym-epsilon-slenderness} > 0.673
+    \end{cases} \quad
+    \gls{sym-rho-psi} = \begin{cases}
+        1, & \gls{sym-psi}> -0.236 \\
+        \frac{1}{2}+\frac{1}{3-\gls{sym-psi}}, & \gls{sym-psi} \leq -0.236
+    \end{cases}
+\end{equation}
+The effective breadth ratio depends on the slenderness factor $\gls{sym-epsilon-slenderness}$ and load distribution factor $\gls{sym-psi}$, found as follows:
+\begin{equation}
+\begin{aligned}
+    \gls{sym-epsilon-slenderness} &= \frac{1.052}{\sqrt{\gls{sym-k-buckle}}} \frac{\gls{sym-w}}{\gls{sym-thick}} \sqrt{\frac{\gls{sym-f-1}}{\gls{sym-E}}} \\
+    \gls{sym-psi}&=\frac{\gls{sym-f-2}}{\gls{sym-f-1}}
+    \end{aligned}
+\end{equation}
+with $\gls{sym-t}$ referring to the plate unstiffened thickness, $\gls{sym-w}$ as the distance between stiffeners, $\gls{sym-f-1}$ as the maximum compression stress along the width, and $\gls{sym-f-2}$ as the maximum tension stress along the width (or minimum compression stress, if there is no tension).
+By convention, compression stress is positive and tension is negative, so $\gls{sym-psi}$ ranges from $-\infty$ to $+1$.
+The plate buckling coefficient $\gls{sym-k-buckle}$ is expressed as:
+\begin{equation}\label{eq:k-buckle}
+  \gls{sym-k-buckle} = 4+2\left(1-\gls{sym-psi}\right)^3+2\left(1-\gls{sym-psi}\right)
+\end{equation}
+This effective breadth procedure follows the American Iron and Steel Institute design manual \citep{american_iron_and_steel_institute_cold-formed_1991}.
+Rather than enforcing $\gls{sym-epsilon-slenderness}<0.673$, corresponding with $\gls{sym-rho-epsilon}=1$, MDOcean more flexibly requires $\gls{sym-epsilon-slenderness}<0.809$, corresponding to $\gls{sym-rho-epsilon}=0.9$ and thereby capping the error due to insufficient slenderness at around 10\%.
+MDOcean also uses $\gls{sym-k-buckle}=4$, the minimum value that equation \eqref{eq:k-buckle} can take on, conservatively maximizing the slenderness factor $\gls{sym-epsilon-slenderness}$.
+
+Broadening the design space to allow for more dominant stiffeners with higher slenderness factors would require modeling the stiffener-plate system not as a plate with the stiffeners absorbed into an equivalent thickness, but as individual stiffeners with the plate absorbed into the effective breadth.
+That model has other complexities such as the shear lag phenomenon so is left to future extensions \citep{wierzbicki_lecture_2013,american_iron_and_steel_institute_cold-formed_1991}.
+
+%\hl{Describe how this informs the lower design variable bounds on the structural stiffnesses.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Float}
+The float is composed of 12 watertight stiffened shells in the shape of trapezoidal prisms.
+Each shell consists of a top and a bottom trapezoidal plate, and an inner, an outer, and two side rectangular plates.
+All edges are welded.
+Rather than model the deflections of each edge and apply compatibility, for simplicity the edges of each plate are conservatively modeled as fixed.
+The top and bottom plates are the only ones with external heave loads, arising from the float-spar tubular connection and the hydrodynamic pressure respectively.
+
+The trapezoidal plates are isosceles trapezoids with smaller base $\gls{sym-b-1} = \gls{sym-pi} \gls{sym-D-f-in}/12$,
+larger base $\gls{sym-b-2}=\gls{sym-pi} \gls{sym-D-f}/12$,
+and perpendicular height $\gls{sym-h-0}=(\gls{sym-D-f}-\gls{sym-D-f-in})/2$ (see \Cref{fig:trapezoid}).
+The references consulted do not contain structural results for trapezoidal plates, so geometric intuition is used to scale available solutions.
+For example, \citet{young_roarks_2001} compile models for rectangular plates under perpendicular loading.
+They show that the maximum bending stress $\gls{sym-sigma}$ scales with the square of the shorter side length, $x_{\text{min}}^2$. % in rectangular plates, with the square of the altitude in triangular plates, and with the square of the radius in circular sectors. 
+This makes sense because for fixed-edge plates with distributed loads,
+it is the square of the minimum distance from an edge to the point of highest deflection,
+$(x_{\text{min}}/2)^2$, that geometrically sets the maximum curvature, so $\gls{sym-sigma}\sim x_{\text{min}}^2$.
+For trapezoids, one then expects approximate rectangles ($\gls{sym-b-2}/\gls{sym-b-1}\approx1$) to have $x_{\text{min}}=\min(\gls{sym-b-1},\gls{sym-h-0})$,
+short trapezoids ($\gls{sym-h-0}<\gls{sym-b-1})$ to have $x_{\text{min}}=\gls{sym-h-0}$,
+tall trapezoids ($\gls{sym-h-0}\gg \gls{sym-b-2}$) to have $x_{\text{min}}=\gls{sym-b-1}$,
+and intermediate trapezoids to have an $x_{\text{min}}$ that depends on the trapezoid slope.
+The nominal \gls{acr-rm3} design falls into this intermediate case,
+with $\gls{sym-b-1}\approx1.7$~m,
+$\gls{sym-b-2}\approx5.2$~m,
+and $\gls{sym-h-0}\approx6.8$~m.
+These dimensions are shown in \Cref{fig:trapezoid}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/trapezoid.pdf}]{figs/from-matlab/trapezoid.pdf}
+    \caption[Trapezoidal float plate with inscribed circle]{Trapezoidal float plate with inscribed circle used to determine $x_{\text{min}}$}
+    \label{fig:trapezoid}
+\end{figure}
+
+To approximately capture the dimensions of a trapezoid, which effectively set the deflection curvature and therefore stress, $x_{\text{min}}$ is set to the diameter of the largest circle that can be inscribed in the trapezoid tangent to the shorter base $\gls{sym-b-1}$.
+This inscribed circle scheme satisfies all limit cases mentioned above and can be calculated as
+\begin{equation}
+    \gls{sym-x-min} =
+    \begin{cases}
+        \gls{sym-b-1} \left( \gls{sym-m-trap} + \sqrt{1+\gls{sym-m-trap}^2}\right), & \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+        \\
+        \gls{sym-h-0}, & \gls{sym-h-0} < \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+    \end{cases}
+\end{equation}
+where $\gls{sym-m-trap}=(\gls{sym-b-2}-\gls{sym-b-1})/(2\gls{sym-h-0})$ is the slope of the trapezoid.
+The expression is continuous at $\gls{sym-h-0}=\sqrt{\gls{sym-b-1}\gls{sym-b-2}}$, the point where the inscribed circle becomes tangent to base $\gls{sym-b-2}$ in addition to $\gls{sym-b-1}$.
+Continuity of the model across the design space avoids problems in the gradient-based optimization due to undefined gradients.
+The inscribed circle model gives $\gls{sym-x-min}\approx2.2$~m for the nominal float design.
+In addition to the shorter side length $\gls{sym-x-min}$, stress in a fixed-edge rectangular plate also depends weakly on the longer side length of the plate $\gls{sym-x-max}$, which for the trapezoid is taken as
+\begin{equation}
+    \gls{sym-x-max} =
+    \begin{cases}
+        \gls{sym-h-0},& \gls{sym-h-0} \geq \sqrt{\gls{sym-b-1}\gls{sym-b-2}}
+        \\
+        \frac{\gls{sym-b-1}+\gls{sym-b-2}}{2} + \gls{sym-h}(1-\sqrt{1+\gls{sym-m-trap}^2}), & \gls{sym-h-0} < \sqrt{\gls{sym-b-1} \gls{sym-b-2}}
+    \end{cases}
+\end{equation}
+using a similar inscribed circle scheme to maintain continuity.
+
+\subsubsection{Float Bottom Plate}
+Under a distributed pressure $\gls{sym-q-pressure}$, the bottom plate maximum moment per unit length is then:
+\begin{equation}\label{eq:bottom-plate-moment}
+\gls{sym-M-bot}=\gls{sym-beta-plate-0} \gls{sym-q-pressure} \gls{sym-x-min}^2
+\end{equation}
+for $\gls{sym-beta-plate-0}$ as a function of $x_{\text{max}}/x_{\text{min}}$ that \citet{timoshenko_theory_1959} tabulates, and the bending stress is found by plugging this moment into equation~\eqref{eq:plate-stress}.
+While the simulation utilizes the real $\gls{sym-beta-plate-0}$, constant $\gls{sym-beta-plate-0}$ is assumed for the scaling laws of \Cref{eq:struct-scaling} because $\gls{sym-beta-plate-0}$ varies only weakly with $x_{\text{max}}/x_{\text{min}}$.
+
+\subsubsection{Float Top Plate}
+The top float plate has equivalent thickness $t_{f,\text{top},eq}$ and the same dimensions and edge fixity as the bottom plate.
+Unlike the uniform pressure on the bottom plate, the top plate is subject to the welded tubular float-spar attachment force and moment, modeled as a load distributed over a small circle of radius $\gls{sym-r-0}$, where $\gls{sym-r-0}$ is assumed to be at least half the thickness.
+Under these conditions, either the stress at the center $\gls{sym-sigma-cent}$ or along the longer edge $\gls{sym-sigma-edge}$ may dominate:
+\begin{equation}\label{eq:top-plate-stress}
+    \begin{aligned}
+    \gls{sym-sigma-edge}&= \frac{3\gls{sym-W}}{2\gls{sym-pi} \gls{sym-t-f-top-eq}^2}\left( (1+\gls{sym-nu-poisson})\ln\frac{2x_{\text{min}}}{\gls{sym-pi} \gls{sym-r-0}}+\gls{sym-beta-plate-1}\right)\\
+        \gls{sym-sigma-cent}&=-\gls{sym-beta-plate-2} \gls{sym-W}/\gls{sym-t-f-top-eq}^2
+    \end{aligned}
+\end{equation}
+using $\gls{sym-beta-plate-1}$ and $\gls{sym-beta-plate-2}$ tabulated as a function of $\gls{sym-x-max}/\gls{sym-x-min}$ by \citet{young_roarks_2001}.
+The bending moment per unit length is then found as $\gls{sym-M-top}=\gls{sym-sigma-edge} \gls{sym-t-f-top-eq}^2/6$.
+However, unlike \Cref{eq:bottom-plate-moment}, it is found that \Cref{eq:top-plate-stress} predicts stresses that do not match well with the finite element results for the nominal \gls{acr-rm3} design \citep{RM3,previsic_reference_2011}.
+It is unknown whether this is an implementation or modeling issue, and remains as future work to address.
+In the meantime, the top plate thickness is set by scaling the bottom plate thickness, as described in \Cref{tab:struct-calc-vs-scale}.
+
+\subsubsection{Other Float Plates}
+The other float plates besides the top and bottom ones experience only the edge reaction moments that the top and bottom plates apply at their interface, with no additional external loads in heave.
+Assuming that the maximum allowable stress is the same in all float plates, the required side plate thickness can be found by simply scaling the input float bottom plate thickness using the float thickness ratios in the nominal \gls{acr-rm3} design.
+This prevents the need for a separate structural analysis of the side plates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Damping Plate}
+For an annular plate with free outer radius $\gls{sym-a-outer-damping-plate}$ and fixed inner radius $\gls{sym-b-inner-damping-plate}$, the nondimensional plate deflection $\gls{sym-overline-delta-plate}$ and bending moment $\gls{sym-overline-M-r}$ can be calculated as a function of plate aspect ratio $\gls{sym-b-inner-damping-plate}/\gls{sym-a-outer-damping-plate}$ for various load cases.
+In this case, the plate is loaded by a distributed load (subscript $dis$) equal to $F_{\text{heave}}$, and a concentrated load (subscript $con$) at four equidistant points along the edge, equal to the tubular support reaction force \gls{sym-F-tube}.
+Formulas for the concentrated loading are given by \citet{boedo_corrected_1998}, and formulas for distributed loading are given by \citet[case 2L, table 11.2]{young_roarks_2001}.
+The 24 radial plate stiffeners are taken into account with the procedure described in \Cref{sec:appendix-equivalent-thickness}, producing equivalent flexural rigidity $\gls{sym-D-eq}$ and equivalent section modulus $\gls{sym-S-eq}$.
+The tube force \gls{sym-F-tube} is statically indeterminate and is solved with compatibility by equating the plate and tubular support displacements, $\delta_{\text{plate}}=\delta_{\text{tube}}$, where the tube displacement is expressed in terms of its bending stiffness $\gls{sym-K-tube}$.
+This results in the following expression for the radial plate bending stress $\gls{sym-sigma-r}$:
+\begin{equation}
+    \gls{sym-sigma-r} =  \frac{\gls{sym-F-heave}}{\gls{sym-S-eq}}
+    \left(
+            \gls{sym-overline-M-r}_{,dis} + \gls{sym-overline-M-r}_{,con} \frac{
+                                                                                \gls{sym-overline-delta-plate}_{dis}
+                                                                                }
+                                                                                {
+                                                                                \frac{\gls{sym-D-eq}}
+                                                                                     {\gls{sym-a-outer-damping-plate}^2 \gls{sym-K-tube}}
+                                                                                - \gls{sym-overline-delta-plate}_{con}
+                                                                                }
+    \right)
+\end{equation}
+
+The critical buckling stress $\gls{sym-sigma-buckle}$ is found with the \citet{american_bureau_of_shipping_requirements_2022} methodology.
+The ultimate stress is then $\sqrt{\gls{sym-sigma-Y} \gls{sym-sigma-buckle}}$  \citep{wierzbicki_lecture_2013-1} and the endurance limit is taken as half of ultimate.
+The factor of safety is then the ratio of the maximum (ultimate or endurance, depending on the design load case) stress to the radial plate bending stress.
+The procedure is summarized in \Cref{fig:damping-plate-flowchart}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[\FigureOptions{aor:figs/from-matlab/damping_plate_flowchart.pdf}]{figs/from-matlab/damping_plate_flowchart.pdf}
+    \caption{Calculation process flowchart for the damping plate structural assessment}
+    \label{fig:damping-plate-flowchart}
+\end{figure}
+%\hl{Todo: typeset equations for all the inputs with leftmost boxes: Seq, Deq, Ktube, the nondim variables, and sigma buckle.
+
+%Todo: describe the plots of plate stress/deflection over space, maybe add dots in the 4 corners showing the point of load application}
+\Cref{fig:damping-plate-struct} shows the spatial distribution of radial bending moment and deflection across the plate radius for the nominal design, computed using the analytical solutions described above.
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.48\linewidth}
+        \includegraphics[\FigureOptions{aor:figs/from-matlab/damping_plate_moment.pdf}]{figs/from-matlab/damping_plate_moment.pdf}
+        \caption{Damping plate moment}
+        \label{fig:damping-plate-moment}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \includegraphics[\FigureOptions{aor:figs/from-matlab/damping_plate_deflection.pdf}]{figs/from-matlab/damping_plate_deflection.pdf}
+        \caption{Damping plate deflection}
+        \label{fig:damping-plate-deflection}
+    \end{subfigure}
+    \caption[Damping plate structural analysis: bending moment and deflection]{Damping plate structural analysis: radial bending moment \ref{fig:damping-plate-moment} and deflection \ref{fig:damping-plate-deflection} over the plate radius.}
+    \label{fig:damping-plate-struct}
+\end{figure}
+In \Cref{fig:damping-plate-maxs}, peak stress and deflection are plotted as a function of damping plate aspect ratio, normalized by their values in the nominal design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Column}
+As stated in \Cref{sec:structures}, the column's small slenderness ratio means that both axial compression and global Euler buckling must be taken into account.
+Meanwhile, the hydrostatic pressure at the bottom creates a substantial compressive hoop stress.
+
+The Euler critical buckling force $\gls{sym-F-crit}$ is:
+\begin{equation}
+    \gls{sym-F-crit} = \frac{\gls{sym-pi}^2 \gls{sym-E} \gls{sym-I-zz}}{(\gls{sym-K-end} \gls{sym-L})^2}
+\end{equation}
+where $\gls{sym-E}$ is the Young's modulus, $\gls{sym-I-zz}$ is the second moment of area, $\gls{sym-K-end}=2$ is the end condition
+(fixed-free since the hydrostatic rotational stiffness provides a restoring moment at the surface),
+and $\gls{sym-L}$ is the beam length, set to $\gls{sym-h-s}$ the full spar height.
+The spar factor of safety $FOS$ to prevent yield and global buckling under the combined loading is \citep{american_bureau_of_shipping_requirements_2022}:
+\begin{equation}
+    FOS = \frac{\gls{sym-sigma}_{\gls{sym-s},\text{max}}}{\gls{sym-sigma-s}}
+    = \frac{
+                \gls{sym-sigma-Y} \frac{
+                                        \gls{sym-zeta-s} + \sqrt{
+                                                                \gls{sym-zeta-s}^2
+                                                                + 4\gls{sym-omega-s}
+                                                                }
+                                        }
+                                        {2}
+            }
+            {
+                \frac{\gls{sym-F-heave}}{\gls{sym-A}} + \gls{sym-q-pressure}
+            }
+\end{equation}
+where $\gls{sym-zeta-s}$ and $\gls{sym-omega-s}$ are defined as follows:
+\begin{equation}
+\begin{aligned}
+     \gls{sym-zeta-s} &= 1 - \gls{sym-P-r}(1 - \gls{sym-P-r})
+                    ~\frac{
+                            \gls{sym-sigma-Y}
+                          }
+                          {
+                            \gls{sym-F-crit}/\gls{sym-A}
+                          }
+                    - \frac{
+                            \gls{sym-sigma-theta}
+                            }
+                            {
+                            \gls{sym-sigma-Y}
+                            },
+     \qquad
+    \gls{sym-omega-s} = \frac{\gls{sym-sigma-theta}}{2\gls{sym-sigma-Y}} 
+                        \left(
+                            1 - \frac{
+                                        \gls{sym-sigma-theta}
+                                    }
+                                    {
+                                        2\gls{sym-sigma-Y}
+                                    }
+                        \right)
+\end{aligned}
+\end{equation}
+and the hoop stress $\gls{sym-sigma-theta}$ is
+\begin{equation}
+     \gls{sym-sigma-theta} = \frac{
+                                    \gls{sym-q-pressure}\gls{sym-D-s}
+                                  }
+                                  {
+                                    2~\gls{sym-t-s-r}
+                                  }
+\end{equation}
+$\gls{sym-P-r}$ is a constant and $\gls{sym-q-pressure}$ is the distributed hydrostatic pressure at the bottom of the spar.
+These equations assume that the spar is compact,
+meaning that local buckling of the tube as a plate element is not a concern \citep{american_bureau_of_shipping_requirements_2022}.
+%These stresses are combined into the von Mises stress $\sigma_{vm}$ as defined in equation \eqref{von}.
+% \begin{equation}
+% \begin{split}
+%     \gls{sym-sigma}_{vm}^2 = \frac{1}{2} \left( (\gls{sym-sigma}_{11} - \gls{sym-sigma}_{22})^2 + (\gls{sym-sigma}_{22} - \gls{sym-sigma}_{33})^2 + (\gls{sym-sigma}_{33} - \gls{sym-sigma}_{11})^2 \right) \\ + 3 (\gls{sym-sigma}_{12}^2 + \gls{sym-sigma}_{23}^2 + \gls{sym-sigma}_{31}^2)
+%     \label{von}
+% \end{split}
+% \end{equation}
+
+% Three yield factors of safety $FOS_y$ (for the float, vertical column, and damping plate) and one buckling factor of safety $FOS_b$ (for the vertical column) are computed for each of two forces (the powertrain force $F_p$ and the hydrodynamic excitation force $F_h$). This gives a total of eight FOS:
+% \begin{equation}
+% \begin{aligned}
+%     FOS_{\gls{sym-y}~{i,\gls{sym-j}}} = \frac{\gls{sym-sigma-Y}}{\gls{sym-sigma}_{vm,ij}} ~~&~~
+%     FOS_{\gls{sym-b},\gls{sym-j}} = \frac{\gls{sym-F-crit}}{\gls{sym-F}_{\gls{sym-j}}}} \\
+%     i = 1..3, ~& \gls{sym-j} = 1..2
+% \end{aligned}
+% \end{equation}

@@ -1,0 +1,121 @@
+% This work, "No appendix glossary", is adapted from
+% "Glossary per chapter or section" by Nikola Talbot,
+% used under CC BY 4.0 and available at https://tex.stackexchange.com/a/89501.
+% "No appendix glossary" is licensed under CC BY 4.0 by Rebecca McCabe.
+
+\newcounter{myglossarycounter}
+\AddToHook{cmd/appendix/before}{\stepcounter{myglossarycounter}}
+\setupglossaries{counter=myglossarycounter}
+
+\makeatletter
+\def\debugglshypernumber#1{%
+  \typeout{LOCATION ARG: [#1]}%
+  \typeout{FIRST TOKEN: [\@car#1\@nil]}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \newglossarystyle{debugstyle}{%
+%   \setglossarystyle{list}%
+%   \renewcommand*{\glossentry}[2]{%
+%     \typeout{^^J=== GLOSS ENTRY DEBUG ===}%
+%     \typeout{LABEL: [##1]}%
+%     \begingroup
+%       \let\@xp@glshypernumber\debugglshypernumber
+%       ##2%
+%     \endgroup
+%     \typeout{=== END GLOSS ENTRY DEBUG ===^^J}%
+%   }%
+% }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \newif\ifmainmatterglossary
+
+% \newcommand*{\checkmainmatterlocations}[1]{%
+%   \edef\mainmatterfirstlocation{\@car#1\@nil}%
+%   \typeout{*** LOCATION ARG = [#1]}%
+%   \typeout{*** FIRST LOCATION = [\mainmatterfirstlocation]}%
+%   \ifx\mainmatterfirstlocation\zerotoken
+%     \global\mainmatterglossarytrue
+%     \typeout{*** DECISION = TRUE (main matter)}%
+%   \else
+%     \global\mainmatterglossaryfalse
+%     \typeout{*** DECISION = FALSE (appendix only)}%
+%   \fi
+% }
+
+% \def\zerotoken{0}
+
+% \newglossarystyle{debugstyle}{%
+%   \setglossarystyle{list}%
+
+%   \renewcommand*{\glossentry}[2]{%
+%     \typeout{^^J=== ENTRY DEBUG ===}%
+%     \typeout{LABEL = [##1]}%
+%     \mainmatterglossaryfalse
+%     \begingroup
+%       \def\debugglshypernumber####1{%
+%         \checkmainmatterlocations{####1}%
+%       }%
+%       \let\@xp@glshypernumber\debugglshypernumber
+%       ##2%
+%     \endgroup
+%     \ifmainmatterglossary
+%       \typeout{*** FINAL DECISION = PRINT ***}%
+%     \else
+%       \typeout{*** FINAL DECISION = OMIT ***}%
+%     \fi
+%     \typeout{=== END ENTRY DEBUG ===^^J}%
+%   }%
+% }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newif\ifmainmatterglossary
+
+\def\checkmainmatterlocations#1{%
+  \edef\mainmatterfirstlocation{\@car#1\@nil}%
+  \ifx\mainmatterfirstlocation\zerotoken
+    \global\mainmatterglossarytrue
+  \else
+    \global\mainmatterglossaryfalse
+  \fi
+}
+
+\def\zerotoken{0}
+
+\newglossarystyle{mystyle}{%
+  \setglossarystyle{list}%
+  \setlist[description]{itemsep=0.15ex,parsep=0.15ex,topsep=0pt}
+
+  \renewcommand*{\glossentry}[2]{%
+    \mainmatterglossaryfalse
+    \begingroup
+      \def\debugglshypernumber####1{%
+        \checkmainmatterlocations{####1}%
+      }%
+      \let\@xp@glshypernumber\debugglshypernumber
+      ##2%
+    \endgroup
+    \ifmainmatterglossary
+      \glsxtrifhasfield*{alias}{##1}
+      {
+        \item
+      }
+      {%
+        \item
+        \glsentryitem{##1}%
+        \glstarget{##1}{\glossentryname{##1}}%
+        \space
+        \glossentrydesc{##1}%
+      }
+    \fi
+  }%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makeatother
+
+\setglossarystyle{mystyle}
