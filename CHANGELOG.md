@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [v1.5.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.3) - 2026-11-10
+### Added
+- Readme: remove newlines from license to enable autodetection for license badge on readme
+
 ## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-16
 ### Added
 - CI/pipeline: Created workflow and pipeline stages for executing a dvc merge of upstream branch
