@@ -32,11 +32,11 @@ environments:
     image: ghcr.io/quarto-dev/quarto:latest
     description: Quarto via Docker.
     wdir: /data
-  playwright:
-    kind: docker
-    path: pubs/defense/quarto/Dockerfile
-    description: Playwright via Docker.
-    image: playwright
+  # playwright:
+  #   kind: docker
+  #   path: pubs/defense/quarto/Dockerfile
+  #   description: Playwright via Docker.
+  #   image: playwright
   bibtex-conda:
     path: dev/latex/environment.yml
     kind: conda
@@ -6206,15 +6206,15 @@ pipeline:
         - path: pubs/defense/quarto/slides.html
           storage: git
         - pubs/defense/quarto/slides_files/
-    render-quarto-pdf:
-      kind: shell-command
-      environment: playwright
-      command: python pubs/defense/quarto/html_to_pdf.py
-      inputs:
-        - pubs/defense/quarto/slides.html
-        - pubs/defense/quarto/html_to_pdf.py
-      outputs:
-        - path: pubs/defense/quarto/slides.pdf
+    # render-quarto-pdf:
+    #   kind: shell-command
+    #   environment: playwright
+    #   command: python pubs/defense/quarto/html_to_pdf.py
+    #   inputs:
+    #     - pubs/defense/quarto/slides.html
+    #     - pubs/defense/quarto/html_to_pdf.py
+    #   outputs:
+    #     - path: pubs/defense/quarto/slides.pdf
     merge-ours:
       kind: shell-command
       command: git fetch origin $UPSTREAM && git merge origin/$UPSTREAM <<< "o"
