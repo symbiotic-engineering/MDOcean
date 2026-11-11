@@ -81,6 +81,16 @@
 
 % glossary - must come after hyperref
 \usepackage[nopostdot,automake,nogroupskip,nomain,toc=false,sanitizesort=false,section=subsection]{glossaries-extra}
+% patch to fix quoting of makeindex command from glossaries automake when auxdir is used
+\makeatletter
+\ExplSyntaxOn
+\cs_set:Npn \@gls@run@output@file #1
+  {
+    \glsquote
+      { \l_glossaries_output_dir_tl / #1 }
+  }
+\ExplSyntaxOff
+\makeatother
 \usepackage{morewrites}
 \input{glossary/glossary-setup.tex}
 
