@@ -80,17 +80,22 @@
 \usepackage{cleveref}
 
 % glossary - must come after hyperref
-\usepackage[nopostdot,automake,nogroupskip,nomain,toc=false,sanitizesort=false,section=subsection]{glossaries-extra}
-% patch to fix quoting of makeindex command from glossaries automake when auxdir is used
-\makeatletter
-\ExplSyntaxOn
-\cs_set:Npn \@gls@run@output@file #1
-  {
-    \glsquote
-      { \l_glossaries_output_dir_tl / #1 }
-  }
-\ExplSyntaxOff
-\makeatother
+% the shell escape conditional is because arxiv disables shell escape, so automake will fail
+\ifnum\pdfshellescape>0
+    \usepackage[nopostdot,automake,nogroupskip,nomain,acronym,toc=false,sanitizesort=false,section=subsection]{glossaries-extra}
+    % patch to fix quoting of makeindex command from glossaries automake when auxdir is used
+  \makeatletter
+  \ExplSyntaxOn
+  \cs_set:Npn \@gls@run@output@file #1
+    {
+      \glsquote
+        { \l_glossaries_output_dir_tl / #1 }
+    }
+  \ExplSyntaxOff
+  \makeatother
+\else
+    \usepackage[nopostdot         ,nogroupskip,nomain,acronym,toc=false,sanitizesort=false,section=subsection]{glossaries-extra}
+\fi
 \usepackage{morewrites}
 \input{glossary/glossary-setup.tex}
 
