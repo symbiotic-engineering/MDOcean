@@ -88,7 +88,9 @@
 \newglossarystyle{mystyle}{%
   \setglossarystyle{list}%
   \setlist[description]{itemsep=0.15ex,parsep=0.15ex,topsep=0pt}
-
+  \renewcommand*{\glossaryheader}{%
+    \let\@noitemerr\relax
+  }
   \renewcommand*{\glossentry}[2]{%
     \mainmatterglossaryfalse
     \begingroup
@@ -101,15 +103,17 @@
     \ifmainmatterglossary
       \glsxtrifhasfield*{alias}{##1}
       {
+      % occurs in main matter, but has an alias, so don't print
         \item
       }
-      {%
+      {% occurs in main matter and doesn't have an alias, so print
         \item
         \glsentryitem{##1}%
         \glstarget{##1}{\glossentryname{##1}}%
         \space
         \glossentrydesc{##1}%
       }
+    \else % only occurs in appendix, so don't print
     \fi
   }%
 }
