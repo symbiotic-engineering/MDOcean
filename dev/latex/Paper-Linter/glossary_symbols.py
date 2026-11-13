@@ -57,6 +57,7 @@ CITE_COMMANDS_RE = re.compile(r"\\(?:cite|citet|citep)\*?(?:\[[^\]]*\]){0,2}\{[^
 DECLARE_FIGURE_OPTIONS_RE = re.compile(r"\\DeclareFigureOptions\*?\{[^{}]*\}\{[^{}]*\}\{[^{}]*\}")
 REQUIREMENT_COMMAND_RE = re.compile(r"\\requirement\*?(?:\[[^\]]*\])?\{[^{}]*\}")
 URL_COMMAND_RE = re.compile(r"\\url\*?\{[^{}]*\}")
+HREF_COMMAND_RE = re.compile(r"\\href\*?(?:\[[^\]]*\])?\{[^{}]*\}\{[^{}]*\}")
 ACRONYM_REPLACEMENT_EXCEPTIONS_RE = re.compile(r"\bWEC-Sim\b")
 
 _skip_ws = shared_skip_ws
@@ -91,14 +92,23 @@ def _prefer_glossary_symbol(existing_symbol, candidate_symbol):
     return existing_symbol
 
 
-def read_glossary_replacements(glossary_dir):
+def _glossary_dirs(glossary_dirs):
+    if not glossary_dirs:
+        return []
+    if isinstance(glossary_dirs, (str, pathlib.Path)):
+        return [glossary_dirs]
+    return glossary_dirs
+
+
+def read_glossary_replacements(glossary_dirs):
     replacements = {}
-    if not glossary_dir or not os.path.isdir(glossary_dir):
-        return replacements
-    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
-        for key, symbol, _ in parse_newsym_entries(path):
-            label = "sym-%s" % key
-            replacements[shared_symbol_key(shared_canonicalize_symbol(symbol))] = label
+    for glossary_dir in _glossary_dirs(glossary_dirs):
+        if not os.path.isdir(glossary_dir):
+            continue
+        for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+            for key, symbol, _ in parse_newsym_entries(path):
+                label = "sym-%s" % key
+                replacements[shared_symbol_key(shared_canonicalize_symbol(symbol))] = label
     return replacements
 
 
@@ -149,22 +159,25 @@ def parse_acronym_entries(path):
     return entries
 
 
-def read_acronym_replacements(path):
+def read_acronym_replacements(paths):
     replacements = []
-    if not path:
+    if not paths:
         return replacements
-    for label, short, long_form in parse_acronym_entries(pathlib.Path(path)):
-        if long_form:
-            replacements.append((f"{long_form} ({short})", rf"\gls{{{label}}}"))
-            if not long_form.endswith("s") and short.endswith("s") is False:
-                replacements.append((f"{long_form}s ({short}s)", rf"\glspl{{{label}}}"))
-        replacements.append((short, rf"\gls{{{label}}}"))
-        replacements.append((f"{short}s", rf"\glspl{{{label}}}"))
-        replacements.append((f"{short}'s", rf"\gls{{{label}}}'s"))
-        if long_form:
-            replacements.append((long_form, rf"\gls{{{label}}}"))
-            if not long_form.endswith("s"):
-                replacements.append((f"{long_form}s", rf"\glspl{{{label}}}"))
+    if isinstance(paths, (str, pathlib.Path)):
+        paths = [paths]
+    for path in paths:
+        for label, short, long_form in parse_acronym_entries(pathlib.Path(path)):
+            if long_form:
+                replacements.append((f"{long_form} ({short})", rf"\gls{{{label}}}"))
+                if not long_form.endswith("s") and short.endswith("s") is False:
+                    replacements.append((f"{long_form}s ({short}s)", rf"\glspl{{{label}}}"))
+            replacements.append((short, rf"\gls{{{label}}}"))
+            replacements.append((f"{short}s", rf"\glspl{{{label}}}"))
+            replacements.append((f"{short}'s", rf"\gls{{{label}}}'s"))
+            if long_form:
+                replacements.append((long_form, rf"\gls{{{label}}}"))
+                if not long_form.endswith("s"):
+                    replacements.append((f"{long_form}s", rf"\glspl{{{label}}}"))
 
     # Replace longer phrases first so singular does not consume plural forms.
     replacements.sort(key=lambda item: len(item[0]), reverse=True)
@@ -218,6 +231,7 @@ def _mask_label_commands(text):
     masked = DECLARE_FIGURE_OPTIONS_RE.sub(repl, masked)
     masked = REQUIREMENT_COMMAND_RE.sub(repl, masked)
     masked = URL_COMMAND_RE.sub(repl, masked)
+    masked = HREF_COMMAND_RE.sub(repl, masked)
     return masked, placeholders
 
 
@@ -433,17 +447,18 @@ def parse_newsym_entries(path):
     return entries
 
 
-def read_newsym_symbols_from_dir(glossary_dir, exclude_path=None):
+def read_newsym_symbols_from_dir(glossary_dirs, exclude_path=None):
     """Collect the normalized symbols already defined by \\newsym in a glossary folder."""
     symbols = set()
     exclude_resolved = pathlib.Path(exclude_path).resolve() if exclude_path else None
-    if not os.path.isdir(glossary_dir):
-        return symbols
-    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
-        if exclude_resolved is not None and path.resolve() == exclude_resolved:
+    for glossary_dir in _glossary_dirs(glossary_dirs):
+        if not os.path.isdir(glossary_dir):
             continue
-        for _, symbol, _ in parse_newsym_entries(path):
-            symbols.add(_normalize_glossary_equivalence_symbol(_canonicalize_symbol(symbol.strip())))
+        for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+            if exclude_resolved is not None and path.resolve() == exclude_resolved:
+                continue
+            for _, symbol, _ in parse_newsym_entries(path):
+                symbols.add(_normalize_glossary_equivalence_symbol(_canonicalize_symbol(symbol.strip())))
     return symbols
 
 
@@ -489,14 +504,14 @@ def build_newsym_lines(symbols, metadata_by_symbol, used_labels=None):
     return lines
 
 
-def write_symbol_glossary(path, symbols, glossary_dir=None, used_labels=None):
-    """Write newly discovered symbols not already documented in glossary_dir to path.
+def write_symbol_glossary(path, symbols, glossary_dirs=None, used_labels=None):
+    """Write newly discovered symbols not already documented in glossary_dirs to path.
 
     Entries already present in path from a previous run are carried over (with
     their description) unless a symbol has since been documented elsewhere in
-    glossary_dir, in which case it is dropped from the generated file.
+    glossary_dirs, in which case it is dropped from the generated file.
     """
-    known_symbols = read_newsym_symbols_from_dir(glossary_dir, exclude_path=path) if glossary_dir else set()
+    known_symbols = read_newsym_symbols_from_dir(glossary_dirs, exclude_path=path)
 
     grouped_symbols = {}
     metadata_by_symbol = {}
@@ -552,27 +567,28 @@ def collect_tex_files_under(roots):
     return files
 
 
-def find_unused_glossary_entries(glossary_dir, usage_roots):
+def find_unused_glossary_entries(glossary_dirs, usage_roots):
     """Return (path, key, symbol) for \\newsym entries never referenced via \\gls{sym-<key>}.
 
     Entries in the auto-generated per-paper files are skipped since they are extracted
     directly from bare equation symbols and so are never wrapped in \\gls{...} yet.
     """
     entries = []
-    if not glossary_dir or not os.path.isdir(glossary_dir):
-        return entries
     used_labels = collect_glossary_labels_from_files(collect_tex_files_under(usage_roots))
-    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
-        if path.name.endswith("-generated.tex"):
+    for glossary_dir in _glossary_dirs(glossary_dirs):
+        if not os.path.isdir(glossary_dir):
             continue
-        for key, symbol, _ in parse_newsym_entries(path):
-            if ("sym-%s" % key) not in used_labels:
-                entries.append((path, key, symbol))
+        for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+            if path.name.endswith("-generated.tex"):
+                continue
+            for key, symbol, _ in parse_newsym_entries(path):
+                if ("sym-%s" % key) not in used_labels:
+                    entries.append((path, key, symbol))
     return entries
 
 
-def delete_unused_glossary_entries(glossary_dir, usage_roots):
-    unused_entries = find_unused_glossary_entries(glossary_dir, usage_roots)
+def delete_unused_glossary_entries(glossary_dirs, usage_roots):
+    unused_entries = find_unused_glossary_entries(glossary_dirs, usage_roots)
     if not unused_entries:
         return 0
     keys_by_path = {}
@@ -592,46 +608,51 @@ def delete_unused_glossary_entries(glossary_dir, usage_roots):
     return len(unused_entries)
 
 
-def find_missing_description_entries(glossary_dir, usage_roots):
+def find_missing_description_entries(glossary_dirs, usage_roots):
     """Return (path, key, symbol) for used \\newsym entries whose description is blank.
 
     Entries in the auto-generated per-paper files are skipped since those are
     always written with a blank description.
     """
     entries = []
-    if not glossary_dir or not os.path.isdir(glossary_dir):
-        return entries
     used_labels = collect_glossary_labels_from_files(collect_tex_files_under(usage_roots))
-    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
-        if path.name.endswith("-generated.tex"):
+    for glossary_dir in _glossary_dirs(glossary_dirs):
+        if not os.path.isdir(glossary_dir):
             continue
-        for key, symbol, description in parse_newsym_entries(path):
-            if not description.strip() and ("sym-%s" % key) in used_labels:
-                entries.append((path, key, symbol))
+        for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+            if path.name.endswith("-generated.tex"):
+                continue
+            for key, symbol, description in parse_newsym_entries(path):
+                if not description.strip() and ("sym-%s" % key) in used_labels:
+                    entries.append((path, key, symbol))
     return entries
 
 
-def find_duplicate_symbol_groups(glossary_dir):
+def find_duplicate_symbol_groups(glossary_dirs):
     """Return (symbol, [(path, line_index, key), ...]) for symbols defined by more than one key."""
     groups = {}
-    if not glossary_dir or not os.path.isdir(glossary_dir):
-        return []
-    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
-        for line_no, key, symbol, _ in parse_newsym_entries_with_lines(path):
-            groups.setdefault(symbol.strip(), []).append((path, line_no, key))
+    for glossary_dir in _glossary_dirs(glossary_dirs):
+        if not os.path.isdir(glossary_dir):
+            continue
+        for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+            for line_no, key, symbol, _ in parse_newsym_entries_with_lines(path):
+                groups.setdefault(symbol.strip(), []).append((path, line_no, key))
     return [(symbol, entries) for symbol, entries in groups.items() if len(entries) > 1]
 
 
-def dedupe_glossary_symbols(glossary_dir):
+def dedupe_glossary_symbols(glossary_dirs):
     """Append a numeric subscript to all but the first entry in each duplicate-symbol group."""
-    duplicate_groups = find_duplicate_symbol_groups(glossary_dir)
+    duplicate_groups = find_duplicate_symbol_groups(glossary_dirs)
     if not duplicate_groups:
         return 0
 
     all_symbols = set()
-    for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
-        for _, _, symbol, _ in parse_newsym_entries_with_lines(path):
-            all_symbols.add(symbol.strip())
+    for glossary_dir in _glossary_dirs(glossary_dirs):
+        if not os.path.isdir(glossary_dir):
+            continue
+        for path in sorted(pathlib.Path(glossary_dir).glob("*.tex")):
+            for _, _, symbol, _ in parse_newsym_entries_with_lines(path):
+                all_symbols.add(symbol.strip())
 
     renames_by_path = {}
     fixed = 0

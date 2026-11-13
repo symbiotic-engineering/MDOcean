@@ -459,13 +459,25 @@ def fix_missing_word_style_in_file(path):
     return _rewrite_lines(path, lambda line: missing_word_style_line(line, prose_style_for_word, styled_word_pattern)[0])
 
 
-def fix_glossary_refs_in_file(path, glossary_dir, acronym_glossary_file=None):
+def fix_glossary_refs_in_file(path, glossary_dir, acronym_glossary_files=None, replace_symbols=True, replace_acronyms=True):
     path = Path(path)
-    replacements = gs.read_glossary_replacements(glossary_dir)
-    acronym_replacements = gs.read_acronym_replacements(acronym_glossary_file)
+    replacements = gs.read_glossary_replacements(glossary_dir) if replace_symbols else {}
+    acronym_replacements = gs.read_acronym_replacements(acronym_glossary_files) if replace_acronyms else []
     if not replacements and not acronym_replacements:
         return 0
     return gs.replace_glossary_refs_in_file(str(path), replacements, acronym_replacements=acronym_replacements)
+
+
+def fix_symbol_glossary_refs_in_file(path, glossary_dir, acronym_glossary_files=None):
+    return fix_glossary_refs_in_file(
+        path, glossary_dir, acronym_glossary_files, replace_symbols=True, replace_acronyms=False
+    )
+
+
+def fix_acronym_glossary_refs_in_file(path, glossary_dir, acronym_glossary_files=None):
+    return fix_glossary_refs_in_file(
+        path, glossary_dir, acronym_glossary_files, replace_symbols=False, replace_acronyms=True
+    )
 
 
 def fix_glossary_unused(glossary_dir, usage_roots):
