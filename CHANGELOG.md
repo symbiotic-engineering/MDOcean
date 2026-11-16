@@ -1,9 +1,23 @@
 # Changelog
 ## Unreleased
 
+## [v1.5.4](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.4) - 2026-11-16
+### Added
+- Paperlint: Add paper-linter checks for glossaries-extra acronym glossary commands and context-sensitive short acronym references.
+### Changed
+- Paperlint: Support multiple glossary paths and acronym seed files
+- Paperlint: Separate symbol and acronym glossary-reference checks
+- Paperlint: Derive generated symbol glossary filenames from the configured prefix
+- Paperlint: update paper-specific lint parameters
+- Pipeline: Update environment locks, gitignores, and other helper files for calkit version 0.50.8
+- Glossary: Improve definition of generic region j in shared glossary
 ### Fixed
-- **Dev:** Add paper-linter checks for modern acronym glossary commands and context-sensitive short acronym references.
-- **Dev:** Preserve the first argument of `\newsym` declarations during glossary replacement.
+- Paperlint: Preserve the first argument of `\newsym` declarations during glossary replacement.
+- Paperlint: Prevent acronym replacement inside links
+
+## [v1.5.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.3) - 2026-11-10
+### Added
+- Readme: remove newlines from license to enable autodetection for license badge on readme
 
 ## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-16
 ### Added
