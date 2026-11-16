@@ -12,11 +12,6 @@ import glossary_symbols as gs
 import options_settings as opts
 import tex_structure as ts
 
-SHARED_GLOSSARY_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs", "shared", "glossary"))
-GLOSSARY_USAGE_ROOTS = [
-    os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "pubs")),
-    os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "mdocean", "simulation", "modules", "OpenFLASH", "pubs", "JFM")),
-]
 # These checks assess the whole shared glossary directory rather than the current file,
 # so they are run once per invocation instead of once per linted file.
 GLOBAL_GLOSSARY_CHECKS = {"glossary-unused", "glossary-missing-description", "glossary-symbol-duplicate"}
@@ -46,17 +41,20 @@ def main():
         checks.remove_categories,
     )
 
-    checks.GLOSSARY_DIR = SHARED_GLOSSARY_DIR
-    checks.GLOSSARY_USAGE_ROOTS = GLOSSARY_USAGE_ROOTS
-    checks.ACRONYM_GLOSSARY_FILE = options["acronym_glossary_seed_file"]
+    checks.GLOSSARY_DIR = options["glossary_dirs"]
+    checks.GLOSSARY_USAGE_ROOTS = [str(pathlib.Path(path).parent) for path in options["glossary_dirs"]]
+    checks.ACRONYM_GLOSSARY_FILES = options["acronym_glossary_seed_files"]
     checks.PREFIX_CHECK_CONFIGS = options["check_params"]
     if options["replace_glossary_refs"]:
-        options["check_states"]["glossary-refs"] = 2
+        options["check_states"]["glossary-symbol-refs"] = 2
+        options["check_states"]["glossary-acronym-refs"] = 2
 
-    if os.path.isdir(SHARED_GLOSSARY_DIR):
+    if options["glossary_dirs"]:
         try:
             reference_text_parts = [
-                p.read_text() for p in sorted(pathlib.Path(SHARED_GLOSSARY_DIR).glob("*.tex"))
+                p.read_text()
+                for glossary_dir in options["glossary_dirs"]
+                for p in sorted(pathlib.Path(glossary_dir).glob("*.tex"))
             ]
             checks.actions.WORD_STYLE_REFERENCE_TEXT = "\n".join(reference_text_parts)
         except Exception:
@@ -120,8 +118,8 @@ def main():
                     if c[2] == "missing-textstyle" and missing_word_style_prepass:
                         pass
                     elif state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
-                        if c[2] == "glossary-refs":
-                            c[3](file, SHARED_GLOSSARY_DIR, options["acronym_glossary_seed_file"])
+                        if c[2] in {"glossary-symbol-refs", "glossary-acronym-refs"}:
+                            c[3](file, options["glossary_dirs"], options["acronym_glossary_seed_files"])
                         elif c[2] == "prefix":
                             c[3](config.get("path"), config.get("prefix"), recursive=config.get("recursive", False), source_prefix=config.get("source_prefix"))
                         else:
@@ -141,7 +139,7 @@ def main():
                             if c[2] not in autofix_files:
                                 autofix_files[c[2]] = set()
                             autofix_files[c[2]].add(file)
-                if c[2] == "glossary-refs":
+                if c[2] in {"glossary-symbol-refs", "glossary-acronym-refs"}:
                     all_equation_symbols.update(checks.current_file_equation_symbols)
                 if state > 0:
                     warnings += [(x, c[2]) for x in add_warn]
@@ -155,7 +153,7 @@ def main():
         global_suppressed = []
         ran_global_glossary_checks = False
         for c in checks.checks:
-            if c[2] not in GLOBAL_GLOSSARY_CHECKS:
+            if c[2] not in GLOBAL_GLOSSARY_CHECKS or not options["glossary_dirs"]:
                 continue
             ran_global_glossary_checks = True
             state = options["check_states"].get(c[2], 1)
@@ -166,14 +164,14 @@ def main():
                 pre_fix_warning_count = len(add_warn)
                 if state == 2 and len(c) > 3 and c[3] is not None and len(add_warn) > 0:
                     if c[2] == "glossary-unused":
-                        c[3](SHARED_GLOSSARY_DIR, GLOSSARY_USAGE_ROOTS)
+                        c[3](options["glossary_dirs"], options["glossary_usage_roots"])
                     elif c[2] == "glossary-symbol-duplicate":
-                        c[3](SHARED_GLOSSARY_DIR)
+                        c[3](options["glossary_dirs"])
                     add_warn = c[0]()
                     fixed_count = pre_fix_warning_count - len(add_warn)
                     if fixed_count > 0:
                         autofix_counts[c[2]] = autofix_counts.get(c[2], 0) + fixed_count
-                        autofix_files.setdefault(c[2], set()).add(SHARED_GLOSSARY_DIR)
+                        autofix_files.setdefault(c[2], set()).update(options["glossary_dirs"])
             if state > 0:
                 global_warnings += [(x, c[2]) for x in add_warn]
             else:
@@ -181,7 +179,7 @@ def main():
 
         if ran_global_glossary_checks:
             write_output("")
-            write_output("Checking glossary consistency across '%s'" % SHARED_GLOSSARY_DIR)
+            write_output("Checking glossary consistency across '%s'" % ", ".join(options["glossary_dirs"]))
             nr_warnings += checks.print_warnings(global_warnings, write_output, use_color=use_color)
             nr_suppressed += checks.print_warnings(global_suppressed, write_output, use_color=use_color, output=False)
 
@@ -197,16 +195,18 @@ def main():
             write_output("Unique text strings in math environments [math-text-mix]:")
             for text_string in sorted(checks.math_text_mix_strings):
                 write_output("- %s" % text_string)
-        if options["symbol_glossary_paper_name"] is not None:
+        prefix = options["check_params"].get("prefix", {}).get("prefix")
+        if prefix and options["glossary_dirs"]:
             used_glossary_labels = gs.collect_glossary_labels_from_files(tex_files)
+            paper_name = prefix.rstrip(":")
             output_path = os.path.join(
-                SHARED_GLOSSARY_DIR,
-                "glossary-symbols-%s-generated.tex" % options["symbol_glossary_paper_name"],
+                options["glossary_dirs"][0],
+                "glossary-symbols-%s-generated.tex" % paper_name,
             )
             gs.write_symbol_glossary(
                 output_path,
                 all_equation_symbols,
-                SHARED_GLOSSARY_DIR,
+                options["glossary_dirs"],
                 used_labels=used_glossary_labels,
             )
             write_output("Wrote %d symbols to '%s'" % (len(all_equation_symbols), output_path))

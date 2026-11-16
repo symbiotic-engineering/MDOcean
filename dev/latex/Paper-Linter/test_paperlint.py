@@ -7,8 +7,10 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
+import checks
 import glossary_symbols as gs
 import math_symbol_parser as msp
+import options_settings as opts
 import paperlint_actions as actions
 import tex_structure as ts
 
@@ -183,6 +185,79 @@ def test_replace_glossary_refs_skips_requirement_and_url_commands():
     assert r"\url{https://example.com/WEC}" in updated
     assert updated.endswith(r"but \gls{acr-wec} here")
     assert count == 1
+
+
+def test_replace_glossary_refs_skips_acronyms_inside_href_commands():
+    acronym_replacements = [("WEC", r"\gls{acr-wec}")]
+    line = r"\href{https://example.com/WEC}{WEC documentation} and WEC here"
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert r"\href{https://example.com/WEC}{WEC documentation}" in updated
+    assert updated.endswith(r"and \gls{acr-wec} here")
+    assert count == 1
+
+
+def test_read_acronym_replacements_accepts_multiple_seed_files():
+    with tempfile.TemporaryDirectory() as tmp:
+        first = Path(tmp) / "acronyms.tex"
+        second = Path(tmp) / "more-acronyms.tex"
+        first.write_text(r"\newabbreviation{acr-wec}{WEC}{Wave Energy Converter}" + "\n")
+        second.write_text(r"\newabbreviation{acr-mdo}{MDO}{Multidisciplinary Design Optimization}" + "\n")
+
+        replacement_map = dict(gs.read_acronym_replacements([first, second]))
+
+    assert replacement_map["WEC"] == r"\gls{acr-wec}"
+    assert replacement_map["MDO"] == r"\gls{acr-mdo}"
+
+
+def test_read_glossary_replacements_accepts_multiple_paths():
+    with tempfile.TemporaryDirectory() as tmp:
+        first = Path(tmp) / "first"
+        second = Path(tmp) / "second"
+        first.mkdir()
+        second.mkdir()
+        (first / "symbols.tex").write_text(r"\newsym{first}{x}{}" + "\n")
+        (second / "symbols.tex").write_text(r"\newsym{second}{y}{}" + "\n")
+
+        replacements = gs.read_glossary_replacements([first, second])
+
+    assert replacements[msp.symbol_key(msp.canonicalize_symbol("x"))] == "sym-first"
+    assert replacements[msp.symbol_key(msp.canonicalize_symbol("y"))] == "sym-second"
+
+
+def test_params_accept_multiple_glossary_paths_and_seed_files():
+    with tempfile.TemporaryDirectory() as tmp:
+        params = Path(tmp) / "params.txt"
+        params.write_text(
+            "glossary_path=glossary\n"
+            "glossary_path=second-glossary\n"
+            "prefix=test:\n"
+            "acronym_glossary_seed=acronyms.tex\n"
+            "acronym_glossary_seed=more-acronyms.tex\n"
+        )
+        options = opts.parse_cli_args(
+            ["paperlint.py", "main.tex", "--params", str(params)],
+            checks.switch_exists,
+            checks.add_categories,
+            checks.remove_categories,
+        )
+
+    assert len(options["glossary_dirs"]) == 2
+    assert options["glossary_dirs"][0].endswith("/glossary")
+    assert len(options["acronym_glossary_seed_files"]) == 2
+    assert options["check_params"]["prefix"]["prefix"] == "test:"
+
+
+def test_symbol_and_acronym_replacement_checks_are_independent():
+    assert checks.switch_exists("glossary-symbol-refs")
+    assert checks.switch_exists("glossary-acronym-refs")
+    assert not checks.switch_exists("glossary-refs")
 
 
 def test_special_mathbb_superscript_is_split_from_base_symbol():
