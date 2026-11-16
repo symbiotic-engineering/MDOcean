@@ -260,6 +260,36 @@ def test_replace_glossary_refs_preserves_newsym_key_for_symbol_replacements():
     assert count == 2
 
 
+def test_replace_glossary_refs_does_not_replace_inside_gls_calls():
+    line = r"\gls{sym-hat-X-PTO} and PTO"
+    acronym_replacements = [("PTO", r"\gls{acr-pto}")]
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == r"\gls{sym-hat-X-PTO} and \gls{acr-pto}"
+    assert count == 1
+
+
+def test_replace_glossary_refs_does_not_replace_inside_nested_gls_calls():
+    line = r"\gls{sym-outer-\gls{sym-inner-PTO}} and PTO"
+    acronym_replacements = [("PTO", r"\gls{acr-pto}")]
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == r"\gls{sym-outer-\gls{sym-inner-PTO}} and \gls{acr-pto}"
+    assert count == 1
+
+
 def test_read_acronym_replacements_accepts_multiple_seed_files():
     with tempfile.TemporaryDirectory() as tmp:
         first = Path(tmp) / "acronyms.tex"
