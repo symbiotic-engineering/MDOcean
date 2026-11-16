@@ -268,6 +268,49 @@ def _restore_newsym_keys(text, placeholders):
     return restored
 
 
+def _mask_gls_commands(text):
+    placeholders = []
+    command_pattern = re.compile(r"\\gls[a-zA-Z]*\*?(?![A-Za-z])")
+    parts = []
+    last_end = 0
+    search_start = 0
+    while True:
+        match = command_pattern.search(text, search_start)
+        if match is None:
+            parts.append(text[last_end:])
+            break
+        cursor = _skip_ws(text, match.end())
+        if cursor < len(text) and text[cursor] == "[":
+            optional_end = text.find("]", cursor + 1)
+            if optional_end == -1:
+                parts.append(text[last_end:])
+                break
+            cursor = _skip_ws(text, optional_end + 1)
+        if cursor >= len(text) or text[cursor] != "{":
+            search_start = match.end()
+            continue
+        _, argument_end = _read_braced_group(text, cursor)
+        if argument_end is None:
+            parts.append(text[last_end:])
+            break
+        end = argument_end
+        placeholder = "__PAPERLINT_GLS_%d__" % len(placeholders)
+        placeholders.append((placeholder, text[match.start():end]))
+        parts.append(text[last_end:match.start()])
+        parts.append(placeholder)
+        last_end = end
+        search_start = end
+
+    return "".join(parts), placeholders
+
+
+def _restore_gls_commands(text, placeholders):
+    restored = text
+    for placeholder, original in placeholders:
+        restored = restored.replace(placeholder, original)
+    return restored
+
+
 def replace_acronym_refs_in_span(span_text, acronym_replacements):
     if not acronym_replacements:
         return span_text, 0
@@ -314,16 +357,19 @@ def replace_glossary_refs_in_line(line, replacements, acronym_replacements=None,
 
     content, label_placeholders = _mask_label_commands(content)
     content, newsym_key_placeholders = _mask_newsym_keys(content)
+    content, gls_placeholders = _mask_gls_commands(content)
 
     stripped = content.strip()
     if equation_line and stripped.startswith((r"\begin", r"\end", r"\label", r"\tag", r"\nonumber", r"\notag")):
-        restored = _restore_newsym_keys(content, newsym_key_placeholders)
+        restored = _restore_gls_commands(content, gls_placeholders)
+        restored = _restore_newsym_keys(restored, newsym_key_placeholders)
         return _restore_label_commands(restored, label_placeholders) + comment, 0
 
     total = 0
     if equation_line:
         updated, count = replace_glossary_refs_in_span(content, replacements)
         total += count
+        updated = _restore_gls_commands(updated, gls_placeholders)
         updated = _restore_newsym_keys(updated, newsym_key_placeholders)
         return _restore_label_commands(updated, label_placeholders) + comment, total
 
@@ -331,6 +377,7 @@ def replace_glossary_refs_in_line(line, replacements, acronym_replacements=None,
     if not spans:
         updated, count = replace_acronym_refs_in_span(content, acronym_replacements)
         total += count
+        updated = _restore_gls_commands(updated, gls_placeholders)
         updated = _restore_newsym_keys(updated, newsym_key_placeholders)
         return _restore_label_commands(updated, label_placeholders) + comment, total
 
@@ -349,6 +396,7 @@ def replace_glossary_refs_in_line(line, replacements, acronym_replacements=None,
     pieces.append(prose_updated)
     total += prose_count
     updated = "".join(pieces)
+    updated = _restore_gls_commands(updated, gls_placeholders)
     updated = _restore_newsym_keys(updated, newsym_key_placeholders)
     return _restore_label_commands(updated, label_placeholders) + comment, total
 

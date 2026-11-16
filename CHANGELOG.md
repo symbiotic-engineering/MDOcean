@@ -14,6 +14,7 @@
 ### Fixed
 - Paperlint: Preserve the first argument of `\newsym` declarations during glossary replacement.
 - Paperlint: Prevent acronym replacement inside links
+- Paperlint: Prevent glossary replacements inside existing `\gls` calls.
 
 ## [v1.5.3](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.3) - 2026-11-10
 ### Added
