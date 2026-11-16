@@ -25,6 +25,7 @@ The `--ignore` flag can be repeated to skip specific files by path or filename.
 If `--output` is provided, warnings are written to the specified file.
 When `prefix` is configured, equation symbols extracted from the document are compared against every `\newsym{key}{symbol}{description}` entry in the configured `glossary_path` directories, and any symbols not yet documented there are written as new `\newsym{key}{symbol}{}` entries in the first directory. Symbols that get documented there afterwards are dropped from the generated file on the next run, and manually-added descriptions in the generated file are preserved until then.
 If `--replace-glossary-refs` is provided, the linter rewrites matched math-mode symbol bodies and acronym short/long forms to `\gls{...}` references in place using the configured glossary inputs. The `glossary-symbol-refs` and `glossary-acronym-refs` checks can be configured independently with states `0`, `1`, or `2`.
+The `glossary-acronym-format` check requires `\glsxtrshort` and `\glsxtrlong` instead of `\acrshort` and `\acrlong`, and requires `\glsxtrshort{acr-*}` inside `\newsym`, `\caption`, and section, subsection, subsubsection, or paragraph headings. State `2` fixes these commands automatically.
 If `--error` is provided, the tool exits with error code 1 if there are warnings.
 
 ## Warnings

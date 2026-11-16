@@ -242,6 +242,32 @@ def _restore_label_commands(text, placeholders):
     return restored
 
 
+def _mask_newsym_keys(text):
+    placeholders = []
+    command_pattern = re.compile(r"\\newsym(?![A-Za-z])")
+    masked = text
+
+    for match in reversed(list(command_pattern.finditer(text))):
+        cursor = _skip_ws(text, match.end())
+        if cursor >= len(text) or text[cursor] != "{":
+            continue
+        key_group, key_end = _read_braced_group(text, cursor)
+        if key_group is None:
+            continue
+        placeholder = "__PAPERLINT_NEWSYM_KEY_%d__" % len(placeholders)
+        placeholders.append((placeholder, key_group))
+        masked = masked[:cursor] + placeholder + masked[key_end:]
+
+    return masked, placeholders
+
+
+def _restore_newsym_keys(text, placeholders):
+    restored = text
+    for placeholder, original in placeholders:
+        restored = restored.replace(placeholder, original)
+    return restored
+
+
 def replace_acronym_refs_in_span(span_text, acronym_replacements):
     if not acronym_replacements:
         return span_text, 0
@@ -287,21 +313,25 @@ def replace_glossary_refs_in_line(line, replacements, acronym_replacements=None,
         return line, 0
 
     content, label_placeholders = _mask_label_commands(content)
+    content, newsym_key_placeholders = _mask_newsym_keys(content)
 
     stripped = content.strip()
     if equation_line and stripped.startswith((r"\begin", r"\end", r"\label", r"\tag", r"\nonumber", r"\notag")):
-        return _restore_label_commands(content, label_placeholders) + comment, 0
+        restored = _restore_newsym_keys(content, newsym_key_placeholders)
+        return _restore_label_commands(restored, label_placeholders) + comment, 0
 
     total = 0
     if equation_line:
         updated, count = replace_glossary_refs_in_span(content, replacements)
         total += count
+        updated = _restore_newsym_keys(updated, newsym_key_placeholders)
         return _restore_label_commands(updated, label_placeholders) + comment, total
 
     spans = ts.get_math_spans(content)
     if not spans:
         updated, count = replace_acronym_refs_in_span(content, acronym_replacements)
         total += count
+        updated = _restore_newsym_keys(updated, newsym_key_placeholders)
         return _restore_label_commands(updated, label_placeholders) + comment, total
 
     pieces = []
@@ -319,6 +349,7 @@ def replace_glossary_refs_in_line(line, replacements, acronym_replacements=None,
     pieces.append(prose_updated)
     total += prose_count
     updated = "".join(pieces)
+    updated = _restore_newsym_keys(updated, newsym_key_placeholders)
     return _restore_label_commands(updated, label_placeholders) + comment, total
 
 

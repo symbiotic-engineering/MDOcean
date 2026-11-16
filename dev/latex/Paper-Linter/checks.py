@@ -201,6 +201,16 @@ def check_glossary_acronym_refs():
     return _check_glossary_replacements(False, True)
 
 
+def check_acronym_glossary_format():
+    warns = []
+    for i, line in enumerate(ts.tex_lines_clean):
+        _, span = actions.acronym_glossary_format_line(line)
+        if span is not None:
+            warns.append((i, "Acronym glossary commands should use glsxtr forms", span))
+            break
+    return warns
+
+
 def check_glossary_refs():
     return _check_glossary_replacements(True, True)
 
@@ -1226,6 +1236,7 @@ checks = [
     (check_mathmode_subscripts,         CATEGORY_TYPOGRAPHY, "mathmode-subscripts", actions.fix_mathmode_subscripts_in_file),
     (check_glossary_symbol_refs,        CATEGORY_REFERENCE,  "glossary-symbol-refs", actions.fix_symbol_glossary_refs_in_file),
     (check_glossary_acronym_refs,       CATEGORY_REFERENCE,  "glossary-acronym-refs", actions.fix_acronym_glossary_refs_in_file),
+    (check_acronym_glossary_format,     CATEGORY_REFERENCE,  "glossary-acronym-format", actions.fix_acronym_glossary_format_in_file),
     (check_glossary_unused,             CATEGORY_REFERENCE,  "glossary-unused", actions.fix_glossary_unused),
     (check_glossary_missing_description, CATEGORY_REFERENCE, "glossary-missing-description"),
     (check_glossary_symbol_duplicate,   CATEGORY_REFERENCE,  "glossary-symbol-duplicate", actions.fix_glossary_symbol_duplicate),

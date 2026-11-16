@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+### Fixed
+- **Dev:** Add paper-linter checks for modern acronym glossary commands and context-sensitive short acronym references.
+- **Dev:** Preserve the first argument of `\newsym` declarations during glossary replacement.
+
 ## [v1.5.2](https://github.com/symbiotic-engineering/MDOcean/releases/tag/v1.5.2) - 2026-9-16
 ### Added
 - CI/pipeline: Created workflow and pipeline stages for executing a dvc merge of upstream branch

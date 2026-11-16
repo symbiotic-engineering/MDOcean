@@ -128,6 +128,80 @@ def fix_preferred_terminology_in_file(path):
     return _rewrite_lines(path, lambda line: preferred_terminology_line(line)[0])
 
 
+ACRONYM_CONTEXT_COMMANDS = ("newsym", "caption", "section", "subsection", "subsubsection", "paragraph")
+
+
+def _find_braced_argument(text, start):
+    if start >= len(text) or text[start] != "{":
+        return None
+
+    depth = 0
+    for index in range(start, len(text)):
+        if text[index] == "{" and (index == 0 or text[index - 1] != "\\"):
+            depth += 1
+        elif text[index] == "}" and (index == 0 or text[index - 1] != "\\"):
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _rewrite_contextual_acronym_refs(line):
+    updated = re.sub(r"\\acrshort(?=\s*\{)", r"\\glsxtrshort", line)
+    updated = re.sub(r"\\acrlong(?=\s*\{)", r"\\glsxtrlong", updated)
+
+    command_pattern = re.compile(
+        r"\\(?P<command>" + "|".join(ACRONYM_CONTEXT_COMMANDS) + r")\*?"
+    )
+    replacements = []
+    for match in command_pattern.finditer(updated):
+        cursor = match.end()
+        arguments = []
+        while cursor < len(updated):
+            while cursor < len(updated) and updated[cursor].isspace():
+                cursor += 1
+            if cursor < len(updated) and updated[cursor] == "[":
+                optional_end = updated.find("]", cursor + 1)
+                if optional_end == -1:
+                    break
+                cursor = optional_end + 1
+                continue
+            if cursor >= len(updated) or updated[cursor] != "{":
+                break
+            argument_end = _find_braced_argument(updated, cursor)
+            if argument_end is None:
+                break
+            arguments.append((cursor + 1, argument_end))
+            cursor = argument_end + 1
+            if match.group("command") != "newsym":
+                break
+
+        for start, end in arguments:
+            body = updated[start:end]
+            rewritten = re.sub(
+                r"\\gls\{(acr-[^{}]+)\}",
+                r"\\glsxtrshort{\1}",
+                body,
+            )
+            if rewritten != body:
+                replacements.append((start, end, rewritten))
+
+    for start, end, replacement in reversed(replacements):
+        updated = updated[:start] + replacement + updated[end:]
+    return updated
+
+
+def acronym_glossary_format_line(line):
+    updated = _rewrite_contextual_acronym_refs(line)
+    if updated == line:
+        return line, None
+    return updated, (0, len(line))
+
+
+def fix_acronym_glossary_format_in_file(path):
+    return _rewrite_lines(path, lambda line: acronym_glossary_format_line(line)[0])
+
+
 def collect_unused_macro_definitions(text):
     definitions = []
     patterns = [

@@ -40,6 +40,34 @@ def test_preferred_terminology_fail_texts_are_rewritten():
         assert span == (0, len(original))
 
 
+def test_acronym_glossary_format_rewrites_global_and_contextual_commands():
+    line = (
+        r"\newsym{key}{x}{Uses \gls{acr-wec} and \acrlong{acr-mdo}} "
+        r"\caption{A \gls{acr-pto}} "
+        r"\section{The \gls{acr-wec}} "
+        r"Text \acrshort{acr-rm3}."
+    )
+
+    updated, span = actions.acronym_glossary_format_line(line)
+
+    assert updated == (
+        r"\newsym{key}{x}{Uses \glsxtrshort{acr-wec} and \glsxtrlong{acr-mdo}} "
+        r"\caption{A \glsxtrshort{acr-pto}} "
+        r"\section{The \glsxtrshort{acr-wec}} "
+        r"Text \glsxtrshort{acr-rm3}."
+    )
+    assert span == (0, len(line))
+
+
+def test_acronym_glossary_format_preserves_gls_outside_contexts():
+    line = r"Text \gls{acr-wec} and \glsxtrshort{acr-mdo}."
+
+    updated, span = actions.acronym_glossary_format_line(line)
+
+    assert updated == line
+    assert span is None
+
+
 def test_symbol_to_glossary_label_prime_and_star_cases():
     assert gs.symbol_to_glossary_label("p^{'}_F") == "sym-p-prime-F"
     assert gs.symbol_to_glossary_label(r"p_\prime_F") == "sym-p-prime-F"
@@ -201,6 +229,35 @@ def test_replace_glossary_refs_skips_acronyms_inside_href_commands():
     assert r"\href{https://example.com/WEC}{WEC documentation}" in updated
     assert updated.endswith(r"and \gls{acr-wec} here")
     assert count == 1
+
+
+def test_replace_glossary_refs_preserves_newsym_key_but_replaces_other_arguments():
+    line = r"\newsym{WEC}{WEC}{WEC description}"
+    acronym_replacements = [("WEC", r"\gls{acr-wec}")]
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        {},
+        acronym_replacements=acronym_replacements,
+        equation_line=False,
+    )
+
+    assert updated == r"\newsym{WEC}{\gls{acr-wec}}{\gls{acr-wec} description}"
+    assert count == 2
+
+
+def test_replace_glossary_refs_preserves_newsym_key_for_symbol_replacements():
+    line = r"\newsym{x}{x}{x}"
+    replacements = {msp.symbol_key(msp.canonicalize_symbol("x")): "sym-x"}
+
+    updated, count = gs.replace_glossary_refs_in_line(
+        line,
+        replacements,
+        equation_line=True,
+    )
+
+    assert updated == r"\newsym{x}{\gls{sym-x}}{\gls{sym-x}}"
+    assert count == 2
 
 
 def test_read_acronym_replacements_accepts_multiple_seed_files():
