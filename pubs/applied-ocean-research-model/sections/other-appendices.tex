@@ -55,13 +55,13 @@ This intends to lower the likelihood of creating saturation behavior (where a di
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Dynamics and Control Module Details}
+\section{\gls{acr-dyn} and Control Module Details}
 This section provides supplementary derivations and implementation details for the dynamics and control module.
 
 \subsection{Multiport Model Details}
 \input{sections/multiport-appendix}
 
-\subsection{Optimal Control Details}
+\subsection{\gls{acr-oc} Details}
 \input{sections/optimal-control-appendix}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,7 +114,7 @@ While determining the exact source of the error requires further investigation, 
 Moving to the bottom left corner of \Cref{fig:dynamic-validation}, we examine the effect of the error in MDOcean's \gls{acr-meem} hydrodynamic coefficients on its dynamic power production.
 The error closely aligns with the error in the identical hydro coefficient case, including the large errors at longer wave periods, confirming that the small error in the \gls{acr-meem} hydro coefficients has minimal effect on the overall dynamic response.
 Finally, the bottom right corner of \Cref{fig:dynamic-validation} shows the combined effect of drag and hydro coefficient errors, which is the best representation of MDOcean's total dynamic error in the absence of further model improvements.
-Power is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
+\gls{acr-pwr} is underpredicted by up to 40\% at sea states with moderate (10-12s) periods and low wave heights, and overpredicted at both shorter and longer wave periods.
 This results in a beneficial positive and negative error cancellation that explains the low error in weighted average power described in \Cref{sec:dynamic-validation}.
 Meanwhile, MDOcean underpredicts the peak power by around 25\%.
 Error scales more closely with wave period than wave height for periods under 12 seconds, while the opposite is true for periods above 12 seconds.
@@ -219,7 +219,7 @@ The discrepancy is of minimal concern for the reasons described in \Cref{sec:dyn
 Nonetheless, researchers and practitioners should be aware of the inconsistency and exercise caution before using the reference model report's power values for technology benchmarking or model validation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Power Matrix Decomposition}
+\subsection{\gls{acr-pwr} Matrix Decomposition}
 \label{sec:appendix-power-decomposition}
 
 The efficiency matrices introduced in \Cref{eq:power-matrix-decomposition} are defined as follows.
@@ -292,7 +292,7 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
          \gls{acr-cbs} Category&  Nominal \% for $\gls{sym-N-WEC}=1$& Nominal \% for $\gls{sym-N-WEC}=100$&Scales with design?\\\hline
          1.1 - Development&  26\%&  3\%&No\\
          1.2 - Infrastructure&  6\%&  4\%&No\\
-         1.3 - Mooring/Foundation&  3\%&  12\%&No\\
+         1.3 - \gls{acr-moor}/Foundation&  3\%&  12\%&No\\
          1.4 - Structural&  17\%&  46\%&$\gls{sym-V-struct}$\\
          1.5 - \gls{acr-pto}&  4\%&  11\%&$\gls{sym-F-max}, \gls{sym-P-max}$\\
          1.6 - Integration \& Profit Margin&  2\%&  6\%&No\\
@@ -311,7 +311,7 @@ Percentages are shown for both single-device ($\gls{sym-N-WEC}=1$) and array ($\
     \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Power-Law Scaling with Number of Devices}
+\subsection{\gls{acr-pwr}-Law Scaling with Number of Devices}
 \label{sec:appendix-econ-power-law}
 
 The per-\gls{acr-wec} unit costs and prices in \Cref{eq:unit-cost}
@@ -344,7 +344,7 @@ and are tabulated in \Cref{tab:econ-model-values}.
          \gls{acr-cbs} Category& Expo. $\gls{sym-beta-expo}$&Unit cost at scale $\gls{sym-C-infty}$&Single-unit cost \newline $\gls{sym-C-1}$\\\hline
          \textbf{1.1-1.3, 1.6-1.9} - Design-Indep. \gls{acr-capex}& 0.741& 1.24 \$M &13.92 \$M\\
          \textbf{1.4} - Structural \gls{acr-capex} & 0.481& 2.387 \$/kg&4.294 \$/kg\\
-         \textbf{1.5} - \gls{acr-pto} \gls{acr-capex}& 0.206& Constant: 92.59 \$k Power: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k Power: 1.355 \$/W Force: 0.0204 \$/N\\
+         \textbf{1.5} - \gls{acr-pto} \gls{acr-capex}& 0.206& Constant: 92.59 \$k \gls{acr-pwr}: 0.4454 \$/W Force: 0.0086 \$/N &Constant: 93.64 \$k \gls{acr-pwr}: 1.355 \$/W Force: 0.0204 \$/N\\
  \textbf{2.1-2.6} - \gls{acr-opex}&0.557& 0&1.193 \$M\\
     \endtabular
     \end{table}
@@ -377,7 +377,7 @@ The \gls{acr-nrel} \gls{acr-sam} assumes that hydraulic \gls{acr-pto} cost scale
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Structures Module Details}
+\section{\gls{acr-str} Module Details}
 \label{sec:appendix-structures}
 Inputs to the structures module include forces, bulk and structural dimensions, and material constants.
 It outputs a factor of safety for each limit case.
@@ -696,8 +696,8 @@ meaning that local buckling of the tube as a plate element is not a concern \cit
 
 \begin{tabular}{cP{0.35\linewidth}P{0.3\linewidth}c}
 \textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Units}  \\ \hline
-$\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$m^3$  \\ 
-$\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$s^2$  \\ 
+$\gls{sym-rho-w}$ & Seawater density& 1000 & kg/$\gls{sym-m}^3$  \\ 
+$\gls{sym-g}$& Acceleration of gravity& 9.8 & m/$\gls{sym-s}^2$  \\ 
 $\gls{sym-h}$& Water depth & 100 & m  \\ 
 \gls{acr-jpd}& Wave joint probability distribution & read from file \citep{janzou_sam_2022}  &\%  \\ 
 $\gls{sym-H-s}$ & Significant wave height \citep{janzou_sam_2022}& 0.25 : 0.5 : 6.75  & m  \\ 
@@ -705,7 +705,7 @@ $H_{s,\text{struct}}$ & 100 year wave height \citep{berg_extreme_2011}& [13.4, 1
 $\gls{sym-T-e}$& Wave energy period \citep{janzou_sam_2022}& 4.5 : 1 : 18.5  & s  \\ 
 $T_{\text{struct}}$ & 100 year wave peak period \citep{berg_extreme_2011}& [5.57 8.76 12.18 17.26 21.09 24.92 31.70] & s  \\ 
 $\gls{sym-sigma-Y}$ & Material yield strength& 248 & MPa  \\ 
-$\gls{sym-rho-M}$ & Material density& 7850 & kg/$m^3$  \\ 
+$\gls{sym-rho-M}$ & Material density& 7850 & kg/$\gls{sym-m}^3$  \\ 
 $\gls{sym-E}$& Material Young's modulus& 200 & GPa  \\ 
 $\text{cost}_{\gls{sym-M}}$ & Material cost& 1.89 & \$/kg \\ 
 %$t_{ft}$ & \begin{tabular}[c]{@{}c@{}}Surface Float Top Plate\vspace{-1.5 mm} \\ Thickness\end{tabular} & 0.013 & m  \\ 

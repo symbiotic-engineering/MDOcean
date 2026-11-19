@@ -5,7 +5,8 @@ stages:
     always_changed: true
     deps:
       - .calkit/env-locks/openflash-on-branch
-      - .calkit/env-locks/openflash-on-main
+      - .calkit/env-locks/openflash-on-branch-tex
+      - .calkit/env-locks/openflash-on-main-tex
       - .calkit/env-locks/tex
       - .calkit/notebooks/cleaned/analysis/convergence-results.ipynb
       - .calkit/notebooks/cleaned/analysis/low_m0_plots.ipynb
@@ -20,6 +21,9 @@ stages:
       - analysis/data/slope-slants.pkl
       - analysis/sea-lab-utils
       - calkit.yaml
+      - dev/python/convergence-study/i-region-convergence/middle-region/data/predetermined-4.pkl
+      - dev/python/convergence-study/prediction/data/random-four-body-regions.pkl
+      - dev/python/convergence-study/prediction/data/random-three-body-regions.pkl
       - dev/python/limiting-cases/low_m0.py
       - package/src
       - pubs/JFM/FLMguide.tex
@@ -30,11 +34,13 @@ stages:
       - pubs/JFM/glossary/glossary-setup.tex
       - pubs/JFM/glossary/glossary-symbols-jfm.tex
       - pubs/JFM/glossary/glossary-symbols-shared.tex
+      - pubs/JFM/glossary/no-appendix-glossary.tex
       - pubs/JFM/jfm-appendix.tex
       - pubs/JFM/jfm.bib
       - pubs/JFM/jfm.bst
       - pubs/JFM/lineno-FLM.sty
       - pubs/JFM/zotero-meem-refs.bib
+      - pyproject.toml
     outs:
       - .calkit/notebooks/executed/analysis/convergence-results.ipynb:
           cache: false
@@ -6432,12 +6438,12 @@ stages:
       addpath('tests'); run_tests('AOR')\""
     deps:
       - tests/
+      - mdocean/SAFE/
       - mdocean/__version__.py
       - mdocean/analysis/
       - mdocean/inputs/
       - mdocean/optimization/
       - mdocean/plots/
-      - mdocean/SAFE/
       - mdocean/simulation/modules/dynamics/
       - mdocean/simulation/modules/econ/
       - mdocean/simulation/modules/enviro.m
@@ -6518,12 +6524,12 @@ stages:
       addpath('tests'); run_tests('RE')\""
     deps:
       - tests/
+      - mdocean/SAFE/
       - mdocean/__version__.py
       - mdocean/analysis/
       - mdocean/inputs/
       - mdocean/optimization/
       - mdocean/plots/
-      - mdocean/SAFE/
       - mdocean/simulation/modules/dynamics/
       - mdocean/simulation/modules/econ/
       - mdocean/simulation/modules/enviro.m
@@ -8084,14 +8090,17 @@ stages:
       - pubs/applied-ocean-research-model/zotero-meem-refs.bib
       - pubs/applied-ocean-research-model/shared-pkg.tex
       - dev/latex/Paper-Linter/params-aor.txt
-      - pubs/applied-ocean-research-model/glossary/
+      - pubs/applied-ocean-research-model/glossary/glossary-symbols-aor-dynamics.tex
+      - pubs/applied-ocean-research-model/glossary/glossary-symbols-aor-meem.tex
+      - pubs/applied-ocean-research-model/glossary/glossary-symbols-aor-static.tex
+      - pubs/applied-ocean-research-model/glossary/glossary-symbols-shared.tex
       - dev/latex/Paper-Linter/settings.txt
       - .calkit/env-locks/pubs
     outs:
       - dev/latex/Paper-Linter/lint-aor.txt:
           cache: false
           persist: false
-      - pubs/shared/glossary/glossary-symbols-aor-generated.tex:
+      - pubs/applied-ocean-research-model/glossary/glossary-symbols-aor-generated.tex:
           cache: false
           persist: false
     always_changed: true
@@ -8161,13 +8170,15 @@ stages:
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - dev/latex/Paper-Linter/params-jfm.txt
       - dev/latex/Paper-Linter/settings.txt
-      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-acronyms.tex
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-jfm.tex
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-shared.tex
       - .calkit/env-locks/pubs
     outs:
       - dev/latex/Paper-Linter/lint-jfm.txt:
           cache: false
           persist: false
-      - pubs/shared/glossary/glossary-symbols-jfm-generated.tex:
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-jfm-generated.tex:
           cache: false
           persist: false
     always_changed: true
@@ -8193,6 +8204,10 @@ stages:
       - pubs/renewable-energy-mdo/glossary/
       - pubs/renewable-energy-mdo/cas-common.sty
       - .calkit/env-locks/tex
+      - pubs/renewable-energy-mdo/cas-model2-names.bst
+      - pubs/renewable-energy-mdo/figs/methodology_flowchart_dissertation.pdf
+      - pubs/shared/figure-widths.tex
+      - pubs/shared/table-column-specs.tex
       - pubs/renewable-energy-mdo/.latexmkrc
     outs:
       - pubs/renewable-energy-mdo/mdocean.pdf
@@ -8222,6 +8237,12 @@ stages:
       - pubs/applied-ocean-research-model/cas-common.sty
       - pubs/applied-ocean-research-model/glossary/
       - .calkit/env-locks/tex
+      - pubs/applied-ocean-research-model/appendices.tex
+      - pubs/applied-ocean-research-model/content.tex
+      - pubs/applied-ocean-research-model/figs/two_port_dimension_coeff_chain.pdf
+      - pubs/applied-ocean-research-model/stars-cc-by-sa.tex
+      - pubs/shared/figure-widths.tex
+      - pubs/shared/table-column-specs.tex
       - pubs/applied-ocean-research-model/.latexmkrc
     outs:
       - pubs/applied-ocean-research-model/main.pdf
@@ -8286,6 +8307,7 @@ stages:
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/jfm.bib
       - mdocean/simulation/modules/OpenFLASH/pubs/JFM/zotero-meem-refs.bib
       - .calkit/env-locks/tex
+      - mdocean/simulation/modules/OpenFLASH/pubs/JFM/glossary/glossary-symbols-jfm.tex
     outs:
       - pubs/dissertation/sampleThesis.pdf
       - pubs/dissertation/aux/:

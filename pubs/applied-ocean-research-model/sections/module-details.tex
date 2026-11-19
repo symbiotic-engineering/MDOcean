@@ -5,7 +5,7 @@
 \label{sec:modules}
 \ifdefined\DISSERTATION
     The five modules (geometry, hydrodynamics, dynamics and controls, structures, and economics) will now be described one at a time.
-    For notation, unbolded unarrowed variables refer to scalars (e.g. $\gls{sym-x}$ or $X$), arrowed variables refer to vectors ($\gls{sym-vec-x}$ or $\vec{X}$), and bold variables refer to matrices ($\gls{sym-mathbf-x}$ or $\gls{sym-mathbf-X}$).
+    For notation, unbolded unarrowed variables refer to scalars (e.g. $\gls{sym-x}$ or $X$), arrowed variables refer to vectors ($\gls{sym-vec-x}$ or $\gls{sym-vec-X}$), and bold variables refer to matrices ($\gls{sym-mathbf-x}$ or $\gls{sym-mathbf-X}$).
     For dynamic (time-varying) quantities, the time domain representation is denoted $\gls{sym-x}(\gls{sym-t})$, and can also be represented as the real part of a complex signal $\gls{sym-x}(\gls{sym-t})=\Re\left[\gls{sym-tilde-x}(\gls{sym-t})\right]$.
     Assuming the signal is sinusoidal, the complex signal can be expressed as $\gls{sym-tilde-x}(\gls{sym-t})=\gls{sym-hat-X}\exp(i\gls{sym-omega} \gls{sym-t})$ with complex phasor $\gls{sym-hat-X}=|\gls{sym-hat-X}|\exp(i\angle \gls{sym-hat-X})$ and angular frequency $\gls{sym-omega}$.
     Altogether, this gives $\gls{sym-x}(\gls{sym-t})=|\gls{sym-hat-X}|\cos(\gls{sym-omega} \gls{sym-t}+\angle\gls{sym-hat-X})$.
@@ -18,10 +18,10 @@
 \fi
 %TC:break Geometry
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Geometry}\label{sec:geom}
+\subsection{\gls{acr-geo}}\label{sec:geom}
 The geometry module computes submerged volume $\gls{sym-V-sub}$, structural volume $\gls{sym-V-struct}$, and associated hydrostatic properties from bulk dimensions.
 \Cref{fig:dims} defines the principal geometric variables, where $\gls{sym-T-draft}$ denotes drafts, $\gls{sym-h}$ heights, and $\gls{sym-D}$ diameters.
-Subscripts $f$, $s$, and $d$ refer to the float, spar, and damping plate, respectively.
+Subscripts $\gls{sym-f}$, $\gls{sym-s}$, and $d$ refer to the float, spar, and damping plate, respectively.
 Key points include the center of buoyancy $\gls{sym-B}$, center of gravity $\gls{sym-G}$, the keel $\gls{sym-K-keel}$, and metacenter $\gls{sym-M-metacenter}$ for the combined system.
 Additional structural dimensions and thickness definitions are provided in \Cref{sec:structures}.
 
@@ -83,7 +83,7 @@ A two-body heaving point absorber that rigidly locks the bodies in a storm follo
         \gls{sym-gamma-m}
     \end{bmatrix}.
 \end{equation}
-with subscripts for the float ($f$), spar ($s$), their coupling ($c$), and the merged float-spar ($m$).
+with subscripts for the float ($\gls{sym-f}$), spar ($\gls{sym-s}$), their coupling ($\gls{sym-c}$), and the merged float-spar ($\gls{sym-m}$).
 Operational hydrodynamic matrices are symmetric $2\times 2$:
 \begin{equation}\label{eq:op-hydro-coeffs}
 \begin{aligned}
@@ -211,7 +211,7 @@ Any violations are corrected by adjusting the coupling terms $\gls{sym-A-c}$ and
 
 %TC:break Dynamics and Control
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Dynamics and Control}\label{sec:dynamics}
+\subsection{\gls{acr-dyn} and Control}\label{sec:dynamics}
 This subsection introduces the dynamics and control modeling assumptions before detailing the frequency-domain methods and control formulations.
 
 %%%%%%%%%%%%%%%
@@ -280,7 +280,7 @@ Avoiding iterative numerical optimization substantially reduces computational co
 \Cref{fig:mod-freq-domain-synthesis,fig:mod-freq-domain-evaluation,fig:mod-freq-domain-combined} distinguish three application workflows for the \gls{acr-qlps} method: control synthesis (the design of a potentially nonlinear controller to obey constraints and maximize performance of the quasi-linearized system), evaluation (simulation of an arbitrary controller's power performance, where the controller, plant, or both are nonlinear), and both.
 
 MDOcean uses \gls{acr-qlps} for both control synthesis and evaluation.
-In prior wave energy studies, related approaches have been used for evaluation, with simplified treatments of constraints (see F+ and PI+ entries in \Cref{tab:lit}).
+In prior wave energy studies, related approaches have been used for evaluation, with simplified treatments of constraints (see F+ and \gls{acr-pi}+ entries in \Cref{tab:lit}).
 We refer to these as the modified frequency-domain family of methods, of which \gls{acr-qlps} is the most accurate and optimal.
 In contrast, the present work applies \gls{acr-qlps} and other modified frequency-domain methods to control synthesis, enabling nonlinear controller design within a frequency-domain formulation.
 This differs from linearization approaches such as stochastic linearization, which are generally limited to linear controller design.
@@ -322,7 +322,7 @@ However, in the special case where the only time-domain constraint is on the con
 \label{tab:constraint-approaches}
 \begin{tabular}{M{.03\linewidth} >{\raggedright\arraybackslash}m{0.45\linewidth}l l}
 &\textbf{Method} & \textbf{Accuracy} & \textbf{Optimality} \\ \toprule
-M1 & Nonlinear optimal (M1.1) or near-optimal (M1.2) controller, quasi-linearized via describing functions& \Stars{3} &\Stars{3} \\ \hline
+M1 & \gls{acr-nl} optimal (M1.1) or near-optimal (M1.2) controller, quasi-linearized via describing functions& \Stars{3} &\Stars{3} \\ \hline
 M2 & Linear optimal controller& \Stars{3} & \Stars{2} \\ \hline
 M3 & Saturate or zero the times with constraint violations, neglecting the effect on other signals& \Stars{2} & \Stars{1}\\ \hline
 M4 & Saturate or zero entire sea state& \Stars{1} & \Stars{0.5} \\ \hline
@@ -401,8 +401,8 @@ The describing function for control force is prioritized due to its simpler impl
          Drag& Describing function (M1.2) for $\sin(\gls{sym-omega} \gls{sym-t})|\sin(\gls{sym-omega} \gls{sym-t})|$ with iteration to find effect on response and optimal controller\\
          Force limit& Describing function (M1.2) for $\text{sat}(\sin(\gls{sym-omega} \gls{sym-t}))$ with iteration to find effect on response and optimal controller\\
         Operational amplitude limit& Optimal linear controller (M2)\\
-         Power limit& Average value of $\text{sat}(\sin(\gls{sym-omega} \gls{sym-t})+\gls{sym-a})$, neglecting any effect on response and optimal controller (M3)\\
-        Storm amplitude limit&Optimizer considers limit violations as infeasible designs (M5)\\
+         \gls{acr-pwr} limit& Average value of $\text{sat}(\sin(\gls{sym-omega} \gls{sym-t})+\gls{sym-a})$, neglecting any effect on response and optimal controller (M3)\\
+        \gls{acr-sto} amplitude limit&Optimizer considers limit violations as infeasible designs (M5)\\
     \end{tabular}
     \end{table}
 
@@ -522,7 +522,7 @@ The Thévenin equivalent circuit method is used to find the effective intrinsic 
 Details and circuit diagrams are provided in \Cref{sec:appendix-pto-dynamics}.
 
 %%%%%%%%%%%%%%%
-\subsubsection{Power Production}\label{sec:power}
+\subsubsection{\gls{acr-pwr} Production}\label{sec:power}
 The instantaneous time-domain power at any port is simply the product of the port effort and flow variables, $\gls{sym-p}(\gls{sym-t}) = \gls{sym-e-t}~\gls{sym-q-t}$.
 \ifdefined\DISSERTATION
     Substituting $\{\gls{sym-e},\gls{sym-q}\}=\{\gls{sym-F-p},\gls{sym-dot-xi}\}$ yields the floating body mechanical power,
@@ -576,7 +576,7 @@ The full expansion of $\gls{sym-p-avg-elec}$ and $\gls{sym-p-pk-elec}$ in terms 
 %The time-domain mechanical power is $\gls{sym-P}_{\text{mech}}(\gls{sym-t}) = \gls{sym-tau}(\gls{sym-t}) \gls{sym-Omega}(\gls{sym-t}) = (\gls{sym-B-u} \gls{sym-Omega}(\gls{sym-t}) + \gls{sym-K-u} \gls{sym-theta}(\gls{sym-t}) ) \gls{sym-Omega}(\gls{sym-t}) $, where $\gls{sym-theta}(\gls{sym-t})$ is the generator rotational position. Assuming sinusoidal waveforms, the time-average and peak mechanical power in a given sea state are then
 
 %%%%%%%%%%%%%%%
-\subsubsection{Optimal Control}\label{sec:optimal-control}
+\subsubsection{\gls{acr-oc}}\label{sec:optimal-control}
 This subsection presents the unconstrained and constrained optimal-control solutions used in the model.
 \paragraph{Unconstrained}
 In the absence of constraints, maximizing power at a given port requires impedance matching at that port due to the maximum power transfer theorem.
@@ -731,7 +731,7 @@ $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (
     \citet[Appendix A.3.3]{mccabe_dissertation_2026} describes the numerical-indirect approach.
 \fi
 
-\paragraph{Nonlinear controller}
+\paragraph{\gls{acr-nl} controller}
 \ifdefined\DISSERTATION
     For the nonlinear controller, the maximum generator torque constraint is considered separately from the others.
     This constraint changes the optimal torque signal from a pure sinusoid to a saturated waveform, approaching a square wave for sufficiently low torque limit.
@@ -756,7 +756,7 @@ $\gls{sym-Gamma}_{\text{opt}}=0$ corresponds to the impedance-matched solution (
     \includegraphics[\FigureOptions{aor:figs/from-matlab/drag_desc_fcn.pdf}]{figs/from-matlab/drag_desc_fcn.pdf}
     \caption{Quadratic drag}\label{fig:drag-df}
 \end{subfigure}
-\caption[Conceptual demonstration of describing function approximations]{Conceptual demonstration of describing function approximations. Plots show force versus time. Nonlinear signals in red; fundamental amplitudes in blue.}\label{fig:desc-fcns}
+\caption[Conceptual demonstration of describing function approximations]{Conceptual demonstration of describing function approximations. Plots show force versus time. \gls{acr-nl} signals in red; fundamental amplitudes in blue.}\label{fig:desc-fcns}
 \end{figure}
 Details of the calculation are provided in \Cref{sec:appendix-force-sat}.
 The result is updated effective values for control gains $\gls{sym-B-l}$ and $\gls{sym-K-l}$ that represent the nonlinear saturated controller with a torque that obeys the constraint and is used in place of \Cref{eq:constrained-qp-solution}.
@@ -847,7 +847,7 @@ The \gls{acr-jpd} used in this analysis represents wave conditions in Humboldt B
 \begin{figure}[b!]
 \centering
 \includegraphics[\FigureOptions{aor:figs/manual/jpd_mult.pdf}]{figs/manual/jpd_mult.pdf}
-\caption{Power matrix multiplication}
+\caption{\gls{acr-pwr} matrix multiplication}
 \label{fig:JPD-multiply}
 \end{figure}
 
@@ -926,7 +926,7 @@ This approximation can either under- or overestimate the true peak depending on 
 \label{tab:DLCs}
 \begin{tabular}{P{0.28\linewidth}P{0.3\linewidth}P{0.33\linewidth}}
     & \multicolumn{2}{c}{\textbf{Design Loadcase}}\\\cline{2-3}
-    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: Storm}\\ \hline
+    \textbf{Variable}& \textbf{1: Operational}&\textbf{2: \gls{acr-sto}}\\ \hline
     \parbox[m]{\linewidth}{\centering \vspace{8pt}
     Peak powertrain force, $\max_{\gls{sym-t}} |\gls{sym-F-p}(\gls{sym-t})|$ \vspace{8pt} }
         & \parbox[m]{\linewidth}{\centering
@@ -1084,8 +1084,8 @@ This regular wave assumption avoids the time-consuming convolution integral or s
 
 % Approximation accuracy discussion. Trim closing clause for AOR.
 In the absence of dynamic constraints, the regular wave assumption does not significantly affect power production if the ultimate design utilizes a high-order linear controller capable of impedance matching over the bandwidth of each sea state.
-If the ultimate design instead utilizes a simple PI controller, the assumption slightly overestimates the power produced in a broadband wave environment.
-\citet{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with PI control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
+If the ultimate design instead utilizes a simple \gls{acr-pi} controller, the assumption slightly overestimates the power produced in a broadband wave environment.
+\citet{coe_practical_2021} used a Bretschneider spectrum and found the irregular wave power generation for a point absorber with \gls{acr-pi} control to be around 92\% of the perfectly matched power, which is sufficiently close to justify the approximation for early design phases without worrying about the complexity tradeoff of controller order.
 
 \ifdefined\DISSERTATION
     Nonetheless, irregular time-domain transient peaks and the variation of hydrodynamic coefficients over the spectral width of each individual sea state are not considered.
@@ -1098,7 +1098,7 @@ If the ultimate design instead utilizes a simple PI controller, the assumption s
 
 %TC:break Structures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Structures}\label{sec:structures}
+\subsection{\gls{acr-str}}\label{sec:structures}
 The MDOcean structures module uses forces from the dynamics module as well as area and volume outputs from the geometry module to calculate the factors of safety for various structural failure modes.
 The factors of safety represent the multiplicative increase in force before stress would surpass peak limits for storm loads and the endurance limit under operational loads.
 
